@@ -1,0 +1,8 @@
+2026-07-11 10:00:01 INFO Application started
+2026-07-11 10:00:05 INFO Connecting to database
+2026-07-11 10:00:06 ERROR Connection refused
+2026-07-11 10:00:07 ERROR Connection refused
+2026-07-11 10:00:10 WARNING Request taking too long
+2026-07-11 10:00:15 ERROR Request timeout
+2026-07-11 10:00:20 INFO Retrying request
+2026-07-11 10:00:25 ERROR Connection refused
