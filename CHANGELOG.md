@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-The format loosely follows Keep a Changelog.
+This project loosely follows the principles of Keep a Changelog.
 
 ---
 
@@ -10,11 +10,13 @@ The format loosely follows Keep a Changelog.
 
 ### Added
 
-- Engineering foundation
-- Cursor IDE configuration
-- MSYS2 UCRT64 toolchain
-- CMake build configuration
-- Debugging support
-- Automatic formatting
-- Repository structure
-- Developer setup guide
+- Established engineering foundation.
+- Configured MSYS2 UCRT64 toolchain.
+- Configured GCC, GDB and CMake.
+- Added Cursor IDE workspace configuration.
+- Added automatic code formatting using clang-format.
+- Added EditorConfig support.
+- Added CMakePresets.json.
+- Added repository structure.
+- Added Developer Setup guide.
+- Added project README.

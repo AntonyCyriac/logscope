@@ -4,17 +4,18 @@
 
 This document describes how to set up a development environment for LogScope.
 
-The goal is that any developer should be able to clone the repository, follow this guide, and build, run, and debug LogScope without additional assistance.
+A developer should be able to clone the repository, follow this guide, and build, run, and debug LogScope successfully.
 
 ---
 
 # Supported Platform
 
-Current supported platform:
+Current development environment:
 
 - Windows 11
 - MSYS2 UCRT64
 - GCC 16.x
+- GDB 17.x
 - CMake 4.x
 - Git
 - Cursor IDE
@@ -28,16 +29,14 @@ Current supported platform:
 | GCC | 16.1.0 |
 | GDB | 17.2 |
 | CMake | 4.4.0 |
-| Git | 2.55.0 |
+| Git | 2.55.x |
 | Cursor | Latest |
 
 ---
 
 # Install MSYS2
 
-Install MSYS2 from the official website.
-
-After installation, use the **UCRT64** environment.
+Install MSYS2 and use the **UCRT64** environment.
 
 Install required packages:
 
@@ -61,7 +60,7 @@ Add the following directory to the Windows User PATH:
 C:\msys64\ucrt64\bin
 ```
 
-Restart Cursor after updating the PATH.
+Restart Cursor after updating PATH.
 
 ---
 
@@ -78,12 +77,12 @@ clang-format --version
 
 ---
 
-# Cursor IDE
+# Cursor Configuration
 
 Install the following extensions:
 
-- C/C++ (Microsoft)
-- CMake Tools (Microsoft)
+- C/C++
+- CMake Tools
 - CMake
 - GitLens
 - Error Lens
@@ -95,7 +94,7 @@ Install the following extensions:
 
 # Repository Configuration
 
-The repository already contains:
+The repository contains project configuration files:
 
 - `.clang-format`
 - `.editorconfig`
@@ -111,36 +110,25 @@ These files should normally not require modification.
 
 # Build
 
-Configure:
-
 ```bash
 cmake -S . -B build
-```
-
-Build:
-
-```bash
 cmake --build build
 ```
 
 ---
 
-# Debugging
+# Debug
 
-Debugging is configured through Cursor.
+Press **F5** in Cursor to:
 
-Press **F5** to:
-
-- Build LogScope
-- Launch the executable
-- Pass the sample log file
+- Build the project
+- Launch LogScope
 - Attach GDB
+- Stop at breakpoints
 
 ---
 
-# Coding Standards
-
-Formatting is automatic.
+# Coding Style
 
 - Format on Save is enabled.
 - `.clang-format` defines the project style.
@@ -150,9 +138,9 @@ Do not manually format source code.
 
 ---
 
-# Git
+# Git Configuration
 
-Recommended configuration:
+Recommended Git configuration:
 
 ```bash
 git config --global core.autocrlf true
@@ -162,16 +150,14 @@ Commit messages follow the Conventional Commits specification.
 
 Examples:
 
-```text
-feat:
-fix:
-docs:
-refactor:
-test:
-build:
-ci:
-chore:
-```
+- feat:
+- fix:
+- docs:
+- refactor:
+- test:
+- build:
+- ci:
+- chore:
 
 ---
 
@@ -183,4 +169,4 @@ Before starting development:
 - [ ] Project builds successfully.
 - [ ] F5 debugging works.
 - [ ] Format on Save works.
-- [ ] `git status` is clean.
+- [ ] Git working tree is clean.
