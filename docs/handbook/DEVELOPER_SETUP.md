@@ -1,28 +1,51 @@
 # Developer Setup
 
-## Purpose
+| Field | Value |
+|-------|-------|
+| Document | Developer Setup |
+| Category | Handbook |
+| Version | 2.0.0 |
+| Status | Approved |
+| Created | 15-07-2026 |
+| Last Updated | 15-07-2026 |
+
+---
+
+# 1. Purpose
 
 This document describes how to set up a development environment for LogScope.
 
-A developer should be able to clone the repository, follow this guide, and build, run, and debug LogScope successfully.
+A developer should be able to:
+
+- Clone the repository.
+- Configure the development environment.
+- Build and run LogScope.
+- Debug the application.
+- Understand the recommended development workflow.
+
+This document focuses on environment setup. Architecture and implementation guidance are provided by the architecture documentation.
 
 ---
 
-# Supported Platform
+# 2. Supported Development Environment
 
-Current development environment:
+The current reference development environment is:
 
-- Windows 11
-- MSYS2 UCRT64
-- GCC 16.x
-- GDB 17.x
-- CMake 4.x
-- Git
-- Cursor IDE
+| Item | Value |
+|------|-------|
+| Operating System | Windows 11 |
+| Shell | MSYS2 UCRT64 |
+| Compiler | GCC 16.x |
+| Debugger | GDB 17.x |
+| Build System | CMake 4.x |
+| Version Control | Git |
+| IDE | Cursor |
+
+Other platforms may be supported in the future, but all development should remain cross-platform whenever practical.
 
 ---
 
-# Required Software
+# 3. Required Software
 
 | Tool | Version |
 |------|---------|
@@ -34,11 +57,11 @@ Current development environment:
 
 ---
 
-# Install MSYS2
+# 4. Install MSYS2
 
 Install MSYS2 and use the **UCRT64** environment.
 
-Install required packages:
+Install the required packages:
 
 ```bash
 pacman -Syu
@@ -52,7 +75,7 @@ mingw-w64-ucrt-x86_64-clang-tools-extra
 
 ---
 
-# Environment Variables
+# 5. Environment Variables
 
 Add the following directory to the Windows User PATH:
 
@@ -60,11 +83,13 @@ Add the following directory to the Windows User PATH:
 C:\msys64\ucrt64\bin
 ```
 
-Restart Cursor after updating PATH.
+Restart Cursor after updating the PATH.
 
 ---
 
-# Verify Installation
+# 6. Verify Installation
+
+Verify the installation using:
 
 ```bash
 g++ --version
@@ -75,15 +100,17 @@ git --version
 clang-format --version
 ```
 
+All commands should execute successfully before proceeding.
+
 ---
 
-# Cursor Configuration
+# 7. Cursor Configuration
 
 Install the following extensions:
 
 - C/C++
-- CMake Tools
 - CMake
+- CMake Tools
 - GitLens
 - Error Lens
 - EditorConfig
@@ -92,53 +119,80 @@ Install the following extensions:
 
 ---
 
-# Repository Configuration
+# 8. Repository Configuration
 
-The repository contains project configuration files:
+The repository includes project configuration files.
 
-- `.clang-format`
-- `.editorconfig`
-- `.gitignore`
-- `CMakePresets.json`
-- `.vscode/launch.json`
-- `.vscode/tasks.json`
-- `.vscode/settings.json`
+```text
+.clang-format
+.editorconfig
+.gitignore
+CMakePresets.json
+.vscode/
+```
 
-These files should normally not require modification.
+These files define the standard development environment and should normally not require modification.
 
 ---
 
-# Build
+# 9. Build
+
+Configure the project:
 
 ```bash
 cmake -S . -B build
+```
+
+Build the project:
+
+```bash
 cmake --build build
 ```
 
 ---
 
-# Debug
+# 10. Run
+
+Run LogScope:
+
+```bash
+./build/logscope.exe samples/sample.log
+```
+
+Adjust the executable path if the build configuration changes.
+
+---
+
+# 11. Debug
 
 Press **F5** in Cursor to:
 
 - Build the project
 - Launch LogScope
 - Attach GDB
-- Stop at breakpoints
+- Stop at configured breakpoints
 
 ---
 
-# Coding Style
+# 12. Coding Style
 
-- Format on Save is enabled.
-- `.clang-format` defines the project style.
-- `.editorconfig` defines editor behavior.
+The project follows a consistent coding style.
 
-Do not manually format source code.
+Configuration is provided by:
+
+- `.clang-format`
+- `.editorconfig`
+
+Guidelines:
+
+- Format on Save should remain enabled.
+- Do not manually reformat code.
+- Keep commits focused and self-contained.
+- Follow the project's engineering principles.
 
 ---
 
-# Git Configuration
+# 13. Git Configuration
 
 Recommended Git configuration:
 
@@ -161,12 +215,88 @@ Examples:
 
 ---
 
-# Verification Checklist
+# 14. Development Workflow
+
+LogScope follows an architecture-first engineering workflow.
+
+```text
+Engineering Principles
+        ↓
+Product Vision
+        ↓
+Requirements
+        ↓
+Architecture
+        ↓
+Implementation
+        ↓
+Testing
+```
+
+Implementation should always follow approved architecture.
+
+---
+
+# 15. Architecture References
+
+Before implementing a new component, review the relevant architecture documentation.
+
+Recommended reading order:
+
+1. Architecture Overview
+2. Architecture Principles
+3. Component Catalog
+4. Domain Model
+5. Data Flow
+6. HLD-001 – Logical Architecture
+
+Developers should understand the target architecture before modifying implementation.
+
+---
+
+# 16. Component-Based Development
+
+Implementation should align with the approved architecture.
+
+Each implementation task should identify:
+
+- Component ID (Cxx)
+- Functional Requirement (FR)
+- Non-Functional Requirement (NFR)
+
+Example:
+
+```text
+Component:
+C03 – Analysis Engine
+
+Implements:
+FR-001 – Analyze Logs
+
+Constrained By:
+NFR-001 – Quality Attributes
+```
+
+This maintains traceability between requirements, architecture, and implementation.
+
+---
+
+# 17. Verification Checklist
 
 Before starting development:
 
+- [ ] Development tools installed.
 - [ ] Project configures successfully.
 - [ ] Project builds successfully.
-- [ ] F5 debugging works.
+- [ ] Debugging works.
 - [ ] Format on Save works.
 - [ ] Git working tree is clean.
+- [ ] Architecture documents reviewed.
+
+---
+
+# 18. Revision History
+
+| Version | Date | Description |
+|----------|------------|-----------------------------|
+| 2.0.0 | 15-07-2026 | Updated to align with the completed engineering design baseline and architecture-driven development workflow. |
