@@ -2,138 +2,246 @@
 
 | Field | Value |
 |-------|-------|
-| Document | DOCUMENT_STANDARD.md |
-| ID | STD-001 |
+| Document | Document Standard |
+| Category | Standards |
 | Version | 1.0.0 |
 | Status | Approved |
-| Owner | Antony Cyriac |
-| Milestone | M2A – Engineering Standards |
+| Created | 15-07-2026 |
+| Last Updated | 15-07-2026 |
 
 ---
 
-# Purpose
+# 1. Purpose
 
-This document defines the standard structure, terminology and quality expectations for every engineering artifact maintained within the LogScope repository.
+This document defines the standard structure, formatting, lifecycle, and quality expectations for all engineering documentation maintained within the project.
 
-The objective is to ensure that documentation remains consistent, maintainable and understandable throughout the lifetime of the project.
+The objective is to ensure that every engineering artifact is consistent, maintainable, reviewable, and traceable throughout the lifetime of the project.
+
+Documentation is treated as an engineering artifact and is maintained with the same discipline as production source code.
 
 ---
 
-# Scope
+# 2. Scope
 
-This standard applies to every engineering artifact under the `docs/` directory unless explicitly stated otherwise.
+This standard applies to every engineering artifact maintained under the `docs/` directory unless explicitly stated otherwise.
 
 Examples include:
 
 - Vision documents
-- Product documents
-- Functional Requirements
-- Non-Functional Requirements
-- Architecture documents
+- Product documentation
+- Functional requirements
+- Non-functional requirements
+- Architecture documentation
 - Decision records
 - Engineering standards
-- Developer handbook
+- Developer handbooks
+- Roadmaps
 
 ---
 
-# Engineering Principles
+# 3. Guiding Principles
 
-Every engineering artifact SHALL:
+Every engineering artifact MUST:
 
 - Have a single purpose.
 - Answer one primary engineering question.
+- Be technically accurate.
+- Be internally consistent.
 - Avoid unnecessary duplication.
 - Reference related artifacts instead of repeating information.
-- Remain technology-independent whenever practical.
 - Be reviewed before approval.
+- Be maintained throughout its lifecycle.
+
+Documentation SHALL evolve together with the system it describes.
 
 ---
 
-# Artifact Categories
+# 4. Artifact Categories
+
+Engineering artifacts are organized by category.
 
 | Category | Purpose |
 |----------|---------|
-| Vision | Why the product exists |
-| Product | What the product is |
-| Requirements | What the product must do |
-| Architecture | How the system is organized |
-| Decisions | Why specific engineering choices were made |
-| Standards | Rules followed by the project |
-| Handbook | Developer onboarding and engineering practices |
-| Roadmap | Planned milestones and future direction |
+| Vision | Defines why the project exists. |
+| Requirements | Defines what the product must do. |
+| Architecture | Defines how the system is organized. |
+| Standards | Defines engineering rules and practices. |
+| Handbook | Defines developer onboarding and workflows. |
+| Roadmap | Defines milestones and future direction. |
+
+Each category answers a different engineering question.
 
 ---
 
-# Document Metadata
+# 5. Directory Structure
 
-Every engineering artifact SHALL begin with a metadata section.
+Engineering documentation SHALL be organized according to its category.
 
 Example:
+
+```text
+docs/
+├── standards/
+├── vision/
+├── requirements/
+│   ├── functional/
+│   └── non_functional/
+├── architecture/
+│   └── adr/
+├── handbook/
+└── roadmap/
+```
+
+Directories represent documentation categories.
+
+Files represent engineering artifacts.
+
+---
+
+# 6. Document Metadata
+
+Every engineering artifact MUST begin with the following metadata.
+
+```markdown
+| Field | Value |
+|-------|-------|
+| Document | Project Charter |
+| Category | Vision |
+| Version | 1.0.0 |
+| Status | Approved |
+| Created | 15-07-2026 |
+| Last Updated | 15-07-2026 |
+```
+
+Metadata fields are defined below.
 
 | Field | Description |
 |------|-------------|
-| Document | Artifact name |
-| ID | Unique identifier |
-| Version | Semantic version |
-| Status | Draft / Review / Approved / Deprecated |
-| Owner | Responsible engineer |
-| Milestone | Project milestone |
-| Last Updated | Date of last modification |
+| Document | Human-readable artifact name |
+| Category | Documentation category |
+| Version | Semantic Version |
+| Status | Lifecycle status |
+| Created | Original creation date |
+| Last Updated | Date of latest approved revision |
 
 ---
 
-# Versioning
+# 7. Document Structure
 
-Documentation follows Semantic Versioning.
+Unless another structure is more appropriate, engineering artifacts SHOULD follow this structure.
 
-| Version | Meaning |
-|----------|---------|
+1. Purpose
+2. Scope
+3. Main Content
+4. References
+5. Revision History
+
+The structure MAY be extended where necessary but should remain focused on a single engineering topic.
+
+---
+
+# 8. Naming Convention
+
+Document names SHOULD clearly describe their contents.
+
+Recommended examples:
+
+| Artifact | Filename |
+|----------|----------|
+| Project Charter | PROJECT_CHARTER.md |
+| Product Overview | PRODUCT_OVERVIEW.md |
+| Functional Requirement | FR-001-Analyze-Arbitrary-Log-Files.md |
+| Non-Functional Requirement | NFR-001-Quality-Attributes.md |
+| High-Level Design | HLD-001-System-Architecture.md |
+| Architecture Decision | ADR-001-Plugin-Loading.md |
+| Standard | DOCUMENT_STANDARD.md |
+
+Avoid generic filenames such as:
+
+- Notes.md
+- Draft.md
+- Temp.md
+- NewDocument.md
+
+---
+
+# 9. Versioning
+
+Engineering artifacts follow Semantic Versioning.
+
+| Version | Description |
+|----------|-------------|
 | MAJOR | Significant restructuring or change in direction |
 | MINOR | New sections or engineering decisions |
-| PATCH | Editorial corrections and clarifications |
+| PATCH | Editorial corrections, formatting improvements, or clarifications |
+
+Examples:
+
+- 1.0.0
+- 1.0.1
+- 1.1.0
+- 2.0.0
+
+---
+
+# 10. Status Lifecycle
+
+Engineering artifacts progress through the following lifecycle.
+
+```text
+Draft
+   │
+   ▼
+Review
+   │
+   ▼
+Approved
+   │
+   ▼
+Deprecated
+```
+
+Only Approved artifacts should be considered authoritative.
+
+---
+
+# 11. Date Format
+
+All dates SHALL use the following format.
+
+```text
+DD-MM-YYYY
+```
 
 Example:
 
-1.0.0
+```text
+15-07-2026
+```
 
-↓
+This format applies to:
 
-1.0.1
-
-↓
-
-1.1.0
-
-↓
-
-2.0.0
+- Metadata
+- Revision History
+- Roadmaps
+- Changelogs
 
 ---
 
-# Document Status
+# 12. Writing Guidelines
 
-Artifacts SHALL use one of the following statuses.
+Engineering documentation SHOULD:
 
-- Draft
-- Review
-- Approved
-- Deprecated
-
-Only Approved documents should be treated as authoritative.
-
----
-
-# Writing Guidelines
-
-Engineering documents SHOULD:
-
-- Use concise language.
+- Be concise.
+- Use precise language.
 - Avoid marketing terminology.
 - Be implementation-independent where appropriate.
-- Prefer diagrams over lengthy explanations.
-- Use RFC 2119 terminology when defining requirements.
+- Prefer facts over opinions.
+- Prefer diagrams where they improve understanding.
 
-Preferred keywords:
+Requirement documents SHOULD use RFC 2119 terminology where appropriate.
+
+Keywords:
 
 - MUST
 - SHOULD
@@ -141,68 +249,58 @@ Preferred keywords:
 
 ---
 
-# Cross References
+# 13. Traceability
 
-Documents SHALL reference related engineering artifacts instead of duplicating content.
+Engineering artifacts SHOULD reference related artifacts where appropriate.
 
-Example:
+Traceability allows engineers to understand:
 
-Project Charter
+- why a decision exists,
+- what requirement it satisfies,
+- which architecture it influences,
+- and which implementation it affects.
 
-↓
-
-Product Overview
-
-↓
-
-FR-001
-
-↓
-
-HLD-001
+Cross-references SHOULD avoid duplicating information.
 
 ---
 
-# Revision History
+# 14. Definition of Done
 
-Every document SHALL maintain a revision history.
+An engineering artifact is considered complete when:
 
-Example:
-
-| Version | Description |
-|----------|-------------|
-| 1.0.0 | Initial version |
-| 1.1.0 | Added Progressive Extensibility |
-| 1.1.1 | Editorial improvements |
-
----
-
-# Definition of Done
-
-A document is considered complete only when:
-
-- Purpose is clearly defined.
-- Scope is defined.
-- Content is internally consistent.
-- Related artifacts are referenced.
+- Its purpose is clearly defined.
+- Its scope is clearly defined.
+- The content is technically accurate.
+- Terminology is consistent.
+- Related artifacts are referenced where appropriate.
 - Revision history is updated.
-- Review has been completed.
-- Document status is Approved.
+- The document has completed review.
+- Status is set to Approved.
 
 ---
 
-# Documentation Synchronization
+# 15. Documentation Synchronization
 
 Whenever an engineering decision changes:
 
-- Every affected artifact MUST be updated.
-- No document should contradict another approved artifact.
-- Documentation updates SHOULD be committed together with the engineering change whenever practical.
+- Every affected artifact MUST be reviewed.
+- Every affected artifact MUST be updated before the change is considered complete.
+- Documentation SHOULD be committed together with the corresponding engineering change whenever practical.
+
+No approved engineering artifacts should contradict one another.
 
 ---
 
-# Guiding Principle
+# 16. Revision History
 
-Documentation is an engineering artifact.
+| Version | Date | Description |
+|----------|------------|-----------------------------|
+| 1.0.0 | 15-07-2026 | Initial document standard. |
 
-It is maintained with the same discipline, review process and quality expectations as production source code.
+---
+
+# References
+
+None.
+
+This is the governing standard for all engineering documentation within the project.
