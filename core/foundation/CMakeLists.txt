@@ -9,3 +9,5 @@ target_include_directories(scope_foundation
     INTERFACE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_subdirectory(tests)

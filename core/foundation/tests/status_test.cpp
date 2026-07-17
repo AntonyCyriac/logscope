@@ -1,8 +1,13 @@
+/**
+ * @file status_test.cpp
+ * @brief Unit tests for the Foundation Status type.
+ */
+
 #include "status.hpp"
 
 #include <cassert>
 
-using namespace scope::foundation;
+using scope::foundation::Status;
 
 int main()
 {

@@ -8,6 +8,6 @@ target_link_libraries(scope_foundation_status_test
 )
 
 add_test(
-    NAME Foundation.Status
+    NAME Foundation.Status.Basic
     COMMAND scope_foundation_status_test
 )
