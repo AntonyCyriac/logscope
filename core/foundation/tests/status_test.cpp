@@ -1,19 +1,15 @@
-/**
- * @file status_test.cpp
- * @brief Unit tests for the Foundation Status type.
- */
+#include <gtest/gtest.h>
 
-#include "status.hpp"
-
-#include <cassert>
+#include "foundation.hpp"
 
 using scope::foundation::Status;
 
-int main()
+TEST(StatusTest, Success)
 {
-    Status status = Status::Success;
+    EXPECT_EQ(Status::Success, Status::Success);
+}
 
-    assert(status == Status::Success);
-
-    return 0;
+TEST(StatusTest, Failure)
+{
+    EXPECT_EQ(Status::Failure, Status::Failure);
 }
