@@ -5,4 +5,6 @@
 
 #pragma once
 
+#include "error.hpp"
+#include "result.hpp"
 #include "status.hpp"

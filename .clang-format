@@ -1,5 +1,7 @@
----
 BasedOnStyle: LLVM
+
+Standard: c++17
+
 IndentWidth: 4
 TabWidth: 4
 UseTab: Never
@@ -10,16 +12,17 @@ BreakBeforeBraces: Allman
 
 PointerAlignment: Left
 
-AllowShortFunctionsOnASingleLine: Empty
-
-AllowShortIfStatementsOnASingleLine: false
-
-AllowShortLoopsOnASingleLine: false
+SpaceBeforeParens: ControlStatements
 
 IndentCaseLabels: true
 
-SpaceBeforeParens: ControlStatements
-
 SortIncludes: true
 
-Standard: c++17
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+
+BreakConstructorInitializers: BeforeComma
+PackConstructorInitializers: Never
+
+PenaltyReturnTypeOnItsOwnLine: 1000

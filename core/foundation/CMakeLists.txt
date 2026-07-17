@@ -3,10 +3,12 @@
 # Core Foundation
 # ==========================================================
 
-add_library(scope_foundation INTERFACE)
+add_library(scope_foundation
+    error.cpp
+)
 
 target_include_directories(scope_foundation
-    INTERFACE
+    PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
