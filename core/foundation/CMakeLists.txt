@@ -5,6 +5,7 @@
 
 add_library(scope_foundation
     error.cpp
+    version.cpp
 )
 
 target_include_directories(scope_foundation

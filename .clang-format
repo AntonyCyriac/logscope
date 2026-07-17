@@ -1,3 +1,4 @@
+---
 BasedOnStyle: LLVM
 
 Standard: c++17
@@ -21,8 +22,21 @@ SortIncludes: true
 AllowShortFunctionsOnASingleLine: None
 AllowShortIfStatementsOnASingleLine: Never
 AllowShortLoopsOnASingleLine: false
+AllowShortBlocksOnASingleLine: Never
 
 BreakConstructorInitializers: BeforeComma
 PackConstructorInitializers: Never
 
 PenaltyReturnTypeOnItsOwnLine: 1000
+
+AlignConsecutiveAssignments: false
+AlignConsecutiveDeclarations: false
+AlignTrailingComments: true
+
+NamespaceIndentation: None
+
+Cpp11BracedListStyle: true
+
+EmptyLineBeforeAccessModifier: LogicalBlock
+
+FixNamespaceComments: true
