@@ -10,6 +10,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [1.0.0] - 2026-07-18
+
+First stable production release. Delivers the complete M0–M5 roadmap: core pipeline, feature expansion, and production readiness with 246 automated tests.
+
 ### Added
 
 #### M5 – Production Readiness
@@ -29,10 +35,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 - `SessionSerializer::deserialize` uses safe numeric parsing (`std::from_chars`) instead of throwing `std::stoull`.
 - CI expanded from single Ubuntu job to full M5 quality gate pipeline.
+- `InvestigationSession` default constructor explicitly deleted.
 
 ### Fixed
 
 - Session deserialization no longer throws on invalid numeric fields.
+- CMake CMP0135 `FetchContent` timestamp warnings (`DOWNLOAD_EXTRACT_TIMESTAMP`).
 
 ---
 
@@ -184,6 +192,7 @@ M3 – Architecture Realization complete. Delivers the full core pipeline from c
 
 | Tag | Scope |
 |-----|-------|
+| `v1.0.0` | First stable release: M5 production readiness, multi-OS CI, packaging, and distribution. |
 | `v0.4.0` | M4 complete: analysis depth, additional sources, advanced reporting, extensions, and session persistence. |
 | `v0.3.0` | M3 complete: core pipeline, CLI framework, integration and end-to-end tests. |
 | `v0.2.0-design-baseline` | M0–M2 complete: engineering foundation, product vision, and design baseline. |

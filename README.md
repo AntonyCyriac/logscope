@@ -7,7 +7,7 @@ A generic, extensible, high-performance log analysis platform.
 
 LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
 
-**Status:** M5 production readiness in progress ([`v0.4.0`](CHANGELOG.md)) — see [M5 plan](docs/planning/M5-PRODUCTION-READINESS.md) and [Roadmap](docs/ROADMAP.md).
+**Status:** v1.0.0 — first stable release ([`CHANGELOG.md`](CHANGELOG.md)). M0–M5 complete — see [Roadmap](docs/ROADMAP.md).
 
 ## What works today
 

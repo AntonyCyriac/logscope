@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.7.0 |
+| Version | 2.8.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -29,7 +29,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M3 – Architecture Realization** | ✅ Complete | Implement the architecture defined during M2. |
 | **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
-| **v1.0.0** | 🎯 Target | First stable production release. |
+| **v1.0.0** | ✅ Complete | First stable production release. |
 
 ---
 
@@ -44,7 +44,7 @@ M4  ██████████ 100%
 M5  ██████████ 100%
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). M5 planning is documented in [M5 – Production Readiness](planning/M5-PRODUCTION-READINESS.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md).
 
 ---
 
@@ -369,3 +369,4 @@ The roadmap is considered successful when:
 | 2.5.0 | 18-07-2026 | M4 complete; all M4 phases marked complete; linked `v0.4.0` release. |
 | 2.6.0 | 18-07-2026 | Added M5 phased roadmap (M5.1–M5.5) and planning document link. |
 | 2.7.0 | 18-07-2026 | M5 complete; all M5 phases marked complete; production readiness infrastructure delivered. |
+| 2.8.0 | 18-07-2026 | v1.0.0 first stable production release. |
