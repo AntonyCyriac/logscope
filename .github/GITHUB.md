@@ -1,5 +1,7 @@
 # GitHub Configuration
 
+Documentation for the `.github/` directory. This file is intentionally not named `README.md` so it does not override the repository homepage.
+
 ## Purpose
 
 This directory contains GitHub-specific configuration, automation, and workflows used to maintain the LogScope project.
