@@ -6,9 +6,10 @@
 #include "analyze_command.hpp"
 
 #include "LogAnalyzer.hpp"
-#include "report_config.hpp"
 #include "cli_config.hpp"
+#include "extension.hpp"
 #include "log_macros.hpp"
+#include "report_config.hpp"
 
 namespace scope::cli
 {
@@ -43,6 +44,10 @@ int runAnalyzeCommand(const AnalyzeOptions& options,
     {
         return 1;
     }
+
+    scope::extension::ExtensionManager extensionManager = scope::extension::ExtensionManager::createWithBuiltIns();
+    extensionManager.applyConfiguration(configurationManager.configuration());
+    extensionManager.initializeEnabled();
 
     SCOPE_LOG_INFO("cli", "Analyzing " + options.logFile.string());
 

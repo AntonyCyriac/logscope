@@ -23,7 +23,9 @@ enum class CliCommand
 {
     Help,
     Analyze,
-    ConfigValidate
+    ConfigValidate,
+    ExtensionsList,
+    ExtensionsDescribe
 };
 
 /**
@@ -49,6 +51,25 @@ struct ConfigValidateOptions
 };
 
 /**
+ * @brief Options for the extensions list command.
+ */
+struct ExtensionsListOptions
+{
+    foundation::Path configFile;
+    bool showHelp = false;
+};
+
+/**
+ * @brief Options for the extensions describe command.
+ */
+struct ExtensionsDescribeOptions
+{
+    foundation::Path configFile;
+    std::string extensionId;
+    bool showHelp = false;
+};
+
+/**
  * @brief Parsed CLI invocation.
  */
 struct ParsedCli
@@ -56,6 +77,8 @@ struct ParsedCli
     CliCommand command = CliCommand::Help;
     AnalyzeOptions analyze;
     ConfigValidateOptions configValidate;
+    ExtensionsListOptions extensionsList;
+    ExtensionsDescribeOptions extensionsDescribe;
     bool showGlobalHelp = false;
 };
 

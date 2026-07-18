@@ -7,6 +7,7 @@
 
 #include "analyze_command.hpp"
 #include "config_validate_command.hpp"
+#include "extensions_command.hpp"
 
 namespace scope::cli
 {
@@ -19,6 +20,8 @@ void CliApplication::printUsage(std::ostream& output)
            << "Commands:\n"
            << "  analyze            Analyze a log file, directory, or stdin\n"
            << "  config validate    Validate configuration\n"
+           << "  extensions list    List available extensions\n"
+           << "  extensions describe Describe an extension\n"
            << "  help [command]     Show help for a command\n"
            << "\n"
            << "Global options:\n"
@@ -43,6 +46,10 @@ int CliApplication::run(const ParsedCli& parsed,
         return runAnalyzeCommand(parsed.analyze, configurationManager, output, errorOutput);
     case CliCommand::ConfigValidate:
         return runConfigValidateCommand(parsed.configValidate, configurationManager, output, errorOutput);
+    case CliCommand::ExtensionsList:
+        return runExtensionsListCommand(parsed.extensionsList, configurationManager, output, errorOutput);
+    case CliCommand::ExtensionsDescribe:
+        return runExtensionsDescribeCommand(parsed.extensionsDescribe, configurationManager, output, errorOutput);
     case CliCommand::Help:
         printUsage(output);
 

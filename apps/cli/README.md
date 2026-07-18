@@ -12,6 +12,8 @@ It wires together configuration, source acquisition, analysis, investigation, an
 |---------|-------------|
 | `analyze` | Analyze a log file, directory of `.log` files, or stdin (`-`) |
 | `config validate` | Validate configuration files and required keys |
+| `extensions list` | List registered extensions and their status |
+| `extensions describe` | Show metadata for a single extension |
 | `help` | Show command help |
 
 Legacy invocation is supported:
@@ -26,6 +28,8 @@ logscope [--config <file>] <log-source>
 logscope analyze samples/sample.log
 logscope analyze --format csv --sections summary,levels samples/sample.log
 logscope analyze --format markdown samples
+logscope extensions list
+logscope extensions describe analysis.log-levels
 logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log

@@ -119,6 +119,34 @@ TEST(CliParserTest, ParsesAnalyzeSectionsOption)
     EXPECT_FALSE(parsed->analyze.sections->includes(scope::reporting::ReportSection::SourceMetadata));
 }
 
+TEST(CliParserTest, ParsesExtensionsListSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "extensions";
+    std::string subcommand = "list";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand)};
+
+    const auto parsed = parseCliArguments(3, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::ExtensionsList, parsed->command);
+}
+
+TEST(CliParserTest, ParsesExtensionsDescribeSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "extensions";
+    std::string subcommand = "describe";
+    std::string extensionId = "analysis.log-levels";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(extensionId)};
+
+    const auto parsed = parseCliArguments(4, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::ExtensionsDescribe, parsed->command);
+    EXPECT_EQ("analysis.log-levels", parsed->extensionsDescribe.extensionId);
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

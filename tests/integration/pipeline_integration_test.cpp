@@ -10,6 +10,7 @@
 
 #include "analysis.hpp"
 #include "configuration_manager.hpp"
+#include "extension.hpp"
 #include "investigation.hpp"
 #include "reporting.hpp"
 #include "source.hpp"
@@ -195,4 +196,31 @@ TEST_F(PipelineIntegrationTest, AnalyzesDirectoryOfLogFiles)
     std::remove(firstFile.string().c_str());
     std::remove(secondFile.string().c_str());
     std::filesystem::remove(directoryPath.string());
+}
+
+TEST_F(PipelineIntegrationTest, AppliesExtensionConfiguration)
+{
+    const Path configFile("pipeline_integration_extensions.properties");
+
+    {
+        std::ofstream stream(configFile.string());
+
+        stream << "extensions.reporting.multi-format.enabled=false\n";
+    }
+
+    scope::extension::ExtensionManager manager = scope::extension::ExtensionManager::createWithBuiltIns();
+
+    ConfigurationManager configurationManager;
+    auto configurationResult = ConfigurationManager::loadFromFile(configFile);
+
+    ASSERT_TRUE(configurationResult.hasValue());
+
+    manager.applyConfiguration(configurationResult->configuration());
+
+    const auto infoResult = manager.describe("reporting.multi-format");
+
+    ASSERT_TRUE(infoResult.hasValue());
+    EXPECT_FALSE(infoResult->enabled);
+
+    std::remove(configFile.string().c_str());
 }

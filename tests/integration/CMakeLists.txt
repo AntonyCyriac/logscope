@@ -6,6 +6,7 @@ target_link_libraries(logscope_integration_tests
     PRIVATE
         scope_analysis
         scope_configuration
+        scope_extension
         scope_foundation
         scope_investigation
         scope_reporting

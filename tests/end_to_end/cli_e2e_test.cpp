@@ -92,6 +92,24 @@ TEST(CliE2eTest, ConfigValidateSucceedsForSampleConfiguration)
     EXPECT_NE(std::string::npos, output.find("Configuration is valid."));
 }
 
+TEST(CliE2eTest, ExtensionsListShowsBuiltIns)
+{
+    const std::string output = runLogscope("extensions list");
+
+    EXPECT_NE(std::string::npos, output.find("analysis.log-levels"));
+    EXPECT_NE(std::string::npos, output.find("source.files"));
+    EXPECT_NE(std::string::npos, output.find("reporting.multi-format"));
+}
+
+TEST(CliE2eTest, ExtensionsDescribeShowsMetadata)
+{
+    const std::string output = runLogscope("extensions describe analysis.log-levels");
+
+    EXPECT_NE(std::string::npos, output.find("ID          : analysis.log-levels"));
+    EXPECT_NE(std::string::npos, output.find("Description :"));
+    EXPECT_NE(std::string::npos, output.find("ERROR"));
+}
+
 TEST(CliE2eTest, HelpDisplaysUsage)
 {
     const std::string output = runLogscope("--help");
@@ -99,6 +117,7 @@ TEST(CliE2eTest, HelpDisplaysUsage)
     EXPECT_NE(std::string::npos, output.find("Commands:"));
     EXPECT_NE(std::string::npos, output.find("analyze"));
     EXPECT_NE(std::string::npos, output.find("config validate"));
+    EXPECT_NE(std::string::npos, output.find("extensions list"));
 }
 
 TEST(CliE2eTest, AnalyzeDirectoryProducesCombinedReport)
