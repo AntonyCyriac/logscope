@@ -120,20 +120,21 @@ Foundation components are implemented incrementally using small pull requests wi
 
 ## M3.3 – Platform Services (Runtime)
 
-| Component | Description |
-|-----------|-------------|
-| `Configuration` | Key-value configuration store |
-| `Diagnostics` | Diagnostic logging |
-| `PluginRegistry` | Plugin metadata registration |
-| `ServiceRegistry` | Platform service registration |
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `Configuration` | Key-value configuration store | Complete |
+| `Diagnostics` | Level filtering, categories, macros, config integration | Complete |
+| `PluginRegistry` | Plugin metadata registration | Complete |
+| `ServiceRegistry` | Platform service registration | Complete |
 
-Built as `scope_runtime` with unit tests. Depends on Foundation.
+Built as `scope_runtime` with unit tests. Depends on Foundation. CLI links `scope_runtime` for flow tracing.
 
 ### Next
 
 - Thread pool and task scheduler
 - Extended plugin loading
 - Environment access
+- Structured log output and timestamps (after Foundation `Clock`/`Timestamp`)
 
 ---
 

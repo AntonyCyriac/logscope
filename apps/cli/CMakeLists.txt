@@ -10,6 +10,7 @@ add_executable(logscope
 target_link_libraries(logscope
     PRIVATE
         scope_foundation
+        scope_runtime
 )
 
 target_include_directories(logscope

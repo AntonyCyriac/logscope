@@ -5,6 +5,8 @@
 
 #include "service_registry.hpp"
 
+#include "log_macros.hpp"
+
 namespace scope::runtime
 {
 
@@ -17,6 +19,8 @@ ServiceRegistry& ServiceRegistry::instance()
 
 void ServiceRegistry::registerService(std::string name)
 {
+    SCOPE_LOG_INFO("runtime.service", "register service=" + name);
+
     m_services.insert(std::move(name));
 }
 

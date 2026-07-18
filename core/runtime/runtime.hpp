@@ -7,5 +7,6 @@
 
 #include "configuration.hpp"
 #include "diagnostics.hpp"
+#include "log_macros.hpp"
 #include "plugin_registry.hpp"
 #include "service_registry.hpp"

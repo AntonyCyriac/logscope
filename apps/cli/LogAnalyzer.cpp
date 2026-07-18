@@ -9,17 +9,20 @@
 #include <iostream>
 
 #include "foundation/filesystem.hpp"
+#include "log_macros.hpp"
 
 namespace scope::cli
 {
 
 bool LogAnalyzer::analyze(const foundation::Path& filePath)
 {
+    SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
+
     auto existsResult = foundation::FileSystem::exists(filePath);
 
     if (!existsResult || !*existsResult)
     {
-        std::cerr << "Error: Unable to open log file: " << filePath.string() << std::endl;
+        SCOPE_LOG_ERROR("cli", "Unable to open log file: " + filePath.string());
 
         return false;
     }
@@ -28,10 +31,12 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
 
     if (!logFile.is_open())
     {
-        std::cerr << "Error: Unable to open log file: " << filePath.string() << std::endl;
+        SCOPE_LOG_ERROR("cli", "Unable to open log file: " + filePath.string());
 
         return false;
     }
+
+    SCOPE_LOG_DEBUG("cli", "Opened log file: " + filePath.string());
 
     std::string line;
     unsigned long totalLines = 0;
@@ -40,6 +45,8 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
     {
         ++totalLines;
     }
+
+    SCOPE_LOG_INFO("cli", "Counted " + std::to_string(totalLines) + " log lines");
 
     std::cout << "========== LOGSCOPE REPORT ==========" << std::endl;
     std::cout << "Total log lines : " << totalLines << std::endl;

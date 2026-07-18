@@ -8,12 +8,27 @@
 #include "LogAnalyzer.hpp"
 
 #include "foundation/path.hpp"
+#include "runtime.hpp"
+
+namespace
+{
+
+void initializeDiagnostics()
+{
+    scope::runtime::Configuration configuration;
+
+    scope::runtime::Diagnostics::instance().applyConfiguration(configuration);
+}
+
+} // namespace
 
 int main(int argc, char* argv[])
 {
+    initializeDiagnostics();
+
     if (argc != 2)
     {
-        std::cerr << "Usage: logscope <log-file>" << std::endl;
+        SCOPE_LOG_ERROR("cli", "Usage: logscope <log-file>");
 
         return 1;
     }

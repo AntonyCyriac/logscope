@@ -5,6 +5,9 @@
 
 #include "configuration.hpp"
 
+#include "diagnostics.hpp"
+#include "log_macros.hpp"
+
 #include "foundation/error.hpp"
 
 namespace scope::runtime
@@ -12,6 +15,8 @@ namespace scope::runtime
 
 void Configuration::set(std::string key, std::string value)
 {
+    SCOPE_LOG_DEBUG("runtime.config", "set key=" + key);
+
     m_values[std::move(key)] = std::move(value);
 }
 
@@ -21,9 +26,13 @@ foundation::Result<std::string> Configuration::get(const std::string& key) const
 
     if (iterator == m_values.end())
     {
+        SCOPE_LOG_WARN("runtime.config", "missing key=" + key);
+
         return foundation::Result<std::string>(
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Configuration key not found."));
     }
+
+    SCOPE_LOG_DEBUG("runtime.config", "get key=" + key);
 
     return foundation::Result<std::string>(iterator->second);
 }

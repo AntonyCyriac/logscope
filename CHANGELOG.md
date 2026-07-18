@@ -33,14 +33,15 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 #### M3.3 – Platform Services (Runtime)
 
 - `Configuration` key-value store.
-- `Diagnostics` logging facility.
+- `Diagnostics` logging facility with level filtering, category tags, and `SCOPE_LOG_*` macros.
 - `PluginRegistry` and `ServiceRegistry`.
 - `scope_runtime` library and `scope_runtime_tests` test target.
+- Runtime and CLI flow tracing via `Diagnostics` (`log.level` / `SCOPE_LOG_LEVEL`).
 
 #### Applications
 
 - CLI migrated from legacy `src/` + `include/` to `apps/cli/`.
-- CLI linked to `scope_foundation` using `scope::cli` and `scope::foundation` namespaces.
+- CLI linked to `scope_foundation` and `scope_runtime` using `scope::cli`, `scope::foundation`, and `scope::runtime` namespaces.
 
 #### Documentation
 
