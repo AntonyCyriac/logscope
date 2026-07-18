@@ -7,10 +7,9 @@
 
 #include <iostream>
 
+#include "analysis.hpp"
 #include "log_macros.hpp"
 #include "source.hpp"
-
-using scope::source::LogSource;
 
 namespace scope::cli
 {
@@ -30,33 +29,20 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
         return false;
     }
 
-    std::string line;
-    unsigned long totalLines = 0;
-    LogSource& logSource = datasetResult->source();
+    scope::analysis::AnalysisEngine analysisEngine;
 
-    while (true)
+    auto modelResult = analysisEngine.analyze(*datasetResult);
+
+    if (!modelResult)
     {
-        const auto readResult = logSource.readLine(line);
+        SCOPE_LOG_ERROR("cli", modelResult.error().message());
 
-        if (!readResult)
-        {
-            SCOPE_LOG_ERROR("cli", readResult.error().message());
-
-            return false;
-        }
-
-        if (!*readResult)
-        {
-            break;
-        }
-
-        ++totalLines;
+        return false;
     }
 
-    SCOPE_LOG_INFO("cli", "Counted " + std::to_string(totalLines) + " log lines");
-
     std::cout << "========== LOGSCOPE REPORT ==========" << std::endl;
-    std::cout << "Total log lines : " << totalLines << std::endl;
+    std::cout << "Source          : " << modelResult->sourcePath().string() << std::endl;
+    std::cout << "Total log lines : " << modelResult->totalLines() << std::endl;
     std::cout << "=====================================" << std::endl;
 
     return true;

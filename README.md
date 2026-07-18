@@ -15,6 +15,7 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 - **Runtime library** (`scope_runtime`) — `Configuration`, `Diagnostics`, `PluginRegistry`, `ServiceRegistry`
 - **Configuration library** (`scope_configuration`) — `ConfigurationManager` for file and environment config
 - **Source library** (`scope_source`) — `SourceManager`, `FileLogSource`, and `SourceDataset`
+- **Analysis library** (`scope_analysis`) — `AnalysisEngine` and `AnalysisModel`
 - **CLI application** (`apps/cli`) — basic log file analysis with optional `--config` flag
 - **CI** — build and unit tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook

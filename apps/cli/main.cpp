@@ -9,7 +9,7 @@
 
 #include "LogAnalyzer.hpp"
 
-#include "configuration.hpp"
+#include "configuration_manager.hpp"
 #include "foundation/path.hpp"
 #include "runtime.hpp"
 
