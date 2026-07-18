@@ -26,7 +26,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M0 – Engineering Foundation** | ✅ Complete | Repository setup, development environment, build system, coding standards, CI foundation. |
 | **M1 – Product Vision** | ✅ Complete | Project Charter, Product Overview, product goals, and vision. |
 | **M2 – Engineering Design** | ✅ Complete | Standards, Requirements, Architecture, and High-Level Design completed. |
-| **M3 – Architecture Realization** | 🚧 In Progress | Implement the architecture defined during M2. |
+| **M3 – Architecture Realization** | ✅ Complete | Implement the architecture defined during M2. |
 | **M4 – Feature Expansion** | ⏳ Planned | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ⏳ Planned | Performance optimization, testing, documentation, packaging, and release preparation. |
 | **v1.0.0** | 🎯 Target | First stable production release. |
@@ -39,7 +39,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
-M3  ███████░░░ ~65%
+M3  ██████████ 100%
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 changes are tracked in [CHANGELOG.md](../CHANGELOG.md).
@@ -61,7 +61,7 @@ The implementation phase is divided into logical increments.
 | M3.7 | Investigation Engine | ✅ Complete |
 | M3.8 | Reporting Engine | ✅ Complete |
 | M3.9 | CLI | ✅ Complete |
-| M3.10 | Integration & End-to-End Testing | ⏳ Planned |
+| M3.10 | Integration & End-to-End Testing | ✅ Complete |
 
 ---
 
@@ -202,11 +202,14 @@ CLI supports subcommands while preserving legacy `logscope <log-file>` invocatio
 
 ---
 
-## M3.10 (Planned)
+## M3.10 – Integration and End-to-End Testing
 
-Subsequent M3 phases depend on a stable Foundation library:
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `logscope_integration_tests` | Core pipeline tests across Source, Analysis, Investigation, Reporting, and Configuration | Complete |
+| `logscope_e2e_tests` | CLI executable smoke tests using `samples/` fixtures | Complete |
 
-- **M3.10** – Integration and end-to-end testing
+Repository tests run through CTest with the project root as the working directory.
 
 ---
 

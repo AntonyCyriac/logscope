@@ -19,7 +19,7 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 - **Investigation library** (`scope_investigation`) — `InvestigationEngine`, `InvestigationView`, and `LineCountFilter`
 - **Reporting library** (`scope_reporting`) — `ReportGenerator` and `Report`
 - **CLI application** (`apps/cli`) — subcommands (`analyze`, `config validate`), `--format text|json`, optional `--config` flag
-- **CI** — build and unit tests on every push to `master`
+- **CI** — build, unit tests, integration tests, and CLI end-to-end tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
 ## Requirements
@@ -61,7 +61,7 @@ apps/           Applications (CLI)
 core/           Core libraries (foundation, runtime)
 docs/           Product, architecture, standards, and handbook
 samples/        Sample log files
-tests/          Integration and end-to-end test placeholders
+tests/          Integration and end-to-end tests
 ```
 
 ## Documentation
