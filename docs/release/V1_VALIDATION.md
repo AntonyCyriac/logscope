@@ -7,7 +7,7 @@
 | Version | 1.0.0 |
 | Status | Complete |
 | Created | 18-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 18-07-2026 (post-release) |
 
 ---
 
@@ -52,7 +52,7 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 | Coverage report | Generated in CI | [x] |
 | Benchmark regression | Within baseline tolerance | [x] |
 | Fuzz smoke test | 1000 runs per target, no crashes | [x] |
-| Release binaries | Smoke test `analyze samples/sample.log` per OS | [ ] (after `v1.0.0` tag) |
+| Release binaries | Smoke test `analyze samples/sample.log` per OS | [x] |
 | Security review | [`SECURITY_REVIEW.md`](../handbook/SECURITY_REVIEW.md) completed | [x] |
 | Documentation | README, ROADMAP, CHANGELOG, CLI reference updated | [x] |
 | Known P0/P1 defects | None open | [x] |
@@ -61,11 +61,11 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 
 # Release Steps
 
-1. Complete all checklist items above — **done** (except binary smoke test pending tag)
+1. Complete all checklist items above — **done**
 2. Merge M5 PR — **done** (#20)
-3. Create `chore/v1.0.0-release` branch with version bump to `1.0.0` — **in progress**
-4. Merge, tag `v1.0.0`, publish GitHub Release with binaries
-5. Mark v1.0.0 complete in ROADMAP — **done** in release PR
+3. Create `chore/v1.0.0-release` branch with version bump to `1.0.0` — **done** (#21)
+4. Merge, tag `v1.0.0`, publish GitHub Release with binaries — **done**
+5. Mark v1.0.0 complete in ROADMAP — **done** in release PR (#21)
 
 ---
 
@@ -75,3 +75,4 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial v1.0.0 validation checklist. |
 | 1.1.0 | 18-07-2026 | Marked validation complete for v1.0.0 release. |
+| 1.2.0 | 18-07-2026 | Checked release binaries and closed release steps after GitHub Release. |
