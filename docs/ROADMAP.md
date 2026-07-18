@@ -224,7 +224,7 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 |-------|-------|------------|--------|
 | M4.1 | Analysis depth | FR-001, FR-002 | ✅ Complete |
 | M4.2 | Additional source types | FR-001 | ✅ Complete |
-| M4.3 | Advanced reporting | FR-003 | ⏳ Planned |
+| M4.3 | Advanced reporting | FR-003 | ✅ Complete |
 | M4.4 | Extension ecosystem | FR-004 | ⏳ Planned |
 | M4.5 | Session / workspace | FR-002 | ⏳ Planned |
 | Deferred | REST API, Web UI, AI-assisted investigation | — | Post-M4 |
@@ -264,9 +264,9 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Component | Description | Status |
 |-----------|-------------|--------|
-| Report sections | Summary, level breakdown, source metadata | Planned |
-| Content selection | CLI or config-driven report sections (FR-003.2) | Planned |
-| Additional formats | CSV and Markdown alongside text and JSON (FR-003.4) | Planned |
+| Report sections | Summary, level breakdown, source metadata | Complete |
+| Content selection | CLI or config-driven report sections (FR-003.2) | Complete |
+| Additional formats | CSV and Markdown alongside text and JSON (FR-003.4) | Complete |
 
 **Goal:** Selectable, reproducible reports in multiple formats (FR-003.2, FR-003.4, FR-003.6).
 

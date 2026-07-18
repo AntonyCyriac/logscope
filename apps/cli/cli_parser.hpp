@@ -11,6 +11,7 @@
 
 #include "foundation/path.hpp"
 #include "output_format.hpp"
+#include "report_section.hpp"
 
 namespace scope::cli
 {
@@ -33,6 +34,7 @@ struct AnalyzeOptions
     foundation::Path logFile;
     foundation::Path configFile;
     OutputFormat format = OutputFormat::Text;
+    std::optional<reporting::ReportSections> sections;
     bool showHelp = false;
 };
 

@@ -1,5 +1,7 @@
 add_executable(scope_reporting_tests
+    report_formatter_test.cpp
     report_generator_test.cpp
+    report_section_test.cpp
     report_test.cpp
 )
 

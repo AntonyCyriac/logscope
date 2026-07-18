@@ -7,6 +7,7 @@
 
 #include "analysis_model.hpp"
 #include "report.hpp"
+#include "report_options.hpp"
 
 namespace scope::reporting
 {
@@ -18,12 +19,14 @@ class ReportGenerator
 {
   public:
     /**
-     * @brief Creates a text report from an analysis model.
+     * @brief Creates a report from an analysis model.
      *
      * @param model Analysis model to present.
+     * @param options Report format and section selection.
      * @return Formatted report.
      */
-    [[nodiscard]] Report generate(const analysis::AnalysisModel& model) const;
+    [[nodiscard]] Report generate(const analysis::AnalysisModel& model,
+                                  const ReportOptions& options = ReportOptions::defaults()) const;
 };
 
 } // namespace scope::reporting

@@ -11,6 +11,7 @@ add_executable(logscope
     config_validate_command.cpp
     main.cpp
     output_format.cpp
+    report_config.cpp
     report_output.cpp
 )
 

@@ -84,6 +84,25 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             continue;
         }
 
+        if (argument == "--sections")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto sections = reporting::ReportSections::parse(argv[++index]);
+
+            if (!sections)
+            {
+                return std::nullopt;
+            }
+
+            options.sections = *sections;
+
+            continue;
+        }
+
         if (isOption(argument))
         {
             return std::nullopt;

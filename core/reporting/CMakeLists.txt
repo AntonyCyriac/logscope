@@ -5,7 +5,11 @@
 
 add_library(scope_reporting
     report.cpp
+    report_format.cpp
+    report_formatter.cpp
     report_generator.cpp
+    report_options.cpp
+    report_section.cpp
 )
 
 target_link_libraries(scope_reporting

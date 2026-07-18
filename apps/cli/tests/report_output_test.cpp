@@ -10,9 +10,12 @@
 
 using scope::analysis::AnalysisModel;
 using scope::analysis::LogLevelCounts;
-using scope::cli::OutputFormat;
 using scope::cli::formatAnalysisOutput;
 using scope::foundation::Path;
+using scope::reporting::ReportFormat;
+using scope::reporting::ReportOptions;
+using scope::reporting::ReportSection;
+using scope::reporting::ReportSections;
 
 namespace
 {
@@ -31,7 +34,9 @@ AnalysisModel createSampleModel()
 
 TEST(ReportOutputTest, FormatsTextReport)
 {
-    const std::string output = formatAnalysisOutput(createSampleModel(), OutputFormat::Text);
+    ReportOptions options;
+
+    const std::string output = formatAnalysisOutput(createSampleModel(), options);
 
     EXPECT_NE(std::string::npos, output.find("========== LOGSCOPE REPORT =========="));
     EXPECT_NE(std::string::npos, output.find("Total log lines : 3"));
@@ -40,11 +45,25 @@ TEST(ReportOutputTest, FormatsTextReport)
 
 TEST(ReportOutputTest, FormatsJsonReport)
 {
-    const std::string output = formatAnalysisOutput(createSampleModel(), OutputFormat::Json);
+    ReportOptions options;
+    options.format = ReportFormat::Json;
 
-    EXPECT_NE(std::string::npos, output.find("\"source\": \"sample.log\""));
+    const std::string output = formatAnalysisOutput(createSampleModel(), options);
+
+    EXPECT_NE(std::string::npos, output.find("\"summary\""));
     EXPECT_NE(std::string::npos, output.find("\"totalLines\": 3"));
     EXPECT_NE(std::string::npos, output.find("\"errorLines\": 1"));
     EXPECT_NE(std::string::npos, output.find("\"warningLines\": 1"));
     EXPECT_NE(std::string::npos, output.find("\"infoLines\": 1"));
+}
+
+TEST(ReportOutputTest, FormatsSummaryOnlySections)
+{
+    ReportOptions options;
+    options.sections = ReportSections::parse("summary").value();
+
+    const std::string output = formatAnalysisOutput(createSampleModel(), options);
+
+    EXPECT_NE(std::string::npos, output.find("Total log lines : 3"));
+    EXPECT_EQ(std::string::npos, output.find("--- Level Breakdown ---"));
 }

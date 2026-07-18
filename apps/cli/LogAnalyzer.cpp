@@ -14,7 +14,9 @@
 namespace scope::cli
 {
 
-bool LogAnalyzer::analyze(const foundation::Path& filePath, const OutputFormat format, std::ostream& output)
+bool LogAnalyzer::analyze(const foundation::Path& filePath,
+                          const reporting::ReportOptions& reportOptions,
+                          std::ostream& output)
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
@@ -46,7 +48,7 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath, const OutputFormat f
 
     SCOPE_LOG_INFO("cli", "Investigation summary: " + view.summary());
 
-    output << formatAnalysisOutput(*modelResult, format) << std::endl;
+    output << formatAnalysisOutput(*modelResult, reportOptions) << std::endl;
 
     return true;
 }

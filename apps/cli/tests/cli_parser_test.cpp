@@ -100,6 +100,25 @@ TEST(CliParserTest, ParsesStdinAnalyzeSubcommand)
     EXPECT_EQ("-", parsed->analyze.logFile.string());
 }
 
+TEST(CliParserTest, ParsesAnalyzeSectionsOption)
+{
+    std::string program = "logscope";
+    std::string command = "analyze";
+    std::string sectionsFlag = "--sections";
+    std::string sectionsValue = "summary,levels";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program),     toArgv(command), toArgv(sectionsFlag),
+                    toArgv(sectionsValue), toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    ASSERT_TRUE(parsed->analyze.sections);
+    EXPECT_TRUE(parsed->analyze.sections->includes(scope::reporting::ReportSection::Summary));
+    EXPECT_TRUE(parsed->analyze.sections->includes(scope::reporting::ReportSection::LevelBreakdown));
+    EXPECT_FALSE(parsed->analyze.sections->includes(scope::reporting::ReportSection::SourceMetadata));
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

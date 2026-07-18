@@ -8,7 +8,7 @@
 #include <string>
 
 #include "analysis_model.hpp"
-#include "output_format.hpp"
+#include "report_options.hpp"
 
 namespace scope::cli
 {
@@ -16,6 +16,7 @@ namespace scope::cli
 /**
  * @brief Formats an analysis model for the requested output format.
  */
-[[nodiscard]] std::string formatAnalysisOutput(const analysis::AnalysisModel& model, OutputFormat format);
+[[nodiscard]] std::string formatAnalysisOutput(const analysis::AnalysisModel& model,
+                                               const reporting::ReportOptions& options);
 
 } // namespace scope::cli

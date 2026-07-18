@@ -4,12 +4,14 @@ add_executable(logscope_cli_tests
     report_output_test.cpp
     ../cli_parser.cpp
     ../output_format.cpp
+    ../report_config.cpp
     ../report_output.cpp
 )
 
 target_link_libraries(logscope_cli_tests
     PRIVATE
         scope_analysis
+        scope_configuration
         scope_foundation
         scope_reporting
         GTest::gtest_main

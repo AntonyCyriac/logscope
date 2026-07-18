@@ -54,11 +54,33 @@ TEST(CliE2eTest, AnalyzeSubcommandProducesJsonReport)
     const std::string output =
         runLogscope("analyze --format json " + scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
 
+    EXPECT_NE(std::string::npos, output.find("\"summary\""));
     EXPECT_NE(std::string::npos, output.find("\"totalLines\": 8"));
     EXPECT_NE(std::string::npos, output.find("\"errorLines\": 4"));
     EXPECT_NE(std::string::npos, output.find("\"warningLines\": 1"));
     EXPECT_NE(std::string::npos, output.find("\"infoLines\": 3"));
-    EXPECT_NE(std::string::npos, output.find("\"source\""));
+    EXPECT_NE(std::string::npos, output.find("\"sourceMetadata\""));
+}
+
+TEST(CliE2eTest, AnalyzeSubcommandProducesCsvReport)
+{
+    const std::string output =
+        runLogscope("analyze --format csv " + scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("section,key,value"));
+    EXPECT_NE(std::string::npos, output.find("summary,totalLines,8"));
+    EXPECT_NE(std::string::npos, output.find("levelBreakdown,errorLines,4"));
+}
+
+TEST(CliE2eTest, AnalyzeSubcommandProducesMarkdownReport)
+{
+    const std::string output = runLogscope("analyze --format markdown --sections summary,levels " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("# LogScope Report"));
+    EXPECT_NE(std::string::npos, output.find("## Summary"));
+    EXPECT_NE(std::string::npos, output.find("## Level Breakdown"));
+    EXPECT_EQ(std::string::npos, output.find("## Source Metadata"));
 }
 
 TEST(CliE2eTest, ConfigValidateSucceedsForSampleConfiguration)
