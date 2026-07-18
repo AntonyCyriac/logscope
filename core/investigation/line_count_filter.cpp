@@ -41,4 +41,19 @@ bool LineCountFilter::matches(const analysis::AnalysisModel& model) const noexce
     return totalLines >= m_minLines && totalLines <= m_maxLines;
 }
 
+std::uint64_t LineCountFilter::minimumLines() const noexcept
+{
+    return m_minLines;
+}
+
+std::uint64_t LineCountFilter::maximumLines() const noexcept
+{
+    return m_maxLines;
+}
+
+bool LineCountFilter::hasMaximumLines() const noexcept
+{
+    return m_maxLines < std::numeric_limits<std::uint64_t>::max();
+}
+
 } // namespace scope::investigation

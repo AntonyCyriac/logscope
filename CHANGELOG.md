@@ -39,6 +39,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - CLI commands `extensions list` and `extensions describe` (FR-004.5).
 - Failure-isolated extension initialization during analyze (FR-004.4).
 
+#### M4.5 – Session / Workspace
+
+- `core/workspace` module with `InvestigationSession` and `SessionStore`.
+- Persist analysis metadata, investigation filters, search query, and report preferences.
+- CLI commands `session save`, `session load`, and `session list` (FR-002.5).
+
 ---
 
 ## [0.3.0] - 2026-07-18

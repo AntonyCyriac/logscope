@@ -14,6 +14,9 @@ It wires together configuration, source acquisition, analysis, investigation, an
 | `config validate` | Validate configuration files and required keys |
 | `extensions list` | List registered extensions and their status |
 | `extensions describe` | Show metadata for a single extension |
+| `session save` | Analyze a log source and save investigation context |
+| `session load` | Restore a session and reproduce its report |
+| `session list` | List saved `.logscope-session` files |
 | `help` | Show command help |
 
 Legacy invocation is supported:
@@ -30,6 +33,8 @@ logscope analyze --format csv --sections summary,levels samples/sample.log
 logscope analyze --format markdown samples
 logscope extensions list
 logscope extensions describe analysis.log-levels
+logscope session save sample.logscope-session samples/sample.log --min-errors 1
+logscope session load sample.logscope-session
 logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log

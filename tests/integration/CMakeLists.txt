@@ -12,6 +12,7 @@ target_link_libraries(logscope_integration_tests
         scope_reporting
         scope_runtime
         scope_source
+        scope_workspace
         GTest::gtest_main
 )
 

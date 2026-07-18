@@ -8,6 +8,7 @@
 #include "analyze_command.hpp"
 #include "config_validate_command.hpp"
 #include "extensions_command.hpp"
+#include "session_command.hpp"
 
 namespace scope::cli
 {
@@ -22,6 +23,9 @@ void CliApplication::printUsage(std::ostream& output)
            << "  config validate    Validate configuration\n"
            << "  extensions list    List available extensions\n"
            << "  extensions describe Describe an extension\n"
+           << "  session save       Save investigation context to a session file\n"
+           << "  session load       Restore a session and reproduce its report\n"
+           << "  session list       List saved session files in a directory\n"
            << "  help [command]     Show help for a command\n"
            << "\n"
            << "Global options:\n"
@@ -50,6 +54,12 @@ int CliApplication::run(const ParsedCli& parsed,
         return runExtensionsListCommand(parsed.extensionsList, configurationManager, output, errorOutput);
     case CliCommand::ExtensionsDescribe:
         return runExtensionsDescribeCommand(parsed.extensionsDescribe, configurationManager, output, errorOutput);
+    case CliCommand::SessionSave:
+        return runSessionSaveCommand(parsed.sessionSave, configurationManager, output, errorOutput);
+    case CliCommand::SessionLoad:
+        return runSessionLoadCommand(parsed.sessionLoad, output, errorOutput);
+    case CliCommand::SessionList:
+        return runSessionListCommand(parsed.sessionList, output, errorOutput);
     case CliCommand::Help:
         printUsage(output);
 

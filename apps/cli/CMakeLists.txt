@@ -11,6 +11,7 @@ add_executable(logscope
     config_validate_command.cpp
     extensions_command.cpp
     main.cpp
+    session_command.cpp
     output_format.cpp
     report_config.cpp
     report_output.cpp
@@ -26,6 +27,7 @@ target_link_libraries(logscope
         scope_reporting
         scope_runtime
         scope_source
+        scope_workspace
 )
 
 target_include_directories(logscope

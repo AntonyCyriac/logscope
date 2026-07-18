@@ -226,7 +226,7 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 | M4.2 | Additional source types | FR-001 | ✅ Complete |
 | M4.3 | Advanced reporting | FR-003 | ✅ Complete |
 | M4.4 | Extension ecosystem | FR-004 | ✅ Complete |
-| M4.5 | Session / workspace | FR-002 | ⏳ Planned |
+| M4.5 | Session / workspace | FR-002 | ✅ Complete |
 | Deferred | REST API, Web UI, AI-assisted investigation | — | Post-M4 |
 
 ---
@@ -288,8 +288,8 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Component | Description | Status |
 |-----------|-------------|--------|
-| `core/workspace/` | Persist investigation filters and report preferences | Planned |
-| CLI session commands | Save and load investigation context (FR-002.5) | Planned |
+| `core/workspace/` | Persist investigation filters and report preferences | Complete |
+| CLI session commands | Save and load investigation context (FR-002.5) | Complete |
 
 **Goal:** Progressive investigation without restarting analysis.
 

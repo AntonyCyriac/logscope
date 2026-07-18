@@ -36,4 +36,14 @@ bool LogLevelFilter::matches(const analysis::AnalysisModel& model) const noexcep
     return counts.errorLines() >= m_minErrors && counts.warnLines() >= m_minWarnings;
 }
 
+std::uint64_t LogLevelFilter::minimumErrors() const noexcept
+{
+    return m_minErrors;
+}
+
+std::uint64_t LogLevelFilter::minimumWarnings() const noexcept
+{
+    return m_minWarnings;
+}
+
 } // namespace scope::investigation
