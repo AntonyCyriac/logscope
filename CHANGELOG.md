@@ -28,6 +28,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `Time`, `Date`, and `DateTime` value types with parsing and comparison.
 - `Duration` value type for non-negative time intervals with nanosecond precision.
 - `Timestamp` value type for absolute UTC instants as Unix nanoseconds since epoch.
+- `Clock` wall-clock source returning current UTC `Timestamp`.
 - `Path` and `FileSystem` for filesystem path handling and file operations.
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.

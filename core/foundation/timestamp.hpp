@@ -86,6 +86,8 @@ class Timestamp
 
     friend constexpr bool operator<(const Timestamp& lhs, const Timestamp& rhs) noexcept;
 
+    friend constexpr bool operator<=(const Timestamp& lhs, const Timestamp& rhs) noexcept;
+
     friend constexpr Timestamp operator+(const Timestamp& lhs, const Duration& rhs) noexcept;
 
     friend constexpr Timestamp operator-(const Timestamp& lhs, const Duration& rhs) noexcept;

@@ -45,6 +45,11 @@ constexpr bool operator<(const Timestamp& lhs, const Timestamp& rhs) noexcept
     return lhs.unixNanoseconds() < rhs.unixNanoseconds();
 }
 
+constexpr bool operator<=(const Timestamp& lhs, const Timestamp& rhs) noexcept
+{
+    return lhs.unixNanoseconds() <= rhs.unixNanoseconds();
+}
+
 constexpr Timestamp operator+(const Timestamp& lhs, const Duration& rhs) noexcept
 {
     return Timestamp(lhs.unixNanoseconds() + rhs.totalNanoseconds());
