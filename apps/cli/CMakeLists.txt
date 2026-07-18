@@ -12,6 +12,7 @@ target_link_libraries(logscope
         scope_configuration
         scope_foundation
         scope_runtime
+        scope_source
 )
 
 target_include_directories(logscope

@@ -5,11 +5,12 @@
 
 #include "LogAnalyzer.hpp"
 
-#include <fstream>
 #include <iostream>
 
-#include "foundation/filesystem.hpp"
 #include "log_macros.hpp"
+#include "source.hpp"
+
+using scope::source::LogSource;
 
 namespace scope::cli
 {
@@ -18,31 +19,37 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
-    auto existsResult = foundation::FileSystem::exists(filePath);
+    scope::source::SourceManager sourceManager;
 
-    if (!existsResult || !*existsResult)
+    auto datasetResult = sourceManager.open(filePath);
+
+    if (!datasetResult)
     {
-        SCOPE_LOG_ERROR("cli", "Unable to open log file: " + filePath.string());
+        SCOPE_LOG_ERROR("cli", datasetResult.error().message());
 
         return false;
     }
-
-    std::ifstream logFile(filePath.string());
-
-    if (!logFile.is_open())
-    {
-        SCOPE_LOG_ERROR("cli", "Unable to open log file: " + filePath.string());
-
-        return false;
-    }
-
-    SCOPE_LOG_DEBUG("cli", "Opened log file: " + filePath.string());
 
     std::string line;
     unsigned long totalLines = 0;
+    LogSource& logSource = datasetResult->source();
 
-    while (std::getline(logFile, line))
+    while (true)
     {
+        const auto readResult = logSource.readLine(line);
+
+        if (!readResult)
+        {
+            SCOPE_LOG_ERROR("cli", readResult.error().message());
+
+            return false;
+        }
+
+        if (!*readResult)
+        {
+            break;
+        }
+
         ++totalLines;
     }
 
