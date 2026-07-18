@@ -5,18 +5,16 @@
 
 #include "LogAnalyzer.hpp"
 
-#include <iostream>
-
 #include "analysis.hpp"
 #include "investigation.hpp"
 #include "log_macros.hpp"
-#include "reporting.hpp"
+#include "report_output.hpp"
 #include "source.hpp"
 
 namespace scope::cli
 {
 
-bool LogAnalyzer::analyze(const foundation::Path& filePath)
+bool LogAnalyzer::analyze(const foundation::Path& filePath, const OutputFormat format, std::ostream& output)
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
@@ -48,11 +46,7 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
 
     SCOPE_LOG_INFO("cli", "Investigation summary: " + view.summary());
 
-    scope::reporting::ReportGenerator reportGenerator;
-
-    const scope::reporting::Report report = reportGenerator.generate(*modelResult);
-
-    std::cout << report.text() << std::endl;
+    output << formatAnalysisOutput(*modelResult, format) << std::endl;
 
     return true;
 }

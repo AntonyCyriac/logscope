@@ -4,7 +4,14 @@
 
 add_executable(logscope
     LogAnalyzer.cpp
+    analyze_command.cpp
+    cli_application.cpp
+    cli_config.cpp
+    cli_parser.cpp
+    config_validate_command.cpp
     main.cpp
+    output_format.cpp
+    report_output.cpp
 )
 
 target_link_libraries(logscope
@@ -22,3 +29,5 @@ target_include_directories(logscope
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+add_subdirectory(tests)

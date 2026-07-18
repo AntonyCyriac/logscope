@@ -37,6 +37,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
 
+#### M3.9 – CLI
+
+- `CliApplication`, `analyze`, and `config validate` subcommands with text and JSON output formats.
+- Legacy `logscope <log-file>` invocation preserved for backward compatibility.
+- `logscope_cli_tests` unit test target for CLI parsing and output formatting.
+
 #### M3.7 – Investigation Engine
 
 - `InvestigationView`, `LineCountFilter`, and `InvestigationEngine` for inspecting, filtering, and searching analysis models.
