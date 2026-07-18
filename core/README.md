@@ -22,16 +22,16 @@ The Core layer contains no product-specific business logic.
 
 ## Modules
 
-| Module | Responsibility |
-|---------|----------------|
-| Foundation | Common types, errors, versioning, utilities |
-| Runtime | Platform abstraction |
-| Configuration | Configuration management |
-| Analysis | Analysis pipeline |
-| Investigation | Investigation workflow |
-| Reporting | Report generation |
-| Search | Search and filtering |
-| Workspace | Sessions and persistence |
+| Module | Status | Responsibility |
+|--------|--------|----------------|
+| [Foundation](foundation/README.md) | In progress | `Status`, `Error`, `Result<T>`, `Version`, `Uuid` |
+| Runtime | Planned | Platform abstraction |
+| Configuration | Planned | Configuration management |
+| Analysis | Planned | Analysis pipeline |
+| Investigation | Planned | Investigation workflow |
+| Reporting | Planned | Report generation |
+| Search | Planned | Search and filtering |
+| Workspace | Planned | Sessions and persistence |
 
 ---
 

@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.0.0 |
+| Version | 2.1.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 15-07-2026 |
+| Last Updated | 18-07-2026 |
 
 ---
 
@@ -312,3 +312,4 @@ Before starting development:
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 2.0.0 | 15-07-2026 | Updated to align with the completed engineering design baseline and architecture-driven development workflow. |
+| 2.1.0 | 18-07-2026 | Added contribution workflow section linking to handbook guides. |

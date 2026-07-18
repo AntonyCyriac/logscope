@@ -207,20 +207,19 @@ Smaller pull requests are easier to review, test, and maintain.
 
 # Future Additions
 
-This document will evolve as the project grows and may later include:
+This document will evolve as Foundation components are implemented. Topics still to be added here:
 
-- Naming conventions
-- Header organization
-- Namespace conventions
-- Error handling strategy (`Result<T>`)
 - Logging guidelines
-- Testing philosophy
-- Documentation standards
-- Formatting rules
-- API design principles
-- Performance considerations
+- Performance considerations for Foundation types
 - Thread safety guidelines
-- CMake conventions
+- CMake conventions for Foundation modules
+
+The following topics are covered in other documents:
+
+- Naming, formatting, headers — [C++ Coding Standard](CPP_CODING_STANDARD.md)
+- Error handling (`Result<T>`) — [Result&lt;T&gt; Design](../architecture/foundation/RESULT.md)
+- API design — [API Design Guidelines](API_DESIGN_GUIDELINES.md)
+- Testing and contribution workflow — [handbook](../handbook/)
 
 ---
 

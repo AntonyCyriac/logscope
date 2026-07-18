@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -54,6 +54,15 @@ Release
 ---
 
 # 3. Documentation Structure
+
+Repository-level documents:
+
+```text
+README.md
+CHANGELOG.md
+```
+
+`docs/` structure:
 
 ```text
 docs/
@@ -186,6 +195,8 @@ IMPLEMENTATION
 | FOUNDATION_GUIDELINES.md | Defines Foundation implementation patterns, examples, and workflow checklists. |
 | API_DESIGN_GUIDELINES.md | Defines public API design conventions. |
 | PRODUCT.md | Provides a concise product summary at the documentation root. |
+| CHANGELOG.md | Tracks notable project changes from M3 onward (repository root). |
+| ROADMAP.md | Defines milestones, current progress, and planned work. |
 | architecture/decisions/ | Records Architecture Decision Records (ADRs). |
 | architecture/foundation/ | Documents foundation-layer component designs. |
 | implementation/ | Describes how architectural concepts map to the codebase. |
@@ -243,3 +254,4 @@ These categories should be added only when they provide clear value and support 
 | 1.1.0 | 18-07-2026 | Updated structure for ENGINEERING_GUIDELINES, implementation/, ADRs, and foundation docs. |
 | 1.2.0 | 18-07-2026 | Renamed ENGINEERING_GUIDELINES to FOUNDATION_GUIDELINES under standards/; updated reading order and cross-links. |
 | 1.3.0 | 18-07-2026 | Extracted handbook workflow docs; deduplicated CPP_CODING_STANDARD with Foundation Guidelines. |
+| 1.4.0 | 18-07-2026 | Added CHANGELOG and ROADMAP to document roles; repository-level doc structure. |
