@@ -8,6 +8,7 @@ add_executable(scope_foundation_tests
     path_test.cpp
     result_test.cpp
     status_test.cpp
+    stopwatch_test.cpp
     time_test.cpp
     timestamp_test.cpp
     uuid_test.cpp

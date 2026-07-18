@@ -14,6 +14,7 @@
 #include "path.hpp"
 #include "result.hpp"
 #include "status.hpp"
+#include "stopwatch.hpp"
 #include "time.hpp"
 #include "timestamp.hpp"
 #include "uuid.hpp"

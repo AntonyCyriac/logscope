@@ -100,6 +100,7 @@ The Foundation module provides universal technical capabilities shared by all co
 | `Duration` | Non-negative time interval with nanosecond precision |
 | `Timestamp` | Absolute UTC instant as Unix nanoseconds since epoch |
 | `Clock` | System wall-clock source for current UTC timestamps |
+| `Stopwatch` | Monotonic elapsed-time measurement |
 | `Path` | Filesystem path value type |
 | `FileSystem` | File existence and metadata operations |
 
@@ -109,7 +110,6 @@ All completed components include unit tests and are built as part of `scope_foun
 
 | Component | Priority |
 |-----------|----------|
-| `Stopwatch` | Medium |
 | `Random` | Medium |
 | `String` utilities | Medium |
 | `Hash` | Medium |

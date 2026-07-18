@@ -33,6 +33,7 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 | `Duration` | `duration.hpp`, `duration.cpp`, `duration.inl` |
 | `Timestamp` | `timestamp.hpp`, `timestamp.cpp`, `timestamp.inl` |
 | `Clock` | `clock.hpp`, `clock.cpp` |
+| `Stopwatch` | `stopwatch.hpp`, `stopwatch.cpp` |
 | `Path` | `path.hpp`, `path.cpp` |
 | `FileSystem` | `filesystem.hpp`, `filesystem.cpp` |
 
