@@ -10,6 +10,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [0.3.0] - 2026-07-18
+
+M3 – Architecture Realization complete. Delivers the full core pipeline from configuration through CLI, with 186 automated tests.
+
 ### Added
 
 #### M3.1 – Repository Architecture
@@ -113,4 +119,5 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 | Tag | Scope |
 |-----|-------|
+| `v0.3.0` | M3 complete: core pipeline, CLI framework, integration and end-to-end tests. |
 | `v0.2.0-design-baseline` | M0–M2 complete: engineering foundation, product vision, and design baseline. |

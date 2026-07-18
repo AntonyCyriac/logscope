@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.2.0 |
+| Version | 2.3.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -42,7 +42,7 @@ M2  ██████████ 100%
 M3  ██████████ 100%
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 changes are tracked in [CHANGELOG.md](../CHANGELOG.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md).
 
 ---
 
@@ -52,9 +52,9 @@ The implementation phase is divided into logical increments.
 
 | Phase | Component | Status |
 |-------|-----------|--------|
-| M3.1 | Repository Structure | 🟡 In Progress |
-| M3.2 | Core Library (Foundation) | 🟡 In Progress |
-| M3.3 | Platform Services (Runtime) | 🟡 In Progress |
+| M3.1 | Repository Structure | ✅ Complete |
+| M3.2 | Core Library (Foundation) | ✅ Complete |
+| M3.3 | Platform Services (Runtime) | ✅ Complete |
 | M3.4 | Configuration Manager | ✅ Complete |
 | M3.5 | Source Manager | ✅ Complete |
 | M3.6 | Analysis Engine | ✅ Complete |
@@ -266,3 +266,4 @@ The roadmap is considered successful when:
 | 2.0.0 | 15-07-2026 | Updated roadmap to align with the completed engineering design baseline and architecture realization plan. |
 | 2.1.0 | 18-07-2026 | Updated M3 progress: UUID complete, Foundation status, M3.1/M3.2 tracking, and next priorities. |
 | 2.2.0 | 18-07-2026 | Added Time, Date, DateTime, Path, FileSystem; Runtime module; CLI migration to apps/. |
+| 2.3.0 | 18-07-2026 | M3 complete; all M3 phases marked complete; linked `v0.3.0` release. |

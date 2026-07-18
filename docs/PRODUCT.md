@@ -19,8 +19,14 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-The project is in **M3 – Architecture Realization**. A Foundation library and CLI prototype are under active development. See [Roadmap](ROADMAP.md) and [Changelog](../CHANGELOG.md) for progress.
+M3 – Architecture Realization is **complete** as of [`v0.3.0`](../CHANGELOG.md). The core pipeline is operational:
+
+```text
+Configuration → Source → Analysis → Investigation → Reporting → CLI
+```
+
+Development focus shifts to **M4 – Feature Expansion**. See [Roadmap](ROADMAP.md) and [Changelog](../CHANGELOG.md) for details.
 
 ## Initial Delivery
 
-The first executable delivers basic log file analysis. Long-term capabilities are defined in the functional requirements (FR-001 through FR-004).
+The first executable delivers basic log file analysis with text and JSON output. Long-term capabilities are defined in the functional requirements (FR-001 through FR-004).
