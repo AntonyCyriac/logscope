@@ -1,6 +1,7 @@
 add_executable(scope_analysis_tests
     analysis_engine_test.cpp
     analysis_model_test.cpp
+    log_line_classifier_test.cpp
 )
 
 target_link_libraries(scope_analysis_tests

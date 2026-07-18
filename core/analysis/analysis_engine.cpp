@@ -8,11 +8,39 @@
 #include <string>
 
 #include "foundation/error.hpp"
+#include "log_line_classifier.hpp"
 #include "log_macros.hpp"
 #include "log_source.hpp"
 
 namespace scope::analysis
 {
+
+namespace
+{
+
+void recordLevel(LogLevelCounts& counts, const DetectedLogLevel level) noexcept
+{
+    switch (level)
+    {
+    case DetectedLogLevel::Blank:
+        counts.recordBlank();
+        break;
+    case DetectedLogLevel::Info:
+        counts.recordInfo();
+        break;
+    case DetectedLogLevel::Warn:
+        counts.recordWarn();
+        break;
+    case DetectedLogLevel::Error:
+        counts.recordError();
+        break;
+    case DetectedLogLevel::Other:
+        counts.recordOther();
+        break;
+    }
+}
+
+} // namespace
 
 foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset) const
 {
@@ -26,6 +54,7 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
 
     std::string line;
     std::uint64_t totalLines = 0;
+    LogLevelCounts levelCounts;
     source::LogSource& logSource = dataset.source();
 
     while (true)
@@ -45,11 +74,12 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
         }
 
         ++totalLines;
+        recordLevel(levelCounts, detectLogLevel(line));
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
 
-    return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(), totalLines));
+    return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(), totalLines, levelCounts));
 }
 
 } // namespace scope::analysis

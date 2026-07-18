@@ -8,6 +8,7 @@
 #include <cstdint>
 
 #include "foundation/path.hpp"
+#include "log_level_counts.hpp"
 
 namespace scope::analysis
 {
@@ -23,8 +24,10 @@ class AnalysisModel
      *
      * @param sourcePath Path of the analyzed source.
      * @param totalLines Number of log lines analyzed.
+     * @param levelCounts Per-level line statistics.
      */
-    AnalysisModel(foundation::Path sourcePath, std::uint64_t totalLines) noexcept;
+    AnalysisModel(foundation::Path sourcePath, std::uint64_t totalLines,
+                  LogLevelCounts levelCounts = {}) noexcept;
 
     /**
      * @brief Returns the path of the analyzed source.
@@ -36,9 +39,15 @@ class AnalysisModel
      */
     [[nodiscard]] std::uint64_t totalLines() const noexcept;
 
+    /**
+     * @brief Returns per-level line statistics.
+     */
+    [[nodiscard]] const LogLevelCounts& levelCounts() const noexcept;
+
   private:
     foundation::Path m_sourcePath;
     std::uint64_t m_totalLines;
+    LogLevelCounts m_levelCounts;
 };
 
 } // namespace scope::analysis

@@ -10,6 +10,7 @@
 #include "analysis_model.hpp"
 #include "investigation_view.hpp"
 #include "line_count_filter.hpp"
+#include "log_level_filter.hpp"
 
 namespace scope::investigation
 {
@@ -26,10 +27,16 @@ class InvestigationEngine
     [[nodiscard]] InvestigationView inspect(const analysis::AnalysisModel& model) const;
 
     /**
-     * @brief Determines whether an analysis model satisfies a filter.
+     * @brief Determines whether an analysis model satisfies a line-count filter.
      */
     [[nodiscard]] bool matches(const analysis::AnalysisModel& model,
                                const LineCountFilter& filter) const noexcept;
+
+    /**
+     * @brief Determines whether an analysis model satisfies a log-level filter.
+     */
+    [[nodiscard]] bool matches(const analysis::AnalysisModel& model,
+                               const LogLevelFilter& filter) const noexcept;
 
     /**
      * @brief Searches the analyzed source path for a query string.

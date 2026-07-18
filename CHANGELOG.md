@@ -10,10 +10,13 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
-### Documentation
+### Added
 
-- M4 phased roadmap (M4.1–M4.5) in [docs/ROADMAP.md](docs/ROADMAP.md).
-- [docs/planning/M4-FEATURE-EXPANSION.md](docs/planning/M4-FEATURE-EXPANSION.md) with gap analysis, dependencies, and engineering conventions.
+#### M4.1 – Analysis Depth
+
+- `LogLevelCounts` and `detectLogLevel` for generic INFO/WARN/ERROR statistics.
+- `LogLevelFilter` for investigation filtering by error and warning thresholds.
+- Text and JSON reports include per-level line counts.
 
 ---
 

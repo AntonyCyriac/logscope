@@ -12,6 +12,7 @@ It implements **FR-002 Investigate Logs** by operating directly on **DO-002 Anal
 |-----------|-------------|
 | `InvestigationView` | Read-only inspection of analyzed log information |
 | `LineCountFilter` | Progressive line-count filtering |
+| `LogLevelFilter` | Progressive log-level count filtering |
 | `InvestigationEngine` | Search, filter, and inspect analysis models |
 
 ## Dependencies

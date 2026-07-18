@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string>
 
+#include "analysis_model.hpp"
 #include "foundation/path.hpp"
 
 namespace scope::investigation
@@ -20,12 +21,9 @@ class InvestigationView
 {
   public:
     /**
-     * @brief Constructs an investigation view.
-     *
-     * @param sourcePath Path of the analyzed source.
-     * @param totalLines Number of log lines analyzed.
+     * @brief Constructs an investigation view from an analysis model.
      */
-    InvestigationView(foundation::Path sourcePath, std::uint64_t totalLines) noexcept;
+    explicit InvestigationView(const analysis::AnalysisModel& model) noexcept;
 
     /**
      * @brief Returns the path of the analyzed source.
@@ -36,6 +34,11 @@ class InvestigationView
      * @brief Returns the total number of log lines analyzed.
      */
     [[nodiscard]] std::uint64_t totalLines() const noexcept;
+
+    /**
+     * @brief Returns per-level line statistics.
+     */
+    [[nodiscard]] const analysis::LogLevelCounts& levelCounts() const noexcept;
 
     /**
      * @brief Determines whether the analysis contains no log lines.
@@ -50,6 +53,7 @@ class InvestigationView
   private:
     foundation::Path m_sourcePath;
     std::uint64_t m_totalLines;
+    analysis::LogLevelCounts m_levelCounts;
 };
 
 } // namespace scope::investigation

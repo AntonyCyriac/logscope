@@ -8,3 +8,4 @@
 #include "investigation_engine.hpp"
 #include "investigation_view.hpp"
 #include "line_count_filter.hpp"
+#include "log_level_filter.hpp"
