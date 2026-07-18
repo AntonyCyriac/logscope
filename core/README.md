@@ -24,13 +24,13 @@ The Core layer contains no product-specific business logic.
 
 | Module | Status | Responsibility |
 |--------|--------|----------------|
-| [Foundation](foundation/README.md) | In progress | `Status`, `Error`, `Result<T>`, `Version`, `Uuid`, `Time`, `Date`, `DateTime`, `Path`, `FileSystem` |
-| [Runtime](runtime/README.md) | In progress | Configuration, Diagnostics, PluginRegistry, ServiceRegistry |
-| [Configuration](configuration/README.md) | In progress | Configuration loading, validation, environment overrides |
-| [Source](source/README.md) | In progress | Log source validation, acquisition, and dataset preparation |
-| [Analysis](analysis/README.md) | In progress | Source dataset analysis and analysis model production |
-| [Investigation](investigation/README.md) | In progress | Search, filter, and inspect analysis models |
-| [Reporting](reporting/README.md) | In progress | Report generation from analysis models |
+| [Foundation](foundation/README.md) | Complete | Universal types: `Status`, `Error`, `Result<T>`, time, path, string, and hash utilities |
+| [Runtime](runtime/README.md) | Complete | Configuration store, diagnostics, plugin and service registries |
+| [Configuration](configuration/README.md) | Complete | Configuration loading, validation, environment overrides |
+| [Source](source/README.md) | Complete | Log source validation, acquisition, and dataset preparation |
+| [Analysis](analysis/README.md) | Complete | Source dataset analysis and analysis model production |
+| [Investigation](investigation/README.md) | Complete | Search, filter, and inspect analysis models |
+| [Reporting](reporting/README.md) | Complete | Report generation from analysis models |
 | Workspace | Planned | Sessions and persistence |
 
 ---
