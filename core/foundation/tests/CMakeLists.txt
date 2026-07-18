@@ -6,6 +6,7 @@ add_executable(scope_foundation_tests
     error_test.cpp
     filesystem_test.cpp
     path_test.cpp
+    random_test.cpp
     result_test.cpp
     status_test.cpp
     stopwatch_test.cpp

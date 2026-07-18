@@ -11,6 +11,7 @@ add_library(scope_foundation
     error.cpp
     filesystem.cpp
     path.cpp
+    random.cpp
     stopwatch.cpp
     time.cpp
     timestamp.cpp

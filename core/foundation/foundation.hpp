@@ -12,6 +12,7 @@
 #include "error.hpp"
 #include "filesystem.hpp"
 #include "path.hpp"
+#include "random.hpp"
 #include "result.hpp"
 #include "status.hpp"
 #include "stopwatch.hpp"
