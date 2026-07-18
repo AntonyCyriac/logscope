@@ -6,6 +6,7 @@
 add_library(scope_foundation
     date.cpp
     datetime.cpp
+    duration.cpp
     error.cpp
     filesystem.cpp
     path.cpp

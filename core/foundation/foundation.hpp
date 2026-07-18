@@ -7,6 +7,7 @@
 
 #include "date.hpp"
 #include "datetime.hpp"
+#include "duration.hpp"
 #include "error.hpp"
 #include "filesystem.hpp"
 #include "path.hpp"

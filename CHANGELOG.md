@@ -26,6 +26,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `Version` value type with semantic versioning support.
 - `Uuid` value type with RFC 4122 parsing, version 4 generation, and comparison operators.
 - `Time`, `Date`, and `DateTime` value types with parsing and comparison.
+- `Duration` value type for non-negative time intervals with nanosecond precision.
 - `Path` and `FileSystem` for filesystem path handling and file operations.
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
