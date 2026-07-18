@@ -2,7 +2,9 @@
 
 ## Status
 
-Proposed
+Implemented
+
+**Source:** `core/foundation/result.hpp`, `core/foundation/result.inl`
 
 ---
 

@@ -18,6 +18,20 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 
 ---
 
+## Implemented Components
+
+| Component | Location |
+|-----------|----------|
+| `Status` | `status.hpp` |
+| `Error` / `ErrorCode` | `error.hpp`, `error.cpp` |
+| `Result<T>` | `result.hpp`, `result.inl` |
+| `Version` | `version.hpp`, `version.cpp` |
+| `Uuid` | `uuid.hpp`, `uuid.cpp` |
+
+All components are exported through `foundation.hpp` and tested under `tests/`.
+
+---
+
 ## Dependencies
 
 None.

@@ -2,7 +2,9 @@
 
 All notable changes to this project will be documented in this file.
 
-This project loosely follows the principles of Keep a Changelog.
+This project follows the principles of [Keep a Changelog](https://keepachangelog.com/).
+
+Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and the `v0.2.0-design-baseline` tag. **Changelog entries begin at M3 – Architecture Realization.**
 
 ---
 
@@ -10,13 +12,41 @@ This project loosely follows the principles of Keep a Changelog.
 
 ### Added
 
-- Established engineering foundation.
-- Configured MSYS2 UCRT64 toolchain.
-- Configured GCC, GDB and CMake.
-- Added Cursor IDE workspace configuration.
-- Added automatic code formatting using clang-format.
-- Added EditorConfig support.
-- Added CMakePresets.json.
-- Added repository structure.
-- Added Developer Setup guide.
-- Added project README.
+#### M3.1 – Repository Architecture
+
+- Introduced workspace model directory layout (`core/`, `docs/`, `apps/`, and related areas).
+- Established continuous integration workflow (build and test on push/PR).
+- Added CMake `format` target for `clang-format`.
+
+#### M3.2 – Foundation Library
+
+- `Status` type for lightweight operation outcomes.
+- `Error` and `ErrorCode` types for structured error reporting.
+- `Result<T>` template for type-safe, exception-free error handling.
+- `Version` value type with semantic versioning support.
+- `Uuid` value type with RFC 4122 parsing, version 4 generation, and comparison operators.
+- Unit tests for all Foundation components (38 tests via GoogleTest).
+- `scope_foundation` static library and `scope_foundation_tests` test target.
+
+#### Documentation
+
+- ADR-001: unit testing framework selection (GoogleTest).
+- C++ Coding Standard and API Design Guidelines.
+- Foundation Guidelines (renamed from engineering guidelines; moved under `docs/standards/`).
+- Handbook workflow docs: Git Conventions, Pull Request Guide, Code Review Checklist.
+- Updated Document Map, README, and cross-links across standards documents.
+
+### Changed
+
+- Migrated Foundation unit tests to GoogleTest.
+- Reorganized engineering documentation into standards and handbook layers.
+- Deduplicated C++ Coding Standard with Foundation Guidelines.
+- Renamed `.github/README.md` to `.github/GITHUB.md` so the root README displays on the repository homepage.
+
+---
+
+## Prior Releases
+
+| Tag | Scope |
+|-----|-------|
+| `v0.2.0-design-baseline` | M0–M2 complete: engineering foundation, product vision, and design baseline. |

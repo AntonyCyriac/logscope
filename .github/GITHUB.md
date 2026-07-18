@@ -24,13 +24,13 @@ All pull requests should target the `master` branch.
 
 ## Build Status Badge
 
-Once the Continuous Integration (CI) workflow is successfully running, add the build status badge to the top of the `README.md`.
+The CI badge is included in the root [README.md](../README.md):
 
 ```markdown
 ![CI](https://github.com/AntonyCyriac/logscope/actions/workflows/ci.yml/badge.svg)
 ```
 
-The badge automatically reflects the status of the default branch (`master`) and provides a quick indication of the project's build health.
+The badge reflects the status of the default branch (`master`).
 
 ---
 
@@ -39,6 +39,7 @@ The badge automatically reflects the status of the default branch (`master`) and
 ```text
 .github/
 │
+├── GITHUB.md
 ├── workflows/
 │   └── ci.yml
 │

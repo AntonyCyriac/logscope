@@ -1,5 +1,7 @@
 # Pull Request
 
+Use the [Pull Request Guide](../docs/handbook/PULL_REQUEST_GUIDE.md) and [Code Review Checklist](../docs/handbook/CODE_REVIEW_CHECKLIST.md) for full author and reviewer checklists.
+
 ## Summary
 
 Provide a brief description of the change.
