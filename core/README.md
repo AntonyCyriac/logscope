@@ -26,7 +26,7 @@ The Core layer contains no product-specific business logic.
 |--------|--------|----------------|
 | [Foundation](foundation/README.md) | In progress | `Status`, `Error`, `Result<T>`, `Version`, `Uuid`, `Time`, `Date`, `DateTime`, `Path`, `FileSystem` |
 | [Runtime](runtime/README.md) | In progress | Configuration, Diagnostics, PluginRegistry, ServiceRegistry |
-| Configuration | Planned | Configuration management |
+| [Configuration](configuration/README.md) | In progress | Configuration loading, validation, environment overrides |
 | Analysis | Planned | Analysis pipeline |
 | Investigation | Planned | Investigation workflow |
 | Reporting | Planned | Report generation |
