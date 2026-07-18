@@ -98,6 +98,7 @@ The Foundation module provides universal technical capabilities shared by all co
 | `Date` | Calendar date value type |
 | `DateTime` | Combined date and time |
 | `Duration` | Non-negative time interval with nanosecond precision |
+| `Timestamp` | Absolute UTC instant as Unix nanoseconds since epoch |
 | `Path` | Filesystem path value type |
 | `FileSystem` | File existence and metadata operations |
 
@@ -107,7 +108,6 @@ All completed components include unit tests and are built as part of `scope_foun
 
 | Component | Priority |
 |-----------|----------|
-| `Timestamp` | Medium |
 | `Clock` | Medium |
 | `Stopwatch` | Medium |
 | `Random` | Medium |

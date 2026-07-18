@@ -31,6 +31,7 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 | `Date` | `date.hpp`, `date.cpp`, `date.inl` |
 | `DateTime` | `datetime.hpp`, `datetime.cpp`, `datetime.inl` |
 | `Duration` | `duration.hpp`, `duration.cpp`, `duration.inl` |
+| `Timestamp` | `timestamp.hpp`, `timestamp.cpp`, `timestamp.inl` |
 | `Path` | `path.hpp`, `path.cpp` |
 | `FileSystem` | `filesystem.hpp`, `filesystem.cpp` |
 

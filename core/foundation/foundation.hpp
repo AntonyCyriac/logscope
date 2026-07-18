@@ -14,5 +14,6 @@
 #include "result.hpp"
 #include "status.hpp"
 #include "time.hpp"
+#include "timestamp.hpp"
 #include "uuid.hpp"
 #include "version.hpp"

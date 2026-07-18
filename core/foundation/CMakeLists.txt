@@ -11,6 +11,7 @@ add_library(scope_foundation
     filesystem.cpp
     path.cpp
     time.cpp
+    timestamp.cpp
     uuid.cpp
     version.cpp
 )
