@@ -260,3 +260,37 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
 
     std::remove(sessionFile.string().c_str());
 }
+
+TEST_F(PipelineIntegrationTest, RejectsCorruptSessionFile)
+{
+    const Path sessionFile("pipeline_integration_corrupt.logscope-session");
+
+    {
+        std::ofstream stream(sessionFile.string());
+        stream << "source.path=sample.log\n";
+        stream << "analysis.totalLines=not-a-number\n";
+    }
+
+    SessionStore store;
+    const auto loaded = store.load(sessionFile);
+
+    EXPECT_FALSE(loaded.hasValue());
+
+    std::remove(sessionFile.string().c_str());
+}
+
+TEST_F(PipelineIntegrationTest, RejectsCorruptConfigurationFile)
+{
+    const Path configFile("pipeline_integration_corrupt.properties");
+
+    {
+        std::ofstream stream(configFile.string());
+        stream << "invalid line without equals\n";
+    }
+
+    const auto configurationResult = ConfigurationManager::loadFromFile(configFile);
+
+    EXPECT_FALSE(configurationResult.hasValue());
+
+    std::remove(configFile.string().c_str());
+}

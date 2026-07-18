@@ -25,9 +25,9 @@ M4 – Feature Expansion is **complete** as of [`v0.4.0`](../CHANGELOG.md). The 
 Configuration → Source → Analysis → Investigation → Reporting → CLI
 ```
 
-M4 delivered analysis depth, additional source types, advanced reporting, an extension ecosystem, and session persistence. **M5 – Production Readiness** is next.
+M4 delivered analysis depth, additional source types, advanced reporting, an extension ecosystem, and session persistence. **M5 – Production Readiness** is in progress toward `v1.0.0`.
 
-See [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md) and [Roadmap](ROADMAP.md) for details.
+See [M5 – Production Readiness](planning/M5-PRODUCTION-READINESS.md) and [Roadmap](ROADMAP.md) for details.
 
 ## Initial Delivery
 

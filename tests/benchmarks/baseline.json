@@ -1,0 +1,18 @@
+{
+  "version": 1,
+  "description": "Reference performance baselines for CI regression checks",
+  "benchmarks": [
+    {
+      "name": "BM_AnalysisEngine/100000",
+      "metric": "lines_per_second",
+      "minimum": 500000,
+      "regression_tolerance_percent": 20
+    },
+    {
+      "name": "BM_SourceReadLoop/100000",
+      "metric": "lines_per_second",
+      "minimum": 1000000,
+      "regression_tolerance_percent": 20
+    }
+  ]
+}

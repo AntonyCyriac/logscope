@@ -63,3 +63,5 @@ logscope config validate --config samples/logscope.properties --require log.leve
 ## Tests
 
 - `logscope_cli_tests` — parser and output formatting unit tests
+
+Full command reference: [CLI Reference](../../docs/handbook/CLI_REFERENCE.md).

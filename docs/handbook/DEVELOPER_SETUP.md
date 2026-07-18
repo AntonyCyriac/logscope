@@ -308,6 +308,8 @@ Before starting development:
 - [ ] Git working tree is clean.
 - [ ] Architecture documents reviewed.
 
+For benchmarks, fuzz tests, sanitizers, and coverage, see [Testing Guide](../testing/TESTING.md).
+
 ---
 
 # 19. Revision History
@@ -316,3 +318,4 @@ Before starting development:
 |----------|------------|-----------------------------|
 | 2.0.0 | 15-07-2026 | Updated to align with the completed engineering design baseline and architecture-driven development workflow. |
 | 2.1.0 | 18-07-2026 | Added contribution workflow section linking to handbook guides. |
+| 2.2.0 | 18-07-2026 | Linked M5 testing guide from verification checklist. |

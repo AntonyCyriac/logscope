@@ -1,5 +1,6 @@
 add_executable(scope_configuration_tests
     configuration_manager_test.cpp
+    configuration_malformed_test.cpp
 )
 
 target_link_libraries(scope_configuration_tests

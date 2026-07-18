@@ -7,7 +7,7 @@ A generic, extensible, high-performance log analysis platform.
 
 LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
 
-**Status:** M4 complete ([`v0.4.0`](CHANGELOG.md)); **M5 production readiness** is next — see [Roadmap](docs/ROADMAP.md).
+**Status:** M5 production readiness in progress ([`v0.4.0`](CHANGELOG.md)) — see [M5 plan](docs/planning/M5-PRODUCTION-READINESS.md) and [Roadmap](docs/ROADMAP.md).
 
 ## What works today
 
@@ -73,6 +73,10 @@ tests/          Integration and end-to-end tests
 | Topic | Location |
 |-------|----------|
 | Roadmap and milestones | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| M5 production readiness | [docs/planning/M5-PRODUCTION-READINESS.md](docs/planning/M5-PRODUCTION-READINESS.md) |
+| Testing guide | [docs/testing/TESTING.md](docs/testing/TESTING.md) |
+| CLI reference | [docs/handbook/CLI_REFERENCE.md](docs/handbook/CLI_REFERENCE.md) |
+| Release process | [docs/release/RELEASE.md](docs/release/RELEASE.md) |
 | Changelog | [CHANGELOG.md](CHANGELOG.md) |
 | Developer setup | [docs/handbook/DEVELOPER_SETUP.md](docs/handbook/DEVELOPER_SETUP.md) |
 | Engineering principles | [docs/standards/ENGINEERING_PRINCIPLES.md](docs/standards/ENGINEERING_PRINCIPLES.md) |
