@@ -6,20 +6,30 @@
 #include "output_format.hpp"
 
 #include "foundation/string.hpp"
+#include "report_format.hpp"
 
 namespace scope::cli
 {
 
 std::optional<OutputFormat> parseOutputFormat(const std::string_view value) noexcept
 {
-    if (foundation::toLower(value) == "text")
+    const auto format = reporting::parseReportFormat(value);
+
+    if (!format)
     {
-        return OutputFormat::Text;
+        return std::nullopt;
     }
 
-    if (foundation::toLower(value) == "json")
+    switch (*format)
     {
+    case reporting::ReportFormat::Text:
+        return OutputFormat::Text;
+    case reporting::ReportFormat::Json:
         return OutputFormat::Json;
+    case reporting::ReportFormat::Csv:
+        return OutputFormat::Csv;
+    case reporting::ReportFormat::Markdown:
+        return OutputFormat::Markdown;
     }
 
     return std::nullopt;
@@ -30,12 +40,33 @@ std::string_view outputFormatName(const OutputFormat format) noexcept
     switch (format)
     {
     case OutputFormat::Text:
-        return "text";
+        return reporting::reportFormatName(reporting::ReportFormat::Text);
     case OutputFormat::Json:
-        return "json";
+        return reporting::reportFormatName(reporting::ReportFormat::Json);
+    case OutputFormat::Csv:
+        return reporting::reportFormatName(reporting::ReportFormat::Csv);
+    case OutputFormat::Markdown:
+        return reporting::reportFormatName(reporting::ReportFormat::Markdown);
     }
 
-    return "text";
+    return reporting::reportFormatName(reporting::ReportFormat::Text);
+}
+
+reporting::ReportFormat toReportFormat(const OutputFormat format) noexcept
+{
+    switch (format)
+    {
+    case OutputFormat::Text:
+        return reporting::ReportFormat::Text;
+    case OutputFormat::Json:
+        return reporting::ReportFormat::Json;
+    case OutputFormat::Csv:
+        return reporting::ReportFormat::Csv;
+    case OutputFormat::Markdown:
+        return reporting::ReportFormat::Markdown;
+    }
+
+    return reporting::ReportFormat::Text;
 }
 
 } // namespace scope::cli

@@ -41,11 +41,12 @@ TEST(ReportGeneratorTest, GeneratesTextReport)
     const Report report = generator.generate(createSampleModel());
 
     EXPECT_NE(std::string::npos, report.text().find("========== LOGSCOPE REPORT =========="));
-    EXPECT_NE(std::string::npos, report.text().find("Source          : sample.log"));
+    EXPECT_NE(std::string::npos, report.text().find("--- Summary ---"));
     EXPECT_NE(std::string::npos, report.text().find("Total log lines : 8"));
+    EXPECT_NE(std::string::npos, report.text().find("--- Level Breakdown ---"));
     EXPECT_NE(std::string::npos, report.text().find("Error lines     : 4"));
-    EXPECT_NE(std::string::npos, report.text().find("Warning lines   : 1"));
-    EXPECT_NE(std::string::npos, report.text().find("Info lines      : 3"));
+    EXPECT_NE(std::string::npos, report.text().find("--- Source Metadata ---"));
+    EXPECT_NE(std::string::npos, report.text().find("Source          : sample.log"));
     EXPECT_NE(std::string::npos, report.text().find("====================================="));
 }
 

@@ -25,6 +25,13 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `FileSystem::listRegularFiles` for directory enumeration.
 - Clear unsupported-input errors for empty directories and invalid sources (FR-001.4).
 
+#### M4.3 – Advanced Reporting
+
+- Report sections: summary, level breakdown, and source metadata.
+- Section selection via `--sections` CLI flag or `report.sections` configuration key (FR-003.2).
+- CSV and Markdown output formats alongside text and JSON (FR-003.4).
+- Unified formatting in `core/reporting` for reproducible output (FR-003.6).
+
 ---
 
 ## [0.3.0] - 2026-07-18

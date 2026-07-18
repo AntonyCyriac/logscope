@@ -11,6 +11,9 @@ It implements **DO-003 Report** from the domain model.
 | Component | Description |
 |-----------|-------------|
 | `Report` | Formatted presentation of analysis results |
+| `ReportSections` | Selectable report sections (summary, levels, metadata) |
+| `ReportOptions` | Format and section selection |
+| `ReportFormatter` | Multi-format report serialization |
 | `ReportGenerator` | Creates reports from `AnalysisModel` |
 
 ## Dependencies
@@ -25,7 +28,11 @@ It implements **DO-003 Report** from the domain model.
 #include "reporting.hpp"
 
 scope::reporting::ReportGenerator generator;
-scope::reporting::Report report = generator.generate(model);
+scope::reporting::ReportOptions options;
+options.format = scope::reporting::ReportFormat::Markdown;
+options.sections = scope::reporting::ReportSections::parse("summary,levels").value();
+
+scope::reporting::Report report = generator.generate(model, options);
 
 std::cout << report.text() << std::endl;
 ```

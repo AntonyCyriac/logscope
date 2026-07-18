@@ -24,7 +24,8 @@ logscope [--config <file>] <log-source>
 
 ```bash
 logscope analyze samples/sample.log
-logscope analyze samples
+logscope analyze --format csv --sections summary,levels samples/sample.log
+logscope analyze --format markdown samples
 logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log
@@ -35,8 +36,10 @@ logscope config validate --config samples/logscope.properties --require log.leve
 
 | Format | Description |
 |--------|-------------|
-| `text` | Human-readable report (default) |
-| `json` | Structured JSON output |
+| `text` | Human-readable report with sections (default) |
+| `json` | Structured JSON with section objects |
+| `csv` | Section/key/value rows for spreadsheets |
+| `markdown` | Markdown tables for documentation |
 
 ## Components
 

@@ -8,6 +8,8 @@
 #include <optional>
 #include <string_view>
 
+#include "report_format.hpp"
+
 namespace scope::cli
 {
 
@@ -17,7 +19,9 @@ namespace scope::cli
 enum class OutputFormat
 {
     Text,
-    Json
+    Json,
+    Csv,
+    Markdown
 };
 
 /**
@@ -29,5 +33,10 @@ enum class OutputFormat
  * @brief Returns the canonical format name.
  */
 [[nodiscard]] std::string_view outputFormatName(OutputFormat format) noexcept;
+
+/**
+ * @brief Converts a CLI output format to a reporting format.
+ */
+[[nodiscard]] reporting::ReportFormat toReportFormat(OutputFormat format) noexcept;
 
 } // namespace scope::cli
