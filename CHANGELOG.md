@@ -37,6 +37,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
 
+#### M3.10 – Integration and End-to-End Testing
+
+- `logscope_integration_tests` for the Source → Analysis → Investigation → Reporting pipeline.
+- `logscope_e2e_tests` for CLI executable smoke tests against `samples/` fixtures.
+- Repository `tests/` directory wired into the root CMake build.
+
 #### M3.9 – CLI
 
 - `CliApplication`, `analyze`, and `config validate` subcommands with text and JSON output formats.
