@@ -37,6 +37,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
 
+#### M3.8 – Reporting Engine
+
+- `Report` and `ReportGenerator` for text reports from `AnalysisModel`.
+- `scope_reporting` library and `scope_reporting_tests` test target.
+- CLI `LogAnalyzer` refactored to render output via `ReportGenerator`.
+
 #### M3.6 – Analysis Engine
 
 - `AnalysisModel` and `AnalysisEngine` for transforming `SourceDataset` into analysis results.

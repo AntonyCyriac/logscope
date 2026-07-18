@@ -59,7 +59,7 @@ The implementation phase is divided into logical increments.
 | M3.5 | Source Manager | ✅ Complete |
 | M3.6 | Analysis Engine | ✅ Complete |
 | M3.7 | Investigation Engine | ⏳ Planned |
-| M3.8 | Reporting Engine | ⏳ Planned |
+| M3.8 | Reporting Engine | ✅ Complete |
 | M3.9 | CLI | ⏳ Planned |
 | M3.10 | Integration & End-to-End Testing | ⏳ Planned |
 
@@ -167,12 +167,22 @@ Built as `scope_analysis` with unit tests. CLI `LogAnalyzer` delegates analysis 
 
 ---
 
+## M3.8 – Reporting Engine
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `Report` | User-facing report presentation (DO-003) | Complete |
+| `ReportGenerator` | Generates text reports from `AnalysisModel` | Complete |
+
+Built as `scope_reporting` with unit tests. CLI `LogAnalyzer` renders output through `ReportGenerator`.
+
+---
+
 ## M3.7 – M3.10 (Planned)
 
 Subsequent M3 phases depend on a stable Foundation library:
 
 - **M3.7** – Investigation Engine
-- **M3.8** – Reporting Engine
 - **M3.9** – CLI (command framework, subcommands, configuration, output formats)
 - **M3.10** – Integration and end-to-end testing
 
