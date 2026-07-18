@@ -5,6 +5,7 @@
 
 #include <fstream>
 
+#include <filesystem>
 #include <gtest/gtest.h>
 
 #include "analysis.hpp"
@@ -149,4 +150,49 @@ TEST_F(PipelineIntegrationTest, InvestigationFilterExcludesEmptyAnalysis)
     EXPECT_NE(std::string::npos, report.text().find("Total log lines : 0"));
 
     std::remove(emptyFile.string().c_str());
+}
+
+TEST_F(PipelineIntegrationTest, AnalyzesDirectoryOfLogFiles)
+{
+    const Path directoryPath("pipeline_integration_dir");
+
+    std::filesystem::create_directory(directoryPath.string());
+
+    const Path firstFile = directoryPath.append("one.log");
+    const Path secondFile = directoryPath.append("two.log");
+
+    {
+        std::ofstream stream(firstFile.string());
+        stream << "2026-07-11 10:00:01 INFO First file\n";
+        stream << "2026-07-11 10:00:02 ERROR First error\n";
+    }
+
+    {
+        std::ofstream stream(secondFile.string());
+        stream << "2026-07-11 10:00:03 WARNING Second file\n";
+    }
+
+    SourceManager sourceManager;
+
+    {
+        auto datasetResult = sourceManager.open(directoryPath);
+
+        ASSERT_TRUE(datasetResult.hasValue());
+        EXPECT_EQ(directoryPath.string(), datasetResult->path().string());
+
+        const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+        ASSERT_TRUE(modelResult.hasValue());
+        EXPECT_EQ(3U, modelResult->totalLines());
+        EXPECT_EQ(1U, modelResult->levelCounts().errorLines());
+        EXPECT_EQ(1U, modelResult->levelCounts().warnLines());
+
+        const auto report = ReportGenerator{}.generate(*modelResult);
+
+        EXPECT_NE(std::string::npos, report.text().find(directoryPath.string()));
+    }
+
+    std::remove(firstFile.string().c_str());
+    std::remove(secondFile.string().c_str());
+    std::filesystem::remove(directoryPath.string());
 }

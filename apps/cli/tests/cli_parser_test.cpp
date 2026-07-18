@@ -86,6 +86,20 @@ TEST(CliParserTest, ParsesGlobalHelp)
     EXPECT_TRUE(parsed->showGlobalHelp);
 }
 
+TEST(CliParserTest, ParsesStdinAnalyzeSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "analyze";
+    std::string stdinSource = "-";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(stdinSource)};
+
+    const auto parsed = parseCliArguments(3, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Analyze, parsed->command);
+    EXPECT_EQ("-", parsed->analyze.logFile.string());
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

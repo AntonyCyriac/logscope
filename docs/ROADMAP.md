@@ -223,7 +223,7 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 | Phase | Focus | Primary FR | Status |
 |-------|-------|------------|--------|
 | M4.1 | Analysis depth | FR-001, FR-002 | ✅ Complete |
-| M4.2 | Additional source types | FR-001 | ⏳ Planned |
+| M4.2 | Additional source types | FR-001 | ✅ Complete |
 | M4.3 | Advanced reporting | FR-003 | ⏳ Planned |
 | M4.4 | Extension ecosystem | FR-004 | ⏳ Planned |
 | M4.5 | Session / workspace | FR-002 | ⏳ Planned |
@@ -250,9 +250,9 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Component | Description | Status |
 |-----------|-------------|--------|
-| `StdinLogSource` | Pipe-friendly stdin input | Planned |
-| Multi-file / directory dataset | Batch analysis across multiple files | Planned |
-| Unsupported format feedback | Clear, actionable errors (FR-001.4) | Planned |
+| `StdinLogSource` | Pipe-friendly stdin input | Complete |
+| Multi-file / directory dataset | Batch analysis across multiple files | Complete |
+| Unsupported format feedback | Clear, actionable errors (FR-001.4) | Complete |
 
 **Goal:** Broaden supported inputs without breaking the existing file workflow (FR-001.5).
 

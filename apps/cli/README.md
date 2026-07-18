@@ -10,20 +10,22 @@ It wires together configuration, source acquisition, analysis, investigation, an
 
 | Command | Description |
 |---------|-------------|
-| `analyze` | Analyze a log file |
+| `analyze` | Analyze a log file, directory of `.log` files, or stdin (`-`) |
 | `config validate` | Validate configuration files and required keys |
 | `help` | Show command help |
 
 Legacy invocation is supported:
 
 ```bash
-logscope [--config <file>] <log-file>
+logscope [--config <file>] <log-source>
 ```
 
 ## Examples
 
 ```bash
 logscope analyze samples/sample.log
+logscope analyze samples
+logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log
 logscope config validate --config samples/logscope.properties --require log.level

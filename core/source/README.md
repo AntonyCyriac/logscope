@@ -12,6 +12,8 @@ It implements **DO-001 Source Dataset** from the domain model.
 |-----------|-------------|
 | `LogSource` | Abstract interface for sequential log data access |
 | `FileLogSource` | File-based `LogSource` implementation |
+| `StdinLogSource` | Standard input `LogSource` implementation (`-`) |
+| `CompositeLogSource` | Multi-file `LogSource` for directory input |
 | `SourceDataset` | Prepared log data ready for the Analysis Engine |
 | `SourceManager` | Source discovery, validation, and opening |
 

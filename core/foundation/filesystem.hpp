@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include <vector>
 
 #include "path.hpp"
 #include "result.hpp"
@@ -50,6 +51,14 @@ class FileSystem
      * @return File size in bytes.
      */
     [[nodiscard]] static Result<std::uint64_t> fileSize(const Path& path);
+
+    /**
+     * @brief Lists regular files in a directory (non-recursive), sorted by path.
+     *
+     * @param directory Path to the directory.
+     * @return Sorted list of regular file paths.
+     */
+    [[nodiscard]] static Result<std::vector<Path>> listRegularFiles(const Path& directory);
 };
 
 } // namespace scope::foundation

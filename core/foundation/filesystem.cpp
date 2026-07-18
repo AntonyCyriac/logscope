@@ -5,6 +5,7 @@
 
 #include "filesystem.hpp"
 
+#include <algorithm>
 #include <filesystem>
 #include <system_error>
 
@@ -68,6 +69,49 @@ Result<std::uint64_t> FileSystem::fileSize(const Path& path)
     }
 
     return Result<std::uint64_t>(size);
+}
+
+Result<std::vector<Path>> FileSystem::listRegularFiles(const Path& directory)
+{
+    std::error_code error;
+    const std::filesystem::path directoryPath(directory.string());
+
+    if (!std::filesystem::is_directory(directoryPath, error))
+    {
+        if (error)
+        {
+            return Result<std::vector<Path>>(Error(ErrorCode::IOError, error.message()));
+        }
+
+        return Result<std::vector<Path>>(
+            Error(ErrorCode::InvalidArgument, "Path is not a directory."));
+    }
+
+    std::vector<Path> files;
+
+    for (const auto& entry : std::filesystem::directory_iterator(directoryPath, error))
+    {
+        if (error)
+        {
+            return Result<std::vector<Path>>(Error(ErrorCode::IOError, error.message()));
+        }
+
+        if (entry.is_regular_file(error))
+        {
+            if (error)
+            {
+                return Result<std::vector<Path>>(Error(ErrorCode::IOError, error.message()));
+            }
+
+            files.emplace_back(entry.path().string());
+        }
+    }
+
+    std::sort(files.begin(), files.end(), [](const Path& left, const Path& right) {
+        return left.string() < right.string();
+    });
+
+    return Result<std::vector<Path>>(std::move(files));
 }
 
 } // namespace scope::foundation
