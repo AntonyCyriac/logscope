@@ -7,7 +7,7 @@ A generic, extensible, high-performance log analysis platform.
 
 LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
 
-**Status:** M3 complete ([`v0.3.0`](CHANGELOG.md)); **M4 feature expansion in progress** — see [M4 plan](docs/planning/M4-FEATURE-EXPANSION.md) and [Roadmap](docs/ROADMAP.md).
+**Status:** M4 complete ([`v0.4.0`](CHANGELOG.md)); **M5 production readiness** is next — see [Roadmap](docs/ROADMAP.md).
 
 ## What works today
 
@@ -16,9 +16,11 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 - **Configuration library** (`scope_configuration`) — `ConfigurationManager` for file and environment config
 - **Source library** (`scope_source`) — `SourceManager`, `FileLogSource`, and `SourceDataset`
 - **Analysis library** (`scope_analysis`) — `AnalysisEngine` and `AnalysisModel`
-- **Investigation library** (`scope_investigation`) — `InvestigationEngine`, `InvestigationView`, and `LineCountFilter`
-- **Reporting library** (`scope_reporting`) — `ReportGenerator` and `Report`
-- **CLI application** (`apps/cli`) — subcommands (`analyze`, `config validate`), `--format text|json`, optional `--config` flag
+- **Investigation library** (`scope_investigation`) — `InvestigationEngine`, `InvestigationView`, `LineCountFilter`, and `LogLevelFilter`
+- **Reporting library** (`scope_reporting`) — `ReportGenerator`, section selection, and text, JSON, CSV, and Markdown output
+- **Extension library** (`scope_extension`) — `ExtensionManager` with configuration-based enablement
+- **Workspace library** (`scope_workspace`) — `InvestigationSession` and `SessionStore` for `.logscope-session` persistence
+- **CLI application** (`apps/cli`) — `analyze`, `config validate`, `extensions`, and `session` subcommands; stdin and directory input; `--format text|json|csv|markdown`
 - **CI** — build, unit tests, integration tests, and CLI end-to-end tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
@@ -60,7 +62,7 @@ cmake --build build --target format
 
 ```text
 apps/           Applications (CLI)
-core/           Core libraries (foundation, runtime, configuration, source, analysis, investigation, reporting)
+core/           Core libraries (foundation, runtime, configuration, source, analysis, investigation, reporting, extension, workspace)
 docs/           Product, architecture, standards, and handbook
 samples/        Sample log files and configuration
 tests/          Integration and end-to-end tests

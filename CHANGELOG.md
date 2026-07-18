@@ -10,6 +10,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [0.4.0] - 2026-07-18
+
+M4 – Feature Expansion complete. Extends the M3 pipeline with analysis depth, richer sources, advanced reporting, extensions, and session persistence, with 230 automated tests.
+
 ### Added
 
 #### M4.1 – Analysis Depth
@@ -154,5 +160,6 @@ M3 – Architecture Realization complete. Delivers the full core pipeline from c
 
 | Tag | Scope |
 |-----|-------|
+| `v0.4.0` | M4 complete: analysis depth, additional sources, advanced reporting, extensions, and session persistence. |
 | `v0.3.0` | M3 complete: core pipeline, CLI framework, integration and end-to-end tests. |
 | `v0.2.0-design-baseline` | M0–M2 complete: engineering foundation, product vision, and design baseline. |

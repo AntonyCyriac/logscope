@@ -5,7 +5,7 @@
 | Document | M4 – Feature Expansion |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | Approved |
+| Status | Complete |
 | Created | 18-07-2026 |
 | Last Updated | 18-07-2026 |
 
@@ -13,7 +13,7 @@
 
 # 1. Purpose
 
-This document defines the phased plan for **M4 – Feature Expansion** after the completion of M3 – Architecture Realization ([`v0.3.0`](../../CHANGELOG.md)).
+This document defines the phased plan for **M4 – Feature Expansion**, completed and released as [`v0.4.0`](../../CHANGELOG.md) after M3 – Architecture Realization ([`v0.3.0`](../../CHANGELOG.md)).
 
 It maps planned capabilities to functional requirements (FR-001 through FR-004), identifies gaps in the current baseline, and establishes implementation order without prescribing low-level design details.
 
