@@ -1,7 +1,9 @@
 # Build
 /build/
+/build-bench/
 /out/
 /bin/
+/install-test/
 
 # CMake
 CMakeCache.txt
@@ -30,3 +32,8 @@ Thumbs.db
 *.tmp
 *.bak
 *.swp
+pipeline_integration_empty.log
+benchmark_synthetic.log
+benchmark_results.json
+fuzz_configuration.properties
+*.logscope-session

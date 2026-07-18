@@ -10,6 +10,30 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Added
+
+#### M5 – Production Readiness
+
+- M5 planning document and phased roadmap (M5.1–M5.5).
+- Google Benchmark harness under `tests/benchmarks/` with baseline JSON and `PERFORMANCE.md`.
+- ADR-002: benchmark framework selection.
+- Malformed-input unit tests for session serializer, configuration, and CLI parser.
+- libFuzzer targets for session serializer and configuration (`LOGSCOPE_FUZZING=ON`).
+- Sanitizer build preset (`LOGSCOPE_SANITIZE=ON`) and `clang-tidy` target.
+- Multi-OS CI matrix (Ubuntu, Windows, macOS), coverage, benchmark, fuzz, and tidy jobs.
+- CMake `install()` and CPack packaging for source distributions.
+- Tag-triggered release workflow with per-OS binary artifacts.
+- Documentation: `TESTING.md`, `RELEASE.md`, `V1_VALIDATION.md`, `SECURITY_REVIEW.md`, `CLI_REFERENCE.md`.
+
+### Changed
+
+- `SessionSerializer::deserialize` uses safe numeric parsing (`std::from_chars`) instead of throwing `std::stoull`.
+- CI expanded from single Ubuntu job to full M5 quality gate pipeline.
+
+### Fixed
+
+- Session deserialization no longer throws on invalid numeric fields.
+
 ---
 
 ## [0.4.0] - 2026-07-18

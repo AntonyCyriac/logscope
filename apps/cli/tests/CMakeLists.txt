@@ -1,5 +1,6 @@
 add_executable(logscope_cli_tests
     cli_parser_test.cpp
+    cli_parser_malformed_test.cpp
     output_format_test.cpp
     report_output_test.cpp
     ../cli_parser.cpp

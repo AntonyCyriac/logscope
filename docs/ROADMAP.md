@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.5.0 |
+| Version | 2.7.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -28,7 +28,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M2 – Engineering Design** | ✅ Complete | Standards, Requirements, Architecture, and High-Level Design completed. |
 | **M3 – Architecture Realization** | ✅ Complete | Implement the architecture defined during M2. |
 | **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
-| **M5 – Production Readiness** | ⏳ Planned | Performance optimization, testing, documentation, packaging, and release preparation. |
+| **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | 🎯 Target | First stable production release. |
 
 ---
@@ -41,10 +41,10 @@ M1  ██████████ 100%
 M2  ██████████ 100%
 M3  ██████████ 100%
 M4  ██████████ 100%
-M5  ░░░░░░░░░░   0%
+M5  ██████████ 100%
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). M4 planning is documented in [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). M5 planning is documented in [M5 – Production Readiness](planning/M5-PRODUCTION-READINESS.md).
 
 ---
 
@@ -321,13 +321,23 @@ M4 is considered complete when:
 
 # M5 – Production Readiness
 
-Focus areas include:
+M5 prepares LogScope for the first stable production release (`v1.0.0`). Detailed planning: [M5 – Production Readiness](planning/M5-PRODUCTION-READINESS.md).
 
-- Performance optimization
-- Reliability improvements
+| Phase | Focus | Primary NFR | Status |
+|-------|-------|-------------|--------|
+| M5.1 | Performance baselines | §3.1, §3.7 | ✅ Complete |
+| M5.2 | Reliability and fuzz testing | §3.2 | ✅ Complete |
+| M5.3 | CI quality gates | §3.3, §3.6 | ✅ Complete |
+| M5.4 | Packaging and release workflow | §3.6 | ✅ Complete |
+| M5.5 | Documentation, security, v1.0.0 | §3.5 | ✅ Complete |
+
+### Focus areas
+
+- Performance optimization with measurable baselines
+- Reliability improvements and fuzz testing
 - Comprehensive testing (integration, end-to-end, performance, fuzz)
 - Documentation refinement
-- Packaging and distribution
+- Packaging and distribution (source install, then binary GitHub Releases)
 - Continuous Integration enhancements (static analysis, coverage, multi-platform builds, release workflow)
 - Security review
 - Release validation
@@ -357,3 +367,5 @@ The roadmap is considered successful when:
 | 2.3.0 | 18-07-2026 | M3 complete; all M3 phases marked complete; linked `v0.3.0` release. |
 | 2.4.0 | 18-07-2026 | Added M4 phased roadmap (M4.1–M4.5), success criteria, and planning document link. |
 | 2.5.0 | 18-07-2026 | M4 complete; all M4 phases marked complete; linked `v0.4.0` release. |
+| 2.6.0 | 18-07-2026 | Added M5 phased roadmap (M5.1–M5.5) and planning document link. |
+| 2.7.0 | 18-07-2026 | M5 complete; all M5 phases marked complete; production readiness infrastructure delivered. |

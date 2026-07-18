@@ -72,13 +72,22 @@ docs/
 ├── ROADMAP.md
 │
 ├── planning/
-│   └── M4-FEATURE-EXPANSION.md
+│   ├── M4-FEATURE-EXPANSION.md
+│   └── M5-PRODUCTION-READINESS.md
+│
+├── testing/
+│   └── PERFORMANCE.md
+│
+├── release/
+│   ├── RELEASE.md
+│   └── V1_VALIDATION.md
 │
 ├── handbook/
 │   ├── CODE_REVIEW_CHECKLIST.md
 │   ├── DEVELOPER_SETUP.md
 │   ├── GIT_CONVENTIONS.md
-│   └── PULL_REQUEST_GUIDE.md
+│   ├── PULL_REQUEST_GUIDE.md
+│   └── SECURITY_REVIEW.md
 │
 ├── standards/
 │   ├── API_DESIGN_GUIDELINES.md
@@ -110,7 +119,8 @@ docs/
 │   ├── HLD-001-Logical-Architecture.md
 │   │
 │   ├── decisions/
-│   │   └── ADR-001-Testing-Framework.md
+│   │   ├── ADR-001-Testing-Framework.md
+│   │   └── ADR-002-Benchmark-Framework.md
 │   │
 │   └── foundation/
 │       └── RESULT.md
@@ -128,22 +138,23 @@ Developers new to LogScope should read the documentation in the following order.
 | Step | Document | Purpose |
 |------|----------|---------|
 | 1 | ROADMAP.md | Understand the project milestones and current development phase. |
-| 2 | M4-FEATURE-EXPANSION.md | Understand the M4 phased feature expansion plan. |
-| 3 | PROJECT_CHARTER.md | Understand why LogScope exists. |
-| 4 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
-| 5 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
-| 6 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
-| 7 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
-| 8 | Functional Requirements | Understand the required capabilities. |
-| 9 | NFR-001 – Quality Attributes | Understand the quality expectations. |
-| 10 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
-| 11 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
-| 12 | COMPONENT_CATALOG.md | Understand component responsibilities. |
-| 13 | DOMAIN_MODEL.md | Understand the primary business concepts. |
-| 14 | DATA_FLOW.md | Understand how information moves through the system. |
-| 15 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
-| 16 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
-| 17 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
+| 2 | M5-PRODUCTION-READINESS.md | Understand the M5 production readiness plan (current phase). |
+| 3 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
+| 4 | PROJECT_CHARTER.md | Understand why LogScope exists. |
+| 5 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
+| 6 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
+| 7 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
+| 8 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
+| 9 | Functional Requirements | Understand the required capabilities. |
+| 10 | NFR-001 – Quality Attributes | Understand the quality expectations. |
+| 11 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
+| 12 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
+| 13 | COMPONENT_CATALOG.md | Understand component responsibilities. |
+| 14 | DOMAIN_MODEL.md | Understand the primary business concepts. |
+| 15 | DATA_FLOW.md | Understand how information moves through the system. |
+| 16 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
+| 17 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
+| 18 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 
 ---
 
@@ -260,3 +271,4 @@ These categories should be added only when they provide clear value and support 
 | 1.3.0 | 18-07-2026 | Extracted handbook workflow docs; deduplicated CPP_CODING_STANDARD with Foundation Guidelines. |
 | 1.4.0 | 18-07-2026 | Added CHANGELOG and ROADMAP to document roles; repository-level doc structure. |
 | 1.5.0 | 18-07-2026 | Added planning/ directory and M4-FEATURE-EXPANSION.md to structure and reading order. |
+| 1.6.0 | 18-07-2026 | Added M5 planning, testing/, release/, SECURITY_REVIEW, and ADR-002. |

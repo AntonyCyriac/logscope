@@ -35,4 +35,8 @@ target_include_directories(logscope
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
+install(TARGETS logscope
+    RUNTIME DESTINATION bin
+)
+
 add_subdirectory(tests)

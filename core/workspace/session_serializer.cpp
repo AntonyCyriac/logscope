@@ -7,6 +7,9 @@
 
 #include <fstream>
 #include <sstream>
+#include <charconv>
+
+#include "foundation/error.hpp"
 #include "foundation/string.hpp"
 #include "report_format.hpp"
 #include "report_section.hpp"
@@ -18,6 +21,29 @@ namespace
 {
 
 constexpr std::string_view sessionVersion = "1.0";
+
+bool parseUint64(std::string_view value, std::uint64_t& output) noexcept
+{
+    if (value.empty())
+    {
+        return false;
+    }
+
+    const auto result = std::from_chars(value.data(), value.data() + value.size(), output);
+
+    return result.ec == std::errc{} && result.ptr == value.data() + value.size();
+}
+
+bool assignUint64Field(std::string_view value, std::uint64_t& field)
+{
+    if (value.empty())
+    {
+        field = 0U;
+        return true;
+    }
+
+    return parseUint64(value, field);
+}
 
 std::string sectionsToString(const reporting::ReportSections& sections)
 {
@@ -175,31 +201,59 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         }
         else if (key == "analysis.totalLines")
         {
-            totalLines = std::stoull(value);
+            if (!assignUint64Field(value, totalLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.totalLines value."));
+            }
         }
         else if (key == "analysis.infoLines")
         {
-            infoLines = std::stoull(value);
+            if (!assignUint64Field(value, infoLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.infoLines value."));
+            }
         }
         else if (key == "analysis.warningLines")
         {
-            warnLines = std::stoull(value);
+            if (!assignUint64Field(value, warnLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.warningLines value."));
+            }
         }
         else if (key == "analysis.errorLines")
         {
-            errorLines = std::stoull(value);
+            if (!assignUint64Field(value, errorLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.errorLines value."));
+            }
         }
         else if (key == "analysis.otherLines")
         {
-            otherLines = std::stoull(value);
+            if (!assignUint64Field(value, otherLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.otherLines value."));
+            }
         }
         else if (key == "analysis.blankLines")
         {
-            blankLines = std::stoull(value);
+            if (!assignUint64Field(value, blankLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid analysis.blankLines value."));
+            }
         }
         else if (key == "filter.minLines")
         {
-            minLines = std::stoull(value);
+            if (!assignUint64Field(value, minLines))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid filter.minLines value."));
+            }
         }
         else if (key == "filter.maxLines")
         {
@@ -207,11 +261,19 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         }
         else if (key == "filter.minErrors")
         {
-            minErrors = std::stoull(value);
+            if (!assignUint64Field(value, minErrors))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid filter.minErrors value."));
+            }
         }
         else if (key == "filter.minWarnings")
         {
-            minWarnings = std::stoull(value);
+            if (!assignUint64Field(value, minWarnings))
+            {
+                return foundation::Result<InvestigationSession>(foundation::Error(
+                    foundation::ErrorCode::ParseError, "Invalid filter.minWarnings value."));
+            }
         }
         else if (key == "filter.searchQuery")
         {

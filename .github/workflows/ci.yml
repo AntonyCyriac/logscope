@@ -11,7 +11,30 @@ on:
 
 jobs:
   build:
-    name: Build and Test
+    name: Build and Test (${{ matrix.os }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Run Tests
+        run: ctest --test-dir build --output-on-failure --build-config Release
+
+  sanitize:
+    name: Sanitizer Build (Ubuntu)
 
     runs-on: ubuntu-latest
 
@@ -20,15 +43,125 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Configure CMake
-        run: |
-          cmake -S . \
-                -B build \
-                -DCMAKE_BUILD_TYPE=Release
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLOGSCOPE_SANITIZE=ON
 
       - name: Build
-        run: |
-          cmake --build build --config Release
+        run: cmake --build build
 
       - name: Run Tests
+        run: ctest --test-dir build --output-on-failure
+
+  coverage:
+    name: Code Coverage (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install lcov
+        run: sudo apt-get update && sudo apt-get install -y lcov
+
+      - name: Configure CMake
         run: |
-          ctest --test-dir build --output-on-failure
+          cmake -S . -B build \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_CXX_FLAGS="--coverage -fprofile-update=atomic" \
+                -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+
+      - name: Build
+        run: cmake --build build -j 2
+
+      - name: Run Tests
+        run: ctest --test-dir build --output-on-failure
+
+      - name: Generate Coverage Report
+        run: |
+          lcov --capture --directory build --output-file coverage.info \
+            --rc geninfo_unexecuted_blocks=1 \
+            --ignore-errors mismatch,gcov,negative,unused
+          lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' \
+            --output-file coverage.info \
+            --ignore-errors unused
+          lcov --list coverage.info
+
+      - name: Upload Coverage Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage.info
+
+  benchmark:
+    name: Performance Benchmarks (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_BENCHMARKS=ON
+
+      - name: Build Benchmarks
+        run: cmake --build build --target logscope_benchmarks
+
+      - name: Run Benchmarks
+        run: ./build/tests/benchmarks/logscope_benchmarks --benchmark_format=json --benchmark_out=benchmark_results.json
+
+      - name: Check Regression
+        run: python3 scripts/check_benchmark_regression.py tests/benchmarks/baseline.json benchmark_results.json
+
+      - name: Upload Benchmark Results
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-results
+          path: benchmark_results.json
+
+  fuzz:
+    name: Fuzz Targets (Ubuntu Clang)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install Clang
+        run: sudo apt-get update && sudo apt-get install -y clang
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+                -DCMAKE_BUILD_TYPE=Debug \
+                -DCMAKE_C_COMPILER=clang \
+                -DCMAKE_CXX_COMPILER=clang++ \
+                -DLOGSCOPE_FUZZING=ON
+
+      - name: Build Fuzz Targets
+        run: cmake --build build --target session_serializer_fuzz configuration_fuzz
+
+      - name: Run Fuzz Smoke Test
+        run: |
+          ./build/tests/fuzz/session_serializer_fuzz -runs=1000
+          ./build/tests/fuzz/configuration_fuzz -runs=1000
+
+  tidy:
+    name: Static Analysis (clang-tidy)
+
+    runs-on: ubuntu-latest
+    continue-on-error: true
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Install clang-tidy
+        run: sudo apt-get update && sudo apt-get install -y clang-tidy
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+
+      - name: Run clang-tidy
+        run: cmake --build build --target tidy
