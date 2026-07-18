@@ -1,90 +1,80 @@
 # LogScope
 
-> A generic, extensible and high-performance log analysis platform.
+[![CI](https://github.com/AntonyCyriac/logscope/actions/workflows/ci.yml/badge.svg)](https://github.com/AntonyCyriac/logscope/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-## Overview
+A generic, extensible, high-performance log analysis platform.
 
-LogScope is an open-source log analysis framework designed to parse, normalize and analyze logs from software systems regardless of their format.
+LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
 
-The long-term vision is to build a modular platform that enables developers, DevOps engineers, SREs and support teams to quickly understand system behaviour through powerful log analysis.
+**Status:** Early development — architecture design is complete; the project is implementing the core library ([M3 – Architecture Realization](docs/ROADMAP.md)).
 
-The project emphasizes:
+## What works today
 
-- Generic log parsing
-- High performance
-- Extensible plugin architecture
-- Cross-platform support
-- Engineering-first design
+- **Foundation library** (`scope_foundation`) — `Status`, `Error`, `Result<T>`, `Version`, `Uuid`
+- **CLI prototype** — basic log file analysis (`logscope`)
+- **CI** — build and unit tests on every push to `master`
+- **Documentation** — requirements, architecture, standards, and developer handbook
 
----
+## Requirements
 
-## Current Status
+- CMake 3.20 or later
+- C++17 compiler (GCC, Clang, or MSVC)
+- Git
 
-🚧 Early Development
+GoogleTest is fetched automatically by CMake.
 
-The project is currently focused on building a solid engineering foundation before implementing core functionality.
-
----
-
-## Features (Planned)
-
-- Generic log parsing
-- Plugin-based parser architecture
-- Log normalization
-- Search and filtering
-- Performance analysis
-- Statistical reporting
-- Future AI-assisted insights
-
----
-
-## Repository Structure
-
-```text
-docs/       Documentation
-include/    Public headers
-src/        Source code
-tests/      Unit tests
-samples/    Sample log files
-plugins/    Parser plugins
-scripts/    Development scripts
-tools/      Engineering utilities
-```
-
----
-
-## Build
+## Quick start
 
 ```bash
+git clone https://github.com/AntonyCyriac/logscope.git
+cd logscope
+
 cmake -S . -B build
 cmake --build build
+ctest --test-dir build --output-on-failure
 ```
 
----
-
-## Run
+Run the CLI:
 
 ```bash
-./logscope samples/sample.log
+./build/logscope samples/sample.log
 ```
 
----
+Format source files (requires `clang-format`):
+
+```bash
+cmake --build build --target format
+```
+
+## Project layout
+
+```text
+core/           Core libraries (foundation and future modules)
+src/            CLI application source
+include/        Legacy CLI headers
+docs/           Product, architecture, standards, and handbook
+samples/        Sample log files
+tests/          Integration and end-to-end test placeholders
+```
 
 ## Documentation
 
-- Developer Setup Guide
-- Engineering Handbook *(coming soon)*
-- Functional Requirements *(coming soon)*
-- Architecture Documents *(coming soon)*
+| Topic | Location |
+|-------|----------|
+| Roadmap and milestones | [docs/ROADMAP.md](docs/ROADMAP.md) |
+| Developer setup | [docs/handbook/DEVELOPER_SETUP.md](docs/handbook/DEVELOPER_SETUP.md) |
+| Engineering principles | [docs/standards/ENGINEERING_PRINCIPLES.md](docs/standards/ENGINEERING_PRINCIPLES.md) |
+| Foundation coding guidelines | [docs/standards/FOUNDATION_GUIDELINES.md](docs/standards/FOUNDATION_GUIDELINES.md) |
+| Architecture overview | [docs/architecture/ARCHITECTURE_OVERVIEW.md](docs/architecture/ARCHITECTURE_OVERVIEW.md) |
+| Full documentation index | [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) |
 
----
+## Contributing
 
-## Vision
-
-Build a professional engineering ecosystem capable of supporting multiple developer tools while maintaining high code quality, documentation, and long-term maintainability.
-
----
+1. Read [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) and [Foundation Guidelines](docs/standards/FOUNDATION_GUIDELINES.md).
+2. Follow [Git Conventions](docs/handbook/GIT_CONVENTIONS.md) and the [Pull Request Guide](docs/handbook/PULL_REQUEST_GUIDE.md).
+3. Ensure the project builds, tests pass, and code is formatted before opening a PR.
 
 ## License
 
-MIT
+[MIT](LICENSE) — Copyright (c) 2026 AntonyCyriac
