@@ -157,7 +157,9 @@ Run LogScope:
 
 ```bash
 ./build/apps/cli/logscope.exe samples/sample.log
+./build/apps/cli/logscope.exe analyze --format json samples/sample.log
 ./build/apps/cli/logscope.exe --config samples/logscope.properties samples/sample.log
+./build/apps/cli/logscope.exe config validate --config samples/logscope.properties --require log.level
 ```
 
 Adjust the executable path if the build configuration changes.
