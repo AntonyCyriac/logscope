@@ -10,20 +10,21 @@
 #include <string>
 
 #include "configuration_manager.hpp"
+#include "foundation/path.hpp"
 
 extern "C" int LLVMFuzzerTestOneInput(const std::uint8_t* data, const std::size_t size)
 {
     const std::string content(reinterpret_cast<const char*>(data), size);
-    const std::string path = "fuzz_configuration.properties";
+    const scope::foundation::Path configPath("fuzz_configuration.properties");
 
     {
-        std::ofstream stream(path);
+        std::ofstream stream(configPath.string());
 
         stream << content;
     }
 
-    (void)scope::configuration::ConfigurationManager::loadFromFile(path);
-    std::remove(path.c_str());
+    (void)scope::configuration::ConfigurationManager::loadFromFile(configPath);
+    std::remove(configPath.string().c_str());
 
     return 0;
 }

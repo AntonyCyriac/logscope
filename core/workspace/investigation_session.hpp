@@ -23,7 +23,7 @@ namespace scope::workspace
 class InvestigationSession
 {
   public:
-    InvestigationSession() = default;
+    InvestigationSession() = delete;
 
     InvestigationSession(foundation::Uuid sessionId,
                          foundation::Path sourcePath,
