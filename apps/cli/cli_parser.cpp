@@ -17,7 +17,7 @@ namespace
 
 bool isOption(const std::string& argument) noexcept
 {
-    return !argument.empty() && argument.front() == '-';
+    return argument.size() > 1 && argument.front() == '-';
 }
 
 std::vector<std::string> splitRequiredKeys(std::string_view value)

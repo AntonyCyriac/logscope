@@ -14,10 +14,10 @@ namespace scope::cli
 void CliApplication::printUsage(std::ostream& output)
 {
     output << "Usage: logscope <command> [options]\n"
-           << "       logscope [--config <file>] <log-file>\n"
+           << "       logscope [--config <file>] <log-source>\n"
            << "\n"
            << "Commands:\n"
-           << "  analyze            Analyze a log file\n"
+           << "  analyze            Analyze a log file, directory, or stdin\n"
            << "  config validate    Validate configuration\n"
            << "  help [command]     Show help for a command\n"
            << "\n"

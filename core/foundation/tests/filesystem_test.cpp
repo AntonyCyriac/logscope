@@ -5,6 +5,7 @@
 
 #include <fstream>
 
+#include <filesystem>
 #include <gtest/gtest.h>
 
 #include "foundation.hpp"
@@ -75,4 +76,35 @@ TEST_F(FileSystemTest, MissingPath)
 
     ASSERT_TRUE(result.hasValue());
     EXPECT_FALSE(*result);
+}
+
+TEST_F(FileSystemTest, ListRegularFiles)
+{
+    const Path directoryPath("filesystem_test_dir");
+
+    std::filesystem::create_directory(directoryPath.string());
+
+    const Path firstFile = directoryPath.append("b.log");
+    const Path secondFile = directoryPath.append("a.log");
+
+    {
+        std::ofstream stream(firstFile.string());
+        stream << "b";
+    }
+
+    {
+        std::ofstream stream(secondFile.string());
+        stream << "a";
+    }
+
+    const auto result = FileSystem::listRegularFiles(directoryPath);
+
+    ASSERT_TRUE(result.hasValue());
+    ASSERT_EQ(2U, result->size());
+    EXPECT_EQ(secondFile.string(), (*result)[0].string());
+    EXPECT_EQ(firstFile.string(), (*result)[1].string());
+
+    std::remove(firstFile.string().c_str());
+    std::remove(secondFile.string().c_str());
+    std::filesystem::remove(directoryPath.string());
 }

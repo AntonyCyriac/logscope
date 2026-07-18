@@ -18,6 +18,13 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `LogLevelFilter` for investigation filtering by error and warning thresholds.
 - Text and JSON reports include per-level line counts.
 
+#### M4.2 – Additional Source Types
+
+- `StdinLogSource` for pipe-friendly workflows (`logscope analyze -`).
+- `CompositeLogSource` and directory support for multi-file datasets.
+- `FileSystem::listRegularFiles` for directory enumeration.
+- Clear unsupported-input errors for empty directories and invalid sources (FR-001.4).
+
 ---
 
 ## [0.3.0] - 2026-07-18
