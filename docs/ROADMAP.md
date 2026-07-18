@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.4.0 |
+| Version | 2.5.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -27,7 +27,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M1 – Product Vision** | ✅ Complete | Project Charter, Product Overview, product goals, and vision. |
 | **M2 – Engineering Design** | ✅ Complete | Standards, Requirements, Architecture, and High-Level Design completed. |
 | **M3 – Architecture Realization** | ✅ Complete | Implement the architecture defined during M2. |
-| **M4 – Feature Expansion** | 🚧 In Progress | Extend LogScope with additional capabilities while preserving architectural integrity. |
+| **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ⏳ Planned | Performance optimization, testing, documentation, packaging, and release preparation. |
 | **v1.0.0** | 🎯 Target | First stable production release. |
 
@@ -40,10 +40,11 @@ M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
 M3  ██████████ 100%
-M4  ██░░░░░░░░ ~20%
+M4  ██████████ 100%
+M5  ░░░░░░░░░░   0%
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 planning is documented in [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). M4 planning is documented in [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 ---
 
@@ -355,3 +356,4 @@ The roadmap is considered successful when:
 | 2.2.0 | 18-07-2026 | Added Time, Date, DateTime, Path, FileSystem; Runtime module; CLI migration to apps/. |
 | 2.3.0 | 18-07-2026 | M3 complete; all M3 phases marked complete; linked `v0.3.0` release. |
 | 2.4.0 | 18-07-2026 | Added M4 phased roadmap (M4.1–M4.5), success criteria, and planning document link. |
+| 2.5.0 | 18-07-2026 | M4 complete; all M4 phases marked complete; linked `v0.4.0` release. |
