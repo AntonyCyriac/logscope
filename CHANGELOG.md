@@ -37,6 +37,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
 
+#### M3.6 – Analysis Engine
+
+- `AnalysisModel` and `AnalysisEngine` for transforming `SourceDataset` into analysis results.
+- `scope_analysis` library and `scope_analysis_tests` test target.
+- CLI `LogAnalyzer` refactored to use `AnalysisEngine` for log analysis.
+
 #### M3.5 – Source Manager
 
 - `LogSource`, `FileLogSource`, `SourceDataset`, and `SourceManager` for file-based log source acquisition.

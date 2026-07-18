@@ -57,7 +57,7 @@ The implementation phase is divided into logical increments.
 | M3.3 | Platform Services (Runtime) | 🟡 In Progress |
 | M3.4 | Configuration Manager | ✅ Complete |
 | M3.5 | Source Manager | ✅ Complete |
-| M3.6 | Analysis Engine | ⏳ Planned |
+| M3.6 | Analysis Engine | ✅ Complete |
 | M3.7 | Investigation Engine | ⏳ Planned |
 | M3.8 | Reporting Engine | ⏳ Planned |
 | M3.9 | CLI | ⏳ Planned |
@@ -156,11 +156,21 @@ Built as `scope_source` with unit tests. CLI `LogAnalyzer` uses `SourceManager` 
 
 ---
 
-## M3.6 – M3.10 (Planned)
+## M3.6 – Analysis Engine
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `AnalysisModel` | Canonical analysis result (DO-002) | Complete |
+| `AnalysisEngine` | Transforms `SourceDataset` into `AnalysisModel` | Complete |
+
+Built as `scope_analysis` with unit tests. CLI `LogAnalyzer` delegates analysis to `AnalysisEngine`.
+
+---
+
+## M3.7 – M3.10 (Planned)
 
 Subsequent M3 phases depend on a stable Foundation library:
 
-- **M3.6** – Analysis Engine
 - **M3.7** – Investigation Engine
 - **M3.8** – Reporting Engine
 - **M3.9** – CLI (command framework, subcommands, configuration, output formats)
