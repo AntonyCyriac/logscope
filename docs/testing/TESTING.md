@@ -119,10 +119,14 @@ Supported on Clang and GCC.
 # Coverage
 
 ```bash
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DCMAKE_CXX_FLAGS="--coverage -fprofile-update=atomic" -DCMAKE_EXE_LINKER_FLAGS="--coverage"
 cmake --build build
 ctest --test-dir build
-lcov --capture --directory build --output-file coverage.info
+lcov --capture --directory build --output-file coverage.info \
+  --rc geninfo_unexecuted_blocks=1 \
+  --ignore-errors mismatch,gcov,negative,unused
+lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' --output-file coverage.info \
+  --ignore-errors unused
 ```
 
 CI generates and uploads `coverage.info` as an artifact.
