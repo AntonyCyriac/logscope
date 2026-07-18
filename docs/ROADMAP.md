@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.3.0 |
+| Version | 2.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -27,7 +27,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M1 – Product Vision** | ✅ Complete | Project Charter, Product Overview, product goals, and vision. |
 | **M2 – Engineering Design** | ✅ Complete | Standards, Requirements, Architecture, and High-Level Design completed. |
 | **M3 – Architecture Realization** | ✅ Complete | Implement the architecture defined during M2. |
-| **M4 – Feature Expansion** | ⏳ Planned | Extend LogScope with additional capabilities while preserving architectural integrity. |
+| **M4 – Feature Expansion** | 🚧 In Progress | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ⏳ Planned | Performance optimization, testing, documentation, packaging, and release preparation. |
 | **v1.0.0** | 🎯 Target | First stable production release. |
 
@@ -40,9 +40,10 @@ M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
 M3  ██████████ 100%
+M4  ░░░░░░░░░░   0%
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 planning is documented in [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 ---
 
@@ -215,19 +216,105 @@ Repository tests run through CTest with the project root as the working director
 
 # M4 – Feature Expansion
 
-The following capabilities are expected to be introduced incrementally after the architectural foundation is implemented.
+M4 extends the M3 pipeline with meaningful analysis, richer sources, reporting, extensions, and session support. Phases follow the product evolution order defined in [Product Overview](vision/PRODUCT_OVERVIEW.md): built-in capability, configuration, plugin, then SDK (late M4).
 
-Potential initiatives include:
+Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
-- Extension ecosystem
-- Additional source types
-- Advanced reporting
-- Session management
-- AI-assisted investigation
+| Phase | Focus | Primary FR | Status |
+|-------|-------|------------|--------|
+| M4.1 | Analysis depth | FR-001, FR-002 | ⏳ Planned |
+| M4.2 | Additional source types | FR-001 | ⏳ Planned |
+| M4.3 | Advanced reporting | FR-003 | ⏳ Planned |
+| M4.4 | Extension ecosystem | FR-004 | ⏳ Planned |
+| M4.5 | Session / workspace | FR-002 | ⏳ Planned |
+| Deferred | REST API, Web UI, AI-assisted investigation | — | Post-M4 |
+
+---
+
+## M4.1 – Analysis Depth
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `AnalysisModel` extensions | Per-level line counts and aggregate log statistics | Planned |
+| `AnalysisEngine` | Generic pattern-based stats during line scan | Planned |
+| `InvestigationEngine` | Level-based filters and content-aware search | Planned |
+| Reporting / CLI | Surface new stats in text and JSON output | Planned |
+
+**Goal:** Produce meaningful analysis results from plain-text logs (FR-001.3) without custom scripts.
+
+**Acceptance:** `logscope analyze samples/sample.log` reports error and warning counts; investigation can filter by log level.
+
+---
+
+## M4.2 – Additional Source Types
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `StdinLogSource` | Pipe-friendly stdin input | Planned |
+| Multi-file / directory dataset | Batch analysis across multiple files | Planned |
+| Unsupported format feedback | Clear, actionable errors (FR-001.4) | Planned |
+
+**Goal:** Broaden supported inputs without breaking the existing file workflow (FR-001.5).
+
+**Acceptance:** `logscope analyze -` and directory input are documented and tested.
+
+---
+
+## M4.3 – Advanced Reporting
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| Report sections | Summary, level breakdown, source metadata | Planned |
+| Content selection | CLI or config-driven report sections (FR-003.2) | Planned |
+| Additional formats | CSV and Markdown alongside text and JSON (FR-003.4) | Planned |
+
+**Goal:** Selectable, reproducible reports in multiple formats (FR-003.2, FR-003.4, FR-003.6).
+
+---
+
+## M4.4 – Extension Ecosystem
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `ExtensionManager` | Extension discovery, registration, lifecycle (C06) | Planned |
+| Built-in extensions | Static registration at startup; config enablement (FR-004.1) | Planned |
+| CLI discoverability | `extensions list` and `extensions describe` (FR-004.5) | Planned |
+
+**Goal:** Introduce capabilities without modifying core code (FR-004.2). Dynamic library loading is a later sub-phase.
+
+---
+
+## M4.5 – Session / Workspace
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `core/workspace/` | Persist investigation filters and report preferences | Planned |
+| CLI session commands | Save and load investigation context (FR-002.5) | Planned |
+
+**Goal:** Progressive investigation without restarting analysis.
+
+---
+
+## M4 – Deferred
+
+The following remain out of scope for early M4:
+
 - REST API
 - Web interface
+- AI-assisted investigation
+- Performance and fuzz testing (see M5)
 
-Priorities will be determined based on project goals and community feedback.
+---
+
+## M4 – Success Criteria
+
+M4 is considered complete when:
+
+- FR-001 acceptance criteria are met for supported plain-text log analysis.
+- FR-002 supports content-aware search and progressive investigation.
+- FR-003 supports selectable report content and multiple output formats.
+- FR-004 provides discoverable, isolated extension mechanisms.
+- All M4 phases are implemented with unit, integration, and end-to-end test coverage.
 
 ---
 
@@ -267,3 +354,4 @@ The roadmap is considered successful when:
 | 2.1.0 | 18-07-2026 | Updated M3 progress: UUID complete, Foundation status, M3.1/M3.2 tracking, and next priorities. |
 | 2.2.0 | 18-07-2026 | Added Time, Date, DateTime, Path, FileSystem; Runtime module; CLI migration to apps/. |
 | 2.3.0 | 18-07-2026 | M3 complete; all M3 phases marked complete; linked `v0.3.0` release. |
+| 2.4.0 | 18-07-2026 | Added M4 phased roadmap (M4.1–M4.5), success criteria, and planning document link. |

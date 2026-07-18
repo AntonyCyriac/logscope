@@ -25,7 +25,17 @@ M3 – Architecture Realization is **complete** as of [`v0.3.0`](../CHANGELOG.md
 Configuration → Source → Analysis → Investigation → Reporting → CLI
 ```
 
-Development focus shifts to **M4 – Feature Expansion**. See [Roadmap](ROADMAP.md) and [Changelog](../CHANGELOG.md) for details.
+**M4 – Feature Expansion** is in progress. Phased plan:
+
+| Phase | Focus |
+|-------|-------|
+| M4.1 | Analysis depth (log level stats, content-aware investigation) |
+| M4.2 | Additional source types (stdin, directories) |
+| M4.3 | Advanced reporting (sections, CSV, Markdown) |
+| M4.4 | Extension ecosystem |
+| M4.5 | Session / workspace |
+
+See [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md) and [Roadmap](ROADMAP.md) for details.
 
 ## Initial Delivery
 

@@ -10,6 +10,11 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Documentation
+
+- M4 phased roadmap (M4.1–M4.5) in [docs/ROADMAP.md](docs/ROADMAP.md).
+- [docs/planning/M4-FEATURE-EXPANSION.md](docs/planning/M4-FEATURE-EXPANSION.md) with gap analysis, dependencies, and engineering conventions.
+
 ---
 
 ## [0.3.0] - 2026-07-18

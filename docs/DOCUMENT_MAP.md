@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 1.4.0 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -71,6 +71,9 @@ docs/
 ├── PRODUCT.md
 ├── ROADMAP.md
 │
+├── planning/
+│   └── M4-FEATURE-EXPANSION.md
+│
 ├── handbook/
 │   ├── CODE_REVIEW_CHECKLIST.md
 │   ├── DEVELOPER_SETUP.md
@@ -125,21 +128,22 @@ Developers new to LogScope should read the documentation in the following order.
 | Step | Document | Purpose |
 |------|----------|---------|
 | 1 | ROADMAP.md | Understand the project milestones and current development phase. |
-| 2 | PROJECT_CHARTER.md | Understand why LogScope exists. |
-| 3 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
-| 4 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
-| 5 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
-| 6 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
-| 7 | Functional Requirements | Understand the required capabilities. |
-| 8 | NFR-001 – Quality Attributes | Understand the quality expectations. |
-| 9 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
-| 10 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
-| 11 | COMPONENT_CATALOG.md | Understand component responsibilities. |
-| 12 | DOMAIN_MODEL.md | Understand the primary business concepts. |
-| 13 | DATA_FLOW.md | Understand how information moves through the system. |
-| 14 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
-| 15 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
-| 16 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
+| 2 | M4-FEATURE-EXPANSION.md | Understand the M4 phased feature expansion plan. |
+| 3 | PROJECT_CHARTER.md | Understand why LogScope exists. |
+| 4 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
+| 5 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
+| 6 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
+| 7 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
+| 8 | Functional Requirements | Understand the required capabilities. |
+| 9 | NFR-001 – Quality Attributes | Understand the quality expectations. |
+| 10 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
+| 11 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
+| 12 | COMPONENT_CATALOG.md | Understand component responsibilities. |
+| 13 | DOMAIN_MODEL.md | Understand the primary business concepts. |
+| 14 | DATA_FLOW.md | Understand how information moves through the system. |
+| 15 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
+| 16 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
+| 17 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 
 ---
 
@@ -255,3 +259,4 @@ These categories should be added only when they provide clear value and support 
 | 1.2.0 | 18-07-2026 | Renamed ENGINEERING_GUIDELINES to FOUNDATION_GUIDELINES under standards/; updated reading order and cross-links. |
 | 1.3.0 | 18-07-2026 | Extracted handbook workflow docs; deduplicated CPP_CODING_STANDARD with Foundation Guidelines. |
 | 1.4.0 | 18-07-2026 | Added CHANGELOG and ROADMAP to document roles; repository-level doc structure. |
+| 1.5.0 | 18-07-2026 | Added planning/ directory and M4-FEATURE-EXPANSION.md to structure and reading order. |
