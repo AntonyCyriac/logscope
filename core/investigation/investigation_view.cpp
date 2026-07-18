@@ -10,8 +10,8 @@
 namespace scope::investigation
 {
 
-InvestigationView::InvestigationView(foundation::Path sourcePath, const std::uint64_t totalLines) noexcept
-    : m_sourcePath(std::move(sourcePath)), m_totalLines(totalLines)
+InvestigationView::InvestigationView(const analysis::AnalysisModel& model) noexcept
+    : m_sourcePath(model.sourcePath()), m_totalLines(model.totalLines()), m_levelCounts(model.levelCounts())
 {
 }
 
@@ -25,6 +25,11 @@ std::uint64_t InvestigationView::totalLines() const noexcept
     return m_totalLines;
 }
 
+const analysis::LogLevelCounts& InvestigationView::levelCounts() const noexcept
+{
+    return m_levelCounts;
+}
+
 bool InvestigationView::isEmpty() const noexcept
 {
     return m_totalLines == 0U;
@@ -34,7 +39,9 @@ std::string InvestigationView::summary() const
 {
     std::ostringstream output;
 
-    output << "source=" << m_sourcePath.string() << ", lines=" << m_totalLines;
+    output << "source=" << m_sourcePath.string() << ", lines=" << m_totalLines << ", errors="
+           << m_levelCounts.errorLines() << ", warnings=" << m_levelCounts.warnLines()
+           << ", info=" << m_levelCounts.infoLines();
 
     return output.str();
 }

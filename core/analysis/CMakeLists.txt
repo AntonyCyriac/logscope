@@ -6,6 +6,8 @@
 add_library(scope_analysis
     analysis_engine.cpp
     analysis_model.cpp
+    log_level_counts.cpp
+    log_line_classifier.cpp
 )
 
 target_link_libraries(scope_analysis

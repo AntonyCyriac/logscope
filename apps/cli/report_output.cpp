@@ -61,7 +61,10 @@ std::string formatAnalysisOutput(const analysis::AnalysisModel& model, const Out
 
         output << "{\n"
                << "  \"source\": " << escapeJsonString(model.sourcePath().string()) << ",\n"
-               << "  \"totalLines\": " << model.totalLines() << "\n"
+               << "  \"totalLines\": " << model.totalLines() << ",\n"
+               << "  \"errorLines\": " << model.levelCounts().errorLines() << ",\n"
+               << "  \"warningLines\": " << model.levelCounts().warnLines() << ",\n"
+               << "  \"infoLines\": " << model.levelCounts().infoLines() << "\n"
                << '}';
 
         return output.str();

@@ -11,7 +11,9 @@ It implements **DO-002 Analysis Model** from the domain model.
 | Component | Description |
 |-----------|-------------|
 | `AnalysisModel` | Canonical representation of analyzed log information |
+| `LogLevelCounts` | Per-level line statistics (INFO, WARN, ERROR) |
 | `AnalysisEngine` | Orchestrates analysis of a `SourceDataset` |
+| `detectLogLevel` | Generic log line level classification |
 
 ## Dependencies
 

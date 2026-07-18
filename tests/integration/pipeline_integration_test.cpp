@@ -18,6 +18,7 @@ using scope::configuration::ConfigurationManager;
 using scope::foundation::Path;
 using scope::investigation::InvestigationEngine;
 using scope::investigation::LineCountFilter;
+using scope::investigation::LogLevelFilter;
 using scope::reporting::ReportGenerator;
 using scope::source::SourceManager;
 
@@ -73,12 +74,15 @@ TEST_F(PipelineIntegrationTest, RunsSourceToReportPipeline)
     const auto view = investigationEngine.inspect(*modelResult);
 
     EXPECT_FALSE(view.isEmpty());
+    EXPECT_EQ(4U, modelResult->levelCounts().errorLines());
     EXPECT_TRUE(investigationEngine.matches(*modelResult, LineCountFilter::nonEmpty()));
+    EXPECT_TRUE(investigationEngine.matches(*modelResult, LogLevelFilter::any().withMinimumErrors(1U)));
     EXPECT_TRUE(investigationEngine.searchSource(*modelResult, "pipeline_integration"));
 
     const auto report = ReportGenerator{}.generate(*modelResult);
 
     EXPECT_NE(std::string::npos, report.text().find("Total log lines : 8"));
+    EXPECT_NE(std::string::npos, report.text().find("Error lines     : 4"));
     EXPECT_NE(std::string::npos, report.text().find(m_testFile.string()));
 }
 

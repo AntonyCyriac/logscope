@@ -44,6 +44,7 @@ TEST(CliE2eTest, LegacyAnalyzeProducesTextReport)
 
     EXPECT_NE(std::string::npos, output.find("========== LOGSCOPE REPORT =========="));
     EXPECT_NE(std::string::npos, output.find("Total log lines : 8"));
+    EXPECT_NE(std::string::npos, output.find("Error lines     : 4"));
 }
 
 TEST(CliE2eTest, AnalyzeSubcommandProducesJsonReport)
@@ -52,6 +53,9 @@ TEST(CliE2eTest, AnalyzeSubcommandProducesJsonReport)
         runLogscope("analyze --format json " + scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
 
     EXPECT_NE(std::string::npos, output.find("\"totalLines\": 8"));
+    EXPECT_NE(std::string::npos, output.find("\"errorLines\": 4"));
+    EXPECT_NE(std::string::npos, output.find("\"warningLines\": 1"));
+    EXPECT_NE(std::string::npos, output.find("\"infoLines\": 3"));
     EXPECT_NE(std::string::npos, output.find("\"source\""));
 }
 

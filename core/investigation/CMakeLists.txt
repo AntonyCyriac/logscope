@@ -7,6 +7,7 @@ add_library(scope_investigation
     investigation_engine.cpp
     investigation_view.cpp
     line_count_filter.cpp
+    log_level_filter.cpp
 )
 
 target_link_libraries(scope_investigation

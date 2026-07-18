@@ -15,11 +15,17 @@ InvestigationView InvestigationEngine::inspect(const analysis::AnalysisModel& mo
 {
     SCOPE_LOG_INFO("investigation", "Inspecting analysis for " + model.sourcePath().string());
 
-    return InvestigationView(model.sourcePath(), model.totalLines());
+    return InvestigationView(model);
 }
 
 bool InvestigationEngine::matches(const analysis::AnalysisModel& model,
                                   const LineCountFilter& filter) const noexcept
+{
+    return filter.matches(model);
+}
+
+bool InvestigationEngine::matches(const analysis::AnalysisModel& model,
+                                  const LogLevelFilter& filter) const noexcept
 {
     return filter.matches(model);
 }

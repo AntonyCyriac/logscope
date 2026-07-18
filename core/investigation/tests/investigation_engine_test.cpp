@@ -9,32 +9,59 @@
 #include "investigation.hpp"
 
 using scope::analysis::AnalysisModel;
+using scope::analysis::LogLevelCounts;
 using scope::foundation::Path;
 using scope::investigation::InvestigationEngine;
 using scope::investigation::InvestigationView;
 using scope::investigation::LineCountFilter;
+using scope::investigation::LogLevelFilter;
+
+namespace
+{
+
+AnalysisModel createSampleModel()
+{
+    LogLevelCounts levelCounts;
+    levelCounts.recordInfo();
+    levelCounts.recordWarn();
+    levelCounts.recordError();
+    levelCounts.recordError();
+
+    return AnalysisModel(Path("sample.log"), 4U, levelCounts);
+}
+
+} // namespace
 
 TEST(InvestigationEngineTest, InspectsAnalysisModel)
 {
-    const AnalysisModel model(Path("sample.log"), 8U);
-
     InvestigationEngine engine;
 
-    const InvestigationView view = engine.inspect(model);
+    const InvestigationView view = engine.inspect(createSampleModel());
 
     EXPECT_EQ("sample.log", view.sourcePath().string());
-    EXPECT_EQ(8U, view.totalLines());
-    EXPECT_EQ("source=sample.log, lines=8", view.summary());
+    EXPECT_EQ(4U, view.totalLines());
+    EXPECT_NE(std::string::npos, view.summary().find("errors=2"));
 }
 
 TEST(InvestigationEngineTest, AppliesLineCountFilter)
 {
-    const AnalysisModel model(Path("sample.log"), 8U);
-
     InvestigationEngine engine;
+
+    const AnalysisModel model(Path("sample.log"), 8U);
 
     EXPECT_TRUE(engine.matches(model, LineCountFilter::nonEmpty()));
     EXPECT_FALSE(engine.matches(model, LineCountFilter::any().withMinimum(9U)));
+}
+
+TEST(InvestigationEngineTest, AppliesLogLevelFilter)
+{
+    InvestigationEngine engine;
+
+    const AnalysisModel model = createSampleModel();
+
+    EXPECT_TRUE(engine.matches(model, LogLevelFilter::any().withMinimumErrors(2U)));
+    EXPECT_FALSE(engine.matches(model, LogLevelFilter::any().withMinimumErrors(3U)));
+    EXPECT_TRUE(engine.matches(model, LogLevelFilter::any().withMinimumWarnings(1U)));
 }
 
 TEST(InvestigationEngineTest, SearchesSourcePath)

@@ -40,7 +40,7 @@ M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
 M3  ██████████ 100%
-M4  ░░░░░░░░░░   0%
+M4  ██░░░░░░░░ ~20%
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 planning is documented in [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
@@ -222,7 +222,7 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Phase | Focus | Primary FR | Status |
 |-------|-------|------------|--------|
-| M4.1 | Analysis depth | FR-001, FR-002 | ⏳ Planned |
+| M4.1 | Analysis depth | FR-001, FR-002 | ✅ Complete |
 | M4.2 | Additional source types | FR-001 | ⏳ Planned |
 | M4.3 | Advanced reporting | FR-003 | ⏳ Planned |
 | M4.4 | Extension ecosystem | FR-004 | ⏳ Planned |
@@ -235,10 +235,10 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Component | Description | Status |
 |-----------|-------------|--------|
-| `AnalysisModel` extensions | Per-level line counts and aggregate log statistics | Planned |
-| `AnalysisEngine` | Generic pattern-based stats during line scan | Planned |
-| `InvestigationEngine` | Level-based filters and content-aware search | Planned |
-| Reporting / CLI | Surface new stats in text and JSON output | Planned |
+| `AnalysisModel` extensions | Per-level line counts and aggregate log statistics | Complete |
+| `AnalysisEngine` | Generic pattern-based stats during line scan | Complete |
+| `InvestigationEngine` | Level-based filters and content-aware search | Complete |
+| Reporting / CLI | Surface new stats in text and JSON output | Complete |
 
 **Goal:** Produce meaningful analysis results from plain-text logs (FR-001.3) without custom scripts.
 

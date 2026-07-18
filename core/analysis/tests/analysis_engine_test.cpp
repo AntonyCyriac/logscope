@@ -32,12 +32,26 @@ class AnalysisEngineTest : public ::testing::Test
         stream << "line three\n";
     }
 
+    void writeLevelTestFile()
+    {
+        m_levelTestFile = Path("analysis_engine_levels_test.log");
+
+        std::ofstream stream(m_levelTestFile.string());
+
+        stream << "2026-07-11 10:00:01 INFO Application started\n";
+        stream << "2026-07-11 10:00:10 WARNING Request taking too long\n";
+        stream << "2026-07-11 10:00:06 ERROR Connection refused\n";
+        stream << "2026-07-11 10:00:07 ERROR Connection refused\n";
+    }
+
     void TearDown() override
     {
         std::remove(m_testFile.string().c_str());
+        std::remove(m_levelTestFile.string().c_str());
     }
 
     Path m_testFile;
+    Path m_levelTestFile;
 };
 
 } // namespace
@@ -92,4 +106,23 @@ TEST_F(AnalysisEngineTest, RejectsInvalidDataset)
 
     ASSERT_TRUE(modelResult.hasError());
     EXPECT_EQ(scope::foundation::ErrorCode::InvalidArgument, modelResult.error().code());
+}
+
+TEST_F(AnalysisEngineTest, CountsLogLevels)
+{
+    writeLevelTestFile();
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(m_levelTestFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(4U, modelResult->totalLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().infoLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().warnLines());
+    EXPECT_EQ(2U, modelResult->levelCounts().errorLines());
 }
