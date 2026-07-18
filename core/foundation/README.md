@@ -34,6 +34,8 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 | `Timestamp` | `timestamp.hpp`, `timestamp.cpp`, `timestamp.inl` |
 | `Clock` | `clock.hpp`, `clock.cpp` |
 | `Stopwatch` | `stopwatch.hpp`, `stopwatch.cpp` |
+| `Random` | `random.hpp`, `random.cpp` |
+| `String` utilities | `string.hpp`, `string.cpp` |
 | `Path` | `path.hpp`, `path.cpp` |
 | `FileSystem` | `filesystem.hpp`, `filesystem.cpp` |
 

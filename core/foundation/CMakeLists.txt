@@ -13,6 +13,7 @@ add_library(scope_foundation
     path.cpp
     random.cpp
     stopwatch.cpp
+    string.cpp
     time.cpp
     timestamp.cpp
     uuid.cpp
