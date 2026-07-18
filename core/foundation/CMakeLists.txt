@@ -10,6 +10,7 @@ add_library(scope_foundation
     duration.cpp
     error.cpp
     filesystem.cpp
+    hash.cpp
     path.cpp
     random.cpp
     stopwatch.cpp

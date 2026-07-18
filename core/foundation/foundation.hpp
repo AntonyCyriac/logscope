@@ -11,6 +11,7 @@
 #include "duration.hpp"
 #include "error.hpp"
 #include "filesystem.hpp"
+#include "hash.hpp"
 #include "path.hpp"
 #include "random.hpp"
 #include "result.hpp"

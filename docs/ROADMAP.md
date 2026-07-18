@@ -101,18 +101,13 @@ The Foundation module provides universal technical capabilities shared by all co
 | `Timestamp` | Absolute UTC instant as Unix nanoseconds since epoch |
 | `Clock` | System wall-clock source for current UTC timestamps |
 | `Stopwatch` | Monotonic elapsed-time measurement |
+| `Random` | Seedable pseudo-random number generator |
+| `String` utilities | Trim, case conversion, split, prefix/suffix checks |
+| `Hash` | FNV-1a string hashing and hash-combine helpers |
 | `Path` | Filesystem path value type |
 | `FileSystem` | File existence and metadata operations |
 
 All completed components include unit tests and are built as part of `scope_foundation`.
-
-### Next
-
-| Component | Priority |
-|-----------|----------|
-| `Random` | Medium |
-| `String` utilities | Medium |
-| `Hash` | Medium |
 
 Foundation components are implemented incrementally using small pull requests with tests mirroring the public API.
 

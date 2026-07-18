@@ -32,6 +32,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `Stopwatch` monotonic elapsed-time measurement returning `Duration`.
 - `Random` seedable pseudo-random number generator.
 - `String` utilities for trim, case conversion, prefix/suffix checks, and split.
+- `Hash` FNV-1a hashing and hash-combine helpers.
 - `Path` and `FileSystem` for filesystem path handling and file operations.
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.

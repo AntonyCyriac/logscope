@@ -36,6 +36,7 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 | `Stopwatch` | `stopwatch.hpp`, `stopwatch.cpp` |
 | `Random` | `random.hpp`, `random.cpp` |
 | `String` utilities | `string.hpp`, `string.cpp` |
+| `Hash` | `hash.hpp`, `hash.cpp` |
 | `Path` | `path.hpp`, `path.cpp` |
 | `FileSystem` | `filesystem.hpp`, `filesystem.cpp` |
 
