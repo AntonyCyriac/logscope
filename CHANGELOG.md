@@ -32,6 +32,13 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - CSV and Markdown output formats alongside text and JSON (FR-003.4).
 - Unified formatting in `core/reporting` for reproducible output (FR-003.6).
 
+#### M4.4 – Extension Ecosystem
+
+- `ExtensionManager` for built-in extension registration and lifecycle (C06).
+- Configuration-based enablement via `extensions.<id>.enabled` keys (FR-004.1).
+- CLI commands `extensions list` and `extensions describe` (FR-004.5).
+- Failure-isolated extension initialization during analyze (FR-004.4).
+
 ---
 
 ## [0.3.0] - 2026-07-18

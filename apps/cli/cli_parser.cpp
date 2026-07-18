@@ -174,6 +174,92 @@ std::optional<ConfigValidateOptions> parseConfigValidateArguments(int argc, char
     return options;
 }
 
+std::optional<ExtensionsListOptions> parseExtensionsListArguments(int argc, char* argv[], int startIndex)
+{
+    ExtensionsListOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<ExtensionsDescribeOptions> parseExtensionsDescribeArguments(int argc, char* argv[], int startIndex)
+{
+    ExtensionsDescribeOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (!options.extensionId.empty())
+        {
+            return std::nullopt;
+        }
+
+        options.extensionId = argument;
+    }
+
+    if (options.showHelp)
+    {
+        return options;
+    }
+
+    if (options.extensionId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -207,6 +293,22 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::ConfigValidate;
             parsed.configValidate.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "extensions" && std::string_view(argv[3]) == "list")
+        {
+            parsed.command = CliCommand::ExtensionsList;
+            parsed.extensionsList.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "extensions" && std::string_view(argv[3]) == "describe")
+        {
+            parsed.command = CliCommand::ExtensionsDescribe;
+            parsed.extensionsDescribe.showHelp = true;
 
             return parsed;
         }
@@ -249,6 +351,48 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         parsed.configValidate = *options;
 
         return parsed;
+    }
+
+    if (firstArgument == "extensions")
+    {
+        if (argc < 3)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view subcommand = argv[2];
+
+        if (subcommand == "list")
+        {
+            const auto options = parseExtensionsListArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::ExtensionsList;
+            parsed.extensionsList = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "describe")
+        {
+            const auto options = parseExtensionsDescribeArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::ExtensionsDescribe;
+            parsed.extensionsDescribe = *options;
+
+            return parsed;
+        }
+
+        return std::nullopt;
     }
 
     const auto legacyOptions = parseAnalyzeArguments(argc, argv, 1);

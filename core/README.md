@@ -31,7 +31,7 @@ The Core layer contains no product-specific business logic.
 | [Analysis](analysis/README.md) | Complete | Source dataset analysis and analysis model production |
 | [Investigation](investigation/README.md) | Complete | Search, filter, and inspect analysis models |
 | [Reporting](reporting/README.md) | Complete | Report generation from analysis models |
-| Extension | Planned (M4.4) | Extension discovery, registration, and lifecycle |
+| [Extension](extension/README.md) | Complete | Extension discovery, registration, and lifecycle |
 | [Workspace](workspace/) | Planned (M4.5) | Sessions and investigation persistence |
 
 ---

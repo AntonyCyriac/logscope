@@ -225,7 +225,7 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 | M4.1 | Analysis depth | FR-001, FR-002 | ✅ Complete |
 | M4.2 | Additional source types | FR-001 | ✅ Complete |
 | M4.3 | Advanced reporting | FR-003 | ✅ Complete |
-| M4.4 | Extension ecosystem | FR-004 | ⏳ Planned |
+| M4.4 | Extension ecosystem | FR-004 | ✅ Complete |
 | M4.5 | Session / workspace | FR-002 | ⏳ Planned |
 | Deferred | REST API, Web UI, AI-assisted investigation | — | Post-M4 |
 
@@ -276,9 +276,9 @@ Detailed planning: [M4 – Feature Expansion](planning/M4-FEATURE-EXPANSION.md).
 
 | Component | Description | Status |
 |-----------|-------------|--------|
-| `ExtensionManager` | Extension discovery, registration, lifecycle (C06) | Planned |
-| Built-in extensions | Static registration at startup; config enablement (FR-004.1) | Planned |
-| CLI discoverability | `extensions list` and `extensions describe` (FR-004.5) | Planned |
+| `ExtensionManager` | Extension discovery, registration, lifecycle (C06) | Complete |
+| Built-in extensions | Static registration at startup; config enablement (FR-004.1) | Complete |
+| CLI discoverability | `extensions list` and `extensions describe` (FR-004.5) | Complete |
 
 **Goal:** Introduce capabilities without modifying core code (FR-004.2). Dynamic library loading is a later sub-phase.
 
