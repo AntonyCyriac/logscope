@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.8.0 |
+| Version | 2.9.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -30,6 +30,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | ✅ Complete | First stable production release. |
+| **M6 – Log Format Intelligence** | 🔄 Planned | Format detection, structured parsing, field extraction, content investigation, format profiles. Target: `v1.1.0`. |
 
 ---
 
@@ -42,9 +43,10 @@ M2  ██████████ 100%
 M3  ██████████ 100%
 M4  ██████████ 100%
 M5  ██████████ 100%
+M6  ░░░░░░░░░░   0%  (planned)
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md).
 
 ---
 
@@ -346,6 +348,35 @@ Completion of this milestone prepares LogScope for the first stable production r
 
 ---
 
+# M6 – Log Format Intelligence
+
+M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich workflows. Detailed planning: [M6 – Log Format Intelligence](planning/M6-LOG-FORMAT-INTELLIGENCE.md).
+
+| Phase | Focus | Primary FR | Status |
+|-------|-------|------------|--------|
+| M6.1 | Format detection | FR-001.4 | ⏳ Planned |
+| M6.2 | JSON Lines parsing | FR-001.1, FR-001.3 | ⏳ Planned |
+| M6.3 | Timestamp and field extraction | FR-001.3 | ⏳ Planned |
+| M6.4 | Content-aware investigation | FR-002.1, FR-002.2, FR-002.4 | ⏳ Planned |
+| M6.5 | Format profiles and configuration | FR-004.1 | ⏳ Planned |
+
+### Focus areas
+
+- Generic format identification with actionable unsupported-input feedback
+- Structured log parsing (JSON Lines / NDJSON first)
+- Timestamp and field extraction for richer `AnalysisModel` output
+- Content search, time-range filters, and basic correlation in investigation
+- Configuration-driven format profiles (configuration before plugins)
+- Target release: **`v1.1.0`**
+
+### Deferred to post-M6
+
+- REST API, Web UI, AI-assisted investigation
+- Dynamic shared-library plugin loading and extension SDK (M7)
+- Vendor-specific parsers
+
+---
+
 # Success Criteria
 
 The roadmap is considered successful when:
@@ -370,3 +401,4 @@ The roadmap is considered successful when:
 | 2.6.0 | 18-07-2026 | Added M5 phased roadmap (M5.1–M5.5) and planning document link. |
 | 2.7.0 | 18-07-2026 | M5 complete; all M5 phases marked complete; production readiness infrastructure delivered. |
 | 2.8.0 | 18-07-2026 | v1.0.0 first stable production release. |
+| 2.9.0 | 18-07-2026 | Added M6 phased roadmap (M6.1–M6.5) and planning document link; target v1.1.0. |
