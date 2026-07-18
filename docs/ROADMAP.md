@@ -39,7 +39,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
-M3  █████░░░░░ ~40%
+M3  ██████░░░░ ~55%
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 changes are tracked in [CHANGELOG.md](../CHANGELOG.md).
@@ -58,7 +58,7 @@ The implementation phase is divided into logical increments.
 | M3.4 | Configuration Manager | ✅ Complete |
 | M3.5 | Source Manager | ✅ Complete |
 | M3.6 | Analysis Engine | ✅ Complete |
-| M3.7 | Investigation Engine | ⏳ Planned |
+| M3.7 | Investigation Engine | ✅ Complete |
 | M3.8 | Reporting Engine | ✅ Complete |
 | M3.9 | CLI | ⏳ Planned |
 | M3.10 | Integration & End-to-End Testing | ⏳ Planned |
@@ -178,11 +178,22 @@ Built as `scope_reporting` with unit tests. CLI `LogAnalyzer` renders output thr
 
 ---
 
-## M3.7 – M3.10 (Planned)
+## M3.7 – Investigation Engine
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `InvestigationView` | Read-only inspection of analysis results | Complete |
+| `LineCountFilter` | Progressive line-count filtering | Complete |
+| `InvestigationEngine` | Search, filter, and inspect `AnalysisModel` | Complete |
+
+Built as `scope_investigation` with unit tests. CLI `LogAnalyzer` inspects analysis results before reporting.
+
+---
+
+## M3.9 – M3.10 (Planned)
 
 Subsequent M3 phases depend on a stable Foundation library:
 
-- **M3.7** – Investigation Engine
 - **M3.9** – CLI (command framework, subcommands, configuration, output formats)
 - **M3.10** – Integration and end-to-end testing
 
