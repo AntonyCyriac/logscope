@@ -118,7 +118,7 @@ Foundation components are implemented incrementally using small pull requests wi
 | Component | Description | Status |
 |-----------|-------------|--------|
 | `Configuration` | Key-value configuration store | Complete |
-| `Diagnostics` | Level filtering, categories, macros, config integration | Complete |
+| `Diagnostics` | Level filtering, categories, macros, UTC timestamps, config integration | Complete |
 | `PluginRegistry` | Plugin metadata registration | Complete |
 | `ServiceRegistry` | Platform service registration | Complete |
 
@@ -129,7 +129,7 @@ Built as `scope_runtime` with unit tests. Depends on Foundation. CLI links `scop
 - Thread pool and task scheduler
 - Extended plugin loading
 - Environment access
-- Structured log output and timestamps (after Foundation `Clock`/`Timestamp`)
+- Structured JSON log output
 
 ---
 

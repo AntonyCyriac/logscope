@@ -20,8 +20,10 @@ It depends on Foundation and exposes configuration, diagnostics, plugin registra
 `Diagnostics` writes leveled messages to stderr using the format:
 
 ```text
-[LEVEL] [category] message
+[timestamp] [LEVEL] [category] message
 ```
+
+Timestamps are UTC ISO-like values from `Clock::now()` (for example `2026-07-18T12:30:45`). They are enabled by default.
 
 ### Log levels
 
@@ -37,11 +39,12 @@ It depends on Foundation and exposes configuration, diagnostics, plugin registra
 Set the minimum log level via `Configuration`:
 
 ```cpp
-configuration.set("log.level", "debug");  // debug, info, warn, error
+configuration.set("log.level", "debug");       // debug, info, warn, error
+configuration.set("log.timestamps", "true");   // true, false, on, off, yes, no, 1, 0
 Diagnostics::instance().applyConfiguration(configuration);
 ```
 
-If `log.level` is not set, `SCOPE_LOG_LEVEL` environment variable is checked.
+If `log.level` is not set, `SCOPE_LOG_LEVEL` environment variable is checked. Timestamps can be disabled with `log.timestamps=false`.
 
 ### Macros
 

@@ -12,6 +12,7 @@
 #include <string>
 
 #include "configuration.hpp"
+#include "foundation/clock.hpp"
 #include "foundation/error.hpp"
 
 namespace scope::runtime
@@ -28,6 +29,24 @@ std::string toLower(std::string_view value)
                    [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
 
     return lowered;
+}
+
+foundation::Result<bool> parseBool(std::string_view value)
+{
+    const std::string lowered = toLower(value);
+
+    if (lowered == "true" || lowered == "1" || lowered == "on" || lowered == "yes")
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    if (lowered == "false" || lowered == "0" || lowered == "off" || lowered == "no")
+    {
+        return foundation::Result<bool>(false);
+    }
+
+    return foundation::Result<bool>(
+        foundation::Error(foundation::ErrorCode::InvalidArgument, "Invalid boolean value."));
 }
 
 } // namespace
@@ -99,6 +118,16 @@ void Diagnostics::setOutputStream(std::ostream* stream) noexcept
     m_outputStream = stream;
 }
 
+bool Diagnostics::timestampsEnabled() const noexcept
+{
+    return m_timestampsEnabled;
+}
+
+void Diagnostics::setTimestampsEnabled(bool enabled) noexcept
+{
+    m_timestampsEnabled = enabled;
+}
+
 bool Diagnostics::applyConfiguration(const Configuration& configuration)
 {
     if (configuration.has("log.level"))
@@ -118,11 +147,8 @@ bool Diagnostics::applyConfiguration(const Configuration& configuration)
         }
 
         setMinLevel(*parsedLevel);
-
-        return true;
     }
-
-    if (const char* environmentLevel = std::getenv("SCOPE_LOG_LEVEL"))
+    else if (const char* environmentLevel = std::getenv("SCOPE_LOG_LEVEL"))
     {
         const auto parsedLevel = parseLogLevel(environmentLevel);
 
@@ -132,6 +158,25 @@ bool Diagnostics::applyConfiguration(const Configuration& configuration)
         }
 
         setMinLevel(*parsedLevel);
+    }
+
+    if (configuration.has("log.timestamps"))
+    {
+        const auto timestampResult = configuration.get("log.timestamps");
+
+        if (!timestampResult)
+        {
+            return false;
+        }
+
+        const auto parsedTimestamp = parseBool(*timestampResult);
+
+        if (!parsedTimestamp)
+        {
+            return false;
+        }
+
+        setTimestampsEnabled(*parsedTimestamp);
     }
 
     return true;
@@ -160,6 +205,11 @@ bool Diagnostics::shouldLog(LogLevel level) const noexcept
 void Diagnostics::write(LogLevel level, std::string_view category, std::string_view message)
 {
     std::ostream& output = m_outputStream != nullptr ? *m_outputStream : std::cerr;
+
+    if (m_timestampsEnabled)
+    {
+        output << '[' << foundation::Clock::now().toString() << ']';
+    }
 
     output << '[' << toString(level) << ']';
 

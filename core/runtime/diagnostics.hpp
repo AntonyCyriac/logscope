@@ -77,9 +77,21 @@ class Diagnostics
     void setOutputStream(std::ostream* stream) noexcept;
 
     /**
+     * @brief Returns whether timestamps are included in log output.
+     */
+    [[nodiscard]] bool timestampsEnabled() const noexcept;
+
+    /**
+     * @brief Enables or disables UTC timestamps in log output.
+     *
+     * @param enabled true to include timestamps.
+     */
+    void setTimestampsEnabled(bool enabled) noexcept;
+
+    /**
      * @brief Applies log settings from configuration.
      *
-     * Reads the log.level key. Returns false if the value is present but invalid.
+     * Reads the log.level and log.timestamps keys. Returns false if a present value is invalid.
      *
      * @param configuration Configuration store.
      * @return true if configuration was applied successfully.
@@ -111,6 +123,8 @@ class Diagnostics
     void write(LogLevel level, std::string_view category, std::string_view message);
 
     LogLevel m_minLevel = LogLevel::Info;
+
+    bool m_timestampsEnabled = true;
 
     std::ostream* m_outputStream = nullptr;
 };

@@ -28,6 +28,7 @@ class DiagnosticsTest : public ::testing::Test
 
         Diagnostics& diagnostics = Diagnostics::instance();
         diagnostics.setMinLevel(LogLevel::Info);
+        diagnostics.setTimestampsEnabled(true);
         diagnostics.setOutputStream(&m_outputStream);
     }
 
@@ -35,6 +36,7 @@ class DiagnosticsTest : public ::testing::Test
     {
         Diagnostics::instance().setOutputStream(nullptr);
         Diagnostics::instance().setMinLevel(LogLevel::Info);
+        Diagnostics::instance().setTimestampsEnabled(true);
     }
 
     [[nodiscard]] std::string output() const
@@ -84,6 +86,44 @@ TEST_F(DiagnosticsTest, CategoryInOutput)
     EXPECT_NE(output().find("[INFO]"), std::string::npos);
     EXPECT_NE(output().find("[cli]"), std::string::npos);
     EXPECT_NE(output().find("starting analysis"), std::string::npos);
+}
+
+TEST_F(DiagnosticsTest, TimestampInOutput)
+{
+    Diagnostics::instance().setTimestampsEnabled(true);
+    Diagnostics::instance().log(LogLevel::Info, "cli", "timestamped message");
+
+    const std::string line = output();
+
+    EXPECT_NE(line.find("T"), std::string::npos);
+    EXPECT_NE(line.find("[INFO]"), std::string::npos);
+    EXPECT_LT(line.find('T'), line.find("[INFO]"));
+}
+
+TEST_F(DiagnosticsTest, TimestampCanBeDisabled)
+{
+    Diagnostics::instance().setTimestampsEnabled(false);
+    Diagnostics::instance().log(LogLevel::Info, "cli", "plain message");
+
+    EXPECT_EQ(output().find("[INFO]"), 0U);
+}
+
+TEST_F(DiagnosticsTest, ApplyConfigurationTimestamps)
+{
+    Configuration configuration;
+    configuration.set("log.timestamps", "false");
+
+    EXPECT_TRUE(Diagnostics::instance().applyConfiguration(configuration));
+    EXPECT_FALSE(Diagnostics::instance().timestampsEnabled());
+}
+
+TEST_F(DiagnosticsTest, ApplyConfigurationInvalidTimestamps)
+{
+    Configuration configuration;
+    configuration.set("log.timestamps", "maybe");
+
+    EXPECT_FALSE(Diagnostics::instance().applyConfiguration(configuration));
+    EXPECT_TRUE(Diagnostics::instance().timestampsEnabled());
 }
 
 TEST(ParseLogLevelTest, ValidValues)
