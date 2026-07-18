@@ -37,6 +37,11 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
 
+#### M3.4 – Configuration Manager
+
+- `ConfigurationManager` for loading properties files, applying `SCOPE_` environment overrides, and validating required keys.
+- `scope_configuration` library and `scope_configuration_tests` test target.
+
 #### M3.3 – Platform Services (Runtime)
 
 - `Configuration` key-value store.

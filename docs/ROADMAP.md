@@ -55,7 +55,7 @@ The implementation phase is divided into logical increments.
 | M3.1 | Repository Structure | 🟡 In Progress |
 | M3.2 | Core Library (Foundation) | 🟡 In Progress |
 | M3.3 | Platform Services (Runtime) | 🟡 In Progress |
-| M3.4 | Configuration Manager | ⏳ Planned |
+| M3.4 | Configuration Manager | 🟡 In Progress |
 | M3.5 | Source Manager | ⏳ Planned |
 | M3.6 | Analysis Engine | ⏳ Planned |
 | M3.7 | Investigation Engine | ⏳ Planned |
@@ -133,12 +133,20 @@ Built as `scope_runtime` with unit tests. Depends on Foundation. CLI links `scop
 
 ---
 
-## M3.4 – M3.10 (Planned)
+## M3.4 – Configuration Manager
+
+| Component | Description | Status |
+|-----------|-------------|--------|
+| `ConfigurationManager` | Load properties files, apply `SCOPE_` environment overrides, validate required keys | Complete |
+
+Built as `scope_configuration` with unit tests. Depends on Foundation and Runtime.
+
+---
+
+## M3.5 – M3.10 (Planned)
 
 Subsequent M3 phases depend on a stable Foundation library:
 
-- **M3.3** – Platform Services (initial Runtime module complete; threading planned)
-- **M3.4** – Configuration Manager
 - **M3.5** – Source Manager
 - **M3.6** – Analysis Engine
 - **M3.7** – Investigation Engine
