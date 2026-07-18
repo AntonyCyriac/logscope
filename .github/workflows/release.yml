@@ -18,17 +18,14 @@ jobs:
           - os: ubuntu-latest
             artifact_name: logscope-linux-amd64
             binary_path: build/apps/cli/logscope
-            archive_cmd: tar -czf ${{ matrix.artifact_name }}.tar.gz -C dist .
             archive_file: logscope-linux-amd64.tar.gz
           - os: windows-latest
             artifact_name: logscope-windows-amd64
             binary_path: build/apps/cli/Release/logscope.exe
-            archive_cmd: powershell Compress-Archive -Path dist/* -DestinationPath logscope-windows-amd64.zip
             archive_file: logscope-windows-amd64.zip
           - os: macos-latest
             artifact_name: logscope-macos-amd64
             binary_path: build/apps/cli/logscope
-            archive_cmd: tar -czf ${{ matrix.artifact_name }}.tar.gz -C dist .
             archive_file: logscope-macos-amd64.tar.gz
 
     runs-on: ${{ matrix.os }}
@@ -55,12 +52,12 @@ jobs:
 
       - name: Create Archive (Unix)
         if: runner.os != 'Windows'
-        run: ${{ matrix.archive_cmd }}
+        run: tar -czf ${{ matrix.archive_file }} -C dist .
 
       - name: Create Archive (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: ${{ matrix.archive_cmd }}
+        run: Compress-Archive -Path dist/* -DestinationPath ${{ matrix.archive_file }}
 
       - name: Smoke Test
         shell: bash
