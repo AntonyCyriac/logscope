@@ -5,7 +5,7 @@
 
 class LogAnalyzer
 {
-public:
+  public:
     bool analyze(const std::string& filePath);
 };
 

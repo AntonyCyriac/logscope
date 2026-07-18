@@ -281,7 +281,19 @@ This maintains traceability between requirements, architecture, and implementati
 
 ---
 
-# 17. Verification Checklist
+# 17. Contribution Workflow
+
+After environment setup, follow the handbook workflow guides:
+
+| Document | Purpose |
+|----------|---------|
+| [GIT_CONVENTIONS.md](GIT_CONVENTIONS.md) | Commit and branch naming |
+| [PULL_REQUEST_GUIDE.md](PULL_REQUEST_GUIDE.md) | Author checklist and definition of done |
+| [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md) | Reviewer checklist |
+
+---
+
+# 18. Verification Checklist
 
 Before starting development:
 
@@ -295,7 +307,7 @@ Before starting development:
 
 ---
 
-# 18. Revision History
+# 19. Revision History
 
 | Version | Date | Description |
 |----------|------------|-----------------------------|

@@ -2,6 +2,7 @@ add_executable(scope_foundation_tests
     status_test.cpp
     error_test.cpp
     result_test.cpp
+    uuid_test.cpp
     version_test.cpp
 )
 

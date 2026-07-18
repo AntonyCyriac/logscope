@@ -10,8 +10,7 @@ bool LogAnalyzer::analyze(const std::string& filePath)
 
     if (!logFile.is_open())
     {
-        std::cerr << "Error: Unable to open log file: "
-                  << filePath << std::endl;
+        std::cerr << "Error: Unable to open log file: " << filePath << std::endl;
 
         return false;
     }
@@ -24,14 +23,11 @@ bool LogAnalyzer::analyze(const std::string& filePath)
         ++totalLines;
     }
 
-    std::cout << "========== LOGSCOPE REPORT =========="
-              << std::endl;
+    std::cout << "========== LOGSCOPE REPORT ==========" << std::endl;
 
-    std::cout << "Total log lines : "
-              << totalLines << std::endl;
+    std::cout << "Total log lines : " << totalLines << std::endl;
 
-    std::cout << "====================================="
-              << std::endl;
+    std::cout << "=====================================" << std::endl;
 
     return true;
 }

@@ -54,3 +54,9 @@ target_include_directories(logscope
     PRIVATE
         include
 )
+
+# ----------------------------------------------------------
+# Formatting
+# ----------------------------------------------------------
+
+include(cmake/Format.cmake)

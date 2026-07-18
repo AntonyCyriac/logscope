@@ -283,6 +283,20 @@ If most answers are negative, reconsider the decision.
 
 # References
 
-- DOCUMENT_STANDARD.md
-- PROJECT_CHARTER.md
-- PRODUCT_OVERVIEW.md
+## Vision and Product
+
+- [PROJECT_CHARTER.md](../vision/PROJECT_CHARTER.md)
+- [PRODUCT_OVERVIEW.md](../vision/PRODUCT_OVERVIEW.md)
+
+## Standards
+
+- [DOCUMENT_STANDARD.md](DOCUMENT_STANDARD.md)
+- [C++ Coding Standard](CPP_CODING_STANDARD.md)
+- [API Design Guidelines](API_DESIGN_GUIDELINES.md)
+- [Foundation Guidelines](FOUNDATION_GUIDELINES.md)
+
+## Workflow
+
+- [Git Conventions](../handbook/GIT_CONVENTIONS.md)
+- [Pull Request Guide](../handbook/PULL_REQUEST_GUIDE.md)
+- [Code Review Checklist](../handbook/CODE_REVIEW_CHECKLIST.md)

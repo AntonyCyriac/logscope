@@ -5,6 +5,7 @@
 
 add_library(scope_foundation
     error.cpp
+    uuid.cpp
     version.cpp
 )
 

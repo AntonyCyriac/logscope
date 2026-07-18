@@ -349,11 +349,10 @@ Public APIs should use Doxygen comments.
 
 # Error Handling
 
-Prefer explicit return types.
+Prefer explicit return types over exceptions for expected runtime failures.
 
-Avoid exceptions for expected runtime failures.
-
-Foundation types such as `Status` and future `Result<T>` should be used where appropriate.
+- Foundation code uses `Result<T>` — see [Foundation Guidelines](FOUNDATION_GUIDELINES.md) and [Result&lt;T&gt; Design](../architecture/foundation/RESULT.md).
+- Public APIs should document failure modes — see [API Design Guidelines](API_DESIGN_GUIDELINES.md).
 
 ---
 
@@ -371,35 +370,21 @@ Avoid unnecessary transitive includes.
 
 # Modern C++
 
-Prefer:
+Follow modern C++17 practices throughout the repository.
 
-- `constexpr`
-- `noexcept` where appropriate
-- `enum class`
-- `override`
-- `final` where appropriate
-- `nullptr`
-- `using` instead of `typedef`
-- `auto` when it improves readability
-- Range-based `for` loops
+Use `constexpr`, `noexcept`, `enum class`, `override`, `final`, `nullptr`, `using` instead of `typedef`, `auto` when it improves readability, and range-based `for` loops where appropriate.
 
-Avoid:
+Avoid C-style casts, owning raw pointers, mutable global state, macros for constants, and `using namespace` in header files.
 
-- C-style casts
-- Owning raw pointers
-- Mutable global state
-- Macros for constants
-- `using namespace` in header files
+For detailed Foundation patterns (Rule of Zero, `[[nodiscard]]`, `string_view`, and more), see [Foundation Guidelines](FOUNDATION_GUIDELINES.md).
 
 ---
 
 # Testing
 
-Every reusable module shall contain its own tests.
+Every reusable module shall contain its own tests. Tests should remain independent from production code and verify one behavior at a time.
 
-Tests should remain independent from production code.
-
-Unit tests should verify one behavior at a time.
+For Foundation test naming, coverage expectations, and examples, see [Foundation Guidelines](FOUNDATION_GUIDELINES.md).
 
 ---
 
@@ -417,37 +402,31 @@ Prefer target-based CMake over global configuration.
 
 # Simplicity
 
-Prefer the simplest correct solution.
+Prefer the simplest correct solution. Additional abstraction should be introduced only after repeated use demonstrates a clear benefit.
 
-Additional abstraction should be introduced only after repeated use demonstrates a clear benefit.
-
-Avoid premature optimization.
-
-Avoid speculative generalization.
+Avoid premature optimization and speculative generalization. See [EP-010 – Simplicity Over Cleverness](ENGINEERING_PRINCIPLES.md#ep-010--simplicity-over-cleverness).
 
 ---
 
 # Engineering Philosophy
 
-The project follows these principles:
-
-- Design before implementation.
-- Build incrementally.
-- Promote abstractions only after proven reuse.
-- Keep modules small and cohesive.
-- Every commit should leave the repository in a buildable state.
-- Clarity is preferred over cleverness.
-- Consistency is preferred over personal preference.
+See [Engineering Principles](ENGINEERING_PRINCIPLES.md) for the project decision framework.
 
 ---
 
 # Related Standards
 
-- DOCUMENT_STANDARD.md
-- ENGINEERING_PRINCIPLES.md
+- [DOCUMENT_STANDARD.md](DOCUMENT_STANDARD.md)
+- [ENGINEERING_PRINCIPLES.md](ENGINEERING_PRINCIPLES.md)
+- [API_DESIGN_GUIDELINES.md](API_DESIGN_GUIDELINES.md)
+- [FOUNDATION_GUIDELINES.md](FOUNDATION_GUIDELINES.md)
+
+## Handbook
+
+- [Git Conventions](../handbook/GIT_CONVENTIONS.md)
+- [Pull Request Guide](../handbook/PULL_REQUEST_GUIDE.md)
+- [Code Review Checklist](../handbook/CODE_REVIEW_CHECKLIST.md)
 
 Future standards may include:
 
 - TESTING_STANDARD.md
-- GIT_WORKFLOW.md
-- API_DESIGN_GUIDELINES.md

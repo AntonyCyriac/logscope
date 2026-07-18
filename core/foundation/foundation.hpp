@@ -8,4 +8,5 @@
 #include "error.hpp"
 #include "result.hpp"
 #include "status.hpp"
+#include "uuid.hpp"
 #include "version.hpp"
