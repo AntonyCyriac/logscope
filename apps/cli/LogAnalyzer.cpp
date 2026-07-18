@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "analysis.hpp"
+#include "investigation.hpp"
 #include "log_macros.hpp"
 #include "reporting.hpp"
 #include "source.hpp"
@@ -40,6 +41,12 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
 
         return false;
     }
+
+    scope::investigation::InvestigationEngine investigationEngine;
+
+    const scope::investigation::InvestigationView view = investigationEngine.inspect(*modelResult);
+
+    SCOPE_LOG_INFO("cli", "Investigation summary: " + view.summary());
 
     scope::reporting::ReportGenerator reportGenerator;
 
