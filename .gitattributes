@@ -1,0 +1,6 @@
+# Normalize line endings to LF for cross-platform consistency.
+# Matches .editorconfig (end_of_line = lf).
+
+* text=auto eol=lf
+
+*.md text eol=lf
