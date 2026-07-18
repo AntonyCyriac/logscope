@@ -12,6 +12,7 @@ target_link_libraries(logscope
         scope_analysis
         scope_configuration
         scope_foundation
+        scope_reporting
         scope_runtime
         scope_source
 )

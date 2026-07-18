@@ -29,8 +29,7 @@ The Core layer contains no product-specific business logic.
 | [Configuration](configuration/README.md) | In progress | Configuration loading, validation, environment overrides |
 | [Source](source/README.md) | In progress | Log source validation, acquisition, and dataset preparation |
 | [Analysis](analysis/README.md) | In progress | Source dataset analysis and analysis model production |
-| Investigation | Planned | Investigation workflow |
-| Reporting | Planned | Report generation |
+| [Reporting](reporting/README.md) | In progress | Report generation from analysis models |
 | Search | Planned | Search and filtering |
 | Workspace | Planned | Sessions and persistence |
 

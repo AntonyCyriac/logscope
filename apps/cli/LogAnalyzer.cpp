@@ -9,6 +9,7 @@
 
 #include "analysis.hpp"
 #include "log_macros.hpp"
+#include "reporting.hpp"
 #include "source.hpp"
 
 namespace scope::cli
@@ -40,10 +41,11 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath)
         return false;
     }
 
-    std::cout << "========== LOGSCOPE REPORT ==========" << std::endl;
-    std::cout << "Source          : " << modelResult->sourcePath().string() << std::endl;
-    std::cout << "Total log lines : " << modelResult->totalLines() << std::endl;
-    std::cout << "=====================================" << std::endl;
+    scope::reporting::ReportGenerator reportGenerator;
+
+    const scope::reporting::Report report = reportGenerator.generate(*modelResult);
+
+    std::cout << report.text() << std::endl;
 
     return true;
 }
