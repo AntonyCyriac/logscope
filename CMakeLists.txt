@@ -40,20 +40,7 @@ enable_testing()
 # ----------------------------------------------------------
 
 add_subdirectory(core)
-
-# ----------------------------------------------------------
-# Current executable (temporary)
-# ----------------------------------------------------------
-
-add_executable(logscope
-    src/main.cpp
-    src/LogAnalyzer.cpp
-)
-
-target_include_directories(logscope
-    PRIVATE
-        include
-)
+add_subdirectory(apps)
 
 # ----------------------------------------------------------
 # Formatting

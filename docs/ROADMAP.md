@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.1.0 |
+| Version | 2.2.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -39,7 +39,7 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 M0  ██████████ 100%
 M1  ██████████ 100%
 M2  ██████████ 100%
-M3  ███░░░░░░░ ~25%
+M3  █████░░░░░ ~40%
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 changes are tracked in [CHANGELOG.md](../CHANGELOG.md).
@@ -54,7 +54,7 @@ The implementation phase is divided into logical increments.
 |-------|-----------|--------|
 | M3.1 | Repository Structure | 🟡 In Progress |
 | M3.2 | Core Library (Foundation) | 🟡 In Progress |
-| M3.3 | Platform Services | ⏳ Planned |
+| M3.3 | Platform Services (Runtime) | 🟡 In Progress |
 | M3.4 | Configuration Manager | ⏳ Planned |
 | M3.5 | Source Manager | ⏳ Planned |
 | M3.6 | Analysis Engine | ⏳ Planned |
@@ -73,10 +73,11 @@ The implementation phase is divided into logical increments.
 | Core module structure (`core/foundation/`) | ✅ Complete |
 | CI workflow (build and test) | ✅ Complete |
 | CMake format target | ✅ Complete |
-| Legacy `include/` + `src/` CLI separation | ⏳ Pending |
-| Namespace validation across modules | ⏳ Pending |
-| Target layout cleanup | ⏳ Pending |
-| Final CMake organization | ⏳ Pending |
+| Legacy `include/` + `src/` CLI separation | ✅ Complete |
+| CLI under `apps/cli/` linked to Foundation | ✅ Complete |
+| Namespace validation across modules | ✅ Complete |
+| Target layout cleanup | ✅ Complete |
+| Final CMake organization | ✅ Complete |
 
 ---
 
@@ -93,6 +94,11 @@ The Foundation module provides universal technical capabilities shared by all co
 | `Result<T>` | Type-safe success/failure return type |
 | `Version` | Semantic version value type |
 | `Uuid` | RFC 4122 UUID (parse, generate, compare) |
+| `Time` | Time-of-day value type |
+| `Date` | Calendar date value type |
+| `DateTime` | Combined date and time |
+| `Path` | Filesystem path value type |
+| `FileSystem` | File existence and metadata operations |
 
 All completed components include unit tests and are built as part of `scope_foundation`.
 
@@ -100,15 +106,10 @@ All completed components include unit tests and are built as part of `scope_foun
 
 | Component | Priority |
 |-----------|----------|
-| `Time` | High |
-| `Date` | High |
-| `DateTime` | High |
 | `Duration` | Medium |
 | `Timestamp` | Medium |
 | `Clock` | Medium |
 | `Stopwatch` | Medium |
-| `Path` | High |
-| `FileSystem` | High |
 | `Random` | Medium |
 | `String` utilities | Medium |
 | `Hash` | Medium |
@@ -117,11 +118,30 @@ Foundation components are implemented incrementally using small pull requests wi
 
 ---
 
-## M3.3 – M3.10 (Planned)
+## M3.3 – Platform Services (Runtime)
+
+| Component | Description |
+|-----------|-------------|
+| `Configuration` | Key-value configuration store |
+| `Diagnostics` | Diagnostic logging |
+| `PluginRegistry` | Plugin metadata registration |
+| `ServiceRegistry` | Platform service registration |
+
+Built as `scope_runtime` with unit tests. Depends on Foundation.
+
+### Next
+
+- Thread pool and task scheduler
+- Extended plugin loading
+- Environment access
+
+---
+
+## M3.4 – M3.10 (Planned)
 
 Subsequent M3 phases depend on a stable Foundation library:
 
-- **M3.3** – Platform Services (configuration, plugin manager, registry, diagnostics, threading)
+- **M3.3** – Platform Services (initial Runtime module complete; threading planned)
 - **M3.4** – Configuration Manager
 - **M3.5** – Source Manager
 - **M3.6** – Analysis Engine
@@ -184,3 +204,4 @@ The roadmap is considered successful when:
 |----------|------------|-----------------------------|
 | 2.0.0 | 15-07-2026 | Updated roadmap to align with the completed engineering design baseline and architecture realization plan. |
 | 2.1.0 | 18-07-2026 | Updated M3 progress: UUID complete, Foundation status, M3.1/M3.2 tracking, and next priorities. |
+| 2.2.0 | 18-07-2026 | Added Time, Date, DateTime, Path, FileSystem; Runtime module; CLI migration to apps/. |

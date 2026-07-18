@@ -25,8 +25,22 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - `Result<T>` template for type-safe, exception-free error handling.
 - `Version` value type with semantic versioning support.
 - `Uuid` value type with RFC 4122 parsing, version 4 generation, and comparison operators.
-- Unit tests for all Foundation components (38 tests via GoogleTest).
+- `Time`, `Date`, and `DateTime` value types with parsing and comparison.
+- `Path` and `FileSystem` for filesystem path handling and file operations.
+- Unit tests for all Foundation components (69 tests via GoogleTest).
 - `scope_foundation` static library and `scope_foundation_tests` test target.
+
+#### M3.3 – Platform Services (Runtime)
+
+- `Configuration` key-value store.
+- `Diagnostics` logging facility.
+- `PluginRegistry` and `ServiceRegistry`.
+- `scope_runtime` library and `scope_runtime_tests` test target.
+
+#### Applications
+
+- CLI migrated from legacy `src/` + `include/` to `apps/cli/`.
+- CLI linked to `scope_foundation` using `scope::cli` and `scope::foundation` namespaces.
 
 #### Documentation
 

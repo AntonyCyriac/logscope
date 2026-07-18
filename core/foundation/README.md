@@ -27,6 +27,11 @@ Foundation contains no product-specific knowledge and serves as the lowest engin
 | `Result<T>` | `result.hpp`, `result.inl` |
 | `Version` | `version.hpp`, `version.cpp` |
 | `Uuid` | `uuid.hpp`, `uuid.cpp` |
+| `Time` | `time.hpp`, `time.cpp`, `time.inl` |
+| `Date` | `date.hpp`, `date.cpp`, `date.inl` |
+| `DateTime` | `datetime.hpp`, `datetime.cpp`, `datetime.inl` |
+| `Path` | `path.hpp`, `path.cpp` |
+| `FileSystem` | `filesystem.hpp`, `filesystem.cpp` |
 
 All components are exported through `foundation.hpp` and tested under `tests/`.
 

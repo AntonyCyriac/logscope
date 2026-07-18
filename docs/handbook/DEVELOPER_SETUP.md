@@ -156,7 +156,7 @@ cmake --build build
 Run LogScope:
 
 ```bash
-./build/logscope.exe samples/sample.log
+./build/apps/cli/logscope.exe samples/sample.log
 ```
 
 Adjust the executable path if the build configuration changes.

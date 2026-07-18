@@ -4,7 +4,12 @@
 # ==========================================================
 
 add_library(scope_foundation
+    date.cpp
+    datetime.cpp
     error.cpp
+    filesystem.cpp
+    path.cpp
+    time.cpp
     uuid.cpp
     version.cpp
 )
@@ -12,6 +17,7 @@ add_library(scope_foundation
 target_include_directories(scope_foundation
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
 )
 
 add_subdirectory(tests)

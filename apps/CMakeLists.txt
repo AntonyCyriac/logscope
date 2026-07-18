@@ -1,7 +1,5 @@
 # ==========================================================
-# LogScope
-# Core
+# LogScope Applications
 # ==========================================================
 
-add_subdirectory(foundation)
-add_subdirectory(runtime)
+add_subdirectory(cli)

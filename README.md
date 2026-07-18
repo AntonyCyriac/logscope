@@ -11,8 +11,9 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 
 ## What works today
 
-- **Foundation library** (`scope_foundation`) — `Status`, `Error`, `Result<T>`, `Version`, `Uuid`
-- **CLI prototype** — basic log file analysis (`logscope`)
+- **Foundation library** (`scope_foundation`) — `Status`, `Error`, `Result<T>`, `Version`, `Uuid`, `Time`, `Date`, `DateTime`, `Path`, `FileSystem`
+- **Runtime library** (`scope_runtime`) — `Configuration`, `Diagnostics`, `PluginRegistry`, `ServiceRegistry`
+- **CLI application** (`apps/cli`) — basic log file analysis, linked to Foundation
 - **CI** — build and unit tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
@@ -38,7 +39,7 @@ ctest --test-dir build --output-on-failure
 Run the CLI:
 
 ```bash
-./build/logscope samples/sample.log
+./build/apps/cli/logscope samples/sample.log
 ```
 
 Format source files (requires `clang-format`):
@@ -50,9 +51,8 @@ cmake --build build --target format
 ## Project layout
 
 ```text
-core/           Core libraries (foundation and future modules)
-src/            CLI application source
-include/        Legacy CLI headers
+apps/           Applications (CLI)
+core/           Core libraries (foundation, runtime)
 docs/           Product, architecture, standards, and handbook
 samples/        Sample log files
 tests/          Integration and end-to-end test placeholders

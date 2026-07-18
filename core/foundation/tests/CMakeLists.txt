@@ -1,7 +1,12 @@
 add_executable(scope_foundation_tests
-    status_test.cpp
+    date_test.cpp
+    datetime_test.cpp
     error_test.cpp
+    filesystem_test.cpp
+    path_test.cpp
     result_test.cpp
+    status_test.cpp
+    time_test.cpp
     uuid_test.cpp
     version_test.cpp
 )
