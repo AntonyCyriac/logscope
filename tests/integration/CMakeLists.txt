@@ -4,15 +4,9 @@ add_executable(logscope_integration_tests
 
 target_link_libraries(logscope_integration_tests
     PRIVATE
-        scope_analysis
+        scope_workspace
         scope_configuration
         scope_extension
-        scope_foundation
-        scope_investigation
-        scope_reporting
-        scope_runtime
-        scope_source
-        scope_workspace
         GTest::gtest_main
 )
 

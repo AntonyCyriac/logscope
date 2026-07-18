@@ -41,6 +41,7 @@ First stable production release. Delivers the complete M0–M5 roadmap: core pip
 
 - Session deserialization no longer throws on invalid numeric fields.
 - CMake CMP0135 `FetchContent` timestamp warnings (`DOWNLOAD_EXTRACT_TIMESTAMP`).
+- Duplicate static library linkage in integration test target.
 
 ---
 
