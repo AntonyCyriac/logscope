@@ -5,7 +5,7 @@
 | Document | v1.0.0 Validation Checklist |
 | Category | Release |
 | Version | 1.0.0 |
-| Status | Approved |
+| Status | Complete |
 | Created | 18-07-2026 |
 | Last Updated | 18-07-2026 |
 
@@ -21,10 +21,10 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 
 | Requirement | Acceptance | Verified |
 |-------------|------------|----------|
-| FR-001 – Analyze Logs | Plain-text analysis, stdin, directory, unsupported-input errors | [ ] |
-| FR-002 – Investigate Logs | Filters, search, session save/load | [ ] |
-| FR-003 – Generate Reports | Sections, text/JSON/CSV/Markdown | [ ] |
-| FR-004 – Extend LogScope | Extension discovery, config enablement, isolation | [ ] |
+| FR-001 – Analyze Logs | Plain-text analysis, stdin, directory, unsupported-input errors | [x] |
+| FR-002 – Investigate Logs | Filters, search, session save/load | [x] |
+| FR-003 – Generate Reports | Sections, text/JSON/CSV/Markdown | [x] |
+| FR-004 – Extend LogScope | Extension discovery, config enablement, isolation | [x] |
 
 ---
 
@@ -32,13 +32,13 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 
 | Attribute | Evidence | Verified |
 |-----------|----------|----------|
-| §3.1 Performance | Benchmark baselines in [`PERFORMANCE.md`](../testing/PERFORMANCE.md) | [ ] |
-| §3.2 Reliability | Fuzz targets + malformed-input tests; sanitizer CI job | [ ] |
-| §3.3 Maintainability | clang-tidy target; documentation current | [ ] |
-| §3.4 Extensibility | ExtensionManager operational; no core changes for built-ins | [ ] |
-| §3.5 Usability | CLI reference; consistent subcommand patterns | [ ] |
-| §3.6 Portability | CI green on Ubuntu, Windows, macOS | [ ] |
-| §3.7 Observability | Diagnostics macros; actionable error messages | [ ] |
+| §3.1 Performance | Benchmark baselines in [`PERFORMANCE.md`](../testing/PERFORMANCE.md) | [x] |
+| §3.2 Reliability | Fuzz targets + malformed-input tests; sanitizer CI job | [x] |
+| §3.3 Maintainability | clang-tidy target; documentation current | [x] |
+| §3.4 Extensibility | ExtensionManager operational; no core changes for built-ins | [x] |
+| §3.5 Usability | CLI reference; consistent subcommand patterns | [x] |
+| §3.6 Portability | CI green on Ubuntu, Windows, macOS | [x] |
+| §3.7 Observability | Diagnostics macros; actionable error messages | [x] |
 
 ---
 
@@ -46,26 +46,26 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 
 | Gate | Target | Verified |
 |------|--------|----------|
-| Unit / integration / e2e tests | All passing | [ ] |
-| Test count | ≥ 230 | [ ] |
-| Multi-OS CI | Ubuntu, Windows, macOS green | [ ] |
-| Coverage report | Generated in CI | [ ] |
-| Benchmark regression | Within baseline tolerance | [ ] |
-| Fuzz smoke test | 1000 runs per target, no crashes | [ ] |
-| Release binaries | Smoke test `analyze samples/sample.log` per OS | [ ] |
-| Security review | [`SECURITY_REVIEW.md`](../handbook/SECURITY_REVIEW.md) completed | [ ] |
-| Documentation | README, ROADMAP, CHANGELOG, CLI reference updated | [ ] |
-| Known P0/P1 defects | None open | [ ] |
+| Unit / integration / e2e tests | All passing | [x] |
+| Test count | ≥ 230 | [x] (246) |
+| Multi-OS CI | Ubuntu, Windows, macOS green | [x] |
+| Coverage report | Generated in CI | [x] |
+| Benchmark regression | Within baseline tolerance | [x] |
+| Fuzz smoke test | 1000 runs per target, no crashes | [x] |
+| Release binaries | Smoke test `analyze samples/sample.log` per OS | [ ] (after `v1.0.0` tag) |
+| Security review | [`SECURITY_REVIEW.md`](../handbook/SECURITY_REVIEW.md) completed | [x] |
+| Documentation | README, ROADMAP, CHANGELOG, CLI reference updated | [x] |
+| Known P0/P1 defects | None open | [x] |
 
 ---
 
 # Release Steps
 
-1. Complete all checklist items above
-2. Merge final M5.5 PR
-3. Create `chore/v1.0.0-release` branch with version bump to `1.0.0`
+1. Complete all checklist items above — **done** (except binary smoke test pending tag)
+2. Merge M5 PR — **done** (#20)
+3. Create `chore/v1.0.0-release` branch with version bump to `1.0.0` — **in progress**
 4. Merge, tag `v1.0.0`, publish GitHub Release with binaries
-5. Mark M5 complete in ROADMAP
+5. Mark v1.0.0 complete in ROADMAP — **done** in release PR
 
 ---
 
@@ -74,3 +74,4 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial v1.0.0 validation checklist. |
+| 1.1.0 | 18-07-2026 | Marked validation complete for v1.0.0 release. |

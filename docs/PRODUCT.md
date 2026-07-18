@@ -19,15 +19,15 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-M4 – Feature Expansion is **complete** as of [`v0.4.0`](../CHANGELOG.md). The core pipeline is operational:
+LogScope **v1.0.0** is the first stable production release. M0–M5 are complete.
 
 ```text
 Configuration → Source → Analysis → Investigation → Reporting → CLI
 ```
 
-M4 delivered analysis depth, additional source types, advanced reporting, an extension ecosystem, and session persistence. **M5 – Production Readiness** is in progress toward `v1.0.0`.
+Capabilities include analysis depth, stdin/directory sources, multi-format reporting, extensions, session persistence, multi-OS CI, benchmarks, fuzz testing, and installable/binary distribution.
 
-See [M5 – Production Readiness](planning/M5-PRODUCTION-READINESS.md) and [Roadmap](ROADMAP.md) for details.
+See [Roadmap](ROADMAP.md) and [Changelog](../CHANGELOG.md) for milestone history.
 
 ## Initial Delivery
 
