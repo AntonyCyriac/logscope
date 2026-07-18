@@ -14,15 +14,21 @@
 #include "investigation.hpp"
 #include "reporting.hpp"
 #include "source.hpp"
+#include "workspace.hpp"
 
 using scope::analysis::AnalysisEngine;
+using scope::analysis::AnalysisModel;
+using scope::analysis::LogLevelCounts;
 using scope::configuration::ConfigurationManager;
 using scope::foundation::Path;
 using scope::investigation::InvestigationEngine;
 using scope::investigation::LineCountFilter;
 using scope::investigation::LogLevelFilter;
 using scope::reporting::ReportGenerator;
+using scope::reporting::ReportOptions;
 using scope::source::SourceManager;
+using scope::workspace::InvestigationSession;
+using scope::workspace::SessionStore;
 
 namespace
 {
@@ -223,4 +229,34 @@ TEST_F(PipelineIntegrationTest, AppliesExtensionConfiguration)
     EXPECT_FALSE(infoResult->enabled);
 
     std::remove(configFile.string().c_str());
+}
+
+TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
+{
+    const Path sessionFile("pipeline_integration_session.logscope-session");
+    const LogLevelCounts levelCounts = LogLevelCounts::fromCounts(3U, 1U, 4U, 0U, 0U);
+    const AnalysisModel model(m_testFile, 8U, levelCounts);
+
+    const InvestigationSession session = InvestigationSession::fromAnalysis(
+        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline", ReportOptions{},
+        Path());
+
+    SessionStore store;
+
+    ASSERT_TRUE(store.save(session, sessionFile).hasValue());
+
+    const auto loaded = store.load(sessionFile);
+
+    ASSERT_TRUE(loaded.hasValue());
+    EXPECT_EQ(8U, loaded->analysisModel().totalLines());
+    EXPECT_EQ(1U, loaded->levelFilter().minimumErrors());
+    EXPECT_EQ("pipeline", loaded->searchQuery());
+
+    InvestigationEngine investigationEngine;
+
+    EXPECT_TRUE(investigationEngine.matches(loaded->analysisModel(), loaded->lineFilter()));
+    EXPECT_TRUE(investigationEngine.matches(loaded->analysisModel(), loaded->levelFilter()));
+    EXPECT_TRUE(investigationEngine.searchSource(loaded->analysisModel(), loaded->searchQuery()));
+
+    std::remove(sessionFile.string().c_str());
 }

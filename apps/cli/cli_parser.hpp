@@ -9,6 +9,8 @@
 #include <string>
 #include <vector>
 
+#include <cstdint>
+
 #include "foundation/path.hpp"
 #include "output_format.hpp"
 #include "report_section.hpp"
@@ -25,7 +27,10 @@ enum class CliCommand
     Analyze,
     ConfigValidate,
     ExtensionsList,
-    ExtensionsDescribe
+    ExtensionsDescribe,
+    SessionSave,
+    SessionLoad,
+    SessionList
 };
 
 /**
@@ -70,6 +75,42 @@ struct ExtensionsDescribeOptions
 };
 
 /**
+ * @brief Options for the session save command.
+ */
+struct SessionSaveOptions
+{
+    foundation::Path sessionFile;
+    foundation::Path logFile;
+    foundation::Path configFile;
+    OutputFormat format = OutputFormat::Text;
+    std::optional<reporting::ReportSections> sections;
+    std::uint64_t minErrors = 0U;
+    std::uint64_t minWarnings = 0U;
+    std::uint64_t minLines = 0U;
+    std::optional<std::uint64_t> maxLines;
+    std::string searchQuery;
+    bool showHelp = false;
+};
+
+/**
+ * @brief Options for the session load command.
+ */
+struct SessionLoadOptions
+{
+    foundation::Path sessionFile;
+    bool showHelp = false;
+};
+
+/**
+ * @brief Options for the session list command.
+ */
+struct SessionListOptions
+{
+    foundation::Path directory = foundation::Path(".");
+    bool showHelp = false;
+};
+
+/**
  * @brief Parsed CLI invocation.
  */
 struct ParsedCli
@@ -79,6 +120,9 @@ struct ParsedCli
     ConfigValidateOptions configValidate;
     ExtensionsListOptions extensionsList;
     ExtensionsDescribeOptions extensionsDescribe;
+    SessionSaveOptions sessionSave;
+    SessionLoadOptions sessionLoad;
+    SessionListOptions sessionList;
     bool showGlobalHelp = false;
 };
 

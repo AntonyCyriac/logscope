@@ -147,6 +147,42 @@ TEST(CliParserTest, ParsesExtensionsDescribeSubcommand)
     EXPECT_EQ("analysis.log-levels", parsed->extensionsDescribe.extensionId);
 }
 
+TEST(CliParserTest, ParsesSessionSaveSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "session";
+    std::string subcommand = "save";
+    std::string sessionFile = "sample.logscope-session";
+    std::string logFile = "sample.log";
+    std::string minErrorsFlag = "--min-errors";
+    std::string minErrorsValue = "1";
+    char* argv[] = {toArgv(program),     toArgv(command),      toArgv(subcommand), toArgv(sessionFile),
+                    toArgv(logFile),     toArgv(minErrorsFlag),  toArgv(minErrorsValue)};
+
+    const auto parsed = parseCliArguments(7, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::SessionSave, parsed->command);
+    EXPECT_EQ("sample.logscope-session", parsed->sessionSave.sessionFile.string());
+    EXPECT_EQ("sample.log", parsed->sessionSave.logFile.string());
+    EXPECT_EQ(1U, parsed->sessionSave.minErrors);
+}
+
+TEST(CliParserTest, ParsesSessionLoadSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "session";
+    std::string subcommand = "load";
+    std::string sessionFile = "sample.logscope-session";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(sessionFile)};
+
+    const auto parsed = parseCliArguments(4, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::SessionLoad, parsed->command);
+    EXPECT_EQ("sample.logscope-session", parsed->sessionLoad.sessionFile.string());
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

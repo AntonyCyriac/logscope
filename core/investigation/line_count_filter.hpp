@@ -44,6 +44,12 @@ class LineCountFilter
      */
     [[nodiscard]] bool matches(const analysis::AnalysisModel& model) const noexcept;
 
+    [[nodiscard]] std::uint64_t minimumLines() const noexcept;
+
+    [[nodiscard]] std::uint64_t maximumLines() const noexcept;
+
+    [[nodiscard]] bool hasMaximumLines() const noexcept;
+
   private:
     std::uint64_t m_minLines{0U};
     std::uint64_t m_maxLines{std::numeric_limits<std::uint64_t>::max()};

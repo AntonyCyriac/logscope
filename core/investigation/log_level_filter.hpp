@@ -38,6 +38,10 @@ class LogLevelFilter
      */
     [[nodiscard]] bool matches(const analysis::AnalysisModel& model) const noexcept;
 
+    [[nodiscard]] std::uint64_t minimumErrors() const noexcept;
+
+    [[nodiscard]] std::uint64_t minimumWarnings() const noexcept;
+
   private:
     std::uint64_t m_minErrors{0U};
     std::uint64_t m_minWarnings{0U};

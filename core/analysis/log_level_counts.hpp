@@ -36,6 +36,15 @@ class LogLevelCounts
 
     void recordBlank() noexcept;
 
+    /**
+     * @brief Creates level counts from explicit values.
+     */
+    [[nodiscard]] static LogLevelCounts fromCounts(std::uint64_t infoLines,
+                                                   std::uint64_t warnLines,
+                                                   std::uint64_t errorLines,
+                                                   std::uint64_t otherLines,
+                                                   std::uint64_t blankLines) noexcept;
+
   private:
     std::uint64_t m_infoLines{0U};
     std::uint64_t m_warnLines{0U};

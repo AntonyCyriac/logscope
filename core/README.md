@@ -32,7 +32,7 @@ The Core layer contains no product-specific business logic.
 | [Investigation](investigation/README.md) | Complete | Search, filter, and inspect analysis models |
 | [Reporting](reporting/README.md) | Complete | Report generation from analysis models |
 | [Extension](extension/README.md) | Complete | Extension discovery, registration, and lifecycle |
-| [Workspace](workspace/) | Planned (M4.5) | Sessions and investigation persistence |
+| [Workspace](workspace/README.md) | Complete | Sessions and investigation persistence |
 
 ---
 

@@ -110,6 +110,26 @@ TEST(CliE2eTest, ExtensionsDescribeShowsMetadata)
     EXPECT_NE(std::string::npos, output.find("ERROR"));
 }
 
+TEST(CliE2eTest, SessionSaveAndLoadRoundTrip)
+{
+    const std::string sessionFile = "cli_e2e_session.logscope-session";
+
+    std::remove(sessionFile.c_str());
+
+    const std::string saveOutput = runLogscope("session save " + sessionFile + " --min-errors 1 " +
+                                               scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, saveOutput.find("Session saved to " + sessionFile));
+
+    const std::string loadOutput = runLogscope("session load " + sessionFile);
+
+    EXPECT_NE(std::string::npos, loadOutput.find("Matches     : yes"));
+    EXPECT_NE(std::string::npos, loadOutput.find("Total log lines : 8"));
+    EXPECT_NE(std::string::npos, loadOutput.find("Error lines     : 4"));
+
+    std::remove(sessionFile.c_str());
+}
+
 TEST(CliE2eTest, HelpDisplaysUsage)
 {
     const std::string output = runLogscope("--help");
@@ -118,6 +138,7 @@ TEST(CliE2eTest, HelpDisplaysUsage)
     EXPECT_NE(std::string::npos, output.find("analyze"));
     EXPECT_NE(std::string::npos, output.find("config validate"));
     EXPECT_NE(std::string::npos, output.find("extensions list"));
+    EXPECT_NE(std::string::npos, output.find("session save"));
 }
 
 TEST(CliE2eTest, AnalyzeDirectoryProducesCombinedReport)
