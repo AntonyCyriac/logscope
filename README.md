@@ -13,7 +13,8 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 
 - **Foundation library** (`scope_foundation`) — `Status`, `Error`, `Result<T>`, `Version`, `Uuid`, `Time`, `Date`, `DateTime`, `Path`, `FileSystem`
 - **Runtime library** (`scope_runtime`) — `Configuration`, `Diagnostics`, `PluginRegistry`, `ServiceRegistry`
-- **CLI application** (`apps/cli`) — basic log file analysis, linked to Foundation
+- **Configuration library** (`scope_configuration`) — `ConfigurationManager` for file and environment config
+- **CLI application** (`apps/cli`) — basic log file analysis with optional `--config` flag
 - **CI** — build and unit tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
@@ -40,6 +41,7 @@ Run the CLI:
 
 ```bash
 ./build/apps/cli/logscope samples/sample.log
+./build/apps/cli/logscope --config samples/logscope.properties samples/sample.log
 ```
 
 Format source files (requires `clang-format`):

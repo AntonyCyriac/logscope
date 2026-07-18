@@ -41,6 +41,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 - `ConfigurationManager` for loading properties files, applying `SCOPE_` environment overrides, and validating required keys.
 - `scope_configuration` library and `scope_configuration_tests` test target.
+- CLI `--config` flag to load configuration from a properties file before analysis.
 
 #### M3.3 – Platform Services (Runtime)
 
