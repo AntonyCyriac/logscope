@@ -5,6 +5,9 @@
 /bin/
 /install-test/
 
+# CTest output (created when tests run from the repo root)
+/Testing/
+
 # CMake
 CMakeCache.txt
 CMakeFiles/
