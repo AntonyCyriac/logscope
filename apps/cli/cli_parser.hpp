@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "foundation/path.hpp"
+#include "investigation_criteria.hpp"
 #include "log_format.hpp"
 #include "output_format.hpp"
 #include "report_section.hpp"
@@ -26,6 +27,7 @@ enum class CliCommand
 {
     Help,
     Analyze,
+    Investigate,
     ConfigValidate,
     ExtensionsList,
     ExtensionsDescribe,
@@ -44,6 +46,19 @@ struct AnalyzeOptions
     OutputFormat format = OutputFormat::Text;
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
     std::optional<reporting::ReportSections> sections;
+    bool showHelp = false;
+};
+
+/**
+ * @brief Options for the investigate command.
+ */
+struct InvestigateOptions
+{
+    foundation::Path logFile;
+    foundation::Path configFile;
+    OutputFormat format = OutputFormat::Text;
+    analysis::LogFormat logFormat = analysis::LogFormat::Auto;
+    investigation::InvestigationCriteria criteria;
     bool showHelp = false;
 };
 
@@ -91,6 +106,7 @@ struct SessionSaveOptions
     std::uint64_t minLines = 0U;
     std::optional<std::uint64_t> maxLines;
     std::string searchQuery;
+    investigation::InvestigationCriteria contentCriteria;
     bool showHelp = false;
 };
 
@@ -119,6 +135,7 @@ struct ParsedCli
 {
     CliCommand command = CliCommand::Help;
     AnalyzeOptions analyze;
+    InvestigateOptions investigate;
     ConfigValidateOptions configValidate;
     ExtensionsListOptions extensionsList;
     ExtensionsDescribeOptions extensionsDescribe;

@@ -14,6 +14,7 @@ target_link_libraries(logscope_cli_tests
         scope_analysis
         scope_configuration
         scope_foundation
+        scope_investigation
         scope_reporting
         GTest::gtest_main
 )

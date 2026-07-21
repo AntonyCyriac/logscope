@@ -43,6 +43,9 @@ struct JsonLineParseResult
 
     /// Raw message field value when a supported key is present.
     std::string messageValue;
+
+    /// Raw correlation/trace field value when a supported key is present.
+    std::string correlationValue;
 };
 
 /**

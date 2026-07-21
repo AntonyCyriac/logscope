@@ -11,7 +11,9 @@
 
 #include "foundation/error.hpp"
 #include "foundation/string.hpp"
+#include "investigation_criteria.hpp"
 #include "log_format.hpp"
+#include "log_line_classifier.hpp"
 #include "report_format.hpp"
 #include "report_section.hpp"
 
@@ -21,7 +23,7 @@ namespace scope::workspace
 namespace
 {
 
-constexpr std::string_view sessionVersion = "1.0";
+constexpr std::string_view sessionVersion = "1.1";
 
 bool parseUint64(std::string_view value, std::uint64_t& output) noexcept
 {
@@ -112,6 +114,142 @@ investigation::LineCountFilter lineFilterFromValues(const std::uint64_t minLines
     return filter;
 }
 
+std::string detectedLevelName(const analysis::DetectedLogLevel level)
+{
+    switch (level)
+    {
+    case analysis::DetectedLogLevel::Error:
+        return "error";
+    case analysis::DetectedLogLevel::Warn:
+        return "warning";
+    case analysis::DetectedLogLevel::Info:
+        return "info";
+    case analysis::DetectedLogLevel::Blank:
+        return "blank";
+    case analysis::DetectedLogLevel::Other:
+        return "other";
+    }
+
+    return "other";
+}
+
+std::optional<analysis::DetectedLogLevel> parseDetectedLevelName(const std::string& value)
+{
+    const std::string lowered = foundation::toLower(value);
+
+    if (lowered == "error")
+    {
+        return analysis::DetectedLogLevel::Error;
+    }
+
+    if (lowered == "warn" || lowered == "warning")
+    {
+        return analysis::DetectedLogLevel::Warn;
+    }
+
+    if (lowered == "info")
+    {
+        return analysis::DetectedLogLevel::Info;
+    }
+
+    if (lowered == "blank")
+    {
+        return analysis::DetectedLogLevel::Blank;
+    }
+
+    if (lowered == "other")
+    {
+        return analysis::DetectedLogLevel::Other;
+    }
+
+    return std::nullopt;
+}
+
+void appendContentCriteria(std::ostringstream& output, const investigation::InvestigationCriteria& criteria)
+{
+    output << "filter.contentSearch=" << criteria.contentSearch << '\n';
+
+    if (criteria.timeRange.earliest().has_value())
+    {
+        output << "filter.timeFrom=" << criteria.timeRange.earliest()->toString() << '\n';
+    }
+    else
+    {
+        output << "filter.timeFrom=\n";
+    }
+
+    if (criteria.timeRange.latest().has_value())
+    {
+        output << "filter.timeTo=" << criteria.timeRange.latest()->toString() << '\n';
+    }
+    else
+    {
+        output << "filter.timeTo=\n";
+    }
+
+    if (criteria.field.level().has_value())
+    {
+        output << "filter.lineLevel=" << detectedLevelName(*criteria.field.level()) << '\n';
+    }
+    else
+    {
+        output << "filter.lineLevel=\n";
+    }
+
+    output << "filter.messageContains=" << criteria.field.messageContains() << '\n';
+    output << "filter.jsonKey=" << criteria.field.requiredJsonKey() << '\n';
+}
+
+investigation::InvestigationCriteria contentCriteriaFromValues(
+    const std::string& contentSearch, const std::string& timeFromValue, const std::string& timeToValue,
+    const std::string& lineLevelValue, const std::string& messageContains, const std::string& jsonKey)
+{
+    investigation::InvestigationCriteria criteria;
+    criteria.contentSearch = contentSearch;
+
+    if (!foundation::isBlank(timeFromValue))
+    {
+        const auto earliest = foundation::Timestamp::parse(timeFromValue);
+
+        if (earliest.hasValue())
+        {
+            criteria.timeRange = criteria.timeRange.withEarliest(*earliest);
+        }
+    }
+
+    if (!foundation::isBlank(timeToValue))
+    {
+        const auto latest = foundation::Timestamp::parse(timeToValue);
+
+        if (latest.hasValue())
+        {
+            criteria.timeRange = criteria.timeRange.withLatest(*latest);
+        }
+    }
+
+    if (!foundation::isBlank(lineLevelValue))
+    {
+        const auto level = parseDetectedLevelName(lineLevelValue);
+
+        if (level)
+        {
+            criteria.field = criteria.field.withLevel(*level);
+        }
+    }
+
+    if (!messageContains.empty())
+    {
+        criteria.field = criteria.field.withMessageContains(messageContains);
+    }
+
+    if (!jsonKey.empty())
+    {
+        criteria.field = criteria.field.withRequiredJsonKey(jsonKey);
+    }
+
+    return criteria;
+}
+
 } // namespace
 
 std::string SessionSerializer::serialize(const InvestigationSession& session)
@@ -146,6 +284,7 @@ std::string SessionSerializer::serialize(const InvestigationSession& session)
     output << "filter.minErrors=" << session.levelFilter().minimumErrors() << '\n';
     output << "filter.minWarnings=" << session.levelFilter().minimumWarnings() << '\n';
     output << "filter.searchQuery=" << session.searchQuery() << '\n';
+    appendContentCriteria(output, session.contentCriteria());
     output << "report.format=" << reporting::reportFormatName(session.reportOptions().format) << '\n';
     output << "report.sections=" << sectionsToString(session.reportOptions().sections) << '\n';
     output << "config.path=" << session.configFile().string() << '\n';
@@ -169,6 +308,12 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     std::uint64_t minErrors = 0U;
     std::uint64_t minWarnings = 0U;
     std::string searchQuery;
+    std::string contentSearch;
+    std::string timeFromValue;
+    std::string timeToValue;
+    std::string lineLevelValue;
+    std::string messageContains;
+    std::string jsonKey;
     std::string reportFormatValue = "text";
     std::string reportSectionsValue = "all";
     std::string configPathValue;
@@ -286,6 +431,30 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         {
             searchQuery = value;
         }
+        else if (key == "filter.contentSearch")
+        {
+            contentSearch = value;
+        }
+        else if (key == "filter.timeFrom")
+        {
+            timeFromValue = value;
+        }
+        else if (key == "filter.timeTo")
+        {
+            timeToValue = value;
+        }
+        else if (key == "filter.lineLevel")
+        {
+            lineLevelValue = value;
+        }
+        else if (key == "filter.messageContains")
+        {
+            messageContains = value;
+        }
+        else if (key == "filter.jsonKey")
+        {
+            jsonKey = value;
+        }
         else if (key == "report.format")
         {
             reportFormatValue = value;
@@ -343,9 +512,12 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
 
     reportOptions.sections = sectionsFromString(reportSectionsValue);
 
+    const investigation::InvestigationCriteria contentCriteria = contentCriteriaFromValues(
+        contentSearch, timeFromValue, timeToValue, lineLevelValue, messageContains, jsonKey);
+
     return foundation::Result<InvestigationSession>(InvestigationSession(
-        sessionId, foundation::Path(sourcePathValue), model, lineFilter, levelFilter, searchQuery, reportOptions,
-        foundation::Path(configPathValue)));
+        sessionId, foundation::Path(sourcePathValue), model, lineFilter, levelFilter, searchQuery, contentCriteria,
+        reportOptions, foundation::Path(configPathValue)));
 }
 
 } // namespace scope::workspace

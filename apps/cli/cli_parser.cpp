@@ -9,7 +9,9 @@
 #include <string_view>
 
 #include "foundation/string.hpp"
+#include "foundation/timestamp.hpp"
 #include "log_format.hpp"
+#include "log_line_classifier.hpp"
 
 namespace scope::cli
 {
@@ -38,6 +40,137 @@ std::vector<std::string> splitRequiredKeys(std::string_view value)
     }
 
     return keys;
+}
+
+std::optional<analysis::DetectedLogLevel> parseDetectedLogLevel(const std::string_view value)
+{
+    const std::string lowered = foundation::toLower(value);
+
+    if (lowered == "error")
+    {
+        return analysis::DetectedLogLevel::Error;
+    }
+
+    if (lowered == "warn" || lowered == "warning")
+    {
+        return analysis::DetectedLogLevel::Warn;
+    }
+
+    if (lowered == "info")
+    {
+        return analysis::DetectedLogLevel::Info;
+    }
+
+    if (lowered == "other")
+    {
+        return analysis::DetectedLogLevel::Other;
+    }
+
+    if (lowered == "blank")
+    {
+        return analysis::DetectedLogLevel::Blank;
+    }
+
+    return std::nullopt;
+}
+
+bool parseInvestigationOption(const std::string& argument, int& index, const int argc, char* argv[],
+                              investigation::InvestigationCriteria& criteria)
+{
+    if (argument == "--search" || argument == "--content-search")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        criteria.contentSearch = argv[++index];
+
+        return true;
+    }
+
+    if (argument == "--time-from")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        const auto timestamp = foundation::Timestamp::parse(argv[++index]);
+
+        if (!timestamp.hasValue())
+        {
+            return false;
+        }
+
+        criteria.timeRange = criteria.timeRange.withEarliest(*timestamp);
+
+        return true;
+    }
+
+    if (argument == "--time-to")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        const auto timestamp = foundation::Timestamp::parse(argv[++index]);
+
+        if (!timestamp.hasValue())
+        {
+            return false;
+        }
+
+        criteria.timeRange = criteria.timeRange.withLatest(*timestamp);
+
+        return true;
+    }
+
+    if (argument == "--level")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        const auto level = parseDetectedLogLevel(argv[++index]);
+
+        if (!level)
+        {
+            return false;
+        }
+
+        criteria.field = criteria.field.withLevel(*level);
+
+        return true;
+    }
+
+    if (argument == "--message")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        criteria.field = criteria.field.withMessageContains(argv[++index]);
+
+        return true;
+    }
+
+    if (argument == "--json-key")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        criteria.field = criteria.field.withRequiredJsonKey(argv[++index]);
+
+        return true;
+    }
+
+    return false;
 }
 
 std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int startIndex)
@@ -121,6 +254,102 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
 
             options.sections = *sections;
 
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (!options.logFile.string().empty())
+        {
+            return std::nullopt;
+        }
+
+        options.logFile = foundation::Path(argument);
+    }
+
+    if (options.showHelp)
+    {
+        return options;
+    }
+
+    if (options.logFile.string().empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigateOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        if (argument == "--format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto format = parseOutputFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+
+            continue;
+        }
+
+        if (argument == "--log-format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto logFormat = analysis::parseLogFormat(argv[++index]);
+
+            if (!logFormat || *logFormat == analysis::LogFormat::Unknown)
+            {
+                return std::nullopt;
+            }
+
+            options.logFormat = *logFormat;
+
+            continue;
+        }
+
+        if (parseInvestigationOption(argument, index, argc, argv, options.criteria))
+        {
             continue;
         }
 
@@ -448,6 +677,11 @@ std::optional<SessionSaveOptions> parseSessionSaveArguments(int argc, char* argv
             continue;
         }
 
+        if (parseInvestigationOption(argument, index, argc, argv, options.contentCriteria))
+        {
+            continue;
+        }
+
         if (isOption(argument))
         {
             return std::nullopt;
@@ -584,6 +818,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
             return parsed;
         }
 
+        if (argc >= 3 && std::string_view(argv[2]) == "investigate")
+        {
+            parsed.command = CliCommand::Investigate;
+            parsed.investigate.showHelp = true;
+
+            return parsed;
+        }
+
         if (argc >= 4 && std::string_view(argv[2]) == "config" && std::string_view(argv[3]) == "validate")
         {
             parsed.command = CliCommand::ConfigValidate;
@@ -648,6 +890,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
         parsed.command = CliCommand::Analyze;
         parsed.analyze = *options;
+
+        return parsed;
+    }
+
+    if (firstArgument == "investigate")
+    {
+        const auto options = parseInvestigateArguments(argc, argv, 2);
+
+        if (!options)
+        {
+            return std::nullopt;
+        }
+
+        parsed.command = CliCommand::Investigate;
+        parsed.investigate = *options;
 
         return parsed;
     }

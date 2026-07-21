@@ -434,6 +434,12 @@ bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view ke
         return tryAssignStringField(result.messageValue, input);
     }
 
+    if (key == "trace_id" || key == "traceId" || key == "correlation_id" || key == "correlationId" ||
+        key == "request_id" || key == "requestId")
+    {
+        return tryAssignStringField(result.correlationValue, input);
+    }
+
     if (key == "log")
     {
         return tryCaptureNestedLogObject(result, input);
@@ -529,6 +535,7 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
         result.levelValue.clear();
         result.timestampValue.clear();
         result.messageValue.clear();
+        result.correlationValue.clear();
 
         return result;
     }
@@ -540,6 +547,7 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
         result.levelValue.clear();
         result.timestampValue.clear();
         result.messageValue.clear();
+        result.correlationValue.clear();
 
         return result;
     }

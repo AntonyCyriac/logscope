@@ -11,13 +11,15 @@ namespace scope::analysis
 AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t totalLines,
                              LogLevelCounts levelCounts, const LogFormat format,
                              std::optional<JsonLinesSummary> jsonLinesSummary,
-                             std::optional<FieldSummary> fieldSummary) noexcept
+                             std::optional<FieldSummary> fieldSummary,
+                             std::optional<LineIndex> lineIndex) noexcept
     : m_sourcePath(std::move(sourcePath))
     , m_totalLines(totalLines)
     , m_levelCounts(levelCounts)
     , m_format(format)
     , m_jsonLinesSummary(std::move(jsonLinesSummary))
     , m_fieldSummary(std::move(fieldSummary))
+    , m_lineIndex(std::move(lineIndex))
 {
 }
 
@@ -49,6 +51,11 @@ const std::optional<JsonLinesSummary>& AnalysisModel::jsonLinesSummary() const n
 const std::optional<FieldSummary>& AnalysisModel::fieldSummary() const noexcept
 {
     return m_fieldSummary;
+}
+
+const std::optional<LineIndex>& AnalysisModel::lineIndex() const noexcept
+{
+    return m_lineIndex;
 }
 
 } // namespace scope::analysis
