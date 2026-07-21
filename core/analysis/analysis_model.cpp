@@ -9,11 +9,13 @@ namespace scope::analysis
 {
 
 AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t totalLines,
-                             LogLevelCounts levelCounts, const LogFormat format) noexcept
+                             LogLevelCounts levelCounts, const LogFormat format,
+                             std::optional<JsonLinesSummary> jsonLinesSummary) noexcept
     : m_sourcePath(std::move(sourcePath))
     , m_totalLines(totalLines)
     , m_levelCounts(levelCounts)
     , m_format(format)
+    , m_jsonLinesSummary(std::move(jsonLinesSummary))
 {
 }
 
@@ -35,6 +37,11 @@ const LogLevelCounts& AnalysisModel::levelCounts() const noexcept
 LogFormat AnalysisModel::format() const noexcept
 {
     return m_format;
+}
+
+const std::optional<JsonLinesSummary>& AnalysisModel::jsonLinesSummary() const noexcept
+{
+    return m_jsonLinesSummary;
 }
 
 } // namespace scope::analysis

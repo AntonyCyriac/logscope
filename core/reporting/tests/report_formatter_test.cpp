@@ -77,3 +77,21 @@ TEST(ReportFormatterTest, FormatsJsonWithSectionStructure)
     EXPECT_NE(std::string::npos, report.text().find("\"sourceMetadata\""));
     EXPECT_NE(std::string::npos, report.text().find("\"format\""));
 }
+
+TEST(ReportFormatterTest, IncludesJsonLinesSummaryInSourceMetadata)
+{
+    scope::analysis::JsonLinesSummary summary;
+    summary.recordValidLine({"level", "message"});
+
+    const AnalysisModel model(Path("sample.jsonl"),
+                              2U,
+                              {},
+                              scope::analysis::LogFormat::JsonLines,
+                              summary);
+
+    const auto report =
+        ReportFormatter::format(model, optionsWithSections(ReportSections::all(), ReportFormat::Json));
+
+    EXPECT_NE(std::string::npos, report.text().find("\"jsonValidLines\": 1"));
+    EXPECT_NE(std::string::npos, report.text().find("\"topLevelKeys\""));
+}

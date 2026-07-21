@@ -183,3 +183,70 @@ TEST_F(AnalysisEngineTest, HonorsPlainFormatOverride)
     ASSERT_TRUE(modelResult.hasValue());
     EXPECT_EQ(scope::analysis::LogFormat::PlainText, modelResult->format());
 }
+
+TEST_F(AnalysisEngineTest, AnalyzesJsonLinesWithFieldAwareLevels)
+{
+    const Path jsonFile("analysis_engine_json_test.jsonl");
+
+    {
+        std::ofstream stream(jsonFile.string());
+
+        stream << R"({"level":"info","message":"started"})" << '\n';
+        stream << R"({"severity":"warning","message":"slow"})" << '\n';
+        stream << R"({"level":"error","message":"failed"})" << '\n';
+        stream << R"({"level":"error","message":"failed again"})" << '\n';
+    }
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(jsonFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(scope::analysis::LogFormat::JsonLines, modelResult->format());
+    EXPECT_EQ(4U, modelResult->totalLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().infoLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().warnLines());
+    EXPECT_EQ(2U, modelResult->levelCounts().errorLines());
+    ASSERT_TRUE(modelResult->jsonLinesSummary().has_value());
+    EXPECT_EQ(4U, modelResult->jsonLinesSummary()->validLines());
+    EXPECT_EQ(0U, modelResult->jsonLinesSummary()->parseFailures());
+
+    std::remove(jsonFile.string().c_str());
+}
+
+TEST_F(AnalysisEngineTest, ContinuesAfterMalformedJsonLines)
+{
+    const Path jsonFile("analysis_engine_json_mixed_test.jsonl");
+
+    {
+        std::ofstream stream(jsonFile.string());
+
+        stream << R"({"level":"info","message":"ok"})" << '\n';
+        stream << "not json" << '\n';
+        stream << R"({"level":"error","message":"bad"})" << '\n';
+    }
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(jsonFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult =
+        AnalysisEngine{}.analyze(*datasetResult, scope::analysis::LogFormat::JsonLines);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(3U, modelResult->totalLines());
+    ASSERT_TRUE(modelResult->jsonLinesSummary().has_value());
+    EXPECT_EQ(2U, modelResult->jsonLinesSummary()->validLines());
+    EXPECT_EQ(1U, modelResult->jsonLinesSummary()->parseFailures());
+    EXPECT_EQ(1U, modelResult->levelCounts().infoLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().errorLines());
+    EXPECT_EQ(1U, modelResult->levelCounts().otherLines());
+
+    std::remove(jsonFile.string().c_str());
+}

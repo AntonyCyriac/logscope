@@ -7,6 +7,7 @@
 
 #include <sstream>
 
+#include "json_lines_summary.hpp"
 #include "log_macros.hpp"
 
 namespace scope::reporting
@@ -114,6 +115,31 @@ void appendTextSourceMetadata(std::ostringstream& output, const analysis::Analys
     output << "--- Source Metadata ---" << '\n';
     output << "Source          : " << model.sourcePath().string() << '\n';
     output << "Format          : " << analysis::logFormatName(model.format()) << '\n';
+
+    if (const std::optional<analysis::JsonLinesSummary>& summary = model.jsonLinesSummary())
+    {
+        output << "JSON valid lines: " << summary->validLines() << '\n';
+        output << "JSON parse fails: " << summary->parseFailures() << '\n';
+
+        const auto topKeys = summary->topLevelKeys();
+
+        if (!topKeys.empty())
+        {
+            output << "Top-level keys  : ";
+
+            for (std::size_t index = 0U; index < topKeys.size(); ++index)
+            {
+                if (index > 0U)
+                {
+                    output << ", ";
+                }
+
+                output << topKeys[index].first << " (" << topKeys[index].second << ')';
+            }
+
+            output << '\n';
+        }
+    }
 }
 
 std::string formatTextReport(const analysis::AnalysisModel& model, const ReportSections& sections)
@@ -187,7 +213,38 @@ std::string formatJsonReport(const analysis::AnalysisModel& model, const ReportS
         writeSeparator();
         output << "\n  \"sourceMetadata\": {\n"
                << "    \"source\": " << escapeJsonString(model.sourcePath().string()) << ",\n"
-               << "    \"format\": " << escapeJsonString(analysis::logFormatName(model.format())) << "\n  }";
+               << "    \"format\": " << escapeJsonString(analysis::logFormatName(model.format()));
+
+        if (const std::optional<analysis::JsonLinesSummary>& summary = model.jsonLinesSummary())
+        {
+            output << ",\n"
+                   << "    \"jsonValidLines\": " << summary->validLines() << ",\n"
+                   << "    \"jsonParseFailures\": " << summary->parseFailures() << ",\n"
+                   << "    \"topLevelKeys\": {";
+
+            const auto topKeys = summary->topLevelKeys();
+            bool wroteKey = false;
+
+            for (const auto& entry : topKeys)
+            {
+                if (wroteKey)
+                {
+                    output << ',';
+                }
+
+                wroteKey = true;
+                output << "\n      " << escapeJsonString(entry.first) << ": " << entry.second;
+            }
+
+            if (wroteKey)
+            {
+                output << '\n';
+            }
+
+            output << "    }";
+        }
+
+        output << "\n  }";
     }
 
     output << "\n}";
@@ -238,6 +295,20 @@ std::string formatCsvReport(const analysis::AnalysisModel& model, const ReportSe
     {
         appendCsvRow(output, "sourceMetadata", "source", model.sourcePath().string());
         appendCsvRow(output, "sourceMetadata", "format", analysis::logFormatName(model.format()));
+
+        if (const std::optional<analysis::JsonLinesSummary>& summary = model.jsonLinesSummary())
+        {
+            appendCsvRow(output, "sourceMetadata", "jsonValidLines", summary->validLines());
+            appendCsvRow(output, "sourceMetadata", "jsonParseFailures", summary->parseFailures());
+
+            for (const auto& entry : summary->topLevelKeys())
+            {
+                appendCsvRow(output,
+                             "sourceMetadata",
+                             "topLevelKey." + entry.first,
+                             std::to_string(entry.second));
+            }
+        }
     }
 
     return output.str();
@@ -278,6 +349,17 @@ std::string formatMarkdownReport(const analysis::AnalysisModel& model, const Rep
         output << "|-------|-------|" << '\n';
         output << "| Source | " << model.sourcePath().string() << " |" << '\n';
         output << "| Format | " << analysis::logFormatName(model.format()) << " |" << '\n';
+
+        if (const std::optional<analysis::JsonLinesSummary>& summary = model.jsonLinesSummary())
+        {
+            output << "| JSON valid lines | " << summary->validLines() << " |" << '\n';
+            output << "| JSON parse failures | " << summary->parseFailures() << " |" << '\n';
+
+            for (const auto& entry : summary->topLevelKeys())
+            {
+                output << "| Key " << entry.first << " | " << entry.second << " |" << '\n';
+            }
+        }
     }
 
     return output.str();
