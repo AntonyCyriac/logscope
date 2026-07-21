@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 21-07-2026 |
 
 ---
 
@@ -42,6 +42,7 @@ logscope analyze [options] <log-source>
 | Option | Description |
 |--------|-------------|
 | `--format text\|json\|csv\|markdown` | Output format (default: text) |
+| `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
 | `--sections <list>` | Report sections: `summary`, `levels`, `source`, or `all` |
 | `--min-errors <n>` | Investigation filter: minimum error lines |
 | `--min-warnings <n>` | Investigation filter: minimum warning lines |
@@ -54,6 +55,7 @@ logscope analyze [options] <log-source>
 ```bash
 logscope analyze samples/sample.log
 logscope analyze --format json samples/sample.log
+logscope analyze --log-format plain samples/sample.log
 logscope analyze - < samples/sample.log
 logscope analyze ./logs/
 ```
@@ -136,3 +138,4 @@ Default directory: current working directory.
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial CLI reference. |
+| 1.1.0 | 21-07-2026 | Added `--log-format` for M6.1 format detection. |

@@ -113,6 +113,7 @@ void appendTextSourceMetadata(std::ostringstream& output, const analysis::Analys
 {
     output << "--- Source Metadata ---" << '\n';
     output << "Source          : " << model.sourcePath().string() << '\n';
+    output << "Format          : " << analysis::logFormatName(model.format()) << '\n';
 }
 
 std::string formatTextReport(const analysis::AnalysisModel& model, const ReportSections& sections)
@@ -185,7 +186,8 @@ std::string formatJsonReport(const analysis::AnalysisModel& model, const ReportS
     {
         writeSeparator();
         output << "\n  \"sourceMetadata\": {\n"
-               << "    \"source\": " << escapeJsonString(model.sourcePath().string()) << "\n  }";
+               << "    \"source\": " << escapeJsonString(model.sourcePath().string()) << ",\n"
+               << "    \"format\": " << escapeJsonString(analysis::logFormatName(model.format())) << "\n  }";
     }
 
     output << "\n}";
@@ -235,6 +237,7 @@ std::string formatCsvReport(const analysis::AnalysisModel& model, const ReportSe
     if (sections.includes(ReportSection::SourceMetadata))
     {
         appendCsvRow(output, "sourceMetadata", "source", model.sourcePath().string());
+        appendCsvRow(output, "sourceMetadata", "format", analysis::logFormatName(model.format()));
     }
 
     return output.str();
@@ -274,6 +277,7 @@ std::string formatMarkdownReport(const analysis::AnalysisModel& model, const Rep
         output << "| Field | Value |" << '\n';
         output << "|-------|-------|" << '\n';
         output << "| Source | " << model.sourcePath().string() << " |" << '\n';
+        output << "| Format | " << analysis::logFormatName(model.format()) << " |" << '\n';
     }
 
     return output.str();

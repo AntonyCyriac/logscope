@@ -1,9 +1,9 @@
 /**
- * @file LogAnalyzer.cpp
+ * @file log_analyzer.cpp
  * @brief LogAnalyzer implementation.
  */
 
-#include "LogAnalyzer.hpp"
+#include "log_analyzer.hpp"
 
 #include "analysis.hpp"
 #include "investigation.hpp"
@@ -16,7 +16,9 @@ namespace scope::cli
 
 bool LogAnalyzer::analyze(const foundation::Path& filePath,
                           const reporting::ReportOptions& reportOptions,
-                          std::ostream& output)
+                          const analysis::LogFormat logFormat,
+                          std::ostream& output,
+                          std::ostream& errorOutput)
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
@@ -26,18 +28,22 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
 
     if (!datasetResult)
     {
-        SCOPE_LOG_ERROR("cli", datasetResult.error().message());
+        const std::string message = datasetResult.error().message();
+        SCOPE_LOG_ERROR("cli", message);
+        errorOutput << message << '\n';
 
         return false;
     }
 
     scope::analysis::AnalysisEngine analysisEngine;
 
-    auto modelResult = analysisEngine.analyze(*datasetResult);
+    auto modelResult = analysisEngine.analyze(*datasetResult, logFormat);
 
     if (!modelResult)
     {
-        SCOPE_LOG_ERROR("cli", modelResult.error().message());
+        const std::string message = modelResult.error().message();
+        SCOPE_LOG_ERROR("cli", message);
+        errorOutput << message << '\n';
 
         return false;
     }

@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | M6 – Log Format Intelligence |
 | Category | Project Planning |
-| Version | 1.0.0 |
-| Status | Draft |
+| Version | 1.1.0 |
+| Status | In Progress |
 | Created | 18-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 21-07-2026 |
 
 ---
 
@@ -295,3 +295,4 @@ The following remain out of scope for M6:
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial M6 log format intelligence plan. |
+| 1.1.0 | 21-07-2026 | M6.1 format detection implementation in progress. |

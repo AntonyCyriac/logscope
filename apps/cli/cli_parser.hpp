@@ -12,6 +12,7 @@
 #include <cstdint>
 
 #include "foundation/path.hpp"
+#include "log_format.hpp"
 #include "output_format.hpp"
 #include "report_section.hpp"
 
@@ -41,6 +42,7 @@ struct AnalyzeOptions
     foundation::Path logFile;
     foundation::Path configFile;
     OutputFormat format = OutputFormat::Text;
+    analysis::LogFormat logFormat = analysis::LogFormat::Auto;
     std::optional<reporting::ReportSections> sections;
     bool showHelp = false;
 };

@@ -1,5 +1,5 @@
 /**
- * @file LogAnalyzer.hpp
+ * @file log_analyzer.hpp
  * @brief CLI log file analyzer.
  */
 
@@ -8,6 +8,7 @@
 #include <iosfwd>
 
 #include "foundation/path.hpp"
+#include "log_format.hpp"
 #include "report_options.hpp"
 
 namespace scope::cli
@@ -24,12 +25,16 @@ class LogAnalyzer
      *
      * @param filePath Path to the log source.
      * @param reportOptions Report format and section selection.
+     * @param logFormat Input format hint (auto detects by default).
      * @param output Stream that receives formatted output.
+     * @param errorOutput Stream that receives actionable error messages.
      * @return true if analysis succeeded.
      */
     bool analyze(const foundation::Path& filePath,
                  const reporting::ReportOptions& reportOptions,
-                 std::ostream& output);
+                 analysis::LogFormat logFormat,
+                 std::ostream& output,
+                 std::ostream& errorOutput);
 };
 
 } // namespace scope::cli

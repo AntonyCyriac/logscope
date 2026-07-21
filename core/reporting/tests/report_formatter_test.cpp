@@ -75,4 +75,5 @@ TEST(ReportFormatterTest, FormatsJsonWithSectionStructure)
     EXPECT_NE(std::string::npos, report.text().find("\"totalLines\": 3"));
     EXPECT_NE(std::string::npos, report.text().find("\"levelBreakdown\""));
     EXPECT_NE(std::string::npos, report.text().find("\"sourceMetadata\""));
+    EXPECT_NE(std::string::npos, report.text().find("\"format\""));
 }
