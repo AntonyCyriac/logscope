@@ -250,3 +250,53 @@ TEST_F(AnalysisEngineTest, ContinuesAfterMalformedJsonLines)
 
     std::remove(jsonFile.string().c_str());
 }
+
+TEST_F(AnalysisEngineTest, ExtractsPlainTextTimeRange)
+{
+    writeLevelTestFile();
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(m_levelTestFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    ASSERT_TRUE(modelResult->fieldSummary().has_value());
+    EXPECT_GT(modelResult->fieldSummary()->linesWithTimestamp(), 0U);
+    EXPECT_TRUE(modelResult->fieldSummary()->earliestTimestamp().has_value());
+    EXPECT_TRUE(modelResult->fieldSummary()->latestTimestamp().has_value());
+    EXPECT_GT(modelResult->fieldSummary()->linesWithMessage(), 0U);
+}
+
+TEST_F(AnalysisEngineTest, ExtractsJsonLinesTimeRange)
+{
+    const Path jsonFile("analysis_engine_json_fields_test.jsonl");
+
+    {
+        std::ofstream stream(jsonFile.string());
+
+        stream << R"({"timestamp":"2026-07-21T10:00:01Z","message":"started","level":"info"})" << '\n';
+        stream << R"({"timestamp":"2026-07-21T10:00:25Z","message":"failed","level":"error"})" << '\n';
+    }
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(jsonFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult =
+        AnalysisEngine{}.analyze(*datasetResult, scope::analysis::LogFormat::JsonLines);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    ASSERT_TRUE(modelResult->fieldSummary().has_value());
+    EXPECT_EQ(2U, modelResult->fieldSummary()->linesWithTimestamp());
+    EXPECT_TRUE(modelResult->fieldSummary()->earliestTimestamp().has_value());
+    EXPECT_TRUE(modelResult->fieldSummary()->latestTimestamp().has_value());
+    EXPECT_EQ(2U, modelResult->fieldSummary()->linesWithMessage());
+
+    std::remove(jsonFile.string().c_str());
+}

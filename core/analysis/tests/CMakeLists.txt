@@ -5,6 +5,8 @@ add_executable(scope_analysis_tests
     json_lines_parser_test.cpp
     json_lines_summary_test.cpp
     log_line_classifier_test.cpp
+    plain_text_field_extractor_test.cpp
+    field_summary_test.cpp
 )
 
 target_link_libraries(scope_analysis_tests

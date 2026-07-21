@@ -7,6 +7,7 @@
 
 #include <sstream>
 
+#include "field_summary.hpp"
 #include "json_lines_summary.hpp"
 #include "log_macros.hpp"
 
@@ -110,6 +111,41 @@ void appendTextLevelBreakdown(std::ostringstream& output, const analysis::Analys
     output << "Blank lines     : " << levels.blankLines() << '\n';
 }
 
+void appendTextFieldSummary(std::ostringstream& output, const analysis::FieldSummary& fieldSummary)
+{
+    if (fieldSummary.linesWithTimestamp() > 0U)
+    {
+        output << "Time range start: "
+               << fieldSummary.earliestTimestamp()->toString() << '\n';
+        output << "Time range end  : " << fieldSummary.latestTimestamp()->toString() << '\n';
+        output << "Lines w/ time   : " << fieldSummary.linesWithTimestamp() << '\n';
+    }
+
+    if (fieldSummary.linesWithMessage() > 0U)
+    {
+        output << "Lines w/ message: " << fieldSummary.linesWithMessage() << '\n';
+
+        const auto topMessages = fieldSummary.topMessages();
+
+        if (!topMessages.empty())
+        {
+            output << "Top messages    : ";
+
+            for (std::size_t index = 0U; index < topMessages.size(); ++index)
+            {
+                if (index > 0U)
+                {
+                    output << ", ";
+                }
+
+                output << topMessages[index].first << " (" << topMessages[index].second << ')';
+            }
+
+            output << '\n';
+        }
+    }
+}
+
 void appendTextSourceMetadata(std::ostringstream& output, const analysis::AnalysisModel& model)
 {
     output << "--- Source Metadata ---" << '\n';
@@ -139,6 +175,11 @@ void appendTextSourceMetadata(std::ostringstream& output, const analysis::Analys
 
             output << '\n';
         }
+    }
+
+    if (const std::optional<analysis::FieldSummary>& fieldSummary = model.fieldSummary())
+    {
+        appendTextFieldSummary(output, *fieldSummary);
     }
 }
 
@@ -244,6 +285,53 @@ std::string formatJsonReport(const analysis::AnalysisModel& model, const ReportS
             output << "    }";
         }
 
+        if (const std::optional<analysis::FieldSummary>& fieldSummary = model.fieldSummary())
+        {
+            output << ",\n"
+                   << "    \"linesWithTimestamp\": " << fieldSummary->linesWithTimestamp() << ",\n"
+                   << "    \"linesWithMessage\": " << fieldSummary->linesWithMessage();
+
+            if (fieldSummary->earliestTimestamp().has_value())
+            {
+                output << ",\n"
+                       << "    \"earliestTimestamp\": "
+                       << escapeJsonString(fieldSummary->earliestTimestamp()->toString());
+            }
+
+            if (fieldSummary->latestTimestamp().has_value())
+            {
+                output << ",\n"
+                       << "    \"latestTimestamp\": "
+                       << escapeJsonString(fieldSummary->latestTimestamp()->toString());
+            }
+
+            const auto topMessages = fieldSummary->topMessages();
+
+            if (!topMessages.empty())
+            {
+                output << ",\n    \"topMessages\": {";
+                bool wroteMessage = false;
+
+                for (const auto& entry : topMessages)
+                {
+                    if (wroteMessage)
+                    {
+                        output << ',';
+                    }
+
+                    wroteMessage = true;
+                    output << "\n      " << escapeJsonString(entry.first) << ": " << entry.second;
+                }
+
+                if (wroteMessage)
+                {
+                    output << '\n';
+                }
+
+                output << "    }";
+            }
+        }
+
         output << "\n  }";
     }
 
@@ -309,6 +397,36 @@ std::string formatCsvReport(const analysis::AnalysisModel& model, const ReportSe
                              std::to_string(entry.second));
             }
         }
+
+        if (const std::optional<analysis::FieldSummary>& fieldSummary = model.fieldSummary())
+        {
+            appendCsvRow(output, "sourceMetadata", "linesWithTimestamp", fieldSummary->linesWithTimestamp());
+            appendCsvRow(output, "sourceMetadata", "linesWithMessage", fieldSummary->linesWithMessage());
+
+            if (fieldSummary->earliestTimestamp().has_value())
+            {
+                appendCsvRow(output,
+                             "sourceMetadata",
+                             "earliestTimestamp",
+                             fieldSummary->earliestTimestamp()->toString());
+            }
+
+            if (fieldSummary->latestTimestamp().has_value())
+            {
+                appendCsvRow(output,
+                             "sourceMetadata",
+                             "latestTimestamp",
+                             fieldSummary->latestTimestamp()->toString());
+            }
+
+            for (const auto& entry : fieldSummary->topMessages())
+            {
+                appendCsvRow(output,
+                             "sourceMetadata",
+                             "topMessage." + entry.first,
+                             std::to_string(entry.second));
+            }
+        }
     }
 
     return output.str();
@@ -358,6 +476,25 @@ std::string formatMarkdownReport(const analysis::AnalysisModel& model, const Rep
             for (const auto& entry : summary->topLevelKeys())
             {
                 output << "| Key " << entry.first << " | " << entry.second << " |" << '\n';
+            }
+        }
+
+        if (const std::optional<analysis::FieldSummary>& fieldSummary = model.fieldSummary())
+        {
+            if (fieldSummary->earliestTimestamp().has_value())
+            {
+                output << "| Earliest timestamp | " << fieldSummary->earliestTimestamp()->toString()
+                       << " |" << '\n';
+                output << "| Latest timestamp | " << fieldSummary->latestTimestamp()->toString() << " |"
+                       << '\n';
+            }
+
+            output << "| Lines with timestamp | " << fieldSummary->linesWithTimestamp() << " |" << '\n';
+            output << "| Lines with message | " << fieldSummary->linesWithMessage() << " |" << '\n';
+
+            for (const auto& entry : fieldSummary->topMessages())
+            {
+                output << "| Message " << entry.first << " | " << entry.second << " |" << '\n';
             }
         }
     }

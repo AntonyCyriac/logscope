@@ -95,3 +95,21 @@ TEST(ReportFormatterTest, IncludesJsonLinesSummaryInSourceMetadata)
     EXPECT_NE(std::string::npos, report.text().find("\"jsonValidLines\": 1"));
     EXPECT_NE(std::string::npos, report.text().find("\"topLevelKeys\""));
 }
+
+TEST(ReportFormatterTest, IncludesFieldSummaryInSourceMetadata)
+{
+    scope::analysis::FieldSummary fieldSummary;
+    const auto timestamp = scope::foundation::Timestamp::parse("2026-07-11T10:00:01");
+
+    ASSERT_TRUE(timestamp.hasValue());
+    fieldSummary.recordTimestamp(*timestamp);
+    fieldSummary.recordMessage("Connection refused");
+
+    const AnalysisModel model(Path("sample.log"), 1U, {}, scope::analysis::LogFormat::PlainText, std::nullopt, fieldSummary);
+
+    const auto report =
+        ReportFormatter::format(model, optionsWithSections(ReportSections::all(), ReportFormat::Json));
+
+    EXPECT_NE(std::string::npos, report.text().find("\"earliestTimestamp\""));
+    EXPECT_NE(std::string::npos, report.text().find("\"topMessages\""));
+}
