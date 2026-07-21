@@ -1,5 +1,5 @@
 /**
- * @file LogAnalyzer.hpp
+ * @file log_analyzer.hpp
  * @brief CLI log file analyzer.
  */
 

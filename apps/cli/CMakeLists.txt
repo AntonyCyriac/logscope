@@ -3,7 +3,7 @@
 # ==========================================================
 
 add_executable(logscope
-    LogAnalyzer.cpp
+    log_analyzer.cpp
     analyze_command.cpp
     cli_application.cpp
     cli_config.cpp

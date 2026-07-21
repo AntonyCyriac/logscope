@@ -5,7 +5,7 @@
 
 #include "analyze_command.hpp"
 
-#include "LogAnalyzer.hpp"
+#include "log_analyzer.hpp"
 #include "cli_config.hpp"
 #include "extension.hpp"
 #include "log_macros.hpp"

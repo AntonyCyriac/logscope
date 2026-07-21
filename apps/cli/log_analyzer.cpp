@@ -1,9 +1,9 @@
 /**
- * @file LogAnalyzer.cpp
+ * @file log_analyzer.cpp
  * @brief LogAnalyzer implementation.
  */
 
-#include "LogAnalyzer.hpp"
+#include "log_analyzer.hpp"
 
 #include "analysis.hpp"
 #include "investigation.hpp"
