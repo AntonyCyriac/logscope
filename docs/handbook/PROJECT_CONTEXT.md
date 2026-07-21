@@ -11,7 +11,7 @@
 
 ---
 
-> **Usage:** Attach or reference this file at the start of a new Cursor session so the assistant begins with the same engineering mindset and project constraints established for LogScope.
+> **Usage:** Attach or reference this file at the start of a new agent session so the assistant begins with the same engineering mindset and project constraints established for LogScope.
 
 ---
 
@@ -315,5 +315,5 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 1.0.0 | 21-07-2026 | Initial project context for Cursor and contributor onboarding. |
+| 1.0.0 | 21-07-2026 | Initial project context for agent and contributor onboarding. |
 | 1.1.0 | 21-07-2026 | Added post-v1 strategic roadmap and M6→M7 sequence. |

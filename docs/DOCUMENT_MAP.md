@@ -141,7 +141,7 @@ Developers new to LogScope should read the documentation in the following order.
 
 | Step | Document | Purpose |
 |------|----------|---------|
-| 0 | PROJECT_CONTEXT.md | Cursor / AI session bootstrap; engineering mindset and constraints. |
+| 0 | PROJECT_CONTEXT.md | Agent session bootstrap; engineering mindset and constraints. |
 | 1 | ROADMAP.md | Understand the project milestones and current development phase. |
 | 2 | POST_V1_STRATEGIC_ROADMAP.md | Understand the long-term post-v1 vision and version targets. |
 | 3 | M6-LOG-FORMAT-INTELLIGENCE.md | Understand the M6 log format intelligence plan (current phase). |
@@ -281,5 +281,5 @@ These categories should be added only when they provide clear value and support 
 | 1.5.0 | 18-07-2026 | Added planning/ directory and M4-FEATURE-EXPANSION.md to structure and reading order. |
 | 1.6.0 | 18-07-2026 | Added M5 planning, testing/, release/, SECURITY_REVIEW, and ADR-002. |
 | 1.7.0 | 18-07-2026 | Added M6-LOG-FORMAT-INTELLIGENCE.md; updated reading order for current phase. |
-| 1.8.0 | 21-07-2026 | Added PROJECT_CONTEXT.md for Cursor session bootstrap. |
+| 1.8.0 | 21-07-2026 | Added PROJECT_CONTEXT.md for agent session bootstrap. |
 | 1.9.0 | 21-07-2026 | Added POST_V1_STRATEGIC_ROADMAP.md and M7-SEARCH-ENGINE.md; updated reading order. |
