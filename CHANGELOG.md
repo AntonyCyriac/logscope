@@ -12,6 +12,8 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ### Added
 
+- Post-v1 strategic roadmap (`POST_V1_STRATEGIC_ROADMAP.md`) with 10-phase vision, M6–M17 milestone mapping, and version targets.
+- M7 Search Engine planning stub (`M7-SEARCH-ENGINE.md`).
 - M6 planning document and phased roadmap (M6.1–M6.5) for log format intelligence; target `v1.1.0`.
 
 ---

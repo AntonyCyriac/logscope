@@ -4,18 +4,20 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 2.9.0 |
+| Version | 3.0.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 21-07-2026 |
 
 ---
 
 # Purpose
 
-This roadmap defines the planned evolution of LogScope from project inception through the first production release.
+This roadmap defines the planned evolution of LogScope from project inception through post-v1 product growth.
 
 The roadmap is milestone-driven. Each milestone represents a stable engineering baseline before progressing to the next phase.
+
+For the long-term strategic vision (phases 1–10, version targets, product boundaries), see [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
 
 ---
 
@@ -31,6 +33,17 @@ The roadmap is milestone-driven. Each milestone represents a stable engineering 
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | ✅ Complete | First stable production release. |
 | **M6 – Log Format Intelligence** | 🔄 Planned | Format detection, structured parsing, field extraction, content investigation, format profiles. Target: `v1.1.0`. |
+| **M7 – Search Engine** | ⏳ Planned | Full-text, regex, boolean search; saved searches; time/field filters. Target: `v1.2.0`. |
+| **M8 – Advanced Reporting** | ⏳ Planned | HTML, PDF, charts, executive summaries. Target: `v1.3.0`. |
+| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
+| **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
+| **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
+| **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
+| **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
+| **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
+| **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |
+| **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
+| **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
 
 ---
 
@@ -46,7 +59,7 @@ M5  ██████████ 100%
 M6  ░░░░░░░░░░   0%  (planned)
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md).
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
 ---
 
@@ -371,9 +384,44 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 
 ### Deferred to post-M6
 
-- REST API, Web UI, AI-assisted investigation
-- Dynamic shared-library plugin loading and extension SDK (M7)
+- REST API, Web UI, AI-assisted investigation (see M13–M15 in strategic roadmap)
+- Dynamic shared-library plugin loading and extension SDK (M12)
 - Vendor-specific parsers
+
+---
+
+# Post-v1 Milestones (M7–M17)
+
+Summary of planned milestones after M6. Full strategic context: [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
+
+| Milestone | Focus | Target version |
+|-----------|-------|----------------|
+| M7 – Search Engine | Full-text, regex, boolean search; saved searches | `v1.2.0` |
+| M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
+| M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.0` |
+| M10 – Query Language | Structured filter DSL | `v1.4.0` |
+| M11 – Storage Layer | SQLite, indexing, compression | `v1.4.0` |
+| M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
+| M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
+| M14 – Desktop Application | Qt GUI | `v2.0.0` |
+| M15 – Web Platform | Dashboard, REST API, shared investigations | `v2.0.0` |
+| M16 – Enterprise | RBAC, agents, streaming, multi-node | `v2.x` |
+| M17 – Cloud Deployment | K8s, Helm, gRPC, OpenTelemetry | `v2.x` |
+
+### Version evolution
+
+```text
+v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
+v1.1.0  — M6: Log Format Intelligence
+v1.2.0  — M7: Search Engine
+v1.3.0  — M8 Reporting + M9 Analytics
+v1.4.0  — M10 Query + M11 Storage + M12 Plugins
+v1.5.0  — M13 AI
+v2.0.0  — M14 GUI + M15 Web
+v2.x    — M16 Enterprise, M17 Cloud
+```
+
+Tactical planning documents exist for M6 and M7 (stub). M8–M17 plans will be added as preceding milestones near completion.
 
 ---
 
@@ -402,3 +450,4 @@ The roadmap is considered successful when:
 | 2.7.0 | 18-07-2026 | M5 complete; all M5 phases marked complete; production readiness infrastructure delivered. |
 | 2.8.0 | 18-07-2026 | v1.0.0 first stable production release. |
 | 2.9.0 | 18-07-2026 | Added M6 phased roadmap (M6.1–M6.5) and planning document link; target v1.1.0. |
+| 3.0.0 | 21-07-2026 | Added post-v1 strategic roadmap; M7–M17 milestone table and version evolution. |
