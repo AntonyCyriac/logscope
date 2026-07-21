@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) (`v1.1.0`), followed by [M7 – Search Engine](M7-SEARCH-ENGINE.md) (`v1.2.0`).
+**Immediate next milestone:** [M7 – Search Engine](M7-SEARCH-ENGINE.md) (`v1.2.0`).
 
 ---
 
@@ -435,8 +435,8 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | [FR-004 – Extend LogScope](../requirements/functional/FR-004-Extend-LogScope.md) | Plugins, configuration |
 | [NFR-001 – Quality Attributes](../requirements/non_functional/NFR-001-Quality-Attributes.md) | Performance, reliability, maintainability |
 | [Product Overview](../vision/PRODUCT_OVERVIEW.md) | Product promise and evolution strategy |
-| [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) | Immediate tactical plan |
-| [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Next tactical plan after M6 |
+| [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) | Completed at `v1.1.0` |
+| [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Immediate tactical plan |
 | [Roadmap](../ROADMAP.md) | Milestone status |
 
 ---

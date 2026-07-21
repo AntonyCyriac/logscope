@@ -380,7 +380,7 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 - Timestamp and field extraction for richer `AnalysisModel` output
 - Content search, time-range filters, and basic correlation in investigation
 - Configuration-driven format profiles (configuration before plugins)
-- Target release: **`v1.1.0`**
+- Released as **`v1.1.0`**
 
 ### Deferred to post-M6
 

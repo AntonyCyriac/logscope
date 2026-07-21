@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.0.0`
+**Current release:** `v1.1.0`
 
 **Completed milestones:**
 
@@ -39,13 +39,13 @@ The project follows architecture-first development. Every implementation should 
 | M3 – Architecture Realization | Core pipeline: source, analysis, investigation, reporting, CLI |
 | M4 – Feature Expansion | Analysis depth, sources, reporting, extensions, sessions |
 | M5 – Production Readiness | Benchmarks, fuzz, multi-OS CI, packaging, v1.0.0 release |
+| M6 – Log Format Intelligence | Format detection, JSON Lines, field extraction, content investigation, format profiles (`v1.1.0`) |
 
-**Planned:**
+**Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M6 – Log Format Intelligence | `v1.1.0` | Format detection, JSON Lines, field extraction (current) |
-| M7 – Search Engine | `v1.2.0` | Full-text, regex, boolean search (next) |
+| M7 – Search Engine | `v1.2.0` | Full-text, regex, boolean search (current) |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M6 planning](../planning/M6-LOG-FORMAT-INTELLIGENCE.md), [M7 planning](../planning/M7-SEARCH-ENGINE.md), and [Roadmap](../ROADMAP.md).
 
@@ -317,3 +317,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 |---------|------|-------------|
 | 1.0.0 | 21-07-2026 | Initial project context for agent and contributor onboarding. |
 | 1.1.0 | 21-07-2026 | Added post-v1 strategic roadmap and M6→M7 sequence. |
+| 1.2.0 | 21-07-2026 | M6 complete; v1.1.0 released; M7 is next. |
