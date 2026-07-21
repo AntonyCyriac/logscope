@@ -9,6 +9,7 @@
 
 #include "foundation/string.hpp"
 #include "log_line_classifier.hpp"
+#include "search_query.hpp"
 
 namespace scope::cli
 {
@@ -40,9 +41,22 @@ std::string formatTextInvestigation(const investigation::InvestigationResult& re
     std::ostringstream output;
 
     output << "========== INVESTIGATION RESULT ==========\n";
+
+    if (!result.searchQuerySummary.empty())
+    {
+        output << "Search query     : " << result.searchQuerySummary << '\n';
+        output << "Search mode      : " << (result.searchMode == search::SearchMode::Regex ? "regex" : "text") << '\n';
+    }
+
     output << "Indexed lines   : " << result.indexedLineCount << '\n';
     output << "Truncated lines : " << result.truncatedLineCount << '\n';
     output << "Matching lines  : " << result.matchingLines.size() << '\n';
+
+    if (result.truncatedLineCount > 0U)
+    {
+        output << "\nWARNING: " << result.truncatedLineCount
+               << " lines were not indexed; search results may be incomplete.\n";
+    }
 
     if (!result.matchingLines.empty())
     {
@@ -119,6 +133,9 @@ std::string formatJsonInvestigation(const investigation::InvestigationResult& re
            << "  \"indexedLineCount\": " << result.indexedLineCount << ",\n"
            << "  \"truncatedLineCount\": " << result.truncatedLineCount << ",\n"
            << "  \"matchingLineCount\": " << result.matchingLines.size() << ",\n"
+           << "  \"searchQuery\": \"" << escapeJson(result.searchQuerySummary) << "\",\n"
+           << "  \"searchMode\": \"" << (result.searchMode == search::SearchMode::Regex ? "regex" : "text") << "\",\n"
+           << "  \"indexTruncated\": " << (result.truncatedLineCount > 0U ? "true" : "false") << ",\n"
            << "  \"matches\": [";
 
     for (std::size_t index = 0U; index < result.matchingLines.size(); ++index)

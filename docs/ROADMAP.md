@@ -33,7 +33,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | ✅ Complete | First stable production release. |
 | **M6 – Log Format Intelligence** | ✅ Complete | Format detection, structured parsing, field extraction, content investigation, format profiles. Released as `v1.1.0`. |
-| **M7 – Search Engine** | ⏳ Planned | Full-text, regex, boolean search; saved searches; time/field filters. Target: `v1.2.0`. |
+| **M7 – Search Engine** | ✅ Complete | Full-text, regex, boolean search; saved searches; session search history. Released as `v1.2.0`. |
 | **M8 – Advanced Reporting** | ⏳ Planned | HTML, PDF, charts, executive summaries. Target: `v1.3.0`. |
 | **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
 | **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
@@ -57,9 +57,10 @@ M3  ██████████ 100%
 M4  ██████████ 100%
 M5  ██████████ 100%
 M6  ██████████ 100%  (v1.1.0 released)
+M7  ██████████ 100%  (v1.2.0 released)
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** is released as [`v1.2.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
 ---
 
@@ -421,7 +422,7 @@ v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6 and M7 (stub). M8–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6 and M7. M8–M17 plans will be added as preceding milestones near completion.
 
 ---
 
@@ -452,3 +453,4 @@ The roadmap is considered successful when:
 | 2.9.0 | 18-07-2026 | Added M6 phased roadmap (M6.1–M6.5) and planning document link; target v1.1.0. |
 | 3.0.0 | 21-07-2026 | Added post-v1 strategic roadmap; M7–M17 milestone table and version evolution. |
 | 3.1.0 | 21-07-2026 | M6 complete; v1.1.0 released with format profiles and configuration. |
+| 3.2.0 | 21-07-2026 | M7 complete; v1.2.0 released with search engine. |

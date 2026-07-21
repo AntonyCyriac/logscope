@@ -12,6 +12,25 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.2.0] - 2026-07-21
+
+M7 – Search Engine complete. Introduces a dedicated search subsystem with boolean queries, regex mode, CLI search workflow, and session search history. 318 automated tests.
+
+### Added
+
+- M7.1 `scope_search` module: `SearchQuery`, `SearchEngine`, `text_matcher`, investigation integration.
+- M7.2 regex search mode with pattern validation and length limits.
+- M7.3 boolean query parser (`AND`, `OR`, `NOT`, quoted terms, parentheses).
+- M7.4 CLI `--query`, `--regex`, `--case-sensitive`; `logscope search` subcommand; investigation output metadata.
+- M7.5 session serializer v1.2 (`search.query`, `search.history`); `search.saved.*` config keys; `BM_SearchEngine` benchmark.
+
+### Changed
+
+- `InvestigationEngine` delegates content matching to `SearchEngine`.
+- `Configuration::keys()` added for search configuration validation.
+
+---
+
 ## [1.1.0] - 2026-07-21
 
 M6 – Log Format Intelligence complete. Extends analysis with format detection, JSON Lines parsing, field extraction, content-aware investigation, and configuration-driven format profiles. 296 automated tests.

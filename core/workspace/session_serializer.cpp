@@ -15,7 +15,8 @@
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
 #include "report_format.hpp"
-#include "report_section.hpp"
+#include "foundation/string.hpp"
+#include "search_query_parser.hpp"
 
 namespace scope::workspace
 {
@@ -23,7 +24,7 @@ namespace scope::workspace
 namespace
 {
 
-constexpr std::string_view sessionVersion = "1.1";
+constexpr std::string_view sessionVersion = "1.2";
 
 bool parseUint64(std::string_view value, std::uint64_t& output) noexcept
 {
@@ -198,6 +199,23 @@ void appendContentCriteria(std::ostringstream& output, const investigation::Inve
 
     output << "filter.messageContains=" << criteria.field.messageContains() << '\n';
     output << "filter.jsonKey=" << criteria.field.requiredJsonKey() << '\n';
+
+    if (!criteria.booleanQuery.empty())
+    {
+        output << "search.query=" << criteria.booleanQuery << '\n';
+    }
+    else if (criteria.searchQuery.has_value())
+    {
+        output << "search.query=" << criteria.searchQuery->toString() << '\n';
+    }
+    else if (!criteria.contentSearch.empty())
+    {
+        output << "search.query=" << criteria.contentSearch << '\n';
+    }
+    else
+    {
+        output << "search.query=\n";
+    }
 }
 
 investigation::InvestigationCriteria contentCriteriaFromValues(
@@ -285,6 +303,7 @@ std::string SessionSerializer::serialize(const InvestigationSession& session)
     output << "filter.minWarnings=" << session.levelFilter().minimumWarnings() << '\n';
     output << "filter.searchQuery=" << session.searchQuery() << '\n';
     appendContentCriteria(output, session.contentCriteria());
+    output << "search.history=" << session.searchHistory().serialize() << '\n';
     output << "report.format=" << reporting::reportFormatName(session.reportOptions().format) << '\n';
     output << "report.sections=" << sectionsToString(session.reportOptions().sections) << '\n';
     output << "config.path=" << session.configFile().string() << '\n';
@@ -314,6 +333,8 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     std::string lineLevelValue;
     std::string messageContains;
     std::string jsonKey;
+    std::string searchQueryExpression;
+    std::string searchHistoryValue;
     std::string reportFormatValue = "text";
     std::string reportSectionsValue = "all";
     std::string configPathValue;
@@ -455,6 +476,14 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         {
             jsonKey = value;
         }
+        else if (key == "search.query")
+        {
+            searchQueryExpression = value;
+        }
+        else if (key == "search.history")
+        {
+            searchHistoryValue = value;
+        }
         else if (key == "report.format")
         {
             reportFormatValue = value;
@@ -512,12 +541,28 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
 
     reportOptions.sections = sectionsFromString(reportSectionsValue);
 
-    const investigation::InvestigationCriteria contentCriteria = contentCriteriaFromValues(
+    investigation::InvestigationCriteria contentCriteria = contentCriteriaFromValues(
         contentSearch, timeFromValue, timeToValue, lineLevelValue, messageContains, jsonKey);
+
+    if (!foundation::isBlank(searchQueryExpression))
+    {
+        const auto parsedQuery = search::parseSearchQuery(searchQueryExpression);
+
+        if (parsedQuery)
+        {
+            contentCriteria.searchQuery = *parsedQuery;
+        }
+        else
+        {
+            contentCriteria.booleanQuery = searchQueryExpression;
+        }
+    }
+
+    const search::SearchHistory searchHistory = search::SearchHistory::deserialize(searchHistoryValue);
 
     return foundation::Result<InvestigationSession>(InvestigationSession(
         sessionId, foundation::Path(sourcePathValue), model, lineFilter, levelFilter, searchQuery, contentCriteria,
-        reportOptions, foundation::Path(configPathValue)));
+        searchHistory, reportOptions, foundation::Path(configPathValue)));
 }
 
 } // namespace scope::workspace

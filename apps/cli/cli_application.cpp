@@ -9,6 +9,7 @@
 #include "config_validate_command.hpp"
 #include "extensions_command.hpp"
 #include "investigate_command.hpp"
+#include "search_command.hpp"
 #include "session_command.hpp"
 
 namespace scope::cli
@@ -22,6 +23,7 @@ void CliApplication::printUsage(std::ostream& output)
            << "Commands:\n"
            << "  analyze            Analyze a log file, directory, or stdin\n"
            << "  investigate        Search and filter indexed log content\n"
+           << "  search             Alias for investigate focused on search queries\n"
            << "  config validate    Validate configuration\n"
            << "  extensions list    List available extensions\n"
            << "  extensions describe Describe an extension\n"
@@ -52,6 +54,8 @@ int CliApplication::run(const ParsedCli& parsed,
         return runAnalyzeCommand(parsed.analyze, configurationManager, output, errorOutput);
     case CliCommand::Investigate:
         return runInvestigateCommand(parsed.investigate, configurationManager, output, errorOutput);
+    case CliCommand::Search:
+        return runSearchCommand(parsed.search, configurationManager, output, errorOutput);
     case CliCommand::ConfigValidate:
         return runConfigValidateCommand(parsed.configValidate, configurationManager, output, errorOutput);
     case CliCommand::ExtensionsList:

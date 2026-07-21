@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** [M7 – Search Engine](M7-SEARCH-ENGINE.md) (`v1.2.0`).
+**Immediate next milestone:** [M8 – Advanced Reporting](POST_V1_STRATEGIC_ROADMAP.md) (`v1.3.0`).
 
 ---
 
@@ -436,7 +436,7 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | [NFR-001 – Quality Attributes](../requirements/non_functional/NFR-001-Quality-Attributes.md) | Performance, reliability, maintainability |
 | [Product Overview](../vision/PRODUCT_OVERVIEW.md) | Product promise and evolution strategy |
 | [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) | Completed at `v1.1.0` |
-| [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Immediate tactical plan |
+| [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Completed at `v1.2.0` |
 | [Roadmap](../ROADMAP.md) | Milestone status |
 
 ---

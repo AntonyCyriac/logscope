@@ -12,7 +12,7 @@ InvestigationSession::InvestigationSession(
     foundation::Uuid sessionId, foundation::Path sourcePath, analysis::AnalysisModel model,
     investigation::LineCountFilter lineFilter, investigation::LogLevelFilter levelFilter,
     std::string searchQuery, investigation::InvestigationCriteria contentCriteria,
-    reporting::ReportOptions reportOptions, foundation::Path configFile)
+    search::SearchHistory searchHistory, reporting::ReportOptions reportOptions, foundation::Path configFile)
     : m_sessionId(std::move(sessionId))
     , m_sourcePath(std::move(sourcePath))
     , m_analysisModel(std::move(model))
@@ -20,6 +20,7 @@ InvestigationSession::InvestigationSession(
     , m_levelFilter(std::move(levelFilter))
     , m_searchQuery(std::move(searchQuery))
     , m_contentCriteria(std::move(contentCriteria))
+    , m_searchHistory(std::move(searchHistory))
     , m_reportOptions(std::move(reportOptions))
     , m_configFile(std::move(configFile))
 {
@@ -60,6 +61,11 @@ const investigation::InvestigationCriteria& InvestigationSession::contentCriteri
     return m_contentCriteria;
 }
 
+const search::SearchHistory& InvestigationSession::searchHistory() const noexcept
+{
+    return m_searchHistory;
+}
+
 const reporting::ReportOptions& InvestigationSession::reportOptions() const noexcept
 {
     return m_reportOptions;
@@ -75,6 +81,7 @@ InvestigationSession InvestigationSession::fromAnalysis(const analysis::Analysis
                                                         investigation::LogLevelFilter levelFilter,
                                                         std::string searchQuery,
                                                         investigation::InvestigationCriteria contentCriteria,
+                                                        search::SearchHistory searchHistory,
                                                         reporting::ReportOptions reportOptions,
                                                         foundation::Path configFile)
 {
@@ -82,7 +89,7 @@ InvestigationSession InvestigationSession::fromAnalysis(const analysis::Analysis
 
     return InvestigationSession(sessionId, model.sourcePath(), model, std::move(lineFilter),
                                 std::move(levelFilter), std::move(searchQuery), std::move(contentCriteria),
-                                std::move(reportOptions), std::move(configFile));
+                                std::move(searchHistory), std::move(reportOptions), std::move(configFile));
 }
 
 } // namespace scope::workspace

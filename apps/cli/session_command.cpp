@@ -14,6 +14,7 @@
 #include "log_macros.hpp"
 #include "report_config.hpp"
 #include "report_output.hpp"
+#include "search_history.hpp"
 #include "source.hpp"
 #include "workspace.hpp"
 
@@ -139,9 +140,21 @@ int runSessionSaveCommand(const SessionSaveOptions& options,
 
     const reporting::ReportOptions reportOptions = buildReportOptions(analyzeOptions, configurationManager);
 
+    search::SearchHistory searchHistory;
+
+    if (options.contentCriteria.isActive())
+    {
+        const auto queryResult = options.contentCriteria.resolvedSearchQuery();
+
+        if (queryResult && queryResult->isActive())
+        {
+            searchHistory.add(queryResult->toString());
+        }
+    }
+
     const scope::workspace::InvestigationSession session = scope::workspace::InvestigationSession::fromAnalysis(
         *modelResult, buildLineFilter(options), buildLevelFilter(options), options.searchQuery,
-        options.contentCriteria, reportOptions, options.configFile);
+        options.contentCriteria, searchHistory, reportOptions, options.configFile);
 
     const scope::workspace::SessionStore store;
 
