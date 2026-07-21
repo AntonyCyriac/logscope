@@ -18,6 +18,14 @@ TEST(AnalysisModelTest, StoresSourcePathAndLineCount)
     EXPECT_EQ("sample.log", model.sourcePath().string());
     EXPECT_EQ(42U, model.totalLines());
     EXPECT_EQ(0U, model.levelCounts().errorLines());
+    EXPECT_EQ(scope::analysis::LogFormat::PlainText, model.format());
+}
+
+TEST(AnalysisModelTest, StoresDetectedFormat)
+{
+    const AnalysisModel model(Path("sample.jsonl"), 2U, {}, scope::analysis::LogFormat::JsonLines);
+
+    EXPECT_EQ(scope::analysis::LogFormat::JsonLines, model.format());
 }
 
 TEST(AnalysisModelTest, StoresLevelCounts)

@@ -56,7 +56,7 @@ M2  ██████████ 100%
 M3  ██████████ 100%
 M4  ██████████ 100%
 M5  ██████████ 100%
-M6  ░░░░░░░░░░   0%  (planned)
+M6  ██░░░░░░░░  20%  (M6.1 in progress)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -367,7 +367,7 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 
 | Phase | Focus | Primary FR | Status |
 |-------|-------|------------|--------|
-| M6.1 | Format detection | FR-001.4 | ⏳ Planned |
+| M6.1 | Format detection | FR-001.4 | 🔄 In progress |
 | M6.2 | JSON Lines parsing | FR-001.1, FR-001.3 | ⏳ Planned |
 | M6.3 | Timestamp and field extraction | FR-001.3 | ⏳ Planned |
 | M6.4 | Content-aware investigation | FR-002.1, FR-002.2, FR-002.4 | ⏳ Planned |

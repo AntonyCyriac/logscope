@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include "foundation/string.hpp"
+#include "log_format.hpp"
 
 namespace scope::cli
 {
@@ -81,6 +82,25 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             }
 
             options.format = *format;
+
+            continue;
+        }
+
+        if (argument == "--log-format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto logFormat = analysis::parseLogFormat(argv[++index]);
+
+            if (!logFormat || *logFormat == analysis::LogFormat::Unknown)
+            {
+                return std::nullopt;
+            }
+
+            options.logFormat = *logFormat;
 
             continue;
         }

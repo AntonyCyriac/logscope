@@ -21,21 +21,36 @@ char* toArgv(std::string& value)
 
 } // namespace
 
-TEST(CliParserTest, ParsesAnalyzeSubcommand)
+TEST(CliParserTest, ParsesAnalyzeLogFormat)
 {
     std::string program = "logscope";
     std::string command = "analyze";
-    std::string formatFlag = "--format";
-    std::string formatValue = "json";
+    std::string logFormatFlag = "--log-format";
+    std::string logFormatValue = "plain";
     std::string logFile = "sample.log";
-    char* argv[] = {toArgv(program), toArgv(command), toArgv(formatFlag), toArgv(formatValue), toArgv(logFile)};
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(logFormatFlag), toArgv(logFormatValue),
+                    toArgv(logFile)};
 
     const auto parsed = parseCliArguments(5, argv);
 
     ASSERT_TRUE(parsed);
     EXPECT_EQ(CliCommand::Analyze, parsed->command);
-    EXPECT_EQ("sample.log", parsed->analyze.logFile.string());
-    EXPECT_EQ(OutputFormat::Json, parsed->analyze.format);
+    EXPECT_EQ(scope::analysis::LogFormat::PlainText, parsed->analyze.logFormat);
+}
+
+TEST(CliParserTest, RejectsInvalidLogFormat)
+{
+    std::string program = "logscope";
+    std::string command = "analyze";
+    std::string logFormatFlag = "--log-format";
+    std::string logFormatValue = "xml";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(logFormatFlag), toArgv(logFormatValue),
+                    toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    EXPECT_FALSE(parsed);
 }
 
 TEST(CliParserTest, ParsesLegacyAnalyzeInvocation)

@@ -11,6 +11,7 @@
 
 #include "foundation/error.hpp"
 #include "foundation/string.hpp"
+#include "log_format.hpp"
 #include "report_format.hpp"
 #include "report_section.hpp"
 
@@ -125,6 +126,7 @@ std::string SessionSerializer::serialize(const InvestigationSession& session)
     output << "session.id=" << session.sessionId().toString() << '\n';
     output << "source.path=" << session.sourcePath().string() << '\n';
     output << "analysis.totalLines=" << model.totalLines() << '\n';
+    output << "analysis.format=" << analysis::logFormatName(model.format()) << '\n';
     output << "analysis.infoLines=" << levels.infoLines() << '\n';
     output << "analysis.warningLines=" << levels.warnLines() << '\n';
     output << "analysis.errorLines=" << levels.errorLines() << '\n';
@@ -156,6 +158,7 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     std::string sessionIdValue;
     std::string sourcePathValue;
     std::uint64_t totalLines = 0U;
+    std::string analysisFormatValue = "plain";
     std::uint64_t infoLines = 0U;
     std::uint64_t warnLines = 0U;
     std::uint64_t errorLines = 0U;
@@ -206,6 +209,10 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
                 return foundation::Result<InvestigationSession>(foundation::Error(
                     foundation::ErrorCode::ParseError, "Invalid analysis.totalLines value."));
             }
+        }
+        else if (key == "analysis.format")
+        {
+            analysisFormatValue = value;
         }
         else if (key == "analysis.infoLines")
         {
@@ -310,7 +317,16 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     const analysis::LogLevelCounts levelCounts =
         analysis::LogLevelCounts::fromCounts(infoLines, warnLines, errorLines, otherLines, blankLines);
 
-    const analysis::AnalysisModel model(foundation::Path(sourcePathValue), totalLines, levelCounts);
+    analysis::LogFormat analysisFormat = analysis::LogFormat::PlainText;
+    const auto parsedAnalysisFormat = analysis::parseLogFormat(analysisFormatValue);
+
+    if (parsedAnalysisFormat && *parsedAnalysisFormat != analysis::LogFormat::Auto &&
+        *parsedAnalysisFormat != analysis::LogFormat::Unknown)
+    {
+        analysisFormat = *parsedAnalysisFormat;
+    }
+
+    const analysis::AnalysisModel model(foundation::Path(sourcePathValue), totalLines, levelCounts, analysisFormat);
 
     investigation::LineCountFilter lineFilter = lineFilterFromValues(minLines, maxLinesValue);
 

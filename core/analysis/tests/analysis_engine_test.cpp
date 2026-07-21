@@ -126,3 +126,60 @@ TEST_F(AnalysisEngineTest, CountsLogLevels)
     EXPECT_EQ(1U, modelResult->levelCounts().warnLines());
     EXPECT_EQ(2U, modelResult->levelCounts().errorLines());
 }
+
+TEST_F(AnalysisEngineTest, DetectsPlainFormat)
+{
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(m_testFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(scope::analysis::LogFormat::PlainText, modelResult->format());
+}
+
+TEST_F(AnalysisEngineTest, RejectsBinaryInput)
+{
+    const Path binaryFile("analysis_engine_binary_test.bin");
+
+    {
+        std::ofstream stream(binaryFile.string(), std::ios::binary);
+        stream.write("abc\0def\ngh", 10);
+        stream.put('\0');
+        stream << "more";
+    }
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(binaryFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    ASSERT_TRUE(modelResult.hasError());
+    EXPECT_EQ(scope::foundation::ErrorCode::InvalidArgument, modelResult.error().code());
+    EXPECT_NE(std::string::npos, modelResult.error().message().find("binary"));
+
+    std::remove(binaryFile.string().c_str());
+}
+
+TEST_F(AnalysisEngineTest, HonorsPlainFormatOverride)
+{
+    writeLevelTestFile();
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(m_levelTestFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult =
+        AnalysisEngine{}.analyze(*datasetResult, scope::analysis::LogFormat::PlainText);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(scope::analysis::LogFormat::PlainText, modelResult->format());
+}
