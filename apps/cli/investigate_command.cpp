@@ -24,6 +24,9 @@ void printInvestigateUsage(std::ostream& output)
            << "\n"
            << "Investigation options:\n"
            << "  --search <query>        Search indexed log line content\n"
+           << "  --query <expr>          Boolean search expression (AND, OR, NOT, quotes)\n"
+           << "  --regex                 Treat --search value as a regular expression\n"
+           << "  --case-sensitive        Disable default case-insensitive matching\n"
            << "  --time-from <timestamp> Earliest timestamp (ISO-like)\n"
            << "  --time-to <timestamp>   Latest timestamp (ISO-like)\n"
            << "  --level <name>          Filter by line level: error, warning, info, other\n"
@@ -82,6 +85,15 @@ int runInvestigateCommand(const InvestigateOptions& options,
 
     if (options.criteria.isActive())
     {
+        const auto queryResult = options.criteria.resolvedSearchQuery();
+
+        if (!queryResult)
+        {
+            errorOutput << queryResult.error().message() << '\n';
+
+            return 1;
+        }
+
         result = investigationEngine.investigate(*modelResult, options.criteria);
     }
     else

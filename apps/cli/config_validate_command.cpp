@@ -5,9 +5,10 @@
 
 #include "config_validate_command.hpp"
 
-#include "analysis.hpp"
+#include "search.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
+#include "search_history.hpp"
 
 namespace scope::cli
 {
@@ -53,6 +54,15 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!analysisValidation)
     {
         errorOutput << analysisValidation.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto searchValidation = scope::search::validateSearchConfiguration(configurationManager.configuration());
+
+    if (!searchValidation)
+    {
+        errorOutput << searchValidation.error().message() << std::endl;
 
         return 1;
     }

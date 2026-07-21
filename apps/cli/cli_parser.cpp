@@ -12,6 +12,7 @@
 #include "foundation/timestamp.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
+#include "search_query.hpp"
 
 namespace scope::cli
 {
@@ -85,6 +86,32 @@ bool parseInvestigationOption(const std::string& argument, int& index, const int
         }
 
         criteria.contentSearch = argv[++index];
+
+        return true;
+    }
+
+    if (argument == "--query")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        criteria.booleanQuery = argv[++index];
+
+        return true;
+    }
+
+    if (argument == "--regex")
+    {
+        criteria.searchMode = search::SearchMode::Regex;
+
+        return true;
+    }
+
+    if (argument == "--case-sensitive")
+    {
+        criteria.caseSensitivity = search::CaseSensitivity::Sensitive;
 
         return true;
     }
@@ -937,6 +964,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
         parsed.command = CliCommand::Investigate;
         parsed.investigate = *options;
+
+        return parsed;
+    }
+
+    if (firstArgument == "search")
+    {
+        const auto options = parseInvestigateArguments(argc, argv, 2);
+
+        if (!options)
+        {
+            return std::nullopt;
+        }
+
+        parsed.command = CliCommand::Search;
+        parsed.search = *options;
 
         return parsed;
     }

@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <string>
 #include <vector>
 
 #include "correlation_summary.hpp"
 #include "line_index.hpp"
+#include "search_query.hpp"
 
 namespace scope::investigation
 {
@@ -22,6 +24,8 @@ struct InvestigationResult
     CorrelationSummary correlations;
     std::uint64_t indexedLineCount{0U};
     std::uint64_t truncatedLineCount{0U};
+    std::string searchQuerySummary;
+    search::SearchMode searchMode{search::SearchMode::Text};
 };
 
 } // namespace scope::investigation

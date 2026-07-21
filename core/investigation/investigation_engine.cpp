@@ -7,8 +7,9 @@
 
 #include <unordered_map>
 
-#include "foundation/string.hpp"
 #include "log_macros.hpp"
+#include "foundation/string.hpp"
+#include "search_engine.hpp"
 
 namespace scope::investigation
 {
@@ -61,50 +62,15 @@ bool InvestigationEngine::searchSource(const analysis::AnalysisModel& model,
     return sourcePath.find(loweredQuery) != std::string::npos;
 }
 
-bool InvestigationEngine::matchesContentSearch(const analysis::IndexedLine& line,
-                                               const std::string_view query) noexcept
-{
-    if (foundation::isBlank(query))
-    {
-        return true;
-    }
-
-    const std::string loweredQuery = foundation::toLower(query);
-    const std::string loweredContent = foundation::toLower(line.contentExcerpt);
-    const std::string loweredMessage = foundation::toLower(line.messageExcerpt);
-
-    return loweredContent.find(loweredQuery) != std::string::npos ||
-           loweredMessage.find(loweredQuery) != std::string::npos;
-}
-
-bool InvestigationEngine::matchesCriteria(const analysis::IndexedLine& line,
-                                          const InvestigationCriteria& criteria) noexcept
-{
-    if (!matchesContentSearch(line, criteria.contentSearch))
-    {
-        return false;
-    }
-
-    if (!criteria.timeRange.matches(line))
-    {
-        return false;
-    }
-
-    if (!criteria.field.matches(line))
-    {
-        return false;
-    }
-
-    return true;
-}
-
 std::vector<analysis::IndexedLine> InvestigationEngine::searchContent(const analysis::AnalysisModel& model,
                                                                       const std::string_view query) const
 {
     InvestigationCriteria criteria;
     criteria.contentSearch = std::string(query);
 
-    return investigate(model, criteria).matchingLines;
+    const auto result = investigate(model, criteria);
+
+    return result.matchingLines;
 }
 
 InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisModel& model,
@@ -121,12 +87,36 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
     result.indexedLineCount = lineIndex.indexedLineCount();
     result.truncatedLineCount = lineIndex.truncatedLineCount();
 
+    const auto resolvedQuery = criteria.resolvedSearchQuery();
+    search::SearchQuery activeQuery = search::SearchQuery::matchAll();
+
+    if (resolvedQuery)
+    {
+        activeQuery = *resolvedQuery;
+        result.searchQuerySummary = activeQuery.toString();
+        result.searchMode = activeQuery.mode();
+    }
+
+    const search::SearchEngine searchEngine;
+
     for (const analysis::IndexedLine& line : lineIndex.lines())
     {
-        if (matchesCriteria(line, criteria))
+        if (!searchEngine.matches(line, activeQuery))
         {
-            result.matchingLines.push_back(line);
+            continue;
         }
+
+        if (!criteria.timeRange.matches(line))
+        {
+            continue;
+        }
+
+        if (!criteria.field.matches(line))
+        {
+            continue;
+        }
+
+        result.matchingLines.push_back(line);
     }
 
     result.correlations = findCorrelations(model);

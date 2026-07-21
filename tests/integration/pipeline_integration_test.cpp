@@ -15,6 +15,7 @@
 #include "reporting.hpp"
 #include "source.hpp"
 #include "workspace.hpp"
+#include "search_history.hpp"
 
 using scope::analysis::AnalysisEngine;
 using scope::analysis::AnalysisModel;
@@ -22,6 +23,7 @@ using scope::analysis::LogLevelCounts;
 using scope::configuration::ConfigurationManager;
 using scope::foundation::Path;
 using scope::investigation::InvestigationCriteria;
+using scope::search::SearchHistory;
 using scope::investigation::InvestigationEngine;
 using scope::investigation::LineCountFilter;
 using scope::investigation::LogLevelFilter;
@@ -240,7 +242,7 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
 
     const InvestigationSession session = InvestigationSession::fromAnalysis(
         model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline",
-        InvestigationCriteria{}, ReportOptions{}, Path());
+        InvestigationCriteria{}, SearchHistory{}, ReportOptions{}, Path());
 
     SessionStore store;
 

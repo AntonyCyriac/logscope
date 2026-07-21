@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.1.0`
+**Current release:** `v1.2.0`
 
 **Completed milestones:**
 
@@ -40,12 +40,13 @@ The project follows architecture-first development. Every implementation should 
 | M4 – Feature Expansion | Analysis depth, sources, reporting, extensions, sessions |
 | M5 – Production Readiness | Benchmarks, fuzz, multi-OS CI, packaging, v1.0.0 release |
 | M6 – Log Format Intelligence | Format detection, JSON Lines, field extraction, content investigation, format profiles (`v1.1.0`) |
+| M7 – Search Engine | Boolean/regex search, `logscope search`, session search history (`v1.2.0`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M7 – Search Engine | `v1.2.0` | Full-text, regex, boolean search (current) |
+| M8 – Advanced Reporting | `v1.3.0` | HTML, PDF, charts (current) |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M6 planning](../planning/M6-LOG-FORMAT-INTELLIGENCE.md), [M7 planning](../planning/M7-SEARCH-ENGINE.md), and [Roadmap](../ROADMAP.md).
 
@@ -318,3 +319,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.0.0 | 21-07-2026 | Initial project context for agent and contributor onboarding. |
 | 1.1.0 | 21-07-2026 | Added post-v1 strategic roadmap and M6→M7 sequence. |
 | 1.2.0 | 21-07-2026 | M6 complete; v1.1.0 released; M7 is next. |
+| 1.3.0 | 21-07-2026 | M7 complete; v1.2.0 released; M8 is next. |

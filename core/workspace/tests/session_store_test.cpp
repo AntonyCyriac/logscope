@@ -9,6 +9,9 @@
 #include <gtest/gtest.h>
 
 #include "workspace.hpp"
+#include "search_history.hpp"
+
+using scope::search::SearchHistory;
 
 using scope::analysis::AnalysisModel;
 using scope::analysis::LogLevelCounts;
@@ -34,7 +37,7 @@ InvestigationSession createSampleSession()
 
     return InvestigationSession::fromAnalysis(
         model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "sample",
-        InvestigationCriteria{}, reportOptions, Path("logscope.properties"));
+        InvestigationCriteria{}, SearchHistory{}, reportOptions, Path("logscope.properties"));
 }
 
 } // namespace
@@ -76,7 +79,8 @@ TEST(SessionStoreTest, RoundTripsContentInvestigationFilters)
     criteria.field = criteria.field.withLevel(scope::analysis::DetectedLogLevel::Error);
 
     const InvestigationSession session = InvestigationSession::fromAnalysis(
-        model, LineCountFilter::any(), LogLevelFilter::any(), "", criteria, reportOptions, Path());
+        model, LineCountFilter::any(), LogLevelFilter::any(), "", criteria, SearchHistory{}, reportOptions,
+        Path());
 
     ASSERT_TRUE(store.save(session, sessionFile).hasValue());
 

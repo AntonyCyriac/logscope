@@ -42,4 +42,17 @@ bool Configuration::has(const std::string& key) const noexcept
     return m_values.find(key) != m_values.end();
 }
 
+std::vector<std::string> Configuration::keys() const
+{
+    std::vector<std::string> keys;
+    keys.reserve(m_values.size());
+
+    for (const auto& entry : m_values)
+    {
+        keys.push_back(entry.first);
+    }
+
+    return keys;
+}
+
 } // namespace scope::runtime

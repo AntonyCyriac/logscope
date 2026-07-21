@@ -14,6 +14,7 @@
 #include "line_count_filter.hpp"
 #include "log_level_filter.hpp"
 #include "report_options.hpp"
+#include "search_history.hpp"
 
 namespace scope::workspace
 {
@@ -33,6 +34,7 @@ class InvestigationSession
                          investigation::LogLevelFilter levelFilter,
                          std::string searchQuery,
                          investigation::InvestigationCriteria contentCriteria,
+                         search::SearchHistory searchHistory,
                          reporting::ReportOptions reportOptions,
                          foundation::Path configFile);
 
@@ -50,6 +52,8 @@ class InvestigationSession
 
     [[nodiscard]] const investigation::InvestigationCriteria& contentCriteria() const noexcept;
 
+    [[nodiscard]] const search::SearchHistory& searchHistory() const noexcept;
+
     [[nodiscard]] const reporting::ReportOptions& reportOptions() const noexcept;
 
     [[nodiscard]] const foundation::Path& configFile() const noexcept;
@@ -62,9 +66,9 @@ class InvestigationSession
                                                            investigation::LogLevelFilter levelFilter,
                                                            std::string searchQuery,
                                                            investigation::InvestigationCriteria contentCriteria,
+                                                           search::SearchHistory searchHistory,
                                                            reporting::ReportOptions reportOptions,
                                                            foundation::Path configFile);
-
   private:
     foundation::Uuid m_sessionId;
     foundation::Path m_sourcePath;
@@ -73,6 +77,7 @@ class InvestigationSession
     investigation::LogLevelFilter m_levelFilter;
     std::string m_searchQuery;
     investigation::InvestigationCriteria m_contentCriteria;
+    search::SearchHistory m_searchHistory;
     reporting::ReportOptions m_reportOptions;
     foundation::Path m_configFile;
 };

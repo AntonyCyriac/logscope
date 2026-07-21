@@ -176,3 +176,12 @@ TEST(CliE2eTest, AnalyzeStdinProducesReport)
     EXPECT_NE(std::string::npos, output.find("Total log lines : 2"));
     EXPECT_NE(std::string::npos, output.find("Error lines     : 1"));
 }
+
+TEST(CliE2eTest, InvestigateQueryFindsMatches)
+{
+    const std::string output = runLogscope("investigate --query \"error AND failed\" " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("Matching lines"));
+}

@@ -66,13 +66,6 @@ class InvestigationEngine
      * @brief Surfaces repeated error messages and shared correlation identifiers.
      */
     [[nodiscard]] CorrelationSummary findCorrelations(const analysis::AnalysisModel& model) const;
-
-  private:
-    [[nodiscard]] static bool matchesContentSearch(const analysis::IndexedLine& line,
-                                                   std::string_view query) noexcept;
-
-    [[nodiscard]] static bool matchesCriteria(const analysis::IndexedLine& line,
-                                              const InvestigationCriteria& criteria) noexcept;
 };
 
 } // namespace scope::investigation

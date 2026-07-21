@@ -28,6 +28,7 @@ enum class CliCommand
     Help,
     Analyze,
     Investigate,
+    Search,
     ConfigValidate,
     ExtensionsList,
     ExtensionsDescribe,
@@ -139,6 +140,7 @@ struct ParsedCli
     CliCommand command = CliCommand::Help;
     AnalyzeOptions analyze;
     InvestigateOptions investigate;
+    InvestigateOptions search;
     ConfigValidateOptions configValidate;
     ExtensionsListOptions extensionsList;
     ExtensionsDescribeOptions extensionsDescribe;

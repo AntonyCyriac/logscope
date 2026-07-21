@@ -7,6 +7,7 @@
 
 #include <string>
 #include <unordered_map>
+#include <vector>
 
 #include "foundation/result.hpp"
 
@@ -42,6 +43,11 @@ class Configuration
      * @return true if the key is present.
      */
     [[nodiscard]] bool has(const std::string& key) const noexcept;
+
+    /**
+     * @brief Returns all configuration keys currently stored.
+     */
+    [[nodiscard]] std::vector<std::string> keys() const;
 
   private:
     std::unordered_map<std::string, std::string> m_values;

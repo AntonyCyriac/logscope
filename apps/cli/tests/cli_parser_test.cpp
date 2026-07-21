@@ -6,6 +6,7 @@
 #include <gtest/gtest.h>
 
 #include "cli_parser.hpp"
+#include "search_query.hpp"
 
 using scope::cli::CliCommand;
 using scope::cli::OutputFormat;
@@ -147,6 +148,41 @@ TEST(CliParserTest, ParsesInvestigateProfileOption)
     ASSERT_TRUE(parsed);
     EXPECT_EQ(CliCommand::Investigate, parsed->command);
     EXPECT_EQ("generic-plain", parsed->investigate.profile);
+}
+
+TEST(CliParserTest, ParsesInvestigateQueryOption)
+{
+    std::string program = "logscope";
+    std::string command = "investigate";
+    std::string queryFlag = "--query";
+    std::string queryValue = "error AND refused";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(queryFlag), toArgv(queryValue), toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Investigate, parsed->command);
+    EXPECT_EQ("error AND refused", parsed->investigate.criteria.booleanQuery);
+}
+
+TEST(CliParserTest, ParsesSearchSubcommandWithRegexFlag)
+{
+    std::string program = "logscope";
+    std::string command = "search";
+    std::string searchFlag = "--search";
+    std::string searchValue = "error.*";
+    std::string regexFlag = "--regex";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program),     toArgv(command), toArgv(searchFlag), toArgv(searchValue),
+                    toArgv(regexFlag),   toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(6, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Search, parsed->command);
+    EXPECT_EQ("error.*", parsed->search.criteria.contentSearch);
+    EXPECT_EQ(scope::search::SearchMode::Regex, parsed->search.criteria.searchMode);
 }
 
 TEST(CliParserTest, ParsesAnalyzeSectionsOption)
