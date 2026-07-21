@@ -40,3 +40,14 @@ TEST(ErrorTest, FileNotFound)
 
     EXPECT_EQ("sample.log", error.message());
 }
+
+TEST(ErrorTest, CopyPreservesState)
+{
+    const Error original(ErrorCode::ParseError, "Malformed input");
+
+    const Error copy(original);
+
+    EXPECT_TRUE(copy.hasError());
+    EXPECT_EQ(ErrorCode::ParseError, copy.code());
+    EXPECT_EQ("Malformed input", copy.message());
+}

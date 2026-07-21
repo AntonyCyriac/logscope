@@ -53,6 +53,12 @@ class Error
      */
     Error(ErrorCode code, std::string message);
 
+    Error(const Error&);
+    Error(Error&&) noexcept;
+    Error& operator=(const Error&);
+    Error& operator=(Error&&) noexcept;
+    ~Error() = default;
+
     /**
      * @brief Returns the error code.
      *
