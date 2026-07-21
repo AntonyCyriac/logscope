@@ -145,7 +145,7 @@ bool skipNumber(std::string_view& input) noexcept
     }
     else
     {
-        if (!std::isdigit(static_cast<unsigned char>(input.front())) != 0)
+        if (std::isdigit(static_cast<unsigned char>(input.front())) == 0)
         {
             return false;
         }
