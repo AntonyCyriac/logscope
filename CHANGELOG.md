@@ -10,6 +10,12 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [1.1.0] - 2026-07-21
+
+M6 – Log Format Intelligence complete. Extends analysis with format detection, JSON Lines parsing, field extraction, content-aware investigation, and configuration-driven format profiles. 296 automated tests.
+
 ### Added
 
 - Post-v1 strategic roadmap (`POST_V1_STRATEGIC_ROADMAP.md`) with 10-phase vision, M6–M17 milestone mapping, and version targets.
@@ -18,6 +24,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - M6.2 JSON Lines parsing: per-line JSON validation, `JsonLinesSummary` stats (valid lines, parse failures, top-level keys), field-aware level mapping, and `samples/sample.jsonl`.
 - M6.3 field extraction: `FieldSummary` with time range and top message patterns; plain-text timestamp prefixes; JSON `timestamp`/`message` fields (hand-rolled parser extended; nlohmann/json deferred).
 - M6.4 content-aware investigation: bounded `LineIndex`, `searchContent`, `TimeRangeFilter`, `FieldFilter`, correlation summary, `investigate` CLI subcommand, and session serializer v1.1 content filter persistence.
+- M6.5 format profiles: `AnalysisConfig`, built-in profiles (`generic-plain`, `generic-json`), configuration keys (`source.format`, `source.json.timestamp_field`, `source.json.level_field`, `investigation.max_indexed_lines`), CLI `--profile`, `config validate` extensions, and `FormatParser` interface.
 
 ### Fixed
 

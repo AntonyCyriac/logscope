@@ -56,10 +56,22 @@ class LineIndex
 
     [[nodiscard]] std::uint64_t truncatedLineCount() const noexcept;
 
+    [[nodiscard]] std::size_t capacity() const noexcept;
+
   private:
+    explicit LineIndex(std::size_t capacity) noexcept;
+
     std::vector<IndexedLine> m_lines;
     std::uint64_t m_truncatedLines{0U};
+    std::size_t m_capacity{maxIndexedLines};
+
+    friend LineIndex makeLineIndex(std::size_t capacity) noexcept;
 };
+
+/**
+ * @brief Creates a line index with the requested capacity.
+ */
+[[nodiscard]] LineIndex makeLineIndex(std::size_t capacity = maxIndexedLines) noexcept;
 
 /**
  * @brief Truncates text to a maximum length.

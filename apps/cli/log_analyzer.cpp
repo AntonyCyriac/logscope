@@ -16,7 +16,7 @@ namespace scope::cli
 
 bool LogAnalyzer::analyze(const foundation::Path& filePath,
                           const reporting::ReportOptions& reportOptions,
-                          const analysis::LogFormat logFormat,
+                          const scope::analysis::AnalysisConfig& analysisConfig,
                           std::ostream& output,
                           std::ostream& errorOutput)
 {
@@ -37,7 +37,7 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
 
     scope::analysis::AnalysisEngine analysisEngine;
 
-    auto modelResult = analysisEngine.analyze(*datasetResult, logFormat);
+    auto modelResult = analysisEngine.analyze(*datasetResult, analysisConfig);
 
     if (!modelResult)
     {

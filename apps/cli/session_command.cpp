@@ -6,6 +6,7 @@
 #include "session_command.hpp"
 
 #include "analysis.hpp"
+#include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 #include "extension.hpp"
 #include "investigation.hpp"
@@ -119,7 +120,8 @@ int runSessionSaveCommand(const SessionSaveOptions& options,
         return 1;
     }
 
-    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult);
+    const scope::analysis::AnalysisConfig analysisConfig = buildAnalysisConfig(options, configurationManager);
+    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig);
 
     if (!modelResult)
     {
@@ -186,7 +188,10 @@ int runSessionLoadCommand(const SessionLoadOptions& options, std::ostream& outpu
 
         if (auto datasetResult = sourceManager.open(session.sourcePath()))
         {
-            if (auto refreshedModel = scope::analysis::AnalysisEngine{}.analyze(*datasetResult))
+            const scope::analysis::AnalysisConfig analysisConfig =
+                scope::analysis::AnalysisConfig::defaults();
+
+            if (auto refreshedModel = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig))
             {
                 model = *refreshedModel;
             }

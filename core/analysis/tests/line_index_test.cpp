@@ -9,11 +9,12 @@
 
 using scope::analysis::IndexedLine;
 using scope::analysis::LineIndex;
+using scope::analysis::makeLineIndex;
 using scope::analysis::maxIndexedLines;
 
 TEST(LineIndexTest, StoresLinesUntilCapacity)
 {
-    LineIndex index;
+    LineIndex index = makeLineIndex(maxIndexedLines);
 
     for (std::size_t lineNumber = 1U; lineNumber <= maxIndexedLines; ++lineNumber)
     {

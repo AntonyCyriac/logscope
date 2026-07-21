@@ -1,4 +1,5 @@
 add_executable(scope_analysis_tests
+    analysis_config_test.cpp
     analysis_engine_test.cpp
     analysis_model_test.cpp
     format_detector_test.cpp

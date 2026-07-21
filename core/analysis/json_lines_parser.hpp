@@ -9,6 +9,7 @@
 #include <string_view>
 #include <vector>
 
+#include "json_field_mapping.hpp"
 #include "log_line_classifier.hpp"
 
 namespace scope::analysis
@@ -60,6 +61,12 @@ class JsonLinesParser
      * @param line Line content without trailing newline.
      */
     [[nodiscard]] static JsonLineParseResult parse(std::string_view line) noexcept;
+
+    /**
+     * @brief Parses a single line using configurable field mapping.
+     */
+    [[nodiscard]] static JsonLineParseResult parse(std::string_view line,
+                                                 const JsonFieldMapping& mapping) noexcept;
 };
 
 /**

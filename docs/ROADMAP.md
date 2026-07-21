@@ -32,7 +32,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | ✅ Complete | First stable production release. |
-| **M6 – Log Format Intelligence** | 🔄 In Progress | Format detection, structured parsing, field extraction, content investigation, format profiles. Target: `v1.1.0`. |
+| **M6 – Log Format Intelligence** | ✅ Complete | Format detection, structured parsing, field extraction, content investigation, format profiles. Released as `v1.1.0`. |
 | **M7 – Search Engine** | ⏳ Planned | Full-text, regex, boolean search; saved searches; time/field filters. Target: `v1.2.0`. |
 | **M8 – Advanced Reporting** | ⏳ Planned | HTML, PDF, charts, executive summaries. Target: `v1.3.0`. |
 | **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
@@ -56,10 +56,10 @@ M2  ██████████ 100%
 M3  ██████████ 100%
 M4  ██████████ 100%
 M5  ██████████ 100%
-M6  ████████░░  80%  (M6.4 complete; M6.5 next)
+M6  ██████████ 100%  (v1.1.0 released)
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
 ---
 
@@ -371,7 +371,7 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 | M6.2 | JSON Lines parsing | FR-001.1, FR-001.3 | ✅ Complete |
 | M6.3 | Timestamp and field extraction | FR-001.3 | ✅ Complete |
 | M6.4 | Content-aware investigation | FR-002.1, FR-002.2, FR-002.4 | ✅ Complete |
-| M6.5 | Format profiles and configuration | FR-004.1 | 🔄 Next |
+| M6.5 | Format profiles and configuration | FR-004.1 | ✅ Complete |
 
 ### Focus areas
 
@@ -451,3 +451,4 @@ The roadmap is considered successful when:
 | 2.8.0 | 18-07-2026 | v1.0.0 first stable production release. |
 | 2.9.0 | 18-07-2026 | Added M6 phased roadmap (M6.1–M6.5) and planning document link; target v1.1.0. |
 | 3.0.0 | 21-07-2026 | Added post-v1 strategic roadmap; M7–M17 milestone table and version evolution. |
+| 3.1.0 | 21-07-2026 | M6 complete; v1.1.0 released with format profiles and configuration. |

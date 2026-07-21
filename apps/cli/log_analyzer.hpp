@@ -7,8 +7,8 @@
 
 #include <iosfwd>
 
+#include "analysis.hpp"
 #include "foundation/path.hpp"
-#include "log_format.hpp"
 #include "report_options.hpp"
 
 namespace scope::cli
@@ -22,17 +22,10 @@ class LogAnalyzer
   public:
     /**
      * @brief Analyzes the log source at the given path.
-     *
-     * @param filePath Path to the log source.
-     * @param reportOptions Report format and section selection.
-     * @param logFormat Input format hint (auto detects by default).
-     * @param output Stream that receives formatted output.
-     * @param errorOutput Stream that receives actionable error messages.
-     * @return true if analysis succeeded.
      */
     bool analyze(const foundation::Path& filePath,
                  const reporting::ReportOptions& reportOptions,
-                 analysis::LogFormat logFormat,
+                 const scope::analysis::AnalysisConfig& analysisConfig,
                  std::ostream& output,
                  std::ostream& errorOutput);
 };

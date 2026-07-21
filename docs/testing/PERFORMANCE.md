@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Performance Baselines |
 | Category | Testing |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 18-07-2026 |
@@ -76,7 +76,7 @@ Content-aware investigation stores a bounded per-line index during analysis:
 
 | Limit | Value | Location |
 |-------|-------|----------|
-| Indexed lines per source | 10,000 | `maxIndexedLines` in `line_index.hpp` |
+| Indexed lines per source | 10,000 (default; configurable via `investigation.max_indexed_lines`, max 1,000,000) | `maxIndexedLines` in `line_index.hpp`; `AnalysisConfig` |
 | Line content excerpt length | 256 characters | `maxLineContentExcerptLength` in `line_index.hpp` |
 
 Lines beyond the index cap are counted in `truncatedLineCount` but are not searchable without re-reading the source. Session files persist content filter state (serializer v1.1) rather than the full index; `session load` re-analyzes the source when content filters are active.
@@ -94,3 +94,4 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial performance baseline documentation. |
+| 1.1.0 | 21-07-2026 | Documented configurable investigation index cap (M6.5). |

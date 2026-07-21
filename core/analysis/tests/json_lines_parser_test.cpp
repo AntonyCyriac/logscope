@@ -5,6 +5,7 @@
 
 #include <gtest/gtest.h>
 
+#include "json_field_mapping.hpp"
 #include "json_lines_parser.hpp"
 
 using scope::analysis::DetectedLogLevel;
@@ -71,6 +72,20 @@ TEST(JsonLinesParserTest, RejectsTrailingContent)
     const auto result = JsonLinesParser::parse(R"({"level":"info"} extra)");
 
     EXPECT_EQ(JsonLineParseOutcome::Invalid, result.outcome);
+}
+
+TEST(JsonLinesParserTest, UsesConfiguredFieldMapping)
+{
+    scope::analysis::JsonFieldMapping mapping;
+    mapping.timestampField = "@ts";
+    mapping.levelField = "severity";
+
+    const auto result = JsonLinesParser::parse(R"({"@ts":"2026-07-21T10:00:01Z","severity":"error","message":"fail"})",
+                                             mapping);
+
+    ASSERT_EQ(JsonLineParseOutcome::Valid, result.outcome);
+    EXPECT_EQ("2026-07-21T10:00:01Z", result.timestampValue);
+    EXPECT_EQ("error", result.levelValue);
 }
 
 TEST(JsonLinesParserTest, MapsJsonLevelValues)

@@ -9,6 +9,7 @@
 #include <optional>
 #include <vector>
 
+#include "analysis_config.hpp"
 #include "field_summary.hpp"
 #include "format_detector.hpp"
 #include "foundation/error.hpp"
@@ -122,9 +123,10 @@ void analyzePlainTextLine(const std::string& line, const std::uint64_t lineNumbe
 }
 
 void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, LogLevelCounts& levelCounts,
-                     JsonLinesSummary& summary, FieldSummary& fieldSummary, LineIndex& lineIndex) noexcept
+                     JsonLinesSummary& summary, FieldSummary& fieldSummary, LineIndex& lineIndex,
+                     const JsonFieldMapping& mapping) noexcept
 {
-    const JsonLineParseResult parsed = JsonLinesParser::parse(line);
+    const JsonLineParseResult parsed = JsonLinesParser::parse(line, mapping);
 
     if (parsed.outcome == JsonLineParseOutcome::Blank)
     {
@@ -183,11 +185,11 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
 
 void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
                  LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary, FieldSummary& fieldSummary,
-                 LineIndex& lineIndex) noexcept
+                 LineIndex& lineIndex, const JsonFieldMapping& mapping) noexcept
 {
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
-        analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, lineIndex);
+        analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, lineIndex, mapping);
 
         return;
     }
@@ -227,10 +229,7 @@ void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const 
     return foundation::Result<LogFormat>(formatHint);
 }
 
-} // namespace
-
-foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset,
-                                                          const LogFormat formatHint) const
+foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset, const AnalysisConfig& config)
 {
     if (!dataset.isValid())
     {
@@ -266,7 +265,7 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
     }
 
     const FormatDetectionResult detection = FormatDetector::detect(sampleLines);
-    const auto formatResult = resolveFormat(detection, formatHint);
+    const auto formatResult = resolveFormat(detection, config.formatHint);
 
     if (!formatResult)
     {
@@ -284,7 +283,7 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
     std::uint64_t totalLines = 0;
     LogLevelCounts levelCounts;
     FieldSummary fieldSummary;
-    LineIndex lineIndex;
+    LineIndex lineIndex = makeLineIndex(config.maxIndexedLines);
     std::optional<JsonLinesSummary> jsonLinesSummary;
 
     if (resolvedFormat == LogFormat::JsonLines)
@@ -297,7 +296,8 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
     for (const std::string& sampleLine : sampleLines)
     {
         ++totalLines;
-        analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex);
+        analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex,
+                    config.jsonFieldMapping);
     }
 
     while (true)
@@ -317,7 +317,8 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
         }
 
         ++totalLines;
-        analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex);
+        analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex,
+                    config.jsonFieldMapping);
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
@@ -329,6 +330,23 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
                                                            std::move(jsonLinesSummary),
                                                            std::make_optional(std::move(fieldSummary)),
                                                            std::make_optional(std::move(lineIndex))));
+}
+
+} // namespace
+
+foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset,
+                                                          const AnalysisConfig& config) const
+{
+    return analyzeDataset(dataset, config);
+}
+
+foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset,
+                                                          const LogFormat formatHint) const
+{
+    AnalysisConfig config = AnalysisConfig::defaults();
+    config.formatHint = formatHint;
+
+    return analyzeDataset(dataset, config);
 }
 
 } // namespace scope::analysis
