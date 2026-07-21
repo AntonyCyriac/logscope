@@ -4,14 +4,14 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 21-07-2026 |
 
 ---
 
-> **Usage:** Attach or reference this file at the start of a new Cursor session so the assistant begins with the same engineering mindset and project constraints established for LogScope.
+> **Usage:** Attach or reference this file at the start of a new agent session so the assistant begins with the same engineering mindset and project constraints established for LogScope.
 
 ---
 
@@ -40,7 +40,14 @@ The project follows architecture-first development. Every implementation should 
 | M4 – Feature Expansion | Analysis depth, sources, reporting, extensions, sessions |
 | M5 – Production Readiness | Benchmarks, fuzz, multi-OS CI, packaging, v1.0.0 release |
 
-**Planned:** M6 – Log Format Intelligence (target `v1.1.0`). See [M6 planning](../planning/M6-LOG-FORMAT-INTELLIGENCE.md) and [Roadmap](../ROADMAP.md).
+**Planned:**
+
+| Milestone | Target | Focus |
+|-----------|--------|-------|
+| M6 – Log Format Intelligence | `v1.1.0` | Format detection, JSON Lines, field extraction (current) |
+| M7 – Search Engine | `v1.2.0` | Full-text, regex, boolean search (next) |
+
+See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M6 planning](../planning/M6-LOG-FORMAT-INTELLIGENCE.md), [M7 planning](../planning/M7-SEARCH-ENGINE.md), and [Roadmap](../ROADMAP.md).
 
 The engineering foundation is complete. Future work should **extend** the product rather than redesign the infrastructure.
 
@@ -296,6 +303,7 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
+| [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |
 | [CLI Reference](CLI_REFERENCE.md) | CLI commands and flags |
 | [TESTING.md](../testing/TESTING.md) | Test layout and CI jobs |
@@ -307,4 +315,5 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 1.0.0 | 21-07-2026 | Initial project context for Cursor and contributor onboarding. |
+| 1.0.0 | 21-07-2026 | Initial project context for agent and contributor onboarding. |
+| 1.1.0 | 21-07-2026 | Added post-v1 strategic roadmap and M6→M7 sequence. |

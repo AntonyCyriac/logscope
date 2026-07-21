@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 1.8.0 |
+| Version | 1.9.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 21-07-2026 |
 
 ---
 
@@ -72,9 +72,11 @@ docs/
 ├── ROADMAP.md
 │
 ├── planning/
+│   ├── POST_V1_STRATEGIC_ROADMAP.md
 │   ├── M4-FEATURE-EXPANSION.md
 │   ├── M5-PRODUCTION-READINESS.md
-│   └── M6-LOG-FORMAT-INTELLIGENCE.md
+│   ├── M6-LOG-FORMAT-INTELLIGENCE.md
+│   └── M7-SEARCH-ENGINE.md
 │
 ├── testing/
 │   └── PERFORMANCE.md
@@ -139,26 +141,28 @@ Developers new to LogScope should read the documentation in the following order.
 
 | Step | Document | Purpose |
 |------|----------|---------|
-| 0 | PROJECT_CONTEXT.md | Cursor / AI session bootstrap; engineering mindset and constraints. |
+| 0 | PROJECT_CONTEXT.md | Agent session bootstrap; engineering mindset and constraints. |
 | 1 | ROADMAP.md | Understand the project milestones and current development phase. |
-| 2 | M6-LOG-FORMAT-INTELLIGENCE.md | Understand the M6 log format intelligence plan (current phase). |
-| 3 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
-| 4 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
-| 5 | PROJECT_CHARTER.md | Understand why LogScope exists. |
-| 6 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
-| 7 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
-| 8 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
-| 9 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
-| 10 | Functional Requirements | Understand the required capabilities. |
-| 11 | NFR-001 – Quality Attributes | Understand the quality expectations. |
-| 12 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
-| 13 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
-| 14 | COMPONENT_CATALOG.md | Understand component responsibilities. |
-| 15 | DOMAIN_MODEL.md | Understand the primary business concepts. |
-| 16 | DATA_FLOW.md | Understand how information moves through the system. |
-| 16 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
-| 17 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
-| 18 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
+| 2 | POST_V1_STRATEGIC_ROADMAP.md | Understand the long-term post-v1 vision and version targets. |
+| 3 | M6-LOG-FORMAT-INTELLIGENCE.md | Understand the M6 log format intelligence plan (current phase). |
+| 4 | M7-SEARCH-ENGINE.md | Understand the planned M7 search engine (next after M6). |
+| 5 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
+| 6 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
+| 7 | PROJECT_CHARTER.md | Understand why LogScope exists. |
+| 8 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
+| 9 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
+| 10 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
+| 11 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
+| 12 | Functional Requirements | Understand the required capabilities. |
+| 13 | NFR-001 – Quality Attributes | Understand the quality expectations. |
+| 14 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
+| 15 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
+| 16 | COMPONENT_CATALOG.md | Understand component responsibilities. |
+| 17 | DOMAIN_MODEL.md | Understand the primary business concepts. |
+| 18 | DATA_FLOW.md | Understand how information moves through the system. |
+| 19 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
+| 20 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
+| 21 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 
 ---
 
@@ -277,4 +281,5 @@ These categories should be added only when they provide clear value and support 
 | 1.5.0 | 18-07-2026 | Added planning/ directory and M4-FEATURE-EXPANSION.md to structure and reading order. |
 | 1.6.0 | 18-07-2026 | Added M5 planning, testing/, release/, SECURITY_REVIEW, and ADR-002. |
 | 1.7.0 | 18-07-2026 | Added M6-LOG-FORMAT-INTELLIGENCE.md; updated reading order for current phase. |
-| 1.8.0 | 21-07-2026 | Added PROJECT_CONTEXT.md for Cursor session bootstrap. |
+| 1.8.0 | 21-07-2026 | Added PROJECT_CONTEXT.md for agent session bootstrap. |
+| 1.9.0 | 21-07-2026 | Added POST_V1_STRATEGIC_ROADMAP.md and M7-SEARCH-ENGINE.md; updated reading order. |
