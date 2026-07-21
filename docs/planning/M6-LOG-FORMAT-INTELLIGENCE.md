@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M6 – Log Format Intelligence |
 | Category | Project Planning |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | In Progress |
 | Created | 18-07-2026 |
 | Last Updated | 21-07-2026 |
@@ -150,7 +150,7 @@ Introduce a format identification layer before analysis:
 
 ## M6.2 – JSON Lines Parsing
 
-**Status:** 🔄 In progress (`feat/m6.2-json-lines`)
+**Status:** ✅ Complete (merged via PR #29)
 
 **Primary FR:** FR-001.1, FR-001.3
 
@@ -174,7 +174,11 @@ Add first-class support for newline-delimited JSON (NDJSON / JSON Lines):
 
 ## M6.3 – Timestamp and Field Extraction
 
+**Status:** 🔄 Next (`feat/m6.3-field-extraction`)
+
 **Primary FR:** FR-001.3
+
+**Note:** Evaluate adopting [nlohmann/json](https://github.com/nlohmann/json) via CMake `FetchContent` if field extraction outgrows the M6.2 hand-rolled parser; otherwise extend `json_lines_parser` for deeper key paths.
 
 Enrich the analysis model with generic, format-aware fields:
 
@@ -302,3 +306,4 @@ The following remain out of scope for M6:
 | 1.1.0 | 21-07-2026 | M6.1 format detection implementation in progress. |
 | 1.2.0 | 21-07-2026 | M6.1 complete; M6.2 JSON Lines parsing is next. |
 | 1.3.0 | 21-07-2026 | M6.2 JSON Lines parsing implementation in progress. |
+| 1.4.0 | 21-07-2026 | M6.2 complete; M6.3 field extraction is next (nlohmann/json evaluation planned). |
