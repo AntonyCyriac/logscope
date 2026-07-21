@@ -7,6 +7,7 @@ add_executable(scope_analysis_tests
     log_line_classifier_test.cpp
     plain_text_field_extractor_test.cpp
     field_summary_test.cpp
+    line_index_test.cpp
 )
 
 target_link_libraries(scope_analysis_tests

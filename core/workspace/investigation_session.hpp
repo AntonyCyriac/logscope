@@ -10,6 +10,7 @@
 #include "analysis_model.hpp"
 #include "foundation/path.hpp"
 #include "foundation/uuid.hpp"
+#include "investigation_criteria.hpp"
 #include "line_count_filter.hpp"
 #include "log_level_filter.hpp"
 #include "report_options.hpp"
@@ -31,6 +32,7 @@ class InvestigationSession
                          investigation::LineCountFilter lineFilter,
                          investigation::LogLevelFilter levelFilter,
                          std::string searchQuery,
+                         investigation::InvestigationCriteria contentCriteria,
                          reporting::ReportOptions reportOptions,
                          foundation::Path configFile);
 
@@ -46,6 +48,8 @@ class InvestigationSession
 
     [[nodiscard]] const std::string& searchQuery() const noexcept;
 
+    [[nodiscard]] const investigation::InvestigationCriteria& contentCriteria() const noexcept;
+
     [[nodiscard]] const reporting::ReportOptions& reportOptions() const noexcept;
 
     [[nodiscard]] const foundation::Path& configFile() const noexcept;
@@ -57,6 +61,7 @@ class InvestigationSession
                                                            investigation::LineCountFilter lineFilter,
                                                            investigation::LogLevelFilter levelFilter,
                                                            std::string searchQuery,
+                                                           investigation::InvestigationCriteria contentCriteria,
                                                            reporting::ReportOptions reportOptions,
                                                            foundation::Path configFile);
 
@@ -67,6 +72,7 @@ class InvestigationSession
     investigation::LineCountFilter m_lineFilter;
     investigation::LogLevelFilter m_levelFilter;
     std::string m_searchQuery;
+    investigation::InvestigationCriteria m_contentCriteria;
     reporting::ReportOptions m_reportOptions;
     foundation::Path m_configFile;
 };

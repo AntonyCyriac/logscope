@@ -70,6 +70,19 @@ Timestamp min/max tracking is O(1) per line. `BM_AnalysisEngine` remains the pri
 
 ---
 
+# Investigation Index Bounds (M6.4)
+
+Content-aware investigation stores a bounded per-line index during analysis:
+
+| Limit | Value | Location |
+|-------|-------|----------|
+| Indexed lines per source | 10,000 | `maxIndexedLines` in `line_index.hpp` |
+| Line content excerpt length | 256 characters | `maxLineContentExcerptLength` in `line_index.hpp` |
+
+Lines beyond the index cap are counted in `truncatedLineCount` but are not searchable without re-reading the source. Session files persist content filter state (serializer v1.1) rather than the full index; `session load` re-analyzes the source when content filters are active.
+
+---
+
 # CI Integration
 
 The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non-gating initially) and compares `BM_AnalysisEngine` throughput against `baseline.json` with a 20% tolerance.

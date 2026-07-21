@@ -198,6 +198,42 @@ TEST(CliParserTest, ParsesSessionLoadSubcommand)
     EXPECT_EQ("sample.logscope-session", parsed->sessionLoad.sessionFile.string());
 }
 
+TEST(CliParserTest, ParsesInvestigateSubcommand)
+{
+    std::string program = "logscope";
+    std::string command = "investigate";
+    std::string searchFlag = "--search";
+    std::string searchValue = "refused";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(searchFlag), toArgv(searchValue), toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Investigate, parsed->command);
+    EXPECT_EQ("sample.log", parsed->investigate.logFile.string());
+    EXPECT_EQ("refused", parsed->investigate.criteria.contentSearch);
+}
+
+TEST(CliParserTest, ParsesSessionSaveContentSearch)
+{
+    std::string program = "logscope";
+    std::string command = "session";
+    std::string subcommand = "save";
+    std::string sessionFile = "sample.logscope-session";
+    std::string logFile = "sample.log";
+    std::string contentSearchFlag = "--content-search";
+    std::string contentSearchValue = "timeout";
+    char* argv[] = {toArgv(program),     toArgv(command),           toArgv(subcommand), toArgv(sessionFile),
+                    toArgv(logFile),     toArgv(contentSearchFlag), toArgv(contentSearchValue)};
+
+    const auto parsed = parseCliArguments(7, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::SessionSave, parsed->command);
+    EXPECT_EQ("timeout", parsed->sessionSave.contentCriteria.contentSearch);
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

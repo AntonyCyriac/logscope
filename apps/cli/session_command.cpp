@@ -9,6 +9,7 @@
 #include "cli_config.hpp"
 #include "extension.hpp"
 #include "investigation.hpp"
+#include "investigation_output.hpp"
 #include "log_macros.hpp"
 #include "report_config.hpp"
 #include "report_output.hpp"
@@ -55,6 +56,12 @@ void printSessionSaveUsage(std::ostream& output)
            << "  --min-lines <n>       Investigation filter: minimum total lines\n"
            << "  --max-lines <n>       Investigation filter: maximum total lines\n"
            << "  --search <query>      Investigation search query for source path\n"
+           << "  --content-search <q>  Search indexed log line content\n"
+           << "  --time-from <ts>      Earliest timestamp filter (ISO-like)\n"
+           << "  --time-to <ts>        Latest timestamp filter (ISO-like)\n"
+           << "  --level <name>        Per-line level filter: error, warning, info, other\n"
+           << "  --message <text>      Message/content substring filter\n"
+           << "  --json-key <key>      Require JSON top-level key on matching lines\n"
            << "  --help, -h            Show this help message\n";
 }
 
@@ -131,8 +138,8 @@ int runSessionSaveCommand(const SessionSaveOptions& options,
     const reporting::ReportOptions reportOptions = buildReportOptions(analyzeOptions, configurationManager);
 
     const scope::workspace::InvestigationSession session = scope::workspace::InvestigationSession::fromAnalysis(
-        *modelResult, buildLineFilter(options), buildLevelFilter(options), options.searchQuery, reportOptions,
-        options.configFile);
+        *modelResult, buildLineFilter(options), buildLevelFilter(options), options.searchQuery,
+        options.contentCriteria, reportOptions, options.configFile);
 
     const scope::workspace::SessionStore store;
 
@@ -171,7 +178,20 @@ int runSessionLoadCommand(const SessionLoadOptions& options, std::ostream& outpu
     }
 
     const scope::workspace::InvestigationSession& session = *sessionResult;
-    const analysis::AnalysisModel& model = session.analysisModel();
+    analysis::AnalysisModel model = session.analysisModel();
+
+    if (session.contentCriteria().isActive())
+    {
+        scope::source::SourceManager sourceManager;
+
+        if (auto datasetResult = sourceManager.open(session.sourcePath()))
+        {
+            if (auto refreshedModel = scope::analysis::AnalysisEngine{}.analyze(*datasetResult))
+            {
+                model = *refreshedModel;
+            }
+        }
+    }
 
     scope::investigation::InvestigationEngine investigationEngine;
 
@@ -182,9 +202,17 @@ int runSessionLoadCommand(const SessionLoadOptions& options, std::ostream& outpu
 
     output << "Session ID  : " << session.sessionId().toString() << '\n'
            << "Source      : " << session.sourcePath().string() << '\n'
-           << "Matches     : " << (matchesFilters ? "yes" : "no") << '\n'
-           << '\n'
-           << formatAnalysisOutput(model, session.reportOptions()) << std::endl;
+           << "Matches     : " << (matchesFilters ? "yes" : "no") << '\n';
+
+    if (session.contentCriteria().isActive())
+    {
+        const scope::investigation::InvestigationResult investigationResult =
+            investigationEngine.investigate(model, session.contentCriteria());
+
+        output << '\n' << formatInvestigationOutput(investigationResult, OutputFormat::Text) << '\n';
+    }
+
+    output << '\n' << formatAnalysisOutput(model, session.reportOptions()) << std::endl;
 
     return 0;
 }

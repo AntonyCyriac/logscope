@@ -11,6 +11,7 @@
 #include "format_detector.hpp"
 #include "json_lines_parser.hpp"
 #include "json_lines_summary.hpp"
+#include "line_index.hpp"
 #include "log_format.hpp"
 #include "log_level_counts.hpp"
 #include "log_line_classifier.hpp"

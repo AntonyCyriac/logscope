@@ -21,6 +21,7 @@ using scope::analysis::AnalysisModel;
 using scope::analysis::LogLevelCounts;
 using scope::configuration::ConfigurationManager;
 using scope::foundation::Path;
+using scope::investigation::InvestigationCriteria;
 using scope::investigation::InvestigationEngine;
 using scope::investigation::LineCountFilter;
 using scope::investigation::LogLevelFilter;
@@ -238,8 +239,8 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
     const AnalysisModel model(m_testFile, 8U, levelCounts);
 
     const InvestigationSession session = InvestigationSession::fromAnalysis(
-        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline", ReportOptions{},
-        Path());
+        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline",
+        InvestigationCriteria{}, ReportOptions{}, Path());
 
     SessionStore store;
 
