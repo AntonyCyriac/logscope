@@ -25,13 +25,13 @@ Result<T>::Result(T&& value)
 
 template <typename T>
 Result<T>::Result(const Error& error)
-    : m_result(error)
+    : m_result(std::in_place_type<Error>, error)
 {
 }
 
 template <typename T>
 Result<T>::Result(Error&& error)
-    : m_result(std::move(error))
+    : m_result(std::in_place_type<Error>, std::move(error))
 {
 }
 
