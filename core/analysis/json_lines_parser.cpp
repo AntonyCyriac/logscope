@@ -8,6 +8,7 @@
 #include <cctype>
 
 #include "foundation/string.hpp"
+#include "json_field_mapping.hpp"
 
 namespace scope::analysis
 {
@@ -343,7 +344,28 @@ bool tryAssignStringField(std::string& destination, std::string_view& input) noe
     return true;
 }
 
-bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& input) noexcept
+bool matchesLevelKey(const std::string_view key, const JsonFieldMapping& mapping) noexcept
+{
+    if (mapping.hasLevelOverride())
+    {
+        return key == mapping.levelField;
+    }
+
+    return key == "level" || key == "severity";
+}
+
+bool matchesTimestampKey(const std::string_view key, const JsonFieldMapping& mapping) noexcept
+{
+    if (mapping.hasTimestampOverride())
+    {
+        return key == mapping.timestampField;
+    }
+
+    return key == "timestamp" || key == "time" || key == "@timestamp";
+}
+
+bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& input,
+                               const JsonFieldMapping& mapping) noexcept
 {
     if (!skipWhitespace(input) || input.empty() || input.front() != '{')
     {
@@ -376,7 +398,7 @@ bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& in
             return false;
         }
 
-        if (nestedKey == "level")
+        if (matchesLevelKey(nestedKey, mapping))
         {
             if (!tryAssignStringField(result.levelValue, input))
             {
@@ -417,14 +439,15 @@ bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& in
     }
 }
 
-bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view key, std::string_view& input) noexcept
+bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view key, std::string_view& input,
+                          const JsonFieldMapping& mapping) noexcept
 {
-    if (key == "level" || key == "severity")
+    if (matchesLevelKey(key, mapping))
     {
         return tryAssignStringField(result.levelValue, input);
     }
 
-    if (key == "timestamp" || key == "time" || key == "@timestamp")
+    if (matchesTimestampKey(key, mapping))
     {
         return tryAssignStringField(result.timestampValue, input);
     }
@@ -442,13 +465,14 @@ bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view ke
 
     if (key == "log")
     {
-        return tryCaptureNestedLogObject(result, input);
+        return tryCaptureNestedLogObject(result, input, mapping);
     }
 
     return skipJsonValue(input);
 }
 
-bool parseTopLevelObject(std::string_view& input, JsonLineParseResult& result) noexcept
+bool parseTopLevelObject(std::string_view& input, JsonLineParseResult& result,
+                         const JsonFieldMapping& mapping) noexcept
 {
     if (!skipLiteral(input, "{"))
     {
@@ -483,7 +507,7 @@ bool parseTopLevelObject(std::string_view& input, JsonLineParseResult& result) n
             return false;
         }
 
-        if (!tryCaptureKnownField(result, key, input))
+        if (!tryCaptureKnownField(result, key, input, mapping))
         {
             return false;
         }
@@ -516,6 +540,12 @@ bool parseTopLevelObject(std::string_view& input, JsonLineParseResult& result) n
 
 JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
 {
+    return parse(line, JsonFieldMapping{});
+}
+
+JsonLineParseResult JsonLinesParser::parse(const std::string_view line,
+                                           const JsonFieldMapping& mapping) noexcept
+{
     JsonLineParseResult result;
 
     std::string_view trimmed = line;
@@ -528,7 +558,7 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
         return result;
     }
 
-    if (!parseTopLevelObject(trimmed, result))
+    if (!parseTopLevelObject(trimmed, result, mapping))
     {
         result.outcome = JsonLineParseOutcome::Invalid;
         result.topLevelKeys.clear();

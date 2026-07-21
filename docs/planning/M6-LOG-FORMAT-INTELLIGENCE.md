@@ -226,7 +226,7 @@ Replace path-only search with log-content investigation:
 
 ## M6.5 – Format Profiles and Configuration
 
-**Status:** 🔄 Next (`feat/m6.5-format-profiles`)
+**Status:** ✅ Complete
 
 **Primary FR:** FR-004.1, FR-001.2
 
@@ -313,3 +313,4 @@ The following remain out of scope for M6:
 | 1.4.0 | 21-07-2026 | M6.2 complete; M6.3 field extraction is next (nlohmann/json evaluation planned). |
 | 1.5.0 | 21-07-2026 | M6.3 complete; M6.4 content-aware investigation is next. |
 | 1.6.0 | 21-07-2026 | M6.4 complete; M6.5 format profiles is next. |
+| 1.7.0 | 21-07-2026 | M6.5 complete; M6 milestone complete; v1.1.0 released. |

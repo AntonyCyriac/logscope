@@ -6,6 +6,7 @@
 #include "investigate_command.hpp"
 
 #include "analysis.hpp"
+#include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 #include "extension.hpp"
 #include "investigation.hpp"
@@ -19,7 +20,7 @@ namespace scope::cli
 void printInvestigateUsage(std::ostream& output)
 {
     output << "Usage: logscope investigate [--config <file>] [--format text|json] "
-              "[--log-format auto|plain|jsonl] [investigation options] <log-source>\n"
+              "[--log-format auto|plain|jsonl] [--profile <name>] [investigation options] <log-source>\n"
            << "\n"
            << "Investigation options:\n"
            << "  --search <query>        Search indexed log line content\n"
@@ -66,7 +67,8 @@ int runInvestigateCommand(const InvestigateOptions& options,
         return 1;
     }
 
-    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, options.logFormat);
+    const scope::analysis::AnalysisConfig analysisConfig = buildAnalysisConfig(options, configurationManager);
+    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig);
 
     if (!modelResult)
     {

@@ -45,6 +45,7 @@ struct AnalyzeOptions
     foundation::Path configFile;
     OutputFormat format = OutputFormat::Text;
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
+    std::string profile;
     std::optional<reporting::ReportSections> sections;
     bool showHelp = false;
 };
@@ -58,6 +59,7 @@ struct InvestigateOptions
     foundation::Path configFile;
     OutputFormat format = OutputFormat::Text;
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
+    std::string profile;
     investigation::InvestigationCriteria criteria;
     bool showHelp = false;
 };
@@ -106,6 +108,7 @@ struct SessionSaveOptions
     std::uint64_t minLines = 0U;
     std::optional<std::uint64_t> maxLines;
     std::string searchQuery;
+    std::string profile;
     investigation::InvestigationCriteria contentCriteria;
     bool showHelp = false;
 };

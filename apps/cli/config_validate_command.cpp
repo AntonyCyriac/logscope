@@ -5,6 +5,8 @@
 
 #include "config_validate_command.hpp"
 
+#include "analysis.hpp"
+#include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 
 namespace scope::cli
@@ -42,6 +44,15 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!validationResult)
     {
         errorOutput << validationResult.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto analysisValidation = scope::analysis::validateAnalysisConfiguration(configurationManager.configuration());
+
+    if (!analysisValidation)
+    {
+        errorOutput << analysisValidation.error().message() << std::endl;
 
         return 1;
     }

@@ -115,6 +115,40 @@ TEST(CliParserTest, ParsesStdinAnalyzeSubcommand)
     EXPECT_EQ("-", parsed->analyze.logFile.string());
 }
 
+TEST(CliParserTest, ParsesAnalyzeProfileOption)
+{
+    std::string program = "logscope";
+    std::string command = "analyze";
+    std::string profileFlag = "--profile";
+    std::string profileValue = "generic-json";
+    std::string logFile = "sample.jsonl";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(profileFlag), toArgv(profileValue),
+                    toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Analyze, parsed->command);
+    EXPECT_EQ("generic-json", parsed->analyze.profile);
+}
+
+TEST(CliParserTest, ParsesInvestigateProfileOption)
+{
+    std::string program = "logscope";
+    std::string command = "investigate";
+    std::string profileFlag = "--profile";
+    std::string profileValue = "generic-plain";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(profileFlag), toArgv(profileValue),
+                    toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::Investigate, parsed->command);
+    EXPECT_EQ("generic-plain", parsed->investigate.profile);
+}
+
 TEST(CliParserTest, ParsesAnalyzeSectionsOption)
 {
     std::string program = "logscope";

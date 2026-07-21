@@ -4,11 +4,14 @@
 # ==========================================================
 
 add_library(scope_analysis
+    analysis_config.cpp
     analysis_engine.cpp
     analysis_model.cpp
     correlation_id_extractor.cpp
     field_summary.cpp
     format_detector.cpp
+    format_parser.cpp
+    json_field_mapping.cpp
     json_lines_parser.cpp
     json_lines_summary.cpp
     line_index.cpp

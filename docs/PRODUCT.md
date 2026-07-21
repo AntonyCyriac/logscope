@@ -19,7 +19,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v1.0.0** is the first stable production release. M0–M5 are complete.
+LogScope **v1.1.0** delivers M6 Log Format Intelligence on top of the v1.0.0 production baseline. M0–M6 are complete.
 
 ```text
 Configuration → Source → Analysis → Investigation → Reporting → CLI

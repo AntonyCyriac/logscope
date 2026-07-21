@@ -8,9 +8,19 @@
 namespace scope::analysis
 {
 
+LineIndex::LineIndex(const std::size_t capacity) noexcept : m_capacity(capacity)
+{
+    m_lines.reserve(capacity);
+}
+
+LineIndex makeLineIndex(const std::size_t capacity) noexcept
+{
+    return LineIndex(capacity);
+}
+
 bool LineIndex::tryAddLine(IndexedLine line) noexcept
 {
-    if (m_lines.size() >= maxIndexedLines)
+    if (m_lines.size() >= m_capacity)
     {
         ++m_truncatedLines;
 
@@ -35,6 +45,11 @@ std::uint64_t LineIndex::indexedLineCount() const noexcept
 std::uint64_t LineIndex::truncatedLineCount() const noexcept
 {
     return m_truncatedLines;
+}
+
+std::size_t LineIndex::capacity() const noexcept
+{
+    return m_capacity;
 }
 
 std::string truncateExcerpt(const std::string_view value, const std::size_t maxLength) noexcept

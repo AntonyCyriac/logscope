@@ -5,6 +5,7 @@
 add_executable(logscope
     log_analyzer.cpp
     analyze_command.cpp
+    cli_analysis_config.cpp
     investigate_command.cpp
     investigation_output.cpp
     cli_application.cpp

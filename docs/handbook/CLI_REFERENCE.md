@@ -43,6 +43,7 @@ logscope analyze [options] <log-source>
 |--------|-------------|
 | `--format text\|json\|csv\|markdown` | Output format (default: text) |
 | `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
+| `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
 | `--sections <list>` | Report sections: `summary`, `levels`, `source`, or `all` |
 | `--min-errors <n>` | Investigation filter: minimum error lines |
 | `--min-warnings <n>` | Investigation filter: minimum warning lines |
@@ -56,9 +57,48 @@ logscope analyze [options] <log-source>
 logscope analyze samples/sample.log
 logscope analyze --format json samples/sample.log
 logscope analyze --log-format plain samples/sample.log
+logscope analyze --profile generic-json samples/sample.jsonl
 logscope analyze - < samples/sample.log
 logscope analyze ./logs/
 ```
+
+---
+
+## investigate
+
+Run content-aware investigation filters against a log source.
+
+```text
+logscope investigate [options] <log-source>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format text\|json` | Output format (default: text) |
+| `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
+| `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
+| `--search <query>` | Search indexed log line content |
+| `--time-from <timestamp>` | Earliest timestamp (ISO-like) |
+| `--time-to <timestamp>` | Latest timestamp (ISO-like) |
+| `--level <name>` | Filter by line level: `error`, `warning`, `info`, `other` |
+| `--message <text>` | Filter by message/content substring |
+| `--json-key <key>` | Require a JSON top-level key on matching lines |
+
+---
+
+## Configuration keys
+
+Format-related keys in `logscope.properties` (validated by `config validate`):
+
+| Key | Description |
+|-----|-------------|
+| `profile` | Built-in profile: `generic-plain`, `generic-json` |
+| `source.format` | Format hint: `auto`, `plain`, `jsonl` |
+| `source.json.timestamp_field` | JSON timestamp field name override |
+| `source.json.level_field` | JSON level field name override |
+| `investigation.max_indexed_lines` | Investigation index capacity (default: 10000, max: 1000000) |
+
+CLI `--profile` and `--log-format` override configuration for a single run.
 
 ---
 
@@ -139,3 +179,4 @@ Default directory: current working directory.
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial CLI reference. |
 | 1.1.0 | 21-07-2026 | Added `--log-format` for M6.1 format detection. |
+| 1.2.0 | 21-07-2026 | Added `--profile`, investigate command, and format configuration keys for M6.5. |

@@ -12,6 +12,7 @@
 using scope::analysis::DetectedLogLevel;
 using scope::analysis::IndexedLine;
 using scope::analysis::LineIndex;
+using scope::analysis::makeLineIndex;
 
 using scope::analysis::AnalysisModel;
 using scope::analysis::LogLevelCounts;
@@ -84,7 +85,7 @@ TEST(InvestigationEngineTest, SearchesSourcePath)
 
 AnalysisModel createIndexedModel()
 {
-    LineIndex lineIndex;
+    LineIndex lineIndex = makeLineIndex();
 
     IndexedLine firstLine;
     firstLine.lineNumber = 3U;

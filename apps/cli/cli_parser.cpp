@@ -173,6 +173,23 @@ bool parseInvestigationOption(const std::string& argument, int& index, const int
     return false;
 }
 
+bool parseProfileOption(const std::string& argument, int& index, const int argc, char* argv[], std::string& profile)
+{
+    if (argument == "--profile")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        profile = argv[++index];
+
+        return true;
+    }
+
+    return false;
+}
+
 std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int startIndex)
 {
     AnalyzeOptions options;
@@ -235,6 +252,11 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
 
             options.logFormat = *logFormat;
 
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
             continue;
         }
 
@@ -345,6 +367,11 @@ std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv
 
             options.logFormat = *logFormat;
 
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
             continue;
         }
 
@@ -674,6 +701,11 @@ std::optional<SessionSaveOptions> parseSessionSaveArguments(int argc, char* argv
 
             options.searchQuery = argv[++index];
 
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
             continue;
         }
 

@@ -6,8 +6,8 @@
 #pragma once
 
 #include "analysis_model.hpp"
+#include "analysis_config.hpp"
 #include "foundation/result.hpp"
-#include "log_format.hpp"
 #include "source_dataset.hpp"
 
 namespace scope::analysis
@@ -27,7 +27,13 @@ class AnalysisEngine
      * @return Analysis model or error.
      */
     [[nodiscard]] foundation::Result<AnalysisModel> analyze(
-        source::SourceDataset& dataset, LogFormat formatHint = LogFormat::Auto) const;
+        source::SourceDataset& dataset, const AnalysisConfig& config = AnalysisConfig::defaults()) const;
+
+    /**
+     * @brief Analyzes a source dataset with a format hint only.
+     */
+    [[nodiscard]] foundation::Result<AnalysisModel> analyze(source::SourceDataset& dataset,
+                                                            LogFormat formatHint) const;
 };
 
 } // namespace scope::analysis

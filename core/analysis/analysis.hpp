@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "analysis_config.hpp"
 #include "analysis_engine.hpp"
 #include "analysis_model.hpp"
 #include "field_summary.hpp"
