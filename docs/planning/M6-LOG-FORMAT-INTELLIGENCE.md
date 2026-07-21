@@ -200,7 +200,7 @@ Enrich the analysis model with generic, format-aware fields:
 
 ## M6.4 – Content-Aware Investigation
 
-**Status:** 🔄 Next (`feat/m6.4-content-investigation`)
+**Status:** ✅ Complete (merged via PR #33)
 
 **Primary FR:** FR-002.1, FR-002.2, FR-002.4
 
@@ -225,6 +225,8 @@ Replace path-only search with log-content investigation:
 ---
 
 ## M6.5 – Format Profiles and Configuration
+
+**Status:** 🔄 Next (`feat/m6.5-format-profiles`)
 
 **Primary FR:** FR-004.1, FR-001.2
 
@@ -310,3 +312,4 @@ The following remain out of scope for M6:
 | 1.3.0 | 21-07-2026 | M6.2 JSON Lines parsing implementation in progress. |
 | 1.4.0 | 21-07-2026 | M6.2 complete; M6.3 field extraction is next (nlohmann/json evaluation planned). |
 | 1.5.0 | 21-07-2026 | M6.3 complete; M6.4 content-aware investigation is next. |
+| 1.6.0 | 21-07-2026 | M6.4 complete; M6.5 format profiles is next. |
