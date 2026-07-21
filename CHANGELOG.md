@@ -15,6 +15,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Post-v1 strategic roadmap (`POST_V1_STRATEGIC_ROADMAP.md`) with 10-phase vision, M6–M17 milestone mapping, and version targets.
 - M7 Search Engine planning stub (`M7-SEARCH-ENGINE.md`).
 - M6.1 format detection: `LogFormat`, `FormatDetector`, report metadata `format`, and CLI `--log-format auto|plain|jsonl`.
+- M6.2 JSON Lines parsing: per-line JSON validation, `JsonLinesSummary` stats (valid lines, parse failures, top-level keys), field-aware level mapping, and `samples/sample.jsonl`.
 
 ### Fixed
 

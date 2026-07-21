@@ -1,0 +1,6 @@
+{"level":"info","message":"Application started","timestamp":"2026-07-21T10:00:01Z"}
+{"severity":"warning","message":"Request taking too long","timestamp":"2026-07-21T10:00:10Z"}
+{"level":"error","message":"Connection refused","timestamp":"2026-07-21T10:00:06Z"}
+{"level":"error","message":"Connection refused","timestamp":"2026-07-21T10:00:07Z"}
+not valid json
+{"log":{"level":"info"},"message":"Nested level field","timestamp":"2026-07-21T10:00:08Z"}

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M6 – Log Format Intelligence |
 | Category | Project Planning |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | In Progress |
 | Created | 18-07-2026 |
 | Last Updated | 21-07-2026 |
@@ -149,6 +149,8 @@ Introduce a format identification layer before analysis:
 ---
 
 ## M6.2 – JSON Lines Parsing
+
+**Status:** 🔄 In progress (`feat/m6.2-json-lines`)
 
 **Primary FR:** FR-001.1, FR-001.3
 
@@ -299,3 +301,4 @@ The following remain out of scope for M6:
 | 1.0.0 | 18-07-2026 | Initial M6 log format intelligence plan. |
 | 1.1.0 | 21-07-2026 | M6.1 format detection implementation in progress. |
 | 1.2.0 | 21-07-2026 | M6.1 complete; M6.2 JSON Lines parsing is next. |
+| 1.3.0 | 21-07-2026 | M6.2 JSON Lines parsing implementation in progress. |

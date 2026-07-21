@@ -7,6 +7,8 @@ add_library(scope_analysis
     analysis_engine.cpp
     analysis_model.cpp
     format_detector.cpp
+    json_lines_parser.cpp
+    json_lines_summary.cpp
     log_format.cpp
     log_level_counts.cpp
     log_line_classifier.cpp

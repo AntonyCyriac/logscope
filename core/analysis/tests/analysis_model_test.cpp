@@ -49,3 +49,14 @@ TEST(AnalysisModelTest, EmptySourceHasZeroLines)
 
     EXPECT_EQ(0U, model.totalLines());
 }
+
+TEST(AnalysisModelTest, StoresJsonLinesSummary)
+{
+    scope::analysis::JsonLinesSummary summary;
+    summary.recordValidLine({"level", "message"});
+
+    const AnalysisModel model(Path("sample.jsonl"), 1U, {}, scope::analysis::LogFormat::JsonLines, summary);
+
+    ASSERT_TRUE(model.jsonLinesSummary().has_value());
+    EXPECT_EQ(1U, model.jsonLinesSummary()->validLines());
+}
