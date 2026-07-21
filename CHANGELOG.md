@@ -16,6 +16,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - M7 Search Engine planning stub (`M7-SEARCH-ENGINE.md`).
 - M6.1 format detection: `LogFormat`, `FormatDetector`, report metadata `format`, and CLI `--log-format auto|plain|jsonl`.
 - M6.2 JSON Lines parsing: per-line JSON validation, `JsonLinesSummary` stats (valid lines, parse failures, top-level keys), field-aware level mapping, and `samples/sample.jsonl`.
+- M6.3 field extraction: `FieldSummary` with time range and top message patterns; plain-text timestamp prefixes; JSON `timestamp`/`message` fields (hand-rolled parser extended; nlohmann/json deferred).
 
 ### Fixed
 

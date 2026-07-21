@@ -44,7 +44,19 @@ TEST(JsonLinesParserTest, ParsesNestedLogLevelField)
 
     ASSERT_EQ(JsonLineParseOutcome::Valid, result.outcome);
     EXPECT_EQ("info", result.levelValue);
+    EXPECT_EQ("ok", result.messageValue);
     EXPECT_EQ("log", result.topLevelKeys[0]);
+}
+
+TEST(JsonLinesParserTest, ParsesTimestampAndMessageFields)
+{
+    const auto result = JsonLinesParser::parse(
+        R"({"timestamp":"2026-07-21T10:00:01Z","message":"started","level":"info"})");
+
+    ASSERT_EQ(JsonLineParseOutcome::Valid, result.outcome);
+    EXPECT_EQ("2026-07-21T10:00:01Z", result.timestampValue);
+    EXPECT_EQ("started", result.messageValue);
+    EXPECT_EQ("info", result.levelValue);
 }
 
 TEST(JsonLinesParserTest, RejectsInvalidJsonLine)

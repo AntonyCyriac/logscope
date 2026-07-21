@@ -37,6 +37,12 @@ struct JsonLineParseResult
 
     /// Raw level field value when a supported key is present.
     std::string levelValue;
+
+    /// Raw timestamp field value when a supported key is present.
+    std::string timestampValue;
+
+    /// Raw message field value when a supported key is present.
+    std::string messageValue;
 };
 
 /**

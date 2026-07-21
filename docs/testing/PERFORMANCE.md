@@ -56,6 +56,20 @@ Machine-readable baselines: [`tests/benchmarks/baseline.json`](../../tests/bench
 
 ---
 
+# Field Extraction Bounds (M6.3)
+
+Analysis field extraction uses streaming summaries rather than indexing every line:
+
+| Limit | Value | Location |
+|-------|-------|----------|
+| Message excerpt length | 120 characters | `maxMessageExcerptLength` in `field_summary.hpp` |
+| Top message patterns reported | 10 | `FieldSummary::topMessages()` default |
+| Unique message keys tracked | Unbounded hash map | Acceptable for typical log volumes; revisit if memory becomes an issue |
+
+Timestamp min/max tracking is O(1) per line. `BM_AnalysisEngine` remains the primary regression guard for analysis throughput after field extraction.
+
+---
+
 # CI Integration
 
 The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non-gating initially) and compares `BM_AnalysisEngine` throughput against `baseline.json` with a 20% tolerance.

@@ -9,12 +9,14 @@
 #include <optional>
 #include <vector>
 
+#include "field_summary.hpp"
 #include "format_detector.hpp"
 #include "foundation/error.hpp"
 #include "json_lines_parser.hpp"
 #include "json_lines_summary.hpp"
 #include "log_line_classifier.hpp"
 #include "log_macros.hpp"
+#include "plain_text_field_extractor.hpp"
 
 namespace scope::analysis
 {
@@ -44,12 +46,30 @@ void recordLevel(LogLevelCounts& counts, const DetectedLogLevel level) noexcept
     }
 }
 
-void analyzePlainTextLine(const std::string& line, LogLevelCounts& levelCounts) noexcept
+void recordExtractedFields(FieldSummary& fieldSummary, const std::optional<foundation::Timestamp>& timestamp,
+                           const std::string_view message) noexcept
 {
-    recordLevel(levelCounts, detectLogLevel(line));
+    if (timestamp.has_value())
+    {
+        fieldSummary.recordTimestamp(*timestamp);
+    }
+
+    if (!message.empty())
+    {
+        fieldSummary.recordMessage(message);
+    }
 }
 
-void analyzeJsonLine(const std::string& line, LogLevelCounts& levelCounts, JsonLinesSummary& summary) noexcept
+void analyzePlainTextLine(const std::string& line, LogLevelCounts& levelCounts, FieldSummary& fieldSummary) noexcept
+{
+    recordLevel(levelCounts, detectLogLevel(line));
+
+    const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
+    recordExtractedFields(fieldSummary, fields.timestamp, fields.messageExcerpt);
+}
+
+void analyzeJsonLine(const std::string& line, LogLevelCounts& levelCounts, JsonLinesSummary& summary,
+                     FieldSummary& fieldSummary) noexcept
 {
     const JsonLineParseResult parsed = JsonLinesParser::parse(line);
 
@@ -78,19 +98,40 @@ void analyzeJsonLine(const std::string& line, LogLevelCounts& levelCounts, JsonL
     {
         recordLevel(levelCounts, detectLogLevel(line));
     }
+
+    std::optional<foundation::Timestamp> timestamp;
+
+    if (!parsed.timestampValue.empty())
+    {
+        const auto timestampResult = parseLogTimestamp(parsed.timestampValue);
+
+        if (timestampResult.hasValue())
+        {
+            timestamp = *timestampResult;
+        }
+    }
+
+    if (!parsed.messageValue.empty())
+    {
+        recordExtractedFields(fieldSummary, timestamp, parsed.messageValue);
+    }
+    else
+    {
+        recordExtractedFields(fieldSummary, timestamp, std::string_view{});
+    }
 }
 
 void analyzeLine(const std::string& line, const LogFormat format, LogLevelCounts& levelCounts,
-                 JsonLinesSummary* jsonSummary) noexcept
+                 JsonLinesSummary* jsonSummary, FieldSummary& fieldSummary) noexcept
 {
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
-        analyzeJsonLine(line, levelCounts, *jsonSummary);
+        analyzeJsonLine(line, levelCounts, *jsonSummary, fieldSummary);
 
         return;
     }
 
-    analyzePlainTextLine(line, levelCounts);
+    analyzePlainTextLine(line, levelCounts, fieldSummary);
 }
 
 [[nodiscard]] foundation::Result<LogFormat> resolveFormat(const FormatDetectionResult& detection,
@@ -181,6 +222,7 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
 
     std::uint64_t totalLines = 0;
     LogLevelCounts levelCounts;
+    FieldSummary fieldSummary;
     std::optional<JsonLinesSummary> jsonLinesSummary;
 
     if (resolvedFormat == LogFormat::JsonLines)
@@ -193,7 +235,7 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
     for (const std::string& sampleLine : sampleLines)
     {
         ++totalLines;
-        analyzeLine(sampleLine, resolvedFormat, levelCounts, jsonSummaryPointer);
+        analyzeLine(sampleLine, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary);
     }
 
     while (true)
@@ -213,13 +255,17 @@ foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset&
         }
 
         ++totalLines;
-        analyzeLine(line, resolvedFormat, levelCounts, jsonSummaryPointer);
+        analyzeLine(line, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary);
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
 
-    return foundation::Result<AnalysisModel>(
-        AnalysisModel(dataset.path(), totalLines, levelCounts, resolvedFormat, std::move(jsonLinesSummary)));
+    return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
+                                                           totalLines,
+                                                           levelCounts,
+                                                           resolvedFormat,
+                                                           std::move(jsonLinesSummary),
+                                                           std::make_optional(std::move(fieldSummary))));
 }
 
 } // namespace scope::analysis

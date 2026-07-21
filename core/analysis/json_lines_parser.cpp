@@ -324,35 +324,76 @@ bool skipJsonValue(std::string_view& input) noexcept
     }
 }
 
-bool tryCaptureLevelField(std::string& levelValue, const std::string_view key, std::string_view& input) noexcept
+bool tryAssignStringField(std::string& destination, std::string_view& input) noexcept
 {
-    if (!levelValue.empty())
+    if (!destination.empty())
     {
         return skipJsonValue(input);
     }
 
-    if (key == "level" || key == "severity")
+    std::string value;
+
+    if (!parseJsonString(input, value))
     {
-        std::string value;
+        return skipJsonValue(input);
+    }
 
-        if (!parseJsonString(input, value))
-        {
-            return skipJsonValue(input);
-        }
+    destination = std::move(value);
 
-        levelValue = std::move(value);
+    return true;
+}
 
+bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& input) noexcept
+{
+    if (!skipWhitespace(input) || input.empty() || input.front() != '{')
+    {
+        return skipJsonValue(input);
+    }
+
+    input.remove_prefix(1U);
+
+    if (!skipWhitespace(input))
+    {
+        return false;
+    }
+
+    if (skipLiteral(input, "}"))
+    {
         return true;
     }
 
-    if (key == "log")
+    while (true)
     {
-        if (!skipWhitespace(input) || input.empty() || input.front() != '{')
+        std::string nestedKey;
+
+        if (!parseJsonString(input, nestedKey))
         {
-            return skipJsonValue(input);
+            return false;
         }
 
-        input.remove_prefix(1U);
+        if (!skipWhitespace(input) || !skipLiteral(input, ":"))
+        {
+            return false;
+        }
+
+        if (nestedKey == "level")
+        {
+            if (!tryAssignStringField(result.levelValue, input))
+            {
+                return false;
+            }
+        }
+        else if (nestedKey == "message")
+        {
+            if (!tryAssignStringField(result.messageValue, input))
+            {
+                return false;
+            }
+        }
+        else if (!skipJsonValue(input))
+        {
+            return false;
+        }
 
         if (!skipWhitespace(input))
         {
@@ -364,56 +405,38 @@ bool tryCaptureLevelField(std::string& levelValue, const std::string_view key, s
             return true;
         }
 
-        while (true)
+        if (!skipLiteral(input, ","))
         {
-            std::string nestedKey;
-
-            if (!parseJsonString(input, nestedKey))
-            {
-                return false;
-            }
-
-            if (!skipWhitespace(input) || !skipLiteral(input, ":"))
-            {
-                return false;
-            }
-
-            if (nestedKey == "level" && levelValue.empty())
-            {
-                std::string value;
-
-                if (!parseJsonString(input, value))
-                {
-                    return false;
-                }
-
-                levelValue = std::move(value);
-            }
-            else if (!skipJsonValue(input))
-            {
-                return false;
-            }
-
-            if (!skipWhitespace(input))
-            {
-                return false;
-            }
-
-            if (skipLiteral(input, "}"))
-            {
-                return true;
-            }
-
-            if (!skipLiteral(input, ","))
-            {
-                return false;
-            }
-
-            if (!skipWhitespace(input))
-            {
-                return false;
-            }
+            return false;
         }
+
+        if (!skipWhitespace(input))
+        {
+            return false;
+        }
+    }
+}
+
+bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view key, std::string_view& input) noexcept
+{
+    if (key == "level" || key == "severity")
+    {
+        return tryAssignStringField(result.levelValue, input);
+    }
+
+    if (key == "timestamp" || key == "time" || key == "@timestamp")
+    {
+        return tryAssignStringField(result.timestampValue, input);
+    }
+
+    if (key == "message" || key == "msg")
+    {
+        return tryAssignStringField(result.messageValue, input);
+    }
+
+    if (key == "log")
+    {
+        return tryCaptureNestedLogObject(result, input);
     }
 
     return skipJsonValue(input);
@@ -454,7 +477,7 @@ bool parseTopLevelObject(std::string_view& input, JsonLineParseResult& result) n
             return false;
         }
 
-        if (!tryCaptureLevelField(result.levelValue, key, input))
+        if (!tryCaptureKnownField(result, key, input))
         {
             return false;
         }
@@ -504,6 +527,8 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
         result.outcome = JsonLineParseOutcome::Invalid;
         result.topLevelKeys.clear();
         result.levelValue.clear();
+        result.timestampValue.clear();
+        result.messageValue.clear();
 
         return result;
     }
@@ -513,6 +538,8 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line) noexcept
         result.outcome = JsonLineParseOutcome::Invalid;
         result.topLevelKeys.clear();
         result.levelValue.clear();
+        result.timestampValue.clear();
+        result.messageValue.clear();
 
         return result;
     }

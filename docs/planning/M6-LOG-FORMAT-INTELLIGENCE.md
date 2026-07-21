@@ -174,11 +174,11 @@ Add first-class support for newline-delimited JSON (NDJSON / JSON Lines):
 
 ## M6.3 – Timestamp and Field Extraction
 
-**Status:** 🔄 Next (`feat/m6.3-field-extraction`)
+**Status:** 🔄 In progress (`feat/m6.3-field-extraction`)
 
 **Primary FR:** FR-001.3
 
-**Note:** Evaluate adopting [nlohmann/json](https://github.com/nlohmann/json) via CMake `FetchContent` if field extraction outgrows the M6.2 hand-rolled parser; otherwise extend `json_lines_parser` for deeper key paths.
+**Note:** Extended the M6.2 hand-rolled JSON parser for `timestamp`/`message` fields. [nlohmann/json](https://github.com/nlohmann/json) remains deferred unless deeper nested extraction requires it in M6.4+.
 
 Enrich the analysis model with generic, format-aware fields:
 
