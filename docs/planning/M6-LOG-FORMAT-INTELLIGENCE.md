@@ -174,7 +174,7 @@ Add first-class support for newline-delimited JSON (NDJSON / JSON Lines):
 
 ## M6.3 – Timestamp and Field Extraction
 
-**Status:** 🔄 In progress (`feat/m6.3-field-extraction`)
+**Status:** ✅ Complete (merged via PR #31, #32)
 
 **Primary FR:** FR-001.3
 
@@ -199,6 +199,8 @@ Enrich the analysis model with generic, format-aware fields:
 ---
 
 ## M6.4 – Content-Aware Investigation
+
+**Status:** 🔄 Next (`feat/m6.4-content-investigation`)
 
 **Primary FR:** FR-002.1, FR-002.2, FR-002.4
 
@@ -307,3 +309,4 @@ The following remain out of scope for M6:
 | 1.2.0 | 21-07-2026 | M6.1 complete; M6.2 JSON Lines parsing is next. |
 | 1.3.0 | 21-07-2026 | M6.2 JSON Lines parsing implementation in progress. |
 | 1.4.0 | 21-07-2026 | M6.2 complete; M6.3 field extraction is next (nlohmann/json evaluation planned). |
+| 1.5.0 | 21-07-2026 | M6.3 complete; M6.4 content-aware investigation is next. |
