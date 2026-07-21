@@ -16,6 +16,40 @@ Error::Error(ErrorCode code, std::string message)
 {
 }
 
+Error::Error(const Error& other)
+    : m_code(other.m_code)
+    , m_message(other.m_message)
+{
+}
+
+Error::Error(Error&& other) noexcept
+    : m_code(other.m_code)
+    , m_message(std::move(other.m_message))
+{
+}
+
+Error& Error::operator=(const Error& other)
+{
+    if (this != &other)
+    {
+        m_code = other.m_code;
+        m_message = other.m_message;
+    }
+
+    return *this;
+}
+
+Error& Error::operator=(Error&& other) noexcept
+{
+    if (this != &other)
+    {
+        m_code = other.m_code;
+        m_message = std::move(other.m_message);
+    }
+
+    return *this;
+}
+
 ErrorCode Error::code() const noexcept
 {
     return m_code;
