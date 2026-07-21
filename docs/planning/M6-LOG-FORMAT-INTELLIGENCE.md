@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M6 – Log Format Intelligence |
 | Category | Project Planning |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | In Progress |
 | Created | 18-07-2026 |
 | Last Updated | 21-07-2026 |
@@ -125,6 +125,8 @@ flowchart TD
 # 6. Phase Descriptions
 
 ## M6.1 – Format Detection
+
+**Status:** ✅ Complete (merged via PR #28)
 
 **Primary FR:** FR-001.4, FR-001.2
 
@@ -296,3 +298,4 @@ The following remain out of scope for M6:
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial M6 log format intelligence plan. |
 | 1.1.0 | 21-07-2026 | M6.1 format detection implementation in progress. |
+| 1.2.0 | 21-07-2026 | M6.1 complete; M6.2 JSON Lines parsing is next. |

@@ -19,6 +19,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 ### Fixed
 
 - Analyze failures now print actionable error messages to stderr (including unsupported binary input).
+- Explicit `Error` copy/move operations to silence clang-analyzer false positives in `Result<T>` error propagation.
 
 ---
 

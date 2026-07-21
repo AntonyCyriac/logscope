@@ -32,7 +32,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M4 – Feature Expansion** | ✅ Complete | Extend LogScope with additional capabilities while preserving architectural integrity. |
 | **M5 – Production Readiness** | ✅ Complete | Performance, reliability, CI, packaging, and release preparation for v1.0.0. |
 | **v1.0.0** | ✅ Complete | First stable production release. |
-| **M6 – Log Format Intelligence** | 🔄 Planned | Format detection, structured parsing, field extraction, content investigation, format profiles. Target: `v1.1.0`. |
+| **M6 – Log Format Intelligence** | 🔄 In Progress | Format detection, structured parsing, field extraction, content investigation, format profiles. Target: `v1.1.0`. |
 | **M7 – Search Engine** | ⏳ Planned | Full-text, regex, boolean search; saved searches; time/field filters. Target: `v1.2.0`. |
 | **M8 – Advanced Reporting** | ⏳ Planned | HTML, PDF, charts, executive summaries. Target: `v1.3.0`. |
 | **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
@@ -56,7 +56,7 @@ M2  ██████████ 100%
 M3  ██████████ 100%
 M4  ██████████ 100%
 M5  ██████████ 100%
-M6  ██░░░░░░░░  20%  (M6.1 in progress)
+M6  ██░░░░░░░░  20%  (M6.1 complete; M6.2 next)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** targets [`v1.1.0`](../CHANGELOG.md); **M7** targets `v1.2.0`. See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -367,8 +367,8 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 
 | Phase | Focus | Primary FR | Status |
 |-------|-------|------------|--------|
-| M6.1 | Format detection | FR-001.4 | 🔄 In progress |
-| M6.2 | JSON Lines parsing | FR-001.1, FR-001.3 | ⏳ Planned |
+| M6.1 | Format detection | FR-001.4 | ✅ Complete |
+| M6.2 | JSON Lines parsing | FR-001.1, FR-001.3 | 🔄 Next |
 | M6.3 | Timestamp and field extraction | FR-001.3 | ⏳ Planned |
 | M6.4 | Content-aware investigation | FR-002.1, FR-002.2, FR-002.4 | ⏳ Planned |
 | M6.5 | Format profiles and configuration | FR-004.1 | ⏳ Planned |
