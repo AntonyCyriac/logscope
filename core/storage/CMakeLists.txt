@@ -24,6 +24,7 @@ add_library(scope_storage
     index_reader.cpp
     index_store_factory.cpp
     query_planner.cpp
+    schema_version.cpp
     sqlite_index_store.cpp
     storage_config.cpp
     workspace_paths.cpp
