@@ -62,6 +62,10 @@ Persisted indexes store **full line content** (not excerpts). Default index dire
 
 M7 text search remains in-memory over fetched rows until a future FTS milestone.
 
+### Bulk index writes (v1.4.2)
+
+`SqliteIndexStore` uses WAL mode, a reused prepared `INSERT`, and transaction batching (5,000 lines per commit). `HybridIndexWriter` logs progress every 10,000 persisted lines. `BM_IndexStoreAppend/100000` is gated in CI via `baseline.json`.
+
 ### Build
 
 - SQLite amalgamation fetched at configure time; `LOGSCOPE_STORAGE=OFF` omits `scope_storage` for minimal builds (future)
@@ -69,13 +73,18 @@ M7 text search remains in-memory over fetched rows until a future FTS milestone.
 
 ---
 
-## Non-goals (v1.4.1)
+## Non-goals (v1.4.1 core; updated through v1.4.2)
 
-- Batched SQLite bulk writes and index-build benchmark SLA (v1.4.2 — see [M11-STORAGE-LAYER.md](../../planning/M11-STORAGE-LAYER.md))
-- Compression (v1.4.2)
-- Cached query results table (v1.4.2)
-- Incremental append indexing (v1.4.2)
-- `line_json_fields` for arbitrary JSON predicates (v1.4.2)
+Shipped in **`v1.4.2`:**
+
+- Batched SQLite bulk writes and `BM_IndexStoreAppend/100000` benchmark SLA (see [M11-STORAGE-LAYER.md](../../planning/M11-STORAGE-LAYER.md))
+
+Deferred to **`v1.4.3+`:**
+
+- Compression
+- Cached query results table
+- Incremental append indexing
+- `line_json_fields` for arbitrary JSON predicates
 - FTS5 full-text index
 - M12 storage provider plugins
 - Replacing source log files

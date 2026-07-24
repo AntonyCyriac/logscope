@@ -15,7 +15,7 @@
 
 This guide explains how LogScope extensions work today and how contributors add new **built-in** extensions in the core repository.
 
-**Current scope (v1.4.1):** static, compile-time extensions registered through `ExtensionManager`. There is no `.so`/`.dll` loading yet — that is planned for **M12 – Dynamic Plugins** (`v1.5.0`).
+**Current scope (v1.4.2):** static, compile-time extensions registered through `ExtensionManager`. There is no `.so`/`.dll` loading yet — that is planned for **M12 – Dynamic Plugins** (`v1.5.0`).
 
 Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md#phase-1--stabilize-v1x).
 
