@@ -431,14 +431,15 @@ class Parser
             return makeError("Expected comparison operator after field name.");
         }
 
-        const auto literalResult = parseLiteral();
+        auto literalResult = parseLiteral();
 
         if (!literalResult)
         {
             return foundation::Result<QueryNode>(literalResult.error());
         }
 
-        return foundation::Result<QueryNode>(QueryNode::comparison(field, op, std::move(*literalResult)));
+        return foundation::Result<QueryNode>(
+            QueryNode::comparison(field, op, std::move(literalResult.value())));
     }
 
     [[nodiscard]] bool parseComparisonOperator(ComparisonOperator& op)
