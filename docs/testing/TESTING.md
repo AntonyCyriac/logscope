@@ -126,9 +126,11 @@ cmake --build build
 ctest --test-dir build
 lcov --capture --directory build --output-file coverage.info \
   --rc geninfo_unexecuted_blocks=1 \
-  --ignore-errors mismatch,gcov,negative,unused
+  --ignore-errors mismatch,inconsistent,gcov,negative,unused \
+  --quiet
 lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' --output-file coverage.info \
-  --ignore-errors unused
+  --ignore-errors unused \
+  --quiet
 ```
 
 CI generates and uploads `coverage.info` as an artifact.

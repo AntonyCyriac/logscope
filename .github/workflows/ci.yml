@@ -80,10 +80,12 @@ jobs:
         run: |
           lcov --capture --directory build --output-file coverage.info \
             --rc geninfo_unexecuted_blocks=1 \
-            --ignore-errors mismatch,gcov,negative,unused
+            --ignore-errors mismatch,inconsistent,gcov,negative,unused \
+            --quiet
           lcov --remove coverage.info '/usr/*' '*/_deps/*' '*/tests/*' \
             --output-file coverage.info \
-            --ignore-errors unused
+            --ignore-errors unused \
+            --quiet
           lcov --list coverage.info
 
       - name: Upload Coverage Artifact
