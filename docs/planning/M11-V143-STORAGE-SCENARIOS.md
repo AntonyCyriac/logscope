@@ -109,12 +109,12 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S5.1 | Source growth | File size increases; mtime newer; `--reuse-index` | Append lines after `indexed_line_count` only | U+I | Yes | ⬜ |
-| S5.2 | Source truncate | File size decreases | Delete index; full rebuild from line 1 | U+I | Yes | ⬜ |
-| S5.3 | Unchanged file | Same size and mtime | Reuse index; no rewrite | U | | ⬜ |
-| S5.4 | Append disabled | `storage.incremental_append=false` | Full rebuild on any fingerprint mismatch | U | | ⬜ |
-| S5.5 | Growth e2e | Append to temp log between runs | Second investigate returns new lines only in index | E | Yes | ⬜ |
-| S5.6 | mtime-only change | Size unchanged, mtime changed | Documented: treat as unchanged if size matches | U | | ⬜ |
+| S5.1 | Source growth | File size increases; mtime newer; `--reuse-index` | Append lines after `indexed_line_count` only | U+I | Yes | ✅ |
+| S5.2 | Source truncate | File size decreases | Delete index; full rebuild from line 1 | U+I | Yes | ✅ |
+| S5.3 | Unchanged file | Same size and mtime | Reuse index; no rewrite | U | | ✅ |
+| S5.4 | Append disabled | `storage.incremental_append=false` | Full rebuild on any fingerprint mismatch | U | | ✅ |
+| S5.5 | Growth e2e | Append to temp log between runs | Second investigate returns new lines only in index | E | Yes | ✅ |
+| S5.6 | mtime-only change | Size unchanged, mtime changed | Documented: treat as unchanged if size matches | U | | ✅ |
 
 ---
 

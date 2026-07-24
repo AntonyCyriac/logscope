@@ -58,3 +58,28 @@ TEST(IndexFingerprintTest, DetectsChangedSource)
     ASSERT_TRUE(matches);
     EXPECT_FALSE(*matches);
 }
+
+TEST(IndexFingerprintTest, ComputesStablePathKeyIndependentOfContent)
+{
+    const Path firstFile("storage_stable_path_first.log");
+    const Path secondFile("storage_stable_path_second.log");
+
+    std::ofstream firstOutput(firstFile.string());
+    firstOutput << "alpha\n";
+    firstOutput.close();
+
+    std::ofstream secondOutput(secondFile.string());
+    secondOutput << "beta\n";
+    secondOutput.close();
+
+    const auto firstKey = IndexFingerprint::stablePathKey(firstFile);
+    const auto secondKey = IndexFingerprint::stablePathKey(secondFile);
+    const auto firstFingerprint = IndexFingerprint::compute(firstFile);
+
+    ASSERT_TRUE(firstKey);
+    ASSERT_TRUE(secondKey);
+    ASSERT_TRUE(firstFingerprint);
+
+    EXPECT_NE(firstKey->value(), secondKey->value());
+    EXPECT_NE(firstKey->value(), firstFingerprint->value());
+}

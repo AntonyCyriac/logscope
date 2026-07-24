@@ -8,17 +8,29 @@
 
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
+#include "index_reuse.hpp"
 #include "index_store_options.hpp"
 #include "sqlite_index_store.hpp"
 
 namespace scope::storage
 {
 
-foundation::Path resolveIndexPath(const StorageConfig& config, const IndexFingerprint& fingerprint)
+foundation::Path resolveIndexPath(const StorageConfig& config, const foundation::Path& sourcePath,
+                                  const IndexFingerprint& fingerprint)
 {
     if (config.indexPath.has_value())
     {
         return *config.indexPath;
+    }
+
+    if (config.incrementalAppend)
+    {
+        const auto stableKey = IndexFingerprint::stablePathKey(sourcePath);
+
+        if (stableKey)
+        {
+            return config.indexDirectory.append(stableKey->value() + ".db");
+        }
     }
 
     return config.indexDirectory.append(fingerprint.value() + ".db");
@@ -29,7 +41,7 @@ foundation::Result<IndexStorePtr> createIndexStore(const StorageConfig& config,
                                                    const foundation::Path& sourcePath,
                                                    const analysis::LogFormat format)
 {
-    const foundation::Path databasePath = resolveIndexPath(config, fingerprint);
+    const foundation::Path databasePath = resolveIndexPath(config, sourcePath, fingerprint);
 
     if (!config.indexPath.has_value())
     {
@@ -55,46 +67,20 @@ foundation::Result<IndexStorePtr> tryOpenReusableIndex(const StorageConfig& conf
                                                        const IndexFingerprint& fingerprint,
                                                        const foundation::Path& sourcePath)
 {
-    if (!config.reuseIndex)
+    const auto prepared = prepareIndexReuse(config, fingerprint, sourcePath);
+
+    if (!prepared)
     {
-        return foundation::Result<IndexStorePtr>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "Index reuse is disabled."));
+        return foundation::Result<IndexStorePtr>(prepared.error());
     }
 
-    const auto matches = IndexFingerprint::matchesSource(fingerprint, sourcePath);
-
-    if (!matches || !*matches)
+    if (prepared->mode != IndexReuseMode::Unchanged || prepared->store == nullptr)
     {
         return foundation::Result<IndexStorePtr>(foundation::Error(
             foundation::ErrorCode::InvalidArgument, "Source fingerprint does not match persisted index."));
     }
 
-    const foundation::Path databasePath = resolveIndexPath(config, fingerprint);
-    const auto opened = SqliteIndexStore::open(databasePath);
-
-    if (!opened)
-    {
-        return opened;
-    }
-
-    if ((*opened)->metadata().fingerprint != fingerprint.value())
-    {
-        return foundation::Result<IndexStorePtr>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "Persisted index fingerprint mismatch."));
-    }
-
-    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(*opened);
-
-    if (sqliteStore->usesContentCompression() != config.compressContent)
-    {
-        return foundation::Result<IndexStorePtr>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument,
-            "Index compression settings require rebuild from source log."));
-    }
-
-    sqliteStore->applyQueryCacheOptions(indexStoreOptionsFromConfig(config));
-
-    return opened;
+    return foundation::Result<IndexStorePtr>(prepared->store);
 }
 
 } // namespace scope::storage

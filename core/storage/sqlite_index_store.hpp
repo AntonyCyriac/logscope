@@ -13,6 +13,7 @@
 #include "index_store_options.hpp"
 #include "log_format.hpp"
 #include "schema_version.hpp"
+#include "source_snapshot.hpp"
 
 namespace scope::storage
 {
@@ -44,6 +45,8 @@ class SqliteIndexStore final : public IndexStore
     [[nodiscard]] std::size_t queryCacheEntryCount() const noexcept;
 
     void clearQueryCache() const noexcept;
+
+    [[nodiscard]] foundation::Result<StoredSourceSnapshot> storedSourceSnapshot() const;
 
     [[nodiscard]] static constexpr int currentSchemaVersion() noexcept
     {

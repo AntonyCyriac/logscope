@@ -49,6 +49,16 @@ IndexFingerprint::IndexFingerprint(std::string value) noexcept
 {
 }
 
+foundation::Result<IndexFingerprint> IndexFingerprint::stablePathKey(const foundation::Path& sourcePath)
+{
+    const std::uint64_t digest = foundation::hashString(sourcePath.string());
+
+    std::ostringstream formatted;
+    formatted << std::hex << digest;
+
+    return foundation::Result<IndexFingerprint>(IndexFingerprint(formatted.str()));
+}
+
 foundation::Result<IndexFingerprint> IndexFingerprint::compute(const foundation::Path& sourcePath)
 {
     const auto sizeResult = foundation::FileSystem::fileSize(sourcePath);

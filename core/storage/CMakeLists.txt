@@ -35,11 +35,13 @@ add_library(scope_storage
     content_codec.cpp
     index_fingerprint.cpp
     index_reader.cpp
+    index_reuse.cpp
     index_store_factory.cpp
     query_planner.cpp
     query_cache_codec.cpp
     query_cache_key.cpp
     schema_version.cpp
+    source_snapshot.cpp
     sqlite_index_store.cpp
     storage_config.cpp
     workspace_paths.cpp

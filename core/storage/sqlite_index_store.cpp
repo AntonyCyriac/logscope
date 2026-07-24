@@ -16,6 +16,7 @@
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
 #include "index_fingerprint.hpp"
+#include "source_snapshot.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
 #include "query_cache_codec.hpp"
@@ -1155,7 +1156,24 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
         return foundation::Result<bool>(mtimeResult.error());
     }
 
-    return setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
+    const auto mtimeMetaResult =
+        setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
+
+    if (!mtimeMetaResult)
+    {
+        return mtimeMetaResult;
+    }
+
+    const auto fingerprintResult = IndexFingerprint::compute(m_impl->metadata.sourcePath);
+
+    if (!fingerprintResult)
+    {
+        return foundation::Result<bool>(fingerprintResult.error());
+    }
+
+    m_impl->metadata.fingerprint = fingerprintResult->value();
+
+    return setMeta(m_impl->database, "fingerprint", m_impl->metadata.fingerprint);
 }
 
 bool SqliteIndexStore::usesContentCompression() const noexcept
@@ -1236,6 +1254,11 @@ bool SqliteIndexStore::queryCacheEnabled() const noexcept
 void SqliteIndexStore::clearQueryCache() const noexcept
 {
     (void)clearQueryCacheTable(m_impl->database);
+}
+
+foundation::Result<StoredSourceSnapshot> SqliteIndexStore::storedSourceSnapshot() const
+{
+    return readStoredSourceSnapshot(m_impl->database);
 }
 
 std::size_t SqliteIndexStore::queryCacheEntryCount() const noexcept

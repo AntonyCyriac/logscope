@@ -149,3 +149,23 @@ TEST(StorageConfigTest, RejectsInvalidQueryCacheMaxEntries)
 
     EXPECT_FALSE(result);
 }
+
+TEST(StorageConfigTest, ResolvesIncrementalAppendSetting)
+{
+    Configuration configuration;
+    configuration.set("storage.incremental_append", "false");
+
+    const StorageConfig resolved = resolveStorageConfig(configuration, StorageConfig{});
+
+    EXPECT_FALSE(resolved.incrementalAppend);
+}
+
+TEST(StorageConfigTest, RejectsInvalidIncrementalAppend)
+{
+    Configuration configuration;
+    configuration.set("storage.incremental_append", "maybe");
+
+    const auto result = validateStorageConfiguration(configuration);
+
+    EXPECT_FALSE(result);
+}

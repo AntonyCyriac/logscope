@@ -16,6 +16,7 @@ namespace scope::storage
 {
 
 [[nodiscard]] foundation::Path resolveIndexPath(const StorageConfig& config,
+                                                const foundation::Path& sourcePath,
                                                 const IndexFingerprint& fingerprint);
 
 [[nodiscard]] foundation::Result<IndexStorePtr>

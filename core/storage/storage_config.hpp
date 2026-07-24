@@ -32,6 +32,7 @@ struct StorageConfig
     StorageMode mode{StorageMode::Memory};
     bool persistIndex{false};
     bool reuseIndex{false};
+    bool incrementalAppend{true};
     bool compressContent{false};
     bool queryCacheEnabled{true};
     std::optional<foundation::Path> indexPath;

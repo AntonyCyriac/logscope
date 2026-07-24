@@ -23,6 +23,9 @@ class IndexFingerprint
 
     [[nodiscard]] static foundation::Result<IndexFingerprint> compute(const foundation::Path& sourcePath);
 
+    [[nodiscard]] static foundation::Result<IndexFingerprint>
+    stablePathKey(const foundation::Path& sourcePath);
+
     [[nodiscard]] static IndexFingerprint fromStored(std::string value);
 
     [[nodiscard]] static foundation::Result<bool> matchesSource(const IndexFingerprint& fingerprint,

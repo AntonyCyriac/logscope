@@ -47,7 +47,7 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | M11.8 | zlib `content` compression | ✅ Complete (`v1.4.3`) |
 | M11.9 | `line_json_fields` + DSL pushdown | ✅ Complete (`v1.4.3`) |
 | M11.10 | `query_cache` materialized results | ✅ (`v1.4.3`) |
-| M11.11 | Incremental append indexing | 🟡 Design (`v1.4.3`) |
+| M11.11 | Incremental append indexing | ✅ Complete (`v1.4.3`) |
 | M11.12 | FTS5 full-text search pushdown | 🟡 Design (`v1.4.3`) |
 
 ---
