@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) is complete; compression and query cache defer to `v1.4.2`. See [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) is complete; **bulk index build performance**, compression, and query cache target **`v1.4.2`**. See [Roadmap](../ROADMAP.md) and [M11-STORAGE-LAYER.md](M11-STORAGE-LAYER.md).
 
 ---
 
@@ -184,7 +184,8 @@ Evolves toward a SQL-like or DSL-based query language over indexed log data.
 
 Improve storage beyond flat files:
 
-- SQLite-backed indexed storage
+- SQLite-backed indexed storage (shipped `v1.4.1`)
+- **Bulk index build performance** — batched SQLite writes, benchmark SLA (`v1.4.2`)
 - Compression
 - Incremental indexing
 - Cached queries

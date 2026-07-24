@@ -424,7 +424,8 @@ v1.2.0  — M7: Search Engine
 v1.3.0  — M8: Advanced Reporting
 v1.4.0  — M10 Query Language (released)
 v1.4.1  — M11 Storage Layer (released)
-v1.4.2+ — M11 compression/cache follow-up + M12 Plugins
+v1.4.2  — M11 storage follow-up: bulk index build perf, compression, query cache
+v1.4.3+ — M12 Plugins (or v1.5.0 per milestone plan)
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud

@@ -71,6 +71,7 @@ M7 text search remains in-memory over fetched rows until a future FTS milestone.
 
 ## Non-goals (v1.4.1)
 
+- Batched SQLite bulk writes and index-build benchmark SLA (v1.4.2 — see [M11-STORAGE-LAYER.md](../../planning/M11-STORAGE-LAYER.md))
 - Compression (v1.4.2)
 - Cached query results table (v1.4.2)
 - Incremental append indexing (v1.4.2)

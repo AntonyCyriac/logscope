@@ -10,6 +10,11 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Planned (v1.4.2)
+
+- Bulk index build performance: batched SQLite writes (prepared statement reuse, WAL, transaction batching), indexing progress feedback, and `BM_IndexStoreAppend` regression SLA for 100k-line fixtures on Windows/Linux/macOS.
+- zlib compression on `content` column, query cache, incremental append indexing, `line_json_fields` table, FTS5.
+
 ---
 
 ## [1.4.1] - 2026-07-24
