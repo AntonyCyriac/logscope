@@ -92,6 +92,8 @@ foundation::Result<IndexStorePtr> tryOpenReusableIndex(const StorageConfig& conf
             "Index compression settings require rebuild from source log."));
     }
 
+    sqliteStore->applyQueryCacheOptions(indexStoreOptionsFromConfig(config));
+
     return opened;
 }
 

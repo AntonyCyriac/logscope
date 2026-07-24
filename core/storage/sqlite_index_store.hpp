@@ -6,6 +6,7 @@
 #pragma once
 
 #include <memory>
+#include <vector>
 
 #include "foundation/result.hpp"
 #include "index_store.hpp"
@@ -15,6 +16,12 @@
 
 namespace scope::storage
 {
+
+struct QueryCacheFetchResult
+{
+    bool cacheHit{false};
+    std::vector<analysis::IndexedLine> lines;
+};
 
 class SqliteIndexStore final : public IndexStore
 {
@@ -26,6 +33,17 @@ class SqliteIndexStore final : public IndexStore
            const IndexStoreOptions& options = IndexStoreOptions{});
 
     [[nodiscard]] static foundation::Result<IndexStorePtr> open(const foundation::Path& databasePath);
+
+    void applyQueryCacheOptions(const IndexStoreOptions& options) noexcept;
+
+    [[nodiscard]] bool queryCacheEnabled() const noexcept;
+
+    [[nodiscard]] foundation::Result<QueryCacheFetchResult>
+    fetchLinesMatchingPushdown(const std::string& canonicalFilter, const std::string& sqlWhere) const;
+
+    [[nodiscard]] std::size_t queryCacheEntryCount() const noexcept;
+
+    void clearQueryCache() const noexcept;
 
     [[nodiscard]] static constexpr int currentSchemaVersion() noexcept
     {

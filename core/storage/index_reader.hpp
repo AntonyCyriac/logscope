@@ -11,9 +11,16 @@
 
 #include "index_store.hpp"
 #include "line_index.hpp"
+#include "query_node.hpp"
 
 namespace scope::storage
 {
+
+struct PushdownFetchResult
+{
+    bool cacheHit{false};
+    std::vector<analysis::IndexedLine> lines;
+};
 
 /**
  * @brief Read-only view over an in-memory line index and optional persistent store.
@@ -27,6 +34,9 @@ class IndexReader
 
     [[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>>
     linesMatchingWhere(const std::string& sqlWhereClause) const;
+
+    [[nodiscard]] foundation::Result<PushdownFetchResult>
+    linesMatchingPushdownFilter(const query::QueryNode& filterNode, const std::string& sqlWhereClause) const;
 
     [[nodiscard]] std::uint64_t indexedLineCount() const noexcept;
 

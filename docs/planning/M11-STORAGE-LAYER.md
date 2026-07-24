@@ -46,7 +46,7 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | M11.7 | Schema v2 migration framework | ✅ Complete (`v1.4.3`) |
 | M11.8 | zlib `content` compression | ✅ Complete (`v1.4.3`) |
 | M11.9 | `line_json_fields` + DSL pushdown | ✅ Complete (`v1.4.3`) |
-| M11.10 | `query_cache` materialized results | 🟡 Design (`v1.4.3`) |
+| M11.10 | `query_cache` materialized results | ✅ (`v1.4.3`) |
 | M11.11 | Incremental append indexing | 🟡 Design (`v1.4.3`) |
 | M11.12 | FTS5 full-text search pushdown | 🟡 Design (`v1.4.3`) |
 
@@ -107,7 +107,7 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | Schema v2 migration | 🟡 Design |
 | zlib compression on `content` | 🟡 Design |
 | `line_json_fields` EAV + pushdown | 🟡 Design |
-| `query_cache` | 🟡 Design |
+| `query_cache` | ✅ |
 | Incremental append | 🟡 Design |
 | FTS5 | 🟡 Design |
 
