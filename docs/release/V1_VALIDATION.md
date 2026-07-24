@@ -52,7 +52,7 @@ Formal checklist to verify LogScope is ready for the first stable production rel
 | Coverage report | Generated in CI | [x] |
 | Benchmark regression | Within baseline tolerance | [x] |
 | Fuzz smoke test | 1000 runs per target, no crashes | [x] |
-| Release binaries | Bulk-log CLI matrix (100k lines on Linux/Windows; 10k on macOS; 22 scenarios) per OS before publish | [x] |
+| Release binaries | Bulk-log CLI matrix (100k lines, 22 scenarios) per OS before publish | [x] |
 | Security review | [`SECURITY_REVIEW.md`](../handbook/SECURITY_REVIEW.md) completed | [x] |
 | Documentation | README, ROADMAP, CHANGELOG, CLI reference updated | [x] |
 | Known P0/P1 defects | None open | [x] |

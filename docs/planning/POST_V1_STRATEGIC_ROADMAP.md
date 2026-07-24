@@ -395,7 +395,7 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Architecture diagrams | `v1.0.x` |
-| Stress tests with large log fixtures | CI/release CLI matrix at 100k lines on Ubuntu CI and Linux/Windows release (`scripts/`); macOS release at 10k; `BM_*` benchmarks use larger fixtures |
+| Stress tests with large log fixtures | CI/release CLI matrix at 100k lines on all OSes (`scripts/`); `BM_*` benchmarks use larger fixtures |
 | Regression tests | [`tests/regression/`](../../tests/regression/README.md) — M11 storage edge cases (Phase 1, started) |
 | Memory leak / ASan CI hardening | CI `ASAN_OPTIONS` / `UBSAN_OPTIONS`; LeakSanitizer via ASan on Linux (Phase 1, partial) |
 | Internal metrics / parser stats | `v1.0.x` or early M6 |

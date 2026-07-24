@@ -78,7 +78,7 @@ Release tags (`vX.Y.Z`) are the public sync points for related private strategy 
 
 For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts, runs the bulk-log CLI matrix, and attaches binaries to the GitHub Release.
 
-**Bulk-log matrix size:** CI (`cli-matrix` on Ubuntu) and release workflows (Linux/Windows) use **100k-line** fixtures (`BULK_LOG_LINES: 100000`), including `--persist-index` scenarios, after **`v1.4.2`** batched SQLite writes. macOS release runners remain at **10k** for budget.
+**Bulk-log matrix size:** CI (`cli-matrix` on Ubuntu) and release workflows (all OSes) use **100k-line** fixtures (`BULK_LOG_LINES: 100000`), including `--persist-index` scenarios, after **`v1.4.2`** batched SQLite writes.
 
 The workflow creates the GitHub Release draft with attached binaries. Maintainer steps:
 
@@ -105,7 +105,7 @@ Complete after the public tag and GitHub Release are live:
 |------|--------|
 | Release notes | Ensure the GitHub Release body summarizes the `[X.Y.Z]` section from [`CHANGELOG.md`](../../CHANGELOG.md) |
 | Private strategy sync | On the private strategy repository: update long-horizon docs for the shipped milestone, then tag `sync/vX.Y.Z` on that commit (annotated message: `sync/vX.Y.Z — public vX.Y.Z <milestone summary>`) and push the tag |
-| Bulk matrix (when ready) | Done for Linux/Windows release + Ubuntu CI at `100000` lines; macOS release remains `10000` |
+| Bulk matrix (when ready) | Done for all release runners + Ubuntu CI at `100000` lines |
 
 Example private strategy sync (run in the strategy repository checkout, not in this repo):
 
