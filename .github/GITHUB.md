@@ -63,7 +63,7 @@ The `workflows/` directory contains GitHub Actions pipelines.
 | `coverage` | `gcov`/`lcov` coverage capture and artifact upload |
 | `benchmark` | Benchmark regression check against committed baseline |
 | `fuzz` | libFuzzer smoke tests (Clang, Ubuntu) |
-| `tidy` | clang-tidy static analysis (`continue-on-error`) |
+| `tidy` | clang-tidy static analyzer (`clang-analyzer-*`; warnings fail CI) |
 
 Runs on every push and pull request to `master`.
 

@@ -129,6 +129,7 @@ The repository includes project configuration files.
 
 ```text
 .clang-format
+.clang-tidy
 .editorconfig
 .gitignore
 CMakePresets.json

@@ -217,7 +217,6 @@ jobs:
     name: Static Analysis (clang-tidy)
 
     runs-on: ubuntu-latest
-    continue-on-error: true
 
     steps:
       - name: Checkout Repository
