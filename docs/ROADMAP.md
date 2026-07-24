@@ -37,7 +37,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
 | **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
 | **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
-| **M11 – Storage Layer** | ✅ Complete | SQLite-backed hybrid index, session reuse, query pushdown. Released: `v1.4.1`. |
+| **M11 – Storage Layer** | ✅ Complete | SQLite-backed hybrid index, session reuse, query pushdown (`v1.4.1`); bulk write perf (`v1.4.2`). |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
 | **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
 | **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
@@ -61,7 +61,7 @@ M7  ██████████ 100%  (v1.2.0 released)
 M8  ██████████ 100%  (v1.3.0 released)
 M9  ██████████ 100%  (v1.3.1 released)
 M10 ██████████ 100%  (v1.4.0 released)
-M11 ██████████ 100%  (v1.4.1 released)
+M11 ██████████ 100%  (v1.4.2 released)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -424,8 +424,8 @@ v1.2.0  — M7: Search Engine
 v1.3.0  — M8: Advanced Reporting
 v1.4.0  — M10 Query Language (released)
 v1.4.1  — M11 Storage Layer (released)
-v1.4.2  — M11 storage follow-up: bulk index build perf, compression, query cache
-v1.4.3+ — M12 Plugins (or v1.5.0 per milestone plan)
+v1.4.2  — M11 bulk index write performance (released)
+v1.4.3+ — M11 remainder: compression, query cache; M12 Plugins (`v1.5.0`)
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud

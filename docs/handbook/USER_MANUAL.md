@@ -25,7 +25,7 @@ Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../plannin
 
 ## 2.1 Install
 
-**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.1` or later) and add `logscope` to your `PATH`.
+**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.2` or later) and add `logscope` to your `PATH`.
 
 **Build from source** — see [Developer Setup](DEVELOPER_SETUP.md) or the [README](../../README.md) quick start.
 
@@ -260,7 +260,7 @@ Default index directory:
 
 Configure defaults in `logscope.properties` — see [Configuration Guide](CONFIGURATION_GUIDE.md) (`storage.*` keys).
 
-**Note:** Very large `--persist-index` runs may take time on v1.4.1; bulk write performance improvements are planned for v1.4.2.
+**Note:** v1.4.2+ batches SQLite writes for faster `--persist-index` builds; progress is logged every 10,000 lines.
 
 ---
 
@@ -324,7 +324,7 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | JSON field names differ | `--profile generic-json` plus `source.json.timestamp_field` / `source.json.level_field` in config |
 | No matches in investigate | Confirm level spelling (`error`, not `ERROR` for `--level`; use `level == ERROR` in DSL) |
 | Index cap hit | Raise `investigation.max_indexed_lines` in config, or use `--persist-index` |
-| Slow persist on large logs | Expected on v1.4.1; use `--index-path` to reuse index on later runs |
+| Slow persist on large logs | Use `--index-path` to reuse index on later runs; v1.4.2+ batches writes for faster first-time persist |
 | Windows build SSL error | `CMAKE_TLS_VERIFY=0` at configure only — see [README](../../README.md#building-on-windows) |
 | Config rejected | `logscope config validate --config <file>` for the exact error |
 
