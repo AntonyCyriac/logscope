@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Configuration Guide |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -174,6 +174,18 @@ Default index directories:
 
 CLI flags `--persist-index`, `--reuse-index`, and `--index-path` override storage settings per run.
 
+## 6.7.1 Storage v1.4.3 (planned)
+
+These keys are **design-complete** for **v1.4.3** — implementation follows [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
+
+| Key | Values | Default | Description |
+|-----|--------|---------|-------------|
+| `storage.compress_content` | boolean | `false` | zlib-compress persisted `content` column |
+| `storage.compress_threshold_bytes` | integer | `256` | Minimum line length to compress |
+| `storage.query_cache.enabled` | boolean | `true` | Cache filter results on persisted indexes |
+| `storage.query_cache.max_entries` | integer | `64` | LRU cap for `query_cache` rows |
+| `storage.incremental_append` | boolean | `true` | Append new lines when source file grows |
+
 ## 6.8 Extensions
 
 | Key | Values | Default | Description |
@@ -230,6 +242,7 @@ report.include_charts=true
 | [M6 – Log Format Intelligence](../planning/M6-LOG-FORMAT-INTELLIGENCE.md) | Format profiles and field extraction |
 | [M10 – Query Language](../planning/M10-QUERY-LANGUAGE.md) | Filter DSL grammar |
 | [M11 – Storage Layer](../planning/M11-STORAGE-LAYER.md) | Persistent index architecture |
+| [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md) | v1.4.3 acceptance scenarios |
 | [ADR-005 – Storage Architecture](../architecture/decisions/ADR-005-Storage-Architecture.md) | Storage design decisions |
 
 ---
@@ -239,3 +252,4 @@ report.include_charts=true
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 configuration guide. |
+| 1.1.0 | 24-07-2026 | Draft v1.4.3 storage keys (compression, cache, incremental append). |

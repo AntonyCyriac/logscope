@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | User Manual |
 | Category | Handbook |
-| Version | 1.2.1 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -377,6 +377,29 @@ log.level=info
 
 Set `log.level=warn` or `SCOPE_LOG_LEVEL=warn` to suppress progress lines. See [Configuration Guide](CONFIGURATION_GUIDE.md) (`log.level`).
 
+## 8.2 Incremental re-index (v1.4.3+ — planned)
+
+When a log file **grows** (new lines appended on disk), `--reuse-index` can append only new lines to an existing SQLite index instead of rebuilding from scratch. Configure with `storage.incremental_append=true` (default when shipped).
+
+If the file **shrinks** (truncated or rotated), LogScope rebuilds the index from the source file.
+
+Opening a **v1.4.2** (schema v1) index with v1.4.3 triggers a one-time rebuild to schema v2.
+
+## 8.3 JSON field filters (v1.4.3+ — planned)
+
+On JSON Lines logs, filter by top-level fields:
+
+```bash
+logscope query --filter 'service == "PCF"' --persist-index samples/sample.jsonl
+logscope investigate --filter 'service == "PCF" AND level == ERROR' samples/sample.jsonl
+```
+
+Requires `--profile generic-json` or auto-detected JSONL format.
+
+## 8.4 Query cache (v1.4.3+ — planned)
+
+Repeat investigations with the same filter on an unchanged index reuse cached line IDs (`storage.query_cache.enabled=true`). Cache invalidates when the source file changes or the index is rebuilt.
+
 ---
 
 # 9. Configuration
@@ -457,6 +480,7 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | JSON field names differ | `--profile generic-json` plus `source.json.timestamp_field` / `source.json.level_field` in config |
 | No matches in investigate | Confirm level spelling (`error`, not `ERROR` for `--level`; use `level == ERROR` in DSL) |
 | Index cap hit | Raise `investigation.max_indexed_lines` in config, or use `--persist-index` |
+| v1 index after v1.4.3 upgrade | First open rebuilds to schema v2 (one-time) |
 | Slow persist on large logs | Use `--index-path` to reuse index on later runs; v1.4.2+ batches writes for faster first-time persist |
 | Windows build SSL error | `CMAKE_TLS_VERIFY=0` at configure only — see [Developer Setup](DEVELOPER_SETUP.md#windows-sqlite-fetchcontent-tls) |
 | Config rejected | `logscope config validate --config <file>` for the exact error |
@@ -484,3 +508,4 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | 1.1.0 | 24-07-2026 | v1.4.2 persist-index performance, progress logging, and Windows build link fix. |
 | 1.2.0 | 24-07-2026 | Complete CLI workflow coverage: CSV/Markdown, session thresholds, extensions, investigate flags. |
 | 1.2.1 | 24-07-2026 | Align session save flags with CLI reference (`--search` path vs `--content-search`). |
+| 1.3.0 | 24-07-2026 | Draft v1.4.3 sections: incremental append, JSON fields, query cache. |

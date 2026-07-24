@@ -80,7 +80,7 @@ See [ADR-004](../architecture/decisions/ADR-004-Query-DSL-Grammar.md) for gramma
 # 6. Deferred
 
 - SQL-like syntax
-- Arbitrary JSON field predicates (`service == "PCF"`) — requires index extension or M11
-- Persistent query cache (M11)
+- Arbitrary JSON field predicates (`service == "PCF"`) — **v1.4.3** via `line_json_fields` (see [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md))
+- Persistent query cache — **v1.4.3** (see [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md))
 - Natural language queries (M13)
 - Query provider plugins (M12)

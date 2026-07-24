@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.8.0 |
+| Version | 1.9.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -136,6 +136,8 @@ logscope query --filter 'level == ERROR AND contains(message, "refused")' sample
 ```
 
 Filter DSL fields: `level`, `time`, `timestamp`, `message`, `content`, `correlationId`, `line`. Functions: `contains(field, "text")`, `hasKey("key")`.
+
+**v1.4.3 (planned):** arbitrary top-level JSON field comparisons (e.g. `service == "PCF"`) when `--persist-index` is used on JSONL sources. See [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
 ---
 
@@ -303,3 +305,4 @@ Default directory: current working directory.
 | 1.6.0 | 24-07-2026 | Added `query` command, `--filter` DSL, and `query.saved.*` config keys for M10. |
 | 1.7.0 | 24-07-2026 | Documented v1.4.2 persist-index progress logging on storage flags. |
 | 1.8.0 | 24-07-2026 | Moved threshold and investigation filters from `analyze` to `session save`; expanded session save option table. |
+| 1.9.0 | 24-07-2026 | Note v1.4.3 JSON field filter and FTS pushdown (planned). |

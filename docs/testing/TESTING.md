@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.5.0 |
+| Version | 1.7.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -16,6 +16,8 @@
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
 **Current baseline:** **396** automated tests (unit, integration, end-to-end, and regression). Storage coverage includes `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, and M11 storage regression guards.
+
+**v1.4.3:** implement tests per [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md) scenario matrix (target ~435 tests at release).
 
 ---
 
@@ -189,3 +191,4 @@ Requires `clang-tidy` on PATH.
 | 1.4.0 | 24-07-2026 | Updated baseline to 365 tests at `v1.4.0`; noted M10 query language coverage. |
 | 1.5.0 | 24-07-2026 | Added regression test layer; updated baseline to 395 tests; sanitizer CI env hardening. |
 | 1.6.0 | 24-07-2026 | Updated baseline to 396 tests at `v1.4.2`; noted M11 bulk index write performance coverage. |
+| 1.7.0 | 24-07-2026 | v1.4.3 scenario test matrix; target ~435 tests at release. |
