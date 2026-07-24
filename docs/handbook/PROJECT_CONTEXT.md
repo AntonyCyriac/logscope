@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.2.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |

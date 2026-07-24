@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Product Overview |
 | Category | Vision |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 15-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -28,6 +28,8 @@ LogScope is a generic log analysis platform designed to help engineers understan
 Rather than building separate tools for different technologies or vendors, LogScope provides a common approach to analyzing logs regardless of their origin or structure.
 
 The product focuses on reducing the effort required to extract meaningful insights from logs while remaining simple to use, extensible, and technology-independent.
+
+Long-term, LogScope aims to grow from log analysis into a broader **system investigation** direction: helping engineers answer “what happened?” across the artifacts they already collect. Near-term public milestones remain log-centric (search, reporting, analytics, query); additional investigation themes are published as public planning documents only when implementation starts.
 
 ---
 
@@ -233,3 +235,4 @@ The following are outside the scope of the product unless future requirements ju
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial Product Overview. |
+| 1.1.0 | 24-07-2026 | Long-term system investigation north star (public; detail remains private until graduated). |

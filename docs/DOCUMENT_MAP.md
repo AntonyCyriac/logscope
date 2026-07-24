@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.0.0 |
+| Version | 2.2.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -78,6 +78,9 @@ docs/
 │   ├── M6-LOG-FORMAT-INTELLIGENCE.md
 │   ├── M7-SEARCH-ENGINE.md
 │   └── M8-ADVANCED-REPORTING.md
+│
+│   (Long-horizon strategy beyond published Mn plans is maintained privately
+│    outside this repository; public Mn docs are added when implementation starts.)
 │
 ├── testing/
 │   └── PERFORMANCE.md
@@ -223,6 +226,7 @@ IMPLEMENTATION
 | PRODUCT.md | Provides a concise product summary at the documentation root. |
 | CHANGELOG.md | Tracks notable project changes from M3 onward (repository root). |
 | ROADMAP.md | Defines milestones, current progress, and planned work. |
+| planning/ | Public tactical milestone plans (`Mn-*.md`) and post-v1 strategic summary. Long-horizon strategy beyond published plans is private and not linked from this repository. |
 | architecture/decisions/ | Records Architecture Decision Records (ADRs). |
 | architecture/foundation/ | Documents foundation-layer component designs. |
 | implementation/ | Describes how architectural concepts map to the codebase. |
@@ -287,3 +291,5 @@ These categories should be added only when they provide clear value and support 
 | 1.8.0 | 21-07-2026 | Added PROJECT_CONTEXT.md for agent session bootstrap. |
 | 1.9.0 | 21-07-2026 | Added POST_V1_STRATEGIC_ROADMAP.md and M7-SEARCH-ENGINE.md; updated reading order. |
 | 2.0.0 | 24-07-2026 | Added M8-ADVANCED-REPORTING.md and ADR-003; updated reading order for `v1.3.0`. |
+| 2.1.0 | 24-07-2026 | Note that long-horizon strategy beyond published Mn plans is private (no private URL). |
+| 2.2.0 | 24-07-2026 | Merged M8 document map with private-strategy documentation note. |

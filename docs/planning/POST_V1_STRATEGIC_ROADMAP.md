@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.0.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 21-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** [M8 – Advanced Reporting](POST_V1_STRATEGIC_ROADMAP.md) (`v1.3.0`).
+**Immediate next milestone:** M9 – Analytics Engine (`v1.3.1`+). Search (M7 / `v1.2.0`) and Advanced Reporting (M8 / `v1.3.0`) are complete; see [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -60,15 +60,15 @@ The primary responsibility remains helping engineers **understand existing log d
 # 4. Documentation Model
 
 ```text
-POST_V1_STRATEGIC_ROADMAP.md  ← strategic vision (this document)
+POST_V1_STRATEGIC_ROADMAP.md  ← public strategic layer (this document)
         │
-        ├── M6-LOG-FORMAT-INTELLIGENCE.md
-        ├── M7-SEARCH-ENGINE.md
-        └── M8–M17 (future tactical plans)
+        ├── M6–Mn planning docs  ← public tactical plans when implementation starts
         │
         ▼
-    ROADMAP.md  ← summary and status
+    ROADMAP.md  ← public milestone status
 ```
+
+Long-horizon product themes beyond the published public milestones are maintained privately. They appear in this repository only as public `Mn` planning documents when implementation is about to start. This repository does not link to any private strategy location.
 
 ---
 
@@ -322,7 +322,7 @@ The broader companion product vision:
 | Phase 2 — Search Engine | M7 | `v1.2.0` |
 | Phase 2 — Reporting Engine | M8 | `v1.3.0` |
 | Phase 2 — Analytics Engine | M9 | `v1.3.1`+ |
-| Phase 2 — Query Engine | M10 | `v1.3.0` / `v1.4.0` |
+| Phase 2 — Query Engine | M10 | `v1.4.0` |
 | Phase 3 — Storage | M11 | `v1.4.0` |
 | Phase 4 — Plugin Ecosystem | M12 | `v1.4.0` / `v1.5.0` |
 | Phase 5 — AI | M13 | `v1.5.0` |
@@ -449,3 +449,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 |---------|------|-------------|
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
 | 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |
+| 1.2.0 | 24-07-2026 | Next milestone M9; private themes stay unpublished until graduated. |

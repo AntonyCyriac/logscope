@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.0.0 |
+| Version | 3.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 21-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -35,7 +35,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M6 – Log Format Intelligence** | ✅ Complete | Format detection, structured parsing, field extraction, content investigation, format profiles. Released as `v1.1.0`. |
 | **M7 – Search Engine** | ✅ Complete | Full-text, regex, boolean search; saved searches; session search history. Released as `v1.2.0`. |
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
-| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
+| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.1`+. |
 | **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
 | **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
@@ -400,7 +400,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 |-----------|-------|----------------|
 | M7 – Search Engine | Full-text, regex, boolean search; saved searches | `v1.2.0` |
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
-| M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.0` |
+| M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
 | M10 – Query Language | Structured filter DSL | `v1.4.0` |
 | M11 – Storage Layer | SQLite, indexing, compression | `v1.4.0` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
@@ -457,3 +457,4 @@ The roadmap is considered successful when:
 | 3.1.0 | 21-07-2026 | M6 complete; v1.1.0 released with format profiles and configuration. |
 | 3.2.0 | 21-07-2026 | M7 complete; v1.2.0 released with search engine. |
 | 3.3.0 | 24-07-2026 | M8 complete; v1.3.0 released with advanced reporting. |
+| 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ after M8 ships as `v1.3.0`. |
