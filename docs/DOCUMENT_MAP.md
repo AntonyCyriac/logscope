@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -84,7 +84,8 @@ docs/
 │   ├── M7-SEARCH-ENGINE.md
 │   ├── M8-ADVANCED-REPORTING.md
 │   ├── M9-ANALYTICS-ENGINE.md
-│   └── M10-QUERY-LANGUAGE.md
+│   ├── M10-QUERY-LANGUAGE.md
+│   └── M11-STORAGE-LAYER.md
 │
 │   (Long-horizon strategy beyond published Mn plans is maintained privately
 │    outside this repository; public Mn docs are added when implementation starts.)
@@ -138,7 +139,8 @@ docs/
 │   │   ├── ADR-001-Testing-Framework.md
 │   │   ├── ADR-002-Benchmark-Framework.md
 │   │   ├── ADR-003-PDF-Report-Generation.md
-│   │   └── ADR-004-Query-DSL-Grammar.md
+│   │   ├── ADR-004-Query-DSL-Grammar.md
+│   │   └── ADR-005-Storage-Architecture.md
 │   │
 │   └── foundation/
 │       └── RESULT.md
@@ -163,6 +165,7 @@ Developers new to LogScope should read the documentation in the following order.
 | 5 | M8-ADVANCED-REPORTING.md | Understand the completed M8 advanced reporting (`v1.3.0`). |
 | 6 | M9-ANALYTICS-ENGINE.md | Understand the completed M9 analytics engine (`v1.3.1`). |
 | 7 | M10-QUERY-LANGUAGE.md | Understand the completed M10 query language (`v1.4.0`). |
+| 8 | M11-STORAGE-LAYER.md | Understand the completed M11 storage layer (`v1.4.1`). |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -307,3 +310,4 @@ These categories should be added only when they provide clear value and support 
 | 2.3.0 | 24-07-2026 | Added M9-ANALYTICS-ENGINE.md and reading order for `v1.3.1`. |
 | 2.4.0 | 24-07-2026 | Documented `scripts/` bulk-log CLI matrix tooling and CI integration. |
 | 2.5.0 | 24-07-2026 | Added M10-QUERY-LANGUAGE.md, ADR-004, and reading order for `v1.4.0`. |
+| 2.6.0 | 24-07-2026 | Added M11-STORAGE-LAYER.md, ADR-005, and reading order for `v1.4.1`. |

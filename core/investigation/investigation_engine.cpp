@@ -8,9 +8,12 @@
 #include <unordered_map>
 
 #include "correlation_analyzer.hpp"
+#include "indexed_line_access.hpp"
+#include "index_reader.hpp"
 #include "log_macros.hpp"
 #include "foundation/string.hpp"
 #include "query_evaluator.hpp"
+#include "query_planner.hpp"
 #include "search_engine.hpp"
 
 namespace scope::investigation
@@ -21,12 +24,34 @@ namespace
 
 std::vector<analysis::IndexedLine> indexedLines(const analysis::AnalysisModel& model)
 {
-    if (!model.lineIndex().has_value())
+    if (!analysis::hasQueryableIndex(model))
     {
         return {};
     }
 
-    return model.lineIndex()->lines();
+    return analysis::fetchIndexedLines(model);
+}
+
+std::vector<analysis::IndexedLine> candidateLines(const analysis::AnalysisModel& model,
+                                                  const query::QueryNode& filterNode)
+{
+    if (model.indexStore() != nullptr)
+    {
+        if (const auto plan = storage::planQueryPushdown(filterNode))
+        {
+            const analysis::LineIndex* memoryIndex =
+                model.lineIndex().has_value() ? &*model.lineIndex() : nullptr;
+            const storage::IndexReader reader(memoryIndex, model.indexStore());
+            const auto fetched = reader.linesMatchingWhere(plan->sqlWhere);
+
+            if (fetched)
+            {
+                return *fetched;
+            }
+        }
+    }
+
+    return indexedLines(model);
 }
 
 CorrelationSummary toCorrelationSummary(const analytics::CorrelationResult& result)
@@ -105,14 +130,13 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
 {
     InvestigationResult result;
 
-    if (!model.lineIndex().has_value())
+    if (!analysis::hasQueryableIndex(model))
     {
         return result;
     }
 
-    const analysis::LineIndex& lineIndex = *model.lineIndex();
-    result.indexedLineCount = lineIndex.indexedLineCount();
-    result.truncatedLineCount = lineIndex.truncatedLineCount();
+    result.indexedLineCount = analysis::indexedLineCountForModel(model);
+    result.truncatedLineCount = analysis::truncatedLineCountForModel(model);
 
     const auto resolvedQuery = criteria.resolvedSearchQuery();
     search::SearchQuery activeQuery = search::SearchQuery::matchAll();
@@ -133,9 +157,10 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
         activeFilter = *resolvedFilter;
     }
 
-    const query::QueryEvaluator filterEvaluator(std::move(activeFilter));
+    const query::QueryEvaluator filterEvaluator(activeFilter);
+    const std::vector<analysis::IndexedLine> lines = candidateLines(model, activeFilter);
 
-    for (const analysis::IndexedLine& line : lineIndex.lines())
+    for (const analysis::IndexedLine& line : lines)
     {
         if (!searchEngine.matches(line, activeQuery))
         {

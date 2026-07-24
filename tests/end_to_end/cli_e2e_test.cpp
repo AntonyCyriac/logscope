@@ -257,6 +257,61 @@ TEST(CliE2eTest, InvestigateCombinesTextQueryAndFilter)
     EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
 }
 
+TEST(CliE2eTest, InvestigatePersistIndexFindsLinesBeyondMemoryCap)
+{
+    const std::string logFile = "e2e_persist_large.log";
+    const std::string indexFile = "e2e_persist_large.db";
+
+    {
+        std::ofstream stream(logFile);
+
+        for (int lineNumber = 1; lineNumber <= 10001; ++lineNumber)
+        {
+            stream << "2026-07-11 10:00:00 INFO line " << lineNumber << '\n';
+        }
+
+        stream << "2026-07-11 10:00:00 ERROR PERSIST_INDEX_MARKER beyond cap\n";
+    }
+
+    const std::string output =
+        runLogscope("investigate --persist-index --index-path " + indexFile +
+                    " --filter \"contains(message, \\\"PERSIST_INDEX_MARKER\\\")\" " +
+                    scope::test_support::quoteArgument(logFile));
+
+    std::remove(logFile.c_str());
+    std::remove(indexFile.c_str());
+
+    EXPECT_NE(std::string::npos, output.find("PERSIST_INDEX_MARKER"));
+}
+
+TEST(CliE2eTest, SessionLoadReusesPersistedIndex)
+{
+    const std::string logFile = "e2e_session_reuse.log";
+    const std::string sessionFile = "e2e_session_reuse.logscope-session";
+    const std::string indexFile = "e2e_session_reuse.db";
+
+    {
+        std::ofstream stream(logFile);
+        stream << "2026-07-11 10:00:00 ERROR SESSION_REUSE_MARKER\n";
+    }
+
+    const std::string saveOutput =
+        runLogscope("session save " + sessionFile + " --persist-index --index-path " + indexFile +
+                    " --content-search SESSION_REUSE_MARKER " +
+                    scope::test_support::quoteArgument(logFile));
+
+    EXPECT_NE(std::string::npos, saveOutput.find("Session saved"));
+
+    const std::string loadOutput = runLogscope("session load " + sessionFile);
+
+    std::remove(logFile.c_str());
+    std::remove(sessionFile.c_str());
+    std::remove(indexFile.c_str());
+
+    EXPECT_NE(std::string::npos, loadOutput.find("SESSION_REUSE_MARKER"));
+    EXPECT_NE(std::string::npos, loadOutput.find("Matches     : yes"));
+}
+
 TEST(CliE2eTest, AnalyzeAnalyticsSections)
 {
     const std::string output = runLogscope("analyze --sections analytics,clusters " +

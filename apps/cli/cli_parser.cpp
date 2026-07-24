@@ -78,6 +78,38 @@ std::optional<analysis::DetectedLogLevel> parseDetectedLogLevel(const std::strin
     return std::nullopt;
 }
 
+bool parseStorageOption(const std::string& argument, int& index, const int argc, char* argv[], bool& persistIndex,
+                        bool& reuseIndex, std::optional<foundation::Path>& indexPath)
+{
+    if (argument == "--persist-index")
+    {
+        persistIndex = true;
+
+        return true;
+    }
+
+    if (argument == "--reuse-index")
+    {
+        reuseIndex = true;
+
+        return true;
+    }
+
+    if (argument == "--index-path")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        indexPath = foundation::Path(argv[++index]);
+
+        return true;
+    }
+
+    return false;
+}
+
 bool parseInvestigationOption(const std::string& argument, int& index, const int argc, char* argv[],
                               investigation::InvestigationCriteria& criteria)
 {
@@ -302,6 +334,11 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             continue;
         }
 
+        if (parseStorageOption(argument, index, argc, argv, options.persistIndex, options.reuseIndex, options.indexPath))
+        {
+            continue;
+        }
+
         if (argument == "--sections")
         {
             if (index + 1 >= argc)
@@ -425,6 +462,11 @@ std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv
         }
 
         if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
+            continue;
+        }
+
+        if (parseStorageOption(argument, index, argc, argv, options.persistIndex, options.reuseIndex, options.indexPath))
         {
             continue;
         }
@@ -893,6 +935,11 @@ std::optional<SessionSaveOptions> parseSessionSaveArguments(int argc, char* argv
         }
 
         if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
+            continue;
+        }
+
+        if (parseStorageOption(argument, index, argc, argv, options.persistIndex, options.reuseIndex, options.indexPath))
         {
             continue;
         }

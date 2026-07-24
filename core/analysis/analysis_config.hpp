@@ -15,6 +15,7 @@
 #include "line_index.hpp"
 #include "log_format.hpp"
 #include "runtime/configuration.hpp"
+#include "storage_config.hpp"
 
 namespace scope::analysis
 {
@@ -33,6 +34,7 @@ struct AnalysisConfig
     LogFormat formatHint{LogFormat::Auto};
     JsonFieldMapping jsonFieldMapping;
     std::size_t maxIndexedLines{defaultIndexedLineCapacity};
+    storage::StorageConfig storage{storage::StorageConfig::defaults()};
 
     [[nodiscard]] static AnalysisConfig defaults() noexcept;
 };

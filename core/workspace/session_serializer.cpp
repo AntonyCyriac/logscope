@@ -19,6 +19,8 @@
 #include "foundation/string.hpp"
 #include "query_parser.hpp"
 #include "search_query_parser.hpp"
+#include "index_fingerprint.hpp"
+#include "sqlite_index_store.hpp"
 
 namespace scope::workspace
 {
@@ -26,7 +28,7 @@ namespace scope::workspace
 namespace
 {
 
-constexpr std::string_view sessionVersion = "1.2";
+constexpr std::string_view sessionVersion = "1.3";
 
 bool parseUint64(std::string_view value, std::uint64_t& output) noexcept
 {
@@ -335,6 +337,19 @@ std::string SessionSerializer::serialize(const InvestigationSession& session)
     output << "report.sections=" << sectionsToString(session.reportOptions().sections) << '\n';
     output << "config.path=" << session.configFile().string() << '\n';
 
+    if (const storage::IndexStorePtr indexStore = session.analysisModel().indexStore())
+    {
+        output << "index.fingerprint=" << indexStore->metadata().fingerprint << '\n';
+        output << "index.path=" << indexStore->path().string() << '\n';
+        output << "index.line_count=" << indexStore->storedLineCount() << '\n';
+    }
+    else
+    {
+        output << "index.fingerprint=\n";
+        output << "index.path=\n";
+        output << "index.line_count=\n";
+    }
+
     return output.str();
 }
 
@@ -366,6 +381,9 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     std::string reportFormatValue = "text";
     std::string reportSectionsValue = "all";
     std::string configPathValue;
+    std::string indexFingerprintValue;
+    std::string indexPathValue;
+    std::string indexLineCountValue;
 
     const std::vector<std::string> lines = foundation::split(content, '\n');
 
@@ -528,6 +546,18 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         {
             configPathValue = value;
         }
+        else if (key == "index.fingerprint")
+        {
+            indexFingerprintValue = value;
+        }
+        else if (key == "index.path")
+        {
+            indexPathValue = value;
+        }
+        else if (key == "index.line_count")
+        {
+            indexLineCountValue = value;
+        }
     }
 
     if (sourcePathValue.empty())
@@ -556,7 +586,26 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         analysisFormat = *parsedAnalysisFormat;
     }
 
-    const analysis::AnalysisModel model(foundation::Path(sourcePathValue), totalLines, levelCounts, analysisFormat);
+    storage::IndexStorePtr indexStore;
+
+    if (!foundation::isBlank(indexPathValue) && !foundation::isBlank(indexFingerprintValue))
+    {
+        const storage::IndexFingerprint fingerprint = storage::IndexFingerprint::fromStored(indexFingerprintValue);
+        const auto matches = storage::IndexFingerprint::matchesSource(fingerprint, foundation::Path(sourcePathValue));
+
+        if (matches && *matches)
+        {
+            const auto opened = storage::SqliteIndexStore::open(foundation::Path(indexPathValue));
+
+            if (opened)
+            {
+                indexStore = *opened;
+            }
+        }
+    }
+
+    analysis::AnalysisModel model(foundation::Path(sourcePathValue), totalLines, levelCounts, analysisFormat,
+                                  std::nullopt, std::nullopt, std::nullopt, indexStore);
 
     investigation::LineCountFilter lineFilter = lineFilterFromValues(minLines, maxLinesValue);
 

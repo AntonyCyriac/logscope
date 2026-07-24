@@ -1,9 +1,9 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(LogScope
-    VERSION 1.4.0
+    VERSION 1.4.1
     DESCRIPTION "Generic, extensible and high-performance log analysis platform"
-    LANGUAGES CXX
+    LANGUAGES CXX C
 )
 
 # ----------------------------------------------------------

@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.4.0`
+**Current release:** `v1.4.1`
 
 **Completed milestones:**
 
@@ -44,15 +44,15 @@ The project follows architecture-first development. Every implementation should 
 | M8 – Advanced Reporting | Section registry, executive/error/chart sections, HTML/PDF, `--output` (`v1.3.0`) |
 | M9 – Analytics Engine | Frequency, clustering, timeline, trends, `logscope analytics` (`v1.3.1`) |
 | M10 – Query Language | Field-aware filter DSL, `--filter`, `logscope query` (`v1.4.0`) |
-| M11 – Storage Layer | Planned (`v1.4.1`+) |
+| M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session index reuse (`v1.4.1`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M10 – Query Language | `v1.4.0` | Structured filter DSL |
+| M12 – Dynamic Plugins | `v1.5.0` | `.so`/`.dll` loading, parser/report/search providers |
 
-See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M10 planning](../planning/M10-QUERY-LANGUAGE.md), and [Roadmap](../ROADMAP.md).
+See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
 The engineering foundation is complete. Future work should **extend** the product rather than redesign the infrastructure.
 

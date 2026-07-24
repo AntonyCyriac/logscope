@@ -12,6 +12,30 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.4.1] - 2026-07-24
+
+M11 – Storage Layer complete (core scope). Introduces `scope_storage`, SQLite-backed hybrid indexing, session index reuse, and basic M10 query pushdown. 392 automated tests.
+
+### Added
+
+- M11.0 `ADR-005` storage architecture and `M11-STORAGE-LAYER.md`.
+- M11.1–M11.3 `scope_storage` module: `IndexStore`, `SqliteIndexStore`, `IndexFingerprint`, `HybridIndexWriter`, `IndexReader`, `QueryPlanner`.
+- M11.4 Session version `1.3` with `index.fingerprint`, `index.path`, `index.line_count`; fingerprint reuse on load.
+- M11.5 `--persist-index`, `--reuse-index`, `--index-path` CLI flags; storage config keys; `BM_IndexStoreAppend`, `BM_QueryPushdown`.
+- `scope_storage_tests` with SQLite CRUD, fingerprint, planner, and config coverage (25 cases).
+
+### Changed
+
+- `AnalysisEngine` spills indexed lines to SQLite when capacity is exceeded or persistence is requested.
+- `InvestigationEngine` and analytics read through `IndexReader` with optional SQL pushdown.
+- Session load reuses persisted indexes when the source fingerprint still matches.
+
+### Deferred to v1.4.2
+
+- zlib compression, query cache, incremental append indexing, `line_json_fields` table, FTS5.
+
+---
+
 ## [1.4.0] - 2026-07-24
 
 M10 – Query Language complete. Introduces `scope_query`, field-aware filter DSL, `--filter` on investigate/search, and `logscope query`. 365 automated tests.

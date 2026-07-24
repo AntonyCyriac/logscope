@@ -29,6 +29,9 @@ void printAnalyzeUsage(std::ostream& output)
            << "  --sections <list>     Comma-separated sections: executive, summary, levels, errors,\n"
            << "                        charts, metadata, formats, all (default: all)\n"
            << "  --output <file>       Write report to file instead of stdout (creates parent dirs)\n"
+           << "  --persist-index       Persist indexed lines to SQLite\n"
+           << "  --reuse-index         Reuse an existing index when the source fingerprint matches\n"
+           << "  --index-path <file>   Explicit SQLite index file path\n"
            << "  --help, -h            Show this help message\n"
            << "\n"
            << "Log source may be a file path, a directory of .log files, or \"-\" for stdin.\n";

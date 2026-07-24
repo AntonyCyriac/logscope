@@ -33,28 +33,50 @@ scope::analysis::AnalysisConfig cliOverridesFromProfileAndFormat(const std::stri
     return overrides;
 }
 
+void applyStorageOverrides(scope::analysis::AnalysisConfig& config, const bool persistIndex, const bool reuseIndex,
+                           const std::optional<scope::foundation::Path>& indexPath)
+{
+    config.storage.persistIndex = persistIndex;
+    config.storage.reuseIndex = reuseIndex;
+    config.storage.indexPath = indexPath;
+
+    if (persistIndex && config.storage.mode == scope::storage::StorageMode::Memory)
+    {
+        config.storage.mode = scope::storage::StorageMode::Hybrid;
+    }
+}
+
 } // namespace
 
 scope::analysis::AnalysisConfig buildAnalysisConfig(const AnalyzeOptions& options,
                                                     const configuration::ConfigurationManager& configurationManager)
 {
-    return scope::analysis::resolveAnalysisConfig(
+    scope::analysis::AnalysisConfig config = scope::analysis::resolveAnalysisConfig(
         configurationManager.configuration(), cliOverridesFromProfileAndFormat(options.profile, options.logFormat));
+    applyStorageOverrides(config, options.persistIndex, options.reuseIndex, options.indexPath);
+
+    return config;
 }
 
 scope::analysis::AnalysisConfig buildAnalysisConfig(
     const InvestigateOptions& options, const configuration::ConfigurationManager& configurationManager)
 {
-    return scope::analysis::resolveAnalysisConfig(
+    scope::analysis::AnalysisConfig config = scope::analysis::resolveAnalysisConfig(
         configurationManager.configuration(), cliOverridesFromProfileAndFormat(options.profile, options.logFormat));
+    applyStorageOverrides(config, options.persistIndex, options.reuseIndex, options.indexPath);
+
+    return config;
 }
 
 scope::analysis::AnalysisConfig buildAnalysisConfig(const SessionSaveOptions& options,
                                                     const configuration::ConfigurationManager& configurationManager)
 {
-    return scope::analysis::resolveAnalysisConfig(configurationManager.configuration(),
-                                                  cliOverridesFromProfileAndFormat(options.profile,
-                                                                                   scope::analysis::LogFormat::Auto));
+    scope::analysis::AnalysisConfig config = scope::analysis::resolveAnalysisConfig(
+        configurationManager.configuration(),
+        cliOverridesFromProfileAndFormat(options.profile, scope::analysis::LogFormat::Auto));
+    applyStorageOverrides(config, options.persistIndex, options.reuseIndex, options.indexPath);
+
+    return config;
 }
 
 scope::analysis::AnalysisConfig buildAnalysisConfig(const AnalyticsOptions& options,

@@ -5,6 +5,8 @@
 
 #include "timeline_analyzer.hpp"
 
+#include "indexed_line_access.hpp"
+
 #include <algorithm>
 
 #include "foundation/duration.hpp"
@@ -90,7 +92,7 @@ TimelineResult TimelineAnalyzer::analyze(const analysis::AnalysisModel& model,
 {
     TimelineResult result;
 
-    if (!model.lineIndex().has_value())
+    if (!analysis::hasQueryableIndex(model))
     {
         return result;
     }
@@ -112,7 +114,7 @@ TimelineResult TimelineAnalyzer::analyze(const analysis::AnalysisModel& model,
 
     if (!hasRange)
     {
-        for (const analysis::IndexedLine& line : model.lineIndex()->lines())
+        for (const analysis::IndexedLine& line : analysis::fetchIndexedLines(model))
         {
             if (!line.timestamp.has_value())
             {
@@ -177,7 +179,7 @@ TimelineResult TimelineAnalyzer::analyze(const analysis::AnalysisModel& model,
         buckets[index].label = buckets[index].start.toString();
     }
 
-    for (const analysis::IndexedLine& line : model.lineIndex()->lines())
+    for (const analysis::IndexedLine& line : analysis::fetchIndexedLines(model))
     {
         if (!line.timestamp.has_value())
         {

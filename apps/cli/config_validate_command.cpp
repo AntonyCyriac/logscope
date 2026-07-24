@@ -7,6 +7,7 @@
 
 #include "query.hpp"
 #include "search.hpp"
+#include "storage.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 #include "search_history.hpp"
@@ -73,6 +74,15 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!queryValidation)
     {
         errorOutput << queryValidation.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto storageValidation = scope::storage::validateStorageConfiguration(configurationManager.configuration());
+
+    if (!storageValidation)
+    {
+        errorOutput << storageValidation.error().message() << std::endl;
 
         return 1;
     }

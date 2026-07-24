@@ -10,6 +10,7 @@
 #include "frequency_analyzer.hpp"
 #include "timeline_analyzer.hpp"
 #include "trend_analyzer.hpp"
+#include "indexed_line_access.hpp"
 
 namespace scope::analytics
 {
@@ -19,10 +20,10 @@ AnalyticsResult AnalyticsEngine::analyze(const analysis::AnalysisModel& model,
 {
     AnalyticsResult result;
 
-    if (model.lineIndex().has_value())
+    if (analysis::hasQueryableIndex(model))
     {
-        result.setIndexedLineCount(model.lineIndex()->indexedLineCount());
-        result.setTruncatedLineCount(model.lineIndex()->truncatedLineCount());
+        result.setIndexedLineCount(analysis::indexedLineCountForModel(model));
+        result.setTruncatedLineCount(analysis::truncatedLineCountForModel(model));
     }
 
     const FrequencyAnalyzer frequencyAnalyzer;

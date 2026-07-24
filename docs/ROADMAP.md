@@ -37,7 +37,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
 | **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
 | **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
-| **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
+| **M11 – Storage Layer** | ✅ Complete | SQLite-backed hybrid index, session reuse, query pushdown. Released: `v1.4.1`. |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
 | **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
 | **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
@@ -61,6 +61,7 @@ M7  ██████████ 100%  (v1.2.0 released)
 M8  ██████████ 100%  (v1.3.0 released)
 M9  ██████████ 100%  (v1.3.1 released)
 M10 ██████████ 100%  (v1.4.0 released)
+M11 ██████████ 100%  (v1.4.1 released)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -406,7 +407,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
 | M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
 | M10 – Query Language | Field-aware filter DSL | `v1.4.0` |
-| M11 – Storage Layer | SQLite, indexing, compression | `v1.4.0` |
+| M11 – Storage Layer | SQLite hybrid index, session reuse | `v1.4.1` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
 | M14 – Desktop Application | Qt GUI | `v2.0.0` |
@@ -422,13 +423,14 @@ v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine
 v1.3.0  — M8: Advanced Reporting
 v1.4.0  — M10 Query Language (released)
-v1.4.1+ — M11 Storage + M12 Plugins
+v1.4.1  — M11 Storage Layer (released)
+v1.4.2+ — M11 compression/cache follow-up + M12 Plugins
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6–M10. M11–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M11. M12–M17 plans will be added as preceding milestones near completion.
 
 ---
 
