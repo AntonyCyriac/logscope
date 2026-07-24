@@ -39,3 +39,7 @@ for (const auto& info : manager.listExtensions()) {
 
 - `scope_extension` — static library
 - `scope_extension_tests` — unit tests
+
+## Handbook
+
+- [Plugin Development Guide](../../docs/handbook/PLUGIN_DEVELOPMENT_GUIDE.md) — built-in extensions, report contributor hook, M12 roadmap

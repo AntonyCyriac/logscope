@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.9.0 |
+| Version | 3.0.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -110,6 +110,7 @@ docs/
 │   ├── DEVELOPER_SETUP.md
 │   ├── GIT_CONVENTIONS.md
 │   ├── PULL_REQUEST_GUIDE.md
+│   ├── PLUGIN_DEVELOPMENT_GUIDE.md
 │   ├── SECURITY_REVIEW.md
 │   └── USER_MANUAL.md
 │
