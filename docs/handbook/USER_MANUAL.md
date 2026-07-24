@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | User Manual |
 | Category | Handbook |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -57,6 +57,16 @@ LogScope accepts:
 | Standard input | `logscope analyze - < /var/log/app.log` |
 
 Use `--log-format plain|jsonl` or `--profile generic-plain|generic-json` when auto-detection is not enough.
+
+## 2.4 Help
+
+```bash
+logscope --help
+logscope analyze --help
+logscope investigate --help
+```
+
+Each subcommand accepts `-h` or `--help` for usage text. Full flag reference: [CLI Reference](CLI_REFERENCE.md).
 
 ---
 
@@ -123,6 +133,32 @@ logscope analyze --profile generic-json samples/sample.jsonl
 
 Override field names in a config file if your JSON uses different keys — see [Configuration Guide](CONFIGURATION_GUIDE.md).
 
+## 4.6 CSV and Markdown export
+
+Export tabular or wiki-friendly reports:
+
+```bash
+logscope analyze --format csv --sections summary,levels samples/sample.log
+logscope analyze --format markdown --sections executive,errors samples/sample.log
+```
+
+`csv` emits section/key/value rows for spreadsheets. `markdown` emits tables and ASCII charts suitable for wikis or paste into tickets.
+
+## 4.7 Investigation thresholds on reports
+
+The `analyze` command always reports on the full log source. To capture a session only when a source meets minimum error, warning, or line counts, use `session save` with `--min-errors`, `--min-warnings`, `--min-lines`, or `--max-lines` — see [§7.1](#71-session-save-with-filters-and-indexes).
+
+## 4.8 Persistent index during analyze
+
+Build a SQLite index while producing a report (same storage flags as `investigate`):
+
+```bash
+logscope analyze --persist-index samples/large-app.log
+logscope analyze --persist-index --index-path /var/log/large-app.index.db samples/large-app.log
+```
+
+Reuse on a later run with `--reuse-index`. See [§8](#8-large-logs-and-persistent-indexes).
+
 ---
 
 # 5. Workflow: investigate an incident
@@ -185,6 +221,25 @@ logscope investigate \
   samples/sample.log
 ```
 
+## 5.8 Message, JSON key, and case sensitivity
+
+Narrow matches by message substring, required JSON field, or case-sensitive search:
+
+```bash
+logscope investigate --message "connection refused" samples/sample.log
+logscope investigate --json-key requestId samples/sample.jsonl
+logscope search --search "ERROR" --case-sensitive samples/sample.log
+```
+
+`--message` and `--json-key` work on `investigate` and `search`. `--case-sensitive` applies to `--search` and `--query` (default matching is case-insensitive).
+
+## 5.9 JSON output
+
+```bash
+logscope investigate --format json --filter 'level == ERROR' samples/sample.log
+logscope search --format json --query "error AND timeout" samples/sample.log
+```
+
 ---
 
 # 6. Workflow: analytics
@@ -208,6 +263,30 @@ Include analytics in a full report with `analyze --sections analytics,timeline,c
 ---
 
 # 7. Workflow: sessions
+
+## 7.1 Session save with filters and indexes
+
+`session save` accepts the same investigation filters as `investigate`, plus report options. Use it to persist state when a log meets thresholds or when you want filters saved with the session:
+
+```bash
+# Save only when the source has at least one error line
+logscope session save incident.session samples/sample.log --min-errors 1
+
+# Save with content filters and a persisted index for large logs
+logscope session save incident.session /var/log/large-app.log \
+  --min-errors 10 \
+  --level error \
+  --content-search "timeout" \
+  --persist-index \
+  --sections executive,errors,charts
+
+# Cap total lines considered
+logscope session save incident.session samples/sample.log --max-lines 50000
+```
+
+Threshold flags: `--min-errors`, `--min-warnings`, `--min-lines`, `--max-lines`. Content filters: `--level`, `--message`, `--json-key`, `--time-from`, `--time-to`, `--content-search`. Storage: `--persist-index`, `--reuse-index`, `--index-path`.
+
+## 7.2 Save and reload
 
 Save state after analysis:
 
@@ -298,7 +377,25 @@ Validate before use:
 
 ```bash
 logscope config validate --config samples/logscope.properties
+logscope config validate --config my.properties --require profile,log.level
 ```
+
+## 9.1 Extensions
+
+List built-in extensions and whether they are enabled:
+
+```bash
+logscope extensions list
+logscope extensions list --config samples/logscope.properties
+```
+
+Show metadata for one extension:
+
+```bash
+logscope extensions describe analysis.log-levels
+```
+
+Extension enable/disable is controlled through configuration — see [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md).
 
 Common uses:
 
@@ -371,3 +468,4 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 user manual. |
 | 1.1.0 | 24-07-2026 | v1.4.2 persist-index performance, progress logging, and Windows build link fix. |
+| 1.2.0 | 24-07-2026 | Complete CLI workflow coverage: CSV/Markdown, session thresholds, extensions, investigate flags. |
