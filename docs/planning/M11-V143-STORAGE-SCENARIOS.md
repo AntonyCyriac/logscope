@@ -49,11 +49,11 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S1.1 | Fresh index | New `--persist-index` on empty path | `meta.schema_version=2`; all v2 tables created | U | | ⬜ |
-| S1.2 | Open v1 index | Open existing schema v1 `.db` | Rebuild index from source log (documented policy); no partial reads | U+I | Yes | ⬜ |
-| S1.3 | Corrupt database | Truncated or invalid SQLite file | Clear error; no crash; index file may be removed | U | | ⬜ |
-| S1.4 | Unsupported future schema | `schema_version` > app maximum | Fail closed with actionable error | U | | ⬜ |
-| S1.5 | Meta source snapshot | After finalize | `meta` stores `source_size`, `source_mtime`, `indexed_line_count` | U | | ⬜ |
+| S1.1 | Fresh index | New `--persist-index` on empty path | `meta.schema_version=2`; all v2 tables created | U | | ✅ |
+| S1.2 | Open v1 index | Open existing schema v1 `.db` | Rebuild index from source log (documented policy); no partial reads | U+I | Yes | ✅ |
+| S1.3 | Corrupt database | Truncated or invalid SQLite file | Clear error; no crash; index file may be removed | U | | ✅ |
+| S1.4 | Unsupported future schema | `schema_version` > app maximum | Fail closed with actionable error | U | | ✅ |
+| S1.5 | Meta source snapshot | After finalize | `meta` stores `source_size`, `source_mtime`, `indexed_line_count` | U | | ✅ |
 
 **Migration policy:** v1 → v2 always rebuilds from the authoritative source log file. In-place row migration is not attempted.
 
