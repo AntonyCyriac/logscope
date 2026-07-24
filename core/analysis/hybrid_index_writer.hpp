@@ -37,6 +37,7 @@ class HybridIndexWriter
     LineIndex m_lineIndex;
     storage::StorageConfig m_storageConfig;
     storage::IndexStorePtr m_persistentStore;
+    std::uint64_t m_persistedLineCount{0U};
 };
 
 } // namespace scope::analysis

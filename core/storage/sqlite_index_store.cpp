@@ -259,11 +259,135 @@ CREATE INDEX IF NOT EXISTS idx_lines_correlation ON lines(correlation_id);
 
 struct SqliteIndexStore::Impl
 {
+    static constexpr std::size_t writeBatchSize = 5000U;
+
     sqlite3* database{nullptr};
     foundation::Path databasePath;
     IndexMetadata metadata;
     std::uint64_t storedLines{0U};
+    sqlite3_stmt* insertStatement{nullptr};
+    bool inWriteBatch{false};
+    std::size_t linesInWriteBatch{0U};
 };
+
+namespace
+{
+
+[[nodiscard]] foundation::Result<bool> configureBulkInsertPragmas(sqlite3* database)
+{
+    const auto walResult = runSql(database, "PRAGMA journal_mode=WAL;");
+
+    if (!walResult)
+    {
+        return walResult;
+    }
+
+    return runSql(database, "PRAGMA synchronous=NORMAL;");
+}
+
+} // namespace
+
+foundation::Result<bool> SqliteIndexStore::beginWriteBatch()
+{
+    if (m_impl->inWriteBatch)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    const auto result = runSql(m_impl->database, "BEGIN IMMEDIATE;");
+
+    if (!result)
+    {
+        return result;
+    }
+
+    m_impl->inWriteBatch = true;
+    m_impl->linesInWriteBatch = 0U;
+
+    return foundation::Result<bool>(true);
+}
+
+foundation::Result<bool> SqliteIndexStore::commitWriteBatch()
+{
+    if (!m_impl->inWriteBatch)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    const auto result = runSql(m_impl->database, "COMMIT;");
+
+    if (!result)
+    {
+        return result;
+    }
+
+    m_impl->inWriteBatch = false;
+    m_impl->linesInWriteBatch = 0U;
+
+    return foundation::Result<bool>(true);
+}
+
+void SqliteIndexStore::rollbackWriteBatch() noexcept
+{
+    if (!m_impl->inWriteBatch)
+    {
+        return;
+    }
+
+    (void)runSql(m_impl->database, "ROLLBACK;");
+    m_impl->inWriteBatch = false;
+    m_impl->linesInWriteBatch = 0U;
+}
+
+foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::IndexedLine& line,
+                                                             const std::string_view fullContent)
+{
+    if (m_impl->insertStatement == nullptr)
+    {
+        const char* sql =
+            "INSERT INTO lines(line_number, level, timestamp_unix, message, content, correlation_id, "
+            "top_level_keys_json) VALUES(?, ?, ?, ?, ?, ?, ?);";
+
+        if (sqlite3_prepare_v2(m_impl->database, sql, -1, &m_impl->insertStatement, nullptr) != SQLITE_OK)
+        {
+            return foundation::Result<bool>(
+                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+        }
+    }
+
+    sqlite3_stmt* statement = m_impl->insertStatement;
+
+    sqlite3_reset(statement);
+    sqlite3_clear_bindings(statement);
+
+    sqlite3_bind_int64(statement, 1, static_cast<sqlite3_int64>(line.lineNumber));
+    sqlite3_bind_int(statement, 2, levelToInt(line.level));
+
+    if (line.timestamp.has_value())
+    {
+        sqlite3_bind_int64(statement, 3, static_cast<sqlite3_int64>(line.timestamp->unixSeconds()));
+    }
+    else
+    {
+        sqlite3_bind_null(statement, 3);
+    }
+
+    sqlite3_bind_text(statement, 4, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 6, line.correlationId.c_str(), -1, SQLITE_TRANSIENT);
+    const std::string keys = joinKeys(line.topLevelKeys);
+    sqlite3_bind_text(statement, 7, keys.c_str(), -1, SQLITE_TRANSIENT);
+
+    const int stepResult = sqlite3_step(statement);
+
+    if (stepResult != SQLITE_DONE)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+    }
+
+    return foundation::Result<bool>(true);
+}
 
 SqliteIndexStore::SqliteIndexStore(std::unique_ptr<Impl> impl) noexcept
     : m_impl(std::move(impl))
@@ -272,7 +396,20 @@ SqliteIndexStore::SqliteIndexStore(std::unique_ptr<Impl> impl) noexcept
 
 SqliteIndexStore::~SqliteIndexStore()
 {
-    if (m_impl != nullptr && m_impl->database != nullptr)
+    if (m_impl == nullptr)
+    {
+        return;
+    }
+
+    (void)commitWriteBatch();
+
+    if (m_impl->insertStatement != nullptr)
+    {
+        sqlite3_finalize(m_impl->insertStatement);
+        m_impl->insertStatement = nullptr;
+    }
+
+    if (m_impl->database != nullptr)
     {
         sqlite3_close(m_impl->database);
         m_impl->database = nullptr;
@@ -308,6 +445,15 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
             sqlite3_close(database);
 
             return foundation::Result<IndexStorePtr>(schemaResult.error());
+        }
+
+        const auto pragmaResult = configureBulkInsertPragmas(database);
+
+        if (!pragmaResult)
+        {
+            sqlite3_close(database);
+
+            return foundation::Result<IndexStorePtr>(pragmaResult.error());
         }
 
         const auto fingerprintResult = setMeta(database, "fingerprint", metadata.fingerprint);
@@ -423,51 +569,51 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
 foundation::Result<bool> SqliteIndexStore::appendLine(const analysis::IndexedLine& line,
                                                         std::string_view fullContent)
 {
-    sqlite3_stmt* statement = nullptr;
-    const char* sql =
-        "INSERT INTO lines(line_number, level, timestamp_unix, message, content, correlation_id, "
-        "top_level_keys_json) VALUES(?, ?, ?, ?, ?, ?, ?);";
+    const auto batchStart = beginWriteBatch();
 
-    if (sqlite3_prepare_v2(m_impl->database, sql, -1, &statement, nullptr) != SQLITE_OK)
+    if (!batchStart)
     {
-        return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+        return batchStart;
     }
 
-    sqlite3_bind_int64(statement, 1, static_cast<sqlite3_int64>(line.lineNumber));
-    sqlite3_bind_int(statement, 2, levelToInt(line.level));
+    const auto insertResult = bindAndInsertLine(line, fullContent);
 
-    if (line.timestamp.has_value())
+    if (!insertResult)
     {
-        sqlite3_bind_int64(statement, 3, static_cast<sqlite3_int64>(line.timestamp->unixSeconds()));
-    }
-    else
-    {
-        sqlite3_bind_null(statement, 3);
-    }
+        rollbackWriteBatch();
 
-    sqlite3_bind_text(statement, 4, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
-    sqlite3_bind_text(statement, 6, line.correlationId.c_str(), -1, SQLITE_TRANSIENT);
-    const std::string keys = joinKeys(line.topLevelKeys);
-    sqlite3_bind_text(statement, 7, keys.c_str(), -1, SQLITE_TRANSIENT);
-
-    const int stepResult = sqlite3_step(statement);
-    sqlite3_finalize(statement);
-
-    if (stepResult != SQLITE_DONE)
-    {
-        return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+        return insertResult;
     }
 
     ++m_impl->storedLines;
+    ++m_impl->linesInWriteBatch;
+
+    if (m_impl->linesInWriteBatch >= Impl::writeBatchSize)
+    {
+        const auto commitResult = commitWriteBatch();
+
+        if (!commitResult)
+        {
+            rollbackWriteBatch();
+
+            return commitResult;
+        }
+    }
 
     return foundation::Result<bool>(true);
 }
 
 foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLines)
 {
+    const auto commitResult = commitWriteBatch();
+
+    if (!commitResult)
+    {
+        rollbackWriteBatch();
+
+        return commitResult;
+    }
+
     m_impl->metadata.totalLines = totalLines;
 
     return setMeta(m_impl->database, "total_lines", std::to_string(totalLines));
