@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Component Catalog |
 | Category | Architecture |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 15-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -320,3 +320,4 @@ Major architectural changes should be documented through Architecture Decision R
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial component catalog. |
+| 1.1.0 | 24-07-2026 | M8 reporting: section registry, contributed sections, HTML/PDF formats (`v1.3.0`). |

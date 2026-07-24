@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.4.0 |
+| Version | 3.5.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -457,4 +457,5 @@ The roadmap is considered successful when:
 | 3.1.0 | 21-07-2026 | M6 complete; v1.1.0 released with format profiles and configuration. |
 | 3.2.0 | 21-07-2026 | M7 complete; v1.2.0 released with search engine. |
 | 3.3.0 | 24-07-2026 | M8 complete; v1.3.0 released with advanced reporting. |
-| 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ after M8 ships as `v1.3.0`. |
+| 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ following M8 release at `v1.3.0`. |
+| 3.5.0 | 24-07-2026 | Revision history wording aligned with shipped `v1.3.0`. |
