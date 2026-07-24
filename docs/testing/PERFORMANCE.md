@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Performance Baselines |
 | Category | Testing |
-| Version | 1.4.0 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -110,6 +110,18 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and 
 
 ---
 
+# Planned benchmarks (v1.4.3)
+
+| Benchmark | Description | CI gate |
+|-----------|-------------|---------|
+| `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; compare disk size | TBD |
+| `BM_QueryCacheHit` | Second identical filter query on persisted index | TBD |
+| `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | TBD |
+
+See [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
+
+---
+
 # Revision History
 
 | Version | Date | Description |
@@ -119,3 +131,4 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and 
 | 1.2.0 | 21-07-2026 | Added search engine benchmark (M7). |
 | 1.3.0 | 24-07-2026 | Fixed deprecated `DoNotOptimize` usage in analysis benchmark (M8 housekeeping). |
 | 1.4.0 | 24-07-2026 | Added `BM_IndexStoreAppend/100000` baseline and storage benchmark section (`v1.4.2`). |
+| 1.5.0 | 24-07-2026 | Planned v1.4.3 storage benchmarks (compression, cache, FTS). |

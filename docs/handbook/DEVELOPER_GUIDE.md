@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Guide |
 | Category | Handbook |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -45,7 +45,7 @@ core/               Libraries (one CMake target per module, scope_<name>)
   analysis/         AnalysisEngine, line index, format detection
   search/           Text and boolean search
   query/            Filter DSL
-  storage/          SQLite indexes (M11; batched writes in v1.4.2)
+  storage/          SQLite indexes (M11; v1.4.3 remainder in progress)
   analytics/        Frequency, clustering, timeline
   investigation/    Investigation engine
   reporting/        Report formats and sections
@@ -205,6 +205,21 @@ cmake --build build --target logscope_benchmarks
 
 Regression gate: `BM_IndexStoreAppend/100000` in [`tests/benchmarks/baseline.json`](../../tests/benchmarks/baseline.json). See [Performance Baselines](../testing/PERFORMANCE.md).
 
+### v1.4.3 storage remainder (after design merge)
+
+Implementation order and acceptance scenarios: [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
+
+| Branch | Feature |
+|--------|---------|
+| `feat/v1.4.3-schema-v2` | Schema v2 migration |
+| `feat/v1.4.3-compression` | zlib compression |
+| `feat/v1.4.3-json-fields` | `line_json_fields` |
+| `feat/v1.4.3-query-cache` | `query_cache` |
+| `feat/v1.4.3-incremental-append` | Incremental append |
+| `feat/v1.4.3-fts5` | FTS5 pushdown |
+
+**Do not open `feat/v1.4.3-*` until `docs/v1.4.3-design` is merged.**
+
 ---
 
 # 8. Documentation expectations
@@ -265,3 +280,4 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 developer guide. |
 | 1.1.0 | 24-07-2026 | v1.4.2 storage benchmark guidance; CI vs release bulk matrix sizes. |
+| 1.2.0 | 24-07-2026 | v1.4.3 implementation order and scenario matrix link. |

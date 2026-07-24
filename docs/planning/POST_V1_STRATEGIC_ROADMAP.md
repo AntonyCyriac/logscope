@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) and bulk index write performance (`v1.4.2`) are complete; **compression** and **query cache** follow in **`v1.4.3`**. See [Roadmap](../ROADMAP.md) and [M11-STORAGE-LAYER.md](M11-STORAGE-LAYER.md).
+**Immediate next milestone:** **M11 remainder (`v1.4.3`)** — compression, query cache, JSON field predicates, incremental append, FTS5. **M12 – Dynamic Plugins** follows at **`v1.5.0`**. See [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md), [Roadmap](../ROADMAP.md), and [M11-STORAGE-LAYER.md](M11-STORAGE-LAYER.md).
 
 ---
 
@@ -361,7 +361,7 @@ v1.3.1+ — M9: Analytics Engine
 v1.4.0  — M10: Query Language
 v1.4.1  — M11: Storage Layer (core)
 v1.4.2  — M11: bulk index write performance
-v1.4.3  — M11 remainder: compression, query cache
+v1.4.3  — M11: compression, cache, JSON fields, incremental append, FTS5 (in progress)
 v1.5.0  — M12: Dynamic Plugins; M13: AI
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.x    — M16 Enterprise, M17 Cloud, ecosystem
@@ -459,3 +459,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |
 | 1.2.0 | 24-07-2026 | Next milestone M9; private themes stay unpublished until graduated. |
 | 1.3.0 | 24-07-2026 | Version roadmap split M10/M11/M12; v1.4.2 bulk perf shipped. |
+| 1.4.0 | 24-07-2026 | v1.4.3 M11 remainder in progress; M12 at v1.5.0. |

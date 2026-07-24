@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M11 – Storage Layer |
 | Category | Project Planning |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -15,9 +15,9 @@
 
 This document defines **M11 – Storage Layer**, introducing SQLite-backed persistent log line indexes with hybrid memory spill, session index reuse, and basic M10 query pushdown.
 
-Target releases: **`v1.4.1`** (core scope), **`v1.4.2`** (bulk index write performance). Compression and query cache follow in **`v1.4.3+`**.
+Target releases: **`v1.4.1`** (core scope), **`v1.4.2`** (bulk index write performance), **`v1.4.3`** (compression, cache, JSON fields, incremental append, FTS5).
 
-See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for architecture and compatibility rules.
+See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M11 v1.4.3 Scenarios](M11-V143-STORAGE-SCENARIOS.md).
 
 ---
 
@@ -43,6 +43,12 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for arc
 | M11.4 | Session 1.3 index metadata, fingerprint reuse on load | ✅ Complete |
 | M11.5 | CLI flags, e2e/matrix/benchmarks, `v1.4.1` release | ✅ Complete |
 | M11.6 | Batched SQLite writes, indexing progress, `v1.4.2` release | ✅ Complete |
+| M11.7 | Schema v2 migration framework | 🟡 Design (`v1.4.3`) |
+| M11.8 | zlib `content` compression | 🟡 Design (`v1.4.3`) |
+| M11.9 | `line_json_fields` + DSL pushdown | 🟡 Design (`v1.4.3`) |
+| M11.10 | `query_cache` materialized results | 🟡 Design (`v1.4.3`) |
+| M11.11 | Incremental append indexing | 🟡 Design (`v1.4.3`) |
+| M11.12 | FTS5 full-text search pushdown | 🟡 Design (`v1.4.3`) |
 
 ---
 
@@ -92,12 +98,29 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for arc
 | Indexing feedback | ✅ Progress log every 10k lines |
 | Benchmark SLA | ✅ `BM_IndexStoreAppend/100000` + `baseline.json` |
 
-## v1.4.3+ — Compression and cache (planned)
+## v1.4.3 — Storage remainder (in progress)
 
+**M11 completion** — compression, query cache, JSON field predicates, incremental append, FTS5. See [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md).
 
-- zlib compression on `content` column
-- `query_cache` materialized results
-- `line_json_fields` for `service == "PCF"` predicates
-- Incremental append indexing
-- FTS5 full-text search
-- M12 storage provider plugins
+| Item | Status |
+|------|--------|
+| Schema v2 migration | 🟡 Design |
+| zlib compression on `content` | 🟡 Design |
+| `line_json_fields` EAV + pushdown | 🟡 Design |
+| `query_cache` | 🟡 Design |
+| Incremental append | 🟡 Design |
+| FTS5 | 🟡 Design |
+
+## Deferred to M12 (`v1.5.0`)
+
+- Storage provider plugins (`.so`/`.dll` backends)
+
+---
+
+# 7. Revision History
+
+| Version | Date | Description |
+|---------|------|-------------|
+| 1.0.0 | 24-07-2026 | Initial M11 planning document. |
+| 1.1.0 | 24-07-2026 | v1.4.1 shipped; v1.4.2 bulk write perf. |
+| 1.2.0 | 24-07-2026 | v1.4.3 phases M11.7–M11.12; scenario matrix link. |

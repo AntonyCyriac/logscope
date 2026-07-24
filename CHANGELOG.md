@@ -10,9 +10,20 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
-### Planned
+### Added (v1.4.3 — planned)
 
-- zlib compression on `content` column, query cache, incremental append indexing, `line_json_fields` table, FTS5.
+- Schema v2 migration framework with v1 index rebuild policy.
+- zlib compression on persisted `content` column (`storage.compress_content`, `storage.compress_threshold_bytes`).
+- `line_json_fields` EAV table and `QueryPlanner` pushdown for top-level JSON field predicates.
+- `query_cache` table for materialized filter results (`storage.query_cache.enabled`, `storage.query_cache.max_entries`).
+- Incremental append indexing when source log grows (`storage.incremental_append`).
+- FTS5 virtual table (`lines_fts`) with search and `contains()` pushdown on persisted indexes.
+- Planned benchmarks: `BM_IndexStoreCompressed`, `BM_QueryCacheHit`, `BM_FtsSearch`.
+
+### Changed (v1.4.3 — planned)
+
+- Opening a schema v1 index rebuilds to schema v2 from source.
+- `IndexFingerprint` semantics extended for append vs full rebuild on source growth/truncation.
 
 ---
 
