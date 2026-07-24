@@ -11,6 +11,7 @@
 #include <sstream>
 #include <string>
 
+#include "content_codec.hpp"
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
@@ -254,7 +255,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
         return versionResult;
     }
 
-    return setMeta(database, "content_compression", "none");
+    return foundation::Result<bool>(true);
 }
 
 [[nodiscard]] foundation::Result<int> readStoredSchemaVersion(sqlite3* database)
@@ -311,7 +312,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     return foundation::Result<bool>(true);
 }
 
-[[nodiscard]] analysis::IndexedLine rowToIndexedLine(sqlite3_stmt* statement)
+[[nodiscard]] foundation::Result<analysis::IndexedLine> decodeIndexedLine(sqlite3_stmt* statement)
 {
     analysis::IndexedLine line;
     line.lineNumber = static_cast<std::uint64_t>(sqlite3_column_int64(statement, 1));
@@ -323,7 +324,6 @@ CREATE TABLE IF NOT EXISTS query_cache (
     }
 
     const unsigned char* message = sqlite3_column_text(statement, 4);
-    const unsigned char* content = sqlite3_column_text(statement, 5);
     const unsigned char* correlationId = sqlite3_column_text(statement, 6);
     const unsigned char* keys = sqlite3_column_text(statement, 7);
 
@@ -332,9 +332,29 @@ CREATE TABLE IF NOT EXISTS query_cache (
         line.messageExcerpt = reinterpret_cast<const char*>(message);
     }
 
-    if (content != nullptr)
+    const int contentType = sqlite3_column_type(statement, 5);
+
+    if (contentType == SQLITE_BLOB)
     {
-        line.contentExcerpt = reinterpret_cast<const char*>(content);
+        const void* blob = sqlite3_column_blob(statement, 5);
+        const int blobSize = sqlite3_column_bytes(statement, 5);
+        const auto decompressed = decompressZlib(blob, static_cast<std::size_t>(blobSize));
+
+        if (!decompressed)
+        {
+            return foundation::Result<analysis::IndexedLine>(decompressed.error());
+        }
+
+        line.contentExcerpt = *decompressed;
+    }
+    else if (contentType == SQLITE_TEXT)
+    {
+        const unsigned char* content = sqlite3_column_text(statement, 5);
+
+        if (content != nullptr)
+        {
+            line.contentExcerpt = reinterpret_cast<const char*>(content);
+        }
     }
 
     if (correlationId != nullptr)
@@ -347,7 +367,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
         line.topLevelKeys = splitKeys(reinterpret_cast<const char*>(keys));
     }
 
-    return line;
+    return foundation::Result<analysis::IndexedLine>(std::move(line));
 }
 
 } // namespace
@@ -363,6 +383,9 @@ struct SqliteIndexStore::Impl
     sqlite3_stmt* insertStatement{nullptr};
     bool inWriteBatch{false};
     std::size_t linesInWriteBatch{0U};
+    bool compressContent{false};
+    std::size_t compressThresholdBytes{256U};
+    bool indexUsesZlib{false};
 };
 
 namespace
@@ -468,7 +491,24 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
     }
 
     sqlite3_bind_text(statement, 4, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
+
+    if (m_impl->compressContent && fullContent.size() >= m_impl->compressThresholdBytes)
+    {
+        const auto compressed = compressZlib(fullContent);
+
+        if (!compressed)
+        {
+            return foundation::Result<bool>(compressed.error());
+        }
+
+        sqlite3_bind_blob(statement, 5, compressed->data(), static_cast<int>(compressed->size()),
+                          SQLITE_TRANSIENT);
+    }
+    else
+    {
+        sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
+    }
+
     sqlite3_bind_text(statement, 6, line.correlationId.c_str(), -1, SQLITE_TRANSIENT);
     const std::string keys = joinKeys(line.topLevelKeys);
     sqlite3_bind_text(statement, 7, keys.c_str(), -1, SQLITE_TRANSIENT);
@@ -512,7 +552,8 @@ SqliteIndexStore::~SqliteIndexStore()
 }
 
 foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Path& databasePath,
-                                                           const IndexMetadata& metadata)
+                                                           const IndexMetadata& metadata,
+                                                           const IndexStoreOptions& options)
 {
     std::error_code removeError;
     std::filesystem::remove(std::filesystem::path(databasePath.string()), removeError);
@@ -535,6 +576,9 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
         impl->database = database;
         impl->databasePath = databasePath;
         impl->metadata = metadata;
+        impl->compressContent = options.compressContent;
+        impl->compressThresholdBytes = options.compressThresholdBytes;
+        impl->indexUsesZlib = options.compressContent;
 
         const auto schemaResult = initializeSchemaV2(database);
 
@@ -579,6 +623,16 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
             sqlite3_close(database);
 
             return foundation::Result<IndexStorePtr>(formatResult.error());
+        }
+
+        const auto compressionResult =
+            setMeta(database, "content_compression", options.compressContent ? "zlib" : "none");
+
+        if (!compressionResult)
+        {
+            sqlite3_close(database);
+
+            return foundation::Result<IndexStorePtr>(compressionResult.error());
         }
 
         return foundation::Result<IndexStorePtr>(
@@ -644,6 +698,7 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
 
     const auto formatResult = getMeta(database, "format");
     const auto totalLinesResult = getMeta(database, "total_lines");
+    const auto compressionResult = getMeta(database, "content_compression");
 
     IndexMetadata metadata;
     metadata.fingerprint = *fingerprintResult;
@@ -656,6 +711,8 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
     }
 
     impl->metadata = metadata;
+    impl->indexUsesZlib = compressionResult.hasValue() && *compressionResult == "zlib";
+    impl->compressContent = impl->indexUsesZlib;
 
     sqlite3_stmt* countStatement = nullptr;
 
@@ -763,6 +820,11 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
     return setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
 }
 
+bool SqliteIndexStore::usesContentCompression() const noexcept
+{
+    return m_impl->indexUsesZlib;
+}
+
 std::uint64_t SqliteIndexStore::storedLineCount() const noexcept
 {
     return m_impl->storedLines;
@@ -802,7 +864,16 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
 
     while (sqlite3_step(statement) == SQLITE_ROW)
     {
-        lines.push_back(rowToIndexedLine(statement));
+        const auto lineResult = decodeIndexedLine(statement);
+
+        if (!lineResult)
+        {
+            sqlite3_finalize(statement);
+
+            return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
+        }
+
+        lines.push_back(*lineResult);
     }
 
     sqlite3_finalize(statement);

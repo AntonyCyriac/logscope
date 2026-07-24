@@ -99,7 +99,7 @@ CREATE VIRTUAL TABLE lines_fts USING fts5(
 );
 ```
 
-### Compression (v1.4.3 — design)
+### Compression (v1.4.3 — M11.8 shipped)
 
 When `storage.compress_content=true`, lines at or above `storage.compress_threshold_bytes` store zlib-compressed `content` BLOBs. Reads decompress transparently. Toggling compression on an existing index requires rebuild.
 

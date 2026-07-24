@@ -63,12 +63,12 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S2.1 | Compression enabled | `storage.compress_content=true` | `content` stored as zlib blob; `meta.content_compression=zlib` | U | | ⬜ |
-| S2.2 | Compression disabled | `storage.compress_content=false` (default) | Plain TEXT `content` as today | U | | ⬜ |
-| S2.3 | Small line skip | Line length < `storage.compress_threshold_bytes` | Store plain TEXT (avoid overhead) | U | | ⬜ |
-| S2.4 | Read round-trip | Fetch compressed row | Decompressed content matches source line | U+I | Yes | ⬜ |
+| S2.1 | Compression enabled | `storage.compress_content=true` | `content` stored as zlib blob; `meta.content_compression=zlib` | U | | ✅ |
+| S2.2 | Compression disabled | `storage.compress_content=false` (default) | Plain TEXT `content` as today | U | | ✅ |
+| S2.3 | Small line skip | Line length < `storage.compress_threshold_bytes` | Store plain TEXT (avoid overhead) | U | | ✅ |
+| S2.4 | Read round-trip | Fetch compressed row | Decompressed content matches source line | U+I | Yes | ✅ |
 | S2.5 | Toggle on existing index | Enable compression on v2 plain index | Rebuild required; documented in USER_MANUAL | E | | ⬜ |
-| S2.6 | Corrupt blob | Invalid zlib payload | Error on read; index marked unusable | U | | ⬜ |
+| S2.6 | Corrupt blob | Invalid zlib payload | Error on read; index marked unusable | U | | ✅ |
 | S2.7 | Disk size | 100k-line index | Measurable size reduction vs uncompressed v2 (benchmark) | B | | ⬜ |
 
 ---

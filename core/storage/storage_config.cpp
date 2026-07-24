@@ -17,6 +17,25 @@ constexpr std::string_view storageModeKey = "storage.mode";
 constexpr std::string_view storageIndexDirectoryKey = "storage.index.directory";
 constexpr std::string_view storageIndexPathKey = "storage.index.path";
 constexpr std::string_view storageSpillThresholdKey = "storage.spill_threshold";
+constexpr std::string_view storageCompressContentKey = "storage.compress_content";
+constexpr std::string_view storageCompressThresholdKey = "storage.compress_threshold_bytes";
+
+[[nodiscard]] std::optional<bool> parseBooleanConfig(std::string_view value) noexcept
+{
+    const std::string lowered = foundation::toLower(value);
+
+    if (lowered == "true" || lowered == "1" || lowered == "on" || lowered == "yes")
+    {
+        return true;
+    }
+
+    if (lowered == "false" || lowered == "0" || lowered == "off" || lowered == "no")
+    {
+        return false;
+    }
+
+    return std::nullopt;
+}
 
 void applyModeOverride(StorageConfig& config, const std::string& modeValue) noexcept
 {
@@ -95,6 +114,31 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
         }
     }
 
+    if (configuration.has(std::string(storageCompressContentKey)))
+    {
+        const auto compressContent = configuration.get(std::string(storageCompressContentKey));
+
+        if (compressContent && !foundation::isBlank(*compressContent))
+        {
+            const auto parsed = parseBooleanConfig(*compressContent);
+
+            if (parsed.has_value())
+            {
+                config.compressContent = *parsed;
+            }
+        }
+    }
+
+    if (configuration.has(std::string(storageCompressThresholdKey)))
+    {
+        const auto compressThreshold = configuration.get(std::string(storageCompressThresholdKey));
+
+        if (compressThreshold && !foundation::isBlank(*compressThreshold))
+        {
+            config.compressThresholdBytes = static_cast<std::size_t>(std::stoull(*compressThreshold));
+        }
+    }
+
     if (cliOverrides.mode != StorageMode::Memory)
     {
         config.mode = cliOverrides.mode;
@@ -131,6 +175,16 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
         config.spillThreshold = cliOverrides.spillThreshold;
     }
 
+    if (cliOverrides.compressContent)
+    {
+        config.compressContent = true;
+    }
+
+    if (cliOverrides.compressThresholdBytes != StorageConfig::defaults().compressThresholdBytes)
+    {
+        config.compressThresholdBytes = cliOverrides.compressThresholdBytes;
+    }
+
     return config;
 }
 
@@ -157,6 +211,30 @@ foundation::Result<bool> validateStorageConfiguration(const runtime::Configurati
         {
             return foundation::Result<bool>(foundation::Error(
                 foundation::ErrorCode::InvalidArgument, "Invalid storage.spill_threshold value."));
+        }
+    }
+
+    if (const auto compressContent = configuration.get(std::string(storageCompressContentKey));
+        compressContent && !foundation::isBlank(*compressContent))
+    {
+        if (!parseBooleanConfig(*compressContent).has_value())
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Invalid storage.compress_content value."));
+        }
+    }
+
+    if (const auto compressThreshold = configuration.get(std::string(storageCompressThresholdKey));
+        compressThreshold && !foundation::isBlank(*compressThreshold))
+    {
+        try
+        {
+            (void)std::stoull(*compressThreshold);
+        }
+        catch (...)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Invalid storage.compress_threshold_bytes value."));
         }
     }
 

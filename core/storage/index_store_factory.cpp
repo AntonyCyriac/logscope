@@ -8,6 +8,7 @@
 
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
+#include "index_store_options.hpp"
 #include "sqlite_index_store.hpp"
 
 namespace scope::storage
@@ -47,7 +48,7 @@ foundation::Result<IndexStorePtr> createIndexStore(const StorageConfig& config,
     metadata.sourcePath = sourcePath;
     metadata.format = format;
 
-    return SqliteIndexStore::create(databasePath, metadata);
+    return SqliteIndexStore::create(databasePath, metadata, indexStoreOptionsFromConfig(config));
 }
 
 foundation::Result<IndexStorePtr> tryOpenReusableIndex(const StorageConfig& config,
@@ -80,6 +81,15 @@ foundation::Result<IndexStorePtr> tryOpenReusableIndex(const StorageConfig& conf
     {
         return foundation::Result<IndexStorePtr>(foundation::Error(
             foundation::ErrorCode::InvalidArgument, "Persisted index fingerprint mismatch."));
+    }
+
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(*opened);
+
+    if (sqliteStore->usesContentCompression() != config.compressContent)
+    {
+        return foundation::Result<IndexStorePtr>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Index compression settings require rebuild from source log."));
     }
 
     return opened;

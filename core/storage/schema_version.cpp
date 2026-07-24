@@ -19,4 +19,14 @@ bool requiresSchemaRebuild(const foundation::Error& error) noexcept
     return error.message().find("requires rebuild from source") != std::string::npos;
 }
 
+bool requiresCompressionRebuild(const foundation::Error& error) noexcept
+{
+    if (error.code() != foundation::ErrorCode::InvalidArgument)
+    {
+        return false;
+    }
+
+    return error.message().find("compression settings require rebuild from source") != std::string::npos;
+}
+
 } // namespace scope::storage
