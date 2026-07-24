@@ -35,7 +35,7 @@ class StorageRegressionTest : public ::testing::Test
 } // namespace
 
 // M11 v1.4.1: fingerprint compute on stdin broke analyze when reuse-index was set.
-TEST(StorageRegressionTest, AnalyzeStdinWithReuseIndexDoesNotFail)
+TEST_F(StorageRegressionTest, AnalyzeStdinWithReuseIndexDoesNotFail)
 {
     std::istringstream input("2026-07-11 10:00:01 INFO stdin line\n"
                               "2026-07-11 10:00:02 ERROR stdin error\n");
@@ -87,7 +87,7 @@ TEST_F(StorageRegressionTest, AnalyzeDirectoryWithPersistIndexDoesNotFail)
 }
 
 // M11 v1.4.1: analyze on a regular file with reuse-index enabled must remain stable.
-TEST(StorageRegressionTest, AnalyzeFileWithReuseIndexSucceeds)
+TEST_F(StorageRegressionTest, AnalyzeFileWithReuseIndexSucceeds)
 {
     const Path logFile("regression_reuse_index.log");
     std::ofstream output(logFile.string());
