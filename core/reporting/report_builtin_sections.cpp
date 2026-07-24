@@ -8,6 +8,7 @@
 #include <cmath>
 #include <sstream>
 
+#include "analytics_engine.hpp"
 #include "ascii_chart_renderer.hpp"
 #include "chart_model.hpp"
 #include "field_summary.hpp"
@@ -513,9 +514,25 @@ class ChartsRenderer final : public ReportSectionRenderer
         const std::string markdownChart = renderMarkdownLevelChart(chart);
         const std::string svgChart = renderSvgLevelChart(chart);
 
+        analytics::AnalyticsConfig analyticsConfig = options.analyticsConfig;
+        analyticsConfig.includeTimeline = options.includeTimeline;
+        const analytics::AnalyticsResult analytics = analytics::AnalyticsEngine{}.analyze(model, analyticsConfig);
+        const TimeSeriesChart timelineChart = buildTimelineChart(analytics.timeline());
+        const bool hasTimelineChart = options.includeTimeline && !timelineChart.points.empty();
+        const std::string timelineAscii =
+            hasTimelineChart ? renderAsciiTimeSeriesChart(timelineChart) : std::string{};
+        const std::string timelineMarkdown =
+            hasTimelineChart ? renderMarkdownTimeSeriesChart(timelineChart) : std::string{};
+        const std::string timelineSvg = hasTimelineChart ? renderSvgTimeSeriesChart(timelineChart) : std::string{};
+
         {
             std::ostringstream text;
             text << "--- Charts ---" << '\n' << asciiChart;
+
+            if (hasTimelineChart)
+            {
+                text << "Timeline errors:\n" << timelineAscii;
+            }
 
             if (const std::optional<analysis::FieldSummary>& fieldSummary = model.fieldSummary())
             {
@@ -535,7 +552,8 @@ class ChartsRenderer final : public ReportSectionRenderer
             fragment.textBody = text.str();
         }
 
-        fragment.markdownBody = std::string("## Charts\n\n") + markdownChart;
+        fragment.markdownBody = std::string("## Charts\n\n") + markdownChart +
+                                (hasTimelineChart ? std::string("\n### Timeline\n\n") + timelineMarkdown : "");
         fragment.jsonBody = "\n    \"levelBarChart\": \"ascii\"";
 
         for (const ChartBar& bar : chart.bars)
@@ -548,6 +566,13 @@ class ChartsRenderer final : public ReportSectionRenderer
             html << "<section class=\"report-section\" id=\"charts\">\n";
             html << "  <h2>Charts</h2>\n";
             html << "  <div class=\"chart\">" << svgChart << "</div>\n";
+
+            if (hasTimelineChart)
+            {
+                html << "  <h3>Timeline</h3>\n";
+                html << "  <div class=\"chart\">" << timelineSvg << "</div>\n";
+            }
+
             html << "</section>\n";
             fragment.htmlBody = html.str();
         }

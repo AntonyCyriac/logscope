@@ -38,6 +38,9 @@ constexpr ReportSection kSectionOrder[] = {ReportSection::ExecutiveSummary,
                                            ReportSection::Summary,
                                            ReportSection::LevelBreakdown,
                                            ReportSection::ErrorSummary,
+                                           ReportSection::AnalyticsSummary,
+                                           ReportSection::Timeline,
+                                           ReportSection::Clusters,
                                            ReportSection::Charts,
                                            ReportSection::SourceMetadata,
                                            ReportSection::FormatsFooter};
@@ -47,6 +50,7 @@ constexpr ReportSection kSectionOrder[] = {ReportSection::ExecutiveSummary,
 ReportSectionRegistry::ReportSectionRegistry()
 {
     registerBuiltInSectionRenderers(*this);
+    registerAnalyticsSectionRenderers(*this);
     registerReportingContributors(*this);
 }
 

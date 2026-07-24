@@ -35,8 +35,8 @@ IndexedLine makeLine(const std::string& content, const std::string& message = {}
 TEST(SearchEngineTest, MatchesIndexedLinesByText)
 {
     auto index = makeLineIndex();
-    index.tryAddLine(makeLine("ERROR connection refused"));
-    index.tryAddLine(makeLine("INFO service started"));
+    EXPECT_TRUE(index.tryAddLine(makeLine("ERROR connection refused")));
+    EXPECT_TRUE(index.tryAddLine(makeLine("INFO service started")));
 
     const SearchEngine engine;
     const auto matches = engine.search(index, SearchQuery::term("refused"));
@@ -48,9 +48,9 @@ TEST(SearchEngineTest, MatchesIndexedLinesByText)
 TEST(SearchEngineTest, EvaluatesBooleanAndQuery)
 {
     auto index = makeLineIndex();
-    index.tryAddLine(makeLine("ERROR connection refused"));
-    index.tryAddLine(makeLine("ERROR timeout waiting"));
-    index.tryAddLine(makeLine("INFO service started"));
+    EXPECT_TRUE(index.tryAddLine(makeLine("ERROR connection refused")));
+    EXPECT_TRUE(index.tryAddLine(makeLine("ERROR timeout waiting")));
+    EXPECT_TRUE(index.tryAddLine(makeLine("INFO service started")));
 
     const SearchQuery query = SearchQuery::andQuery(SearchQuery::term("error"), SearchQuery::term("timeout"));
     const SearchEngine engine;
@@ -63,8 +63,8 @@ TEST(SearchEngineTest, EvaluatesBooleanAndQuery)
 TEST(SearchEngineTest, MatchesRegexPatterns)
 {
     auto index = makeLineIndex();
-    index.tryAddLine(makeLine("ERROR code=500"));
-    index.tryAddLine(makeLine("INFO ok"));
+    EXPECT_TRUE(index.tryAddLine(makeLine("ERROR code=500")));
+    EXPECT_TRUE(index.tryAddLine(makeLine("INFO ok")));
 
     const SearchEngine engine;
     const auto matches =

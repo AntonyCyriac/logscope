@@ -12,6 +12,25 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.3.1] - 2026-07-24
+
+M9 – Analytics Engine complete. Introduces `scope_analytics`, `logscope analytics`, and analytics/timeline/clusters report sections with time-series charts. 337 automated tests.
+
+### Added
+
+- M9.1 `scope_analytics` module and `FrequencyAnalyzer`; `M9-ANALYTICS-ENGINE.md`.
+- M9.2 `ErrorClusterer` with normalized message signatures.
+- M9.3 `TimelineAnalyzer`, `TrendAnalyzer`, and timeline bucket sizing.
+- M9.4 `CorrelationAnalyzer` refactor; `logscope analytics` CLI; analytics config keys.
+- M9.5 Time-series charts, `analytics`/`timeline`/`clusters` report sections; `BM_AnalyticsEngine`.
+
+### Changed
+
+- `InvestigationEngine::findCorrelations` delegates to `CorrelationAnalyzer`.
+- `Charts` report section includes timeline chart when timeline data is available.
+
+---
+
 ## [1.3.0] - 2026-07-24
 
 M8 – Advanced Reporting complete. Introduces section registry architecture, executive/error/chart sections, HTML and PDF formats, and `--output` file writing. 326 automated tests.

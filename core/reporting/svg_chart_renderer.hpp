@@ -17,4 +17,9 @@ namespace scope::reporting
  */
 [[nodiscard]] std::string renderSvgLevelChart(const LevelBarChart& chart);
 
+/**
+ * @brief Renders a time-series chart as an inline SVG fragment.
+ */
+[[nodiscard]] std::string renderSvgTimeSeriesChart(const TimeSeriesChart& chart);
+
 } // namespace scope::reporting

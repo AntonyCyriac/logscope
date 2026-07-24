@@ -22,4 +22,14 @@ namespace scope::reporting
  */
 [[nodiscard]] std::string renderMarkdownLevelChart(const LevelBarChart& chart, std::size_t maxBarWidth = 40U);
 
+/**
+ * @brief Renders a time-series chart as plain text.
+ */
+[[nodiscard]] std::string renderAsciiTimeSeriesChart(const TimeSeriesChart& chart, std::size_t maxBarWidth = 40U);
+
+/**
+ * @brief Renders a time-series chart as a markdown fenced code block.
+ */
+[[nodiscard]] std::string renderMarkdownTimeSeriesChart(const TimeSeriesChart& chart, std::size_t maxBarWidth = 40U);
+
 } // namespace scope::reporting

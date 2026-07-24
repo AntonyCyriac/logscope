@@ -57,4 +57,11 @@ scope::analysis::AnalysisConfig buildAnalysisConfig(const SessionSaveOptions& op
                                                                                    scope::analysis::LogFormat::Auto));
 }
 
+scope::analysis::AnalysisConfig buildAnalysisConfig(const AnalyticsOptions& options,
+                                                    const configuration::ConfigurationManager& configurationManager)
+{
+    return scope::analysis::resolveAnalysisConfig(
+        configurationManager.configuration(), cliOverridesFromProfileAndFormat(options.profile, options.logFormat));
+}
+
 } // namespace scope::cli

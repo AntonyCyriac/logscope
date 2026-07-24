@@ -1,0 +1,3 @@
+# Google Test macro expansion produces conflicting function extents in gcov data.
+# lcov 2.x reports these as mismatch/inconsistent warnings during capture.
+geninfo_ignore_errors = mismatch,inconsistent

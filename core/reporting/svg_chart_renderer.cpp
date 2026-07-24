@@ -49,4 +49,16 @@ std::string renderSvgLevelChart(const LevelBarChart& chart)
     return output.str();
 }
 
+std::string renderSvgTimeSeriesChart(const TimeSeriesChart& chart)
+{
+    LevelBarChart converted;
+
+    for (const TimeSeriesPoint& point : chart.points)
+    {
+        converted.bars.push_back(ChartBar{point.label, point.errorCount, "#dc3545"});
+    }
+
+    return renderSvgLevelChart(converted);
+}
+
 } // namespace scope::reporting

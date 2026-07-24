@@ -19,7 +19,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v1.3.0** delivers M8 Advanced Reporting on top of the v1.2.0 search-engine baseline. M0–M8 are complete.
+LogScope **v1.3.1** delivers M9 Analytics Engine on top of the v1.3.0 advanced reporting baseline. M0–M9 are complete.
 
 ```text
 Configuration → Source → Analysis → Investigation → Reporting → CLI

@@ -60,6 +60,11 @@ class ReportSectionRegistry
 void registerBuiltInSectionRenderers(ReportSectionRegistry& registry);
 
 /**
+ * @brief Registers M9 analytics report section renderers.
+ */
+void registerAnalyticsSectionRenderers(ReportSectionRegistry& registry);
+
+/**
  * @brief Registers built-in report section contributors from extensions.
  */
 void registerReportingContributors(ReportSectionRegistry& registry);

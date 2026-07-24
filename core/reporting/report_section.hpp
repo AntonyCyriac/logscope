@@ -20,6 +20,9 @@ enum class ReportSection
     Summary,
     LevelBreakdown,
     ErrorSummary,
+    AnalyticsSummary,
+    Timeline,
+    Clusters,
     Charts,
     SourceMetadata,
     FormatsFooter
@@ -39,7 +42,7 @@ class ReportSections
     /**
      * @brief Parses a comma-separated section list.
      *
-     * Supported names: executive, summary, levels, errors, charts, metadata, all.
+     * Supported names: executive, summary, levels, errors, analytics, timeline, clusters, charts, metadata, all.
      */
     [[nodiscard]] static std::optional<ReportSections> parse(std::string_view value);
 

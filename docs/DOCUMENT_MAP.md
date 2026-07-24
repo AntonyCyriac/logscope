@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.2.0 |
+| Version | 2.3.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -77,7 +77,8 @@ docs/
 │   ├── M5-PRODUCTION-READINESS.md
 │   ├── M6-LOG-FORMAT-INTELLIGENCE.md
 │   ├── M7-SEARCH-ENGINE.md
-│   └── M8-ADVANCED-REPORTING.md
+│   ├── M8-ADVANCED-REPORTING.md
+│   └── M9-ANALYTICS-ENGINE.md
 │
 │   (Long-horizon strategy beyond published Mn plans is maintained privately
 │    outside this repository; public Mn docs are added when implementation starts.)
@@ -152,6 +153,7 @@ Developers new to LogScope should read the documentation in the following order.
 | 3 | M6-LOG-FORMAT-INTELLIGENCE.md | Understand the completed M6 log format intelligence plan. |
 | 4 | M7-SEARCH-ENGINE.md | Understand the completed M7 search engine (`v1.2.0`). |
 | 5 | M8-ADVANCED-REPORTING.md | Understand the completed M8 advanced reporting (`v1.3.0`). |
+| 6 | M9-ANALYTICS-ENGINE.md | Understand the completed M9 analytics engine (`v1.3.1`). |
 | 6 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 7 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 8 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -293,3 +295,4 @@ These categories should be added only when they provide clear value and support 
 | 2.0.0 | 24-07-2026 | Added M8-ADVANCED-REPORTING.md and ADR-003; updated reading order for `v1.3.0`. |
 | 2.1.0 | 24-07-2026 | Note that long-horizon strategy beyond published Mn plans is private (no private URL). |
 | 2.2.0 | 24-07-2026 | Merged M8 document map with private-strategy documentation note. |
+| 2.3.0 | 24-07-2026 | Added M9-ANALYTICS-ENGINE.md and reading order for `v1.3.1`. |

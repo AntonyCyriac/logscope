@@ -93,18 +93,18 @@ AnalysisModel createIndexedModel()
     firstLine.messageExcerpt = "Connection refused";
     firstLine.contentExcerpt = "2026-07-11 ERROR Connection refused";
     firstLine.correlationId = "trace-abc";
-    lineIndex.tryAddLine(firstLine);
+    EXPECT_TRUE(lineIndex.tryAddLine(firstLine));
 
     IndexedLine secondLine = firstLine;
     secondLine.lineNumber = 4U;
-    lineIndex.tryAddLine(secondLine);
+    EXPECT_TRUE(lineIndex.tryAddLine(secondLine));
 
     IndexedLine thirdLine;
     thirdLine.lineNumber = 5U;
     thirdLine.level = DetectedLogLevel::Info;
     thirdLine.messageExcerpt = "Retrying request";
     thirdLine.contentExcerpt = "2026-07-11 INFO Retrying request";
-    lineIndex.tryAddLine(thirdLine);
+    EXPECT_TRUE(lineIndex.tryAddLine(thirdLine));
 
     LogLevelCounts levelCounts;
     levelCounts.recordError();

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.5.0 |
+| Version | 3.6.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -35,7 +35,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M6 – Log Format Intelligence** | ✅ Complete | Format detection, structured parsing, field extraction, content investigation, format profiles. Released as `v1.1.0`. |
 | **M7 – Search Engine** | ✅ Complete | Full-text, regex, boolean search; saved searches; session search history. Released as `v1.2.0`. |
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
-| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.1`+. |
+| **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
 | **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
 | **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
@@ -59,6 +59,7 @@ M5  ██████████ 100%
 M6  ██████████ 100%  (v1.1.0 released)
 M7  ██████████ 100%  (v1.2.0 released)
 M8  ██████████ 100%  (v1.3.0 released)
+M9  ██████████ 100%  (v1.3.1 released)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -459,3 +460,4 @@ The roadmap is considered successful when:
 | 3.3.0 | 24-07-2026 | M8 complete; v1.3.0 released with advanced reporting. |
 | 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ following M8 release at `v1.3.0`. |
 | 3.5.0 | 24-07-2026 | Revision history wording aligned with shipped `v1.3.0`. |
+| 3.6.0 | 24-07-2026 | M9 complete; v1.3.1 released with analytics engine. |

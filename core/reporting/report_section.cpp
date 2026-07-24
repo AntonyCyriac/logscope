@@ -19,11 +19,15 @@ constexpr unsigned executiveSummaryBit = 1U << 0U;
 constexpr unsigned summaryBit = 1U << 1U;
 constexpr unsigned levelBreakdownBit = 1U << 2U;
 constexpr unsigned errorSummaryBit = 1U << 3U;
-constexpr unsigned chartsBit = 1U << 4U;
-constexpr unsigned sourceMetadataBit = 1U << 5U;
-constexpr unsigned formatsFooterBit = 1U << 6U;
+constexpr unsigned analyticsSummaryBit = 1U << 4U;
+constexpr unsigned timelineBit = 1U << 5U;
+constexpr unsigned clustersBit = 1U << 6U;
+constexpr unsigned chartsBit = 1U << 7U;
+constexpr unsigned sourceMetadataBit = 1U << 8U;
+constexpr unsigned formatsFooterBit = 1U << 9U;
 constexpr unsigned allBits = executiveSummaryBit | summaryBit | levelBreakdownBit | errorSummaryBit |
-                             chartsBit | sourceMetadataBit | formatsFooterBit;
+                             analyticsSummaryBit | timelineBit | clustersBit | chartsBit | sourceMetadataBit |
+                             formatsFooterBit;
 
 unsigned sectionBit(const ReportSection section) noexcept
 {
@@ -37,6 +41,12 @@ unsigned sectionBit(const ReportSection section) noexcept
         return levelBreakdownBit;
     case ReportSection::ErrorSummary:
         return errorSummaryBit;
+    case ReportSection::AnalyticsSummary:
+        return analyticsSummaryBit;
+    case ReportSection::Timeline:
+        return timelineBit;
+    case ReportSection::Clusters:
+        return clustersBit;
     case ReportSection::Charts:
         return chartsBit;
     case ReportSection::SourceMetadata:
@@ -76,6 +86,27 @@ bool parseSectionName(const std::string& name, ReportSections& sections)
     if (normalized == "errors" || normalized == "error-summary")
     {
         sections.enable(ReportSection::ErrorSummary);
+
+        return true;
+    }
+
+    if (normalized == "analytics")
+    {
+        sections.enable(ReportSection::AnalyticsSummary);
+
+        return true;
+    }
+
+    if (normalized == "timeline")
+    {
+        sections.enable(ReportSection::Timeline);
+
+        return true;
+    }
+
+    if (normalized == "clusters")
+    {
+        sections.enable(ReportSection::Clusters);
 
         return true;
     }
