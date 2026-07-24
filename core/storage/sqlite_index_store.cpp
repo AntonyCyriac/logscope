@@ -318,7 +318,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
 
 [[nodiscard]] foundation::Result<analysis::IndexedLine> decodeIndexedLine(sqlite3_stmt* statement)
 {
-    analysis::IndexedLine line;
+    analysis::IndexedLine line{};
     line.lineNumber = static_cast<std::uint64_t>(sqlite3_column_int64(statement, 1));
     line.level = levelFromInt(sqlite3_column_int(statement, 2));
 
@@ -683,9 +683,8 @@ fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lin
             return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
         }
 
-        analysis::IndexedLine line = *lineResult;
-        line.jsonFieldValues = loadJsonFieldValues(database, lineId);
-        lines.push_back(std::move(line));
+        lines.push_back(std::move(*lineResult));
+        lines.back().jsonFieldValues = loadJsonFieldValues(database, lineId);
     }
 
     sqlite3_finalize(statement);
@@ -1230,9 +1229,8 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
             return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
         }
 
-        analysis::IndexedLine line = *lineResult;
-        line.jsonFieldValues = loadJsonFieldValues(m_impl->database, lineId);
-        lines.push_back(std::move(line));
+        lines.push_back(std::move(*lineResult));
+        lines.back().jsonFieldValues = loadJsonFieldValues(m_impl->database, lineId);
     }
 
     sqlite3_finalize(statement);

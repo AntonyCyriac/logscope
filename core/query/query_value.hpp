@@ -40,6 +40,11 @@ class QueryValue
 
     [[nodiscard]] analysis::DetectedLogLevel levelValue() const noexcept;
 
+    QueryValue(const QueryValue&) = default;
+    QueryValue(QueryValue&&) noexcept = default;
+    QueryValue& operator=(const QueryValue&) = default;
+    QueryValue& operator=(QueryValue&&) noexcept = default;
+
   private:
     explicit QueryValue(Kind kind);
 

@@ -28,6 +28,12 @@ constexpr std::size_t maxLineContentExcerptLength = 256U;
  */
 struct IndexedLine
 {
+    IndexedLine() = default;
+    IndexedLine(const IndexedLine&) = default;
+    IndexedLine(IndexedLine&&) noexcept = default;
+    IndexedLine& operator=(const IndexedLine&) = default;
+    IndexedLine& operator=(IndexedLine&&) noexcept = default;
+
     std::uint64_t lineNumber{0U};
     DetectedLogLevel level{DetectedLogLevel::Other};
     std::optional<foundation::Timestamp> timestamp;

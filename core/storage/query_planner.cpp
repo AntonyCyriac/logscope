@@ -55,6 +55,28 @@ namespace
     return 4;
 }
 
+[[nodiscard]] std::optional<const char*> comparisonOperatorSql(
+    const query::ComparisonOperator comparisonOperator) noexcept
+{
+    switch (comparisonOperator)
+    {
+    case query::ComparisonOperator::Equal:
+        return "=";
+    case query::ComparisonOperator::NotEqual:
+        return "<>";
+    case query::ComparisonOperator::Greater:
+        return ">";
+    case query::ComparisonOperator::GreaterEqual:
+        return ">=";
+    case query::ComparisonOperator::Less:
+        return "<";
+    case query::ComparisonOperator::LessEqual:
+        return "<=";
+    }
+
+    return std::nullopt;
+}
+
 [[nodiscard]] bool isReservedComparisonField(const std::string_view field) noexcept
 {
     const std::string lower = foundation::toLower(field);
@@ -143,31 +165,14 @@ namespace
         }
 
         const std::string value = std::to_string(literal.numberValue());
-        const char* op = "=";
+        const auto op = comparisonOperatorSql(node.comparisonOperator());
 
-        switch (node.comparisonOperator())
+        if (!op.has_value())
         {
-        case query::ComparisonOperator::Equal:
-            op = "=";
-            break;
-        case query::ComparisonOperator::NotEqual:
-            op = "<>";
-            break;
-        case query::ComparisonOperator::Greater:
-            op = ">";
-            break;
-        case query::ComparisonOperator::GreaterEqual:
-            op = ">=";
-            break;
-        case query::ComparisonOperator::Less:
-            op = "<";
-            break;
-        case query::ComparisonOperator::LessEqual:
-            op = "<=";
-            break;
+            return std::nullopt;
         }
 
-        return wrap("line_number " + std::string(op) + " " + value);
+        return wrap("line_number " + std::string(*op) + " " + value);
     }
 
     if (field == "time" || field == "timestamp")
@@ -190,31 +195,14 @@ namespace
         }
 
         const std::string value = std::to_string(timestamp->unixSeconds());
-        const char* op = "=";
+        const auto op = comparisonOperatorSql(node.comparisonOperator());
 
-        switch (node.comparisonOperator())
+        if (!op.has_value())
         {
-        case query::ComparisonOperator::Equal:
-            op = "=";
-            break;
-        case query::ComparisonOperator::NotEqual:
-            op = "<>";
-            break;
-        case query::ComparisonOperator::Greater:
-            op = ">";
-            break;
-        case query::ComparisonOperator::GreaterEqual:
-            op = ">=";
-            break;
-        case query::ComparisonOperator::Less:
-            op = "<";
-            break;
-        case query::ComparisonOperator::LessEqual:
-            op = "<=";
-            break;
+            return std::nullopt;
         }
 
-        return wrap("timestamp_unix " + std::string(op) + " " + value);
+        return wrap("timestamp_unix " + std::string(*op) + " " + value);
     }
 
     if (field == "correlationid")
