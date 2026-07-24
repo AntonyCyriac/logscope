@@ -58,7 +58,7 @@ The `workflows/` directory contains GitHub Actions pipelines.
 | Job | Purpose |
 |-----|---------|
 | `build` | Configure, build, and test on Ubuntu, Windows, and macOS |
-| `cli-matrix` | Ubuntu bulk-log CLI matrix (10k-line fixtures, 18 command scenarios) |
+| `cli-matrix` | Ubuntu bulk-log CLI matrix (10k-line fixtures, 22 command scenarios) |
 | `sanitize` | AddressSanitizer build and test on Ubuntu |
 | `coverage` | `gcov`/`lcov` coverage capture and artifact upload |
 | `benchmark` | Benchmark regression check against committed baseline |

@@ -185,8 +185,8 @@ CI runs the sanitizer job on Ubuntu for every push and PR to `master`.
 ### CLI matrix (bulk logs)
 
 ```bash
-python3 scripts/generate_bulk_log.py --lines 100000 --format plain --output /tmp/bulk.log
-python3 scripts/generate_bulk_log.py --lines 100000 --format jsonl --output /tmp/bulk.jsonl
+python3 scripts/generate_bulk_log.py --lines 10000 --format plain --output /tmp/bulk.log
+python3 scripts/generate_bulk_log.py --lines 10000 --format jsonl --output /tmp/bulk.jsonl
 python3 scripts/run_cli_matrix.py --logscope build/apps/cli/logscope \
   --plain-log /tmp/bulk.log --jsonl-log /tmp/bulk.jsonl
 ```
@@ -223,7 +223,7 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 | Job | Purpose |
 |-----|---------|
 | Build and Test | Release build, full `ctest` on three OSes |
-| CLI Matrix | 100k-line bulk log, 22+ CLI scenarios |
+| CLI Matrix | 10k-line bulk log in CI; 100k-line in release workflow |
 | Sanitizer | ASan + UBSan (+ LeakSanitizer on Linux) |
 | Coverage | lcov report artifact |
 | Benchmark | Regression check against `baseline.json` |

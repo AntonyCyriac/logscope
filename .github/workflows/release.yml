@@ -69,7 +69,7 @@ jobs:
       - name: CLI Matrix Smoke Test
         shell: bash
         env:
-          # 100k on all release runners after v1.4.2 batched SQLite writes.
+          # Release-only: 100k stress matrix (CI cli-matrix stays at 10k).
           BULK_LOG_LINES: 100000
         run: |
           python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format plain --output /tmp/bulk.log
