@@ -30,10 +30,10 @@ AnalysisModel createModel()
     line.level = DetectedLogLevel::Error;
     line.messageExcerpt = "Connection refused";
     line.correlationId = "trace-1";
-    index.tryAddLine(line);
+    EXPECT_TRUE(index.tryAddLine(line));
 
     line.lineNumber = 2U;
-    index.tryAddLine(line);
+    EXPECT_TRUE(index.tryAddLine(line));
 
     LogLevelCounts counts;
     counts.recordError();

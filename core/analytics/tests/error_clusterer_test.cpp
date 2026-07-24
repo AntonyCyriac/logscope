@@ -26,12 +26,12 @@ TEST(ErrorClustererTest, GroupsSimilarErrorsBySignature)
     first.lineNumber = 1U;
     first.level = DetectedLogLevel::Error;
     first.messageExcerpt = "Error code=500";
-    index.tryAddLine(first);
+    EXPECT_TRUE(index.tryAddLine(first));
 
     IndexedLine second = first;
     second.lineNumber = 2U;
     second.messageExcerpt = "Error code=503";
-    index.tryAddLine(second);
+    EXPECT_TRUE(index.tryAddLine(second));
 
     LogLevelCounts counts;
     counts.recordError();

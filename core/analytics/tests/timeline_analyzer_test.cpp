@@ -32,14 +32,14 @@ TEST(TimelineAnalyzerTest, BuildsBucketsFromTimestampedLines)
     first.level = DetectedLogLevel::Error;
     first.timestamp = Timestamp::fromUnixSeconds(1000);
     fieldSummary.recordTimestamp(*first.timestamp);
-    index.tryAddLine(first);
+    EXPECT_TRUE(index.tryAddLine(first));
 
     IndexedLine second;
     second.lineNumber = 2U;
     second.level = DetectedLogLevel::Info;
     second.timestamp = Timestamp::fromUnixSeconds(1300);
     fieldSummary.recordTimestamp(*second.timestamp);
-    index.tryAddLine(second);
+    EXPECT_TRUE(index.tryAddLine(second));
 
     LogLevelCounts counts;
     counts.recordError();
