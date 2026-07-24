@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | User Manual |
 | Category | Handbook |
-| Version | 1.2.0 |
+| Version | 1.2.1 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -146,7 +146,7 @@ logscope analyze --format markdown --sections executive,errors samples/sample.lo
 
 ## 4.7 Investigation thresholds on reports
 
-The `analyze` command always reports on the full log source. To capture a session only when a source meets minimum error, warning, or line counts, use `session save` with `--min-errors`, `--min-warnings`, `--min-lines`, or `--max-lines` — see [§7.1](#71-session-save-with-filters-and-indexes).
+The `analyze` command always reports on the full log source. It does **not** accept threshold flags (`--min-errors`, etc.) or investigation content filters (`--search`, `--filter`, `--level`, etc.). To capture a session only when a source meets minimum error, warning, or line counts — or to save filters with the session — use `session save` — see [§7.1](#71-session-save-with-filters-and-indexes).
 
 ## 4.8 Persistent index during analyze
 
@@ -266,7 +266,9 @@ Include analytics in a full report with `analyze --sections analytics,timeline,c
 
 ## 7.1 Session save with filters and indexes
 
-`session save` accepts the same investigation filters as `investigate`, plus report options. Use it to persist state when a log meets thresholds or when you want filters saved with the session:
+`session save` runs analysis, applies optional filters, and writes a `.logscope-session` file. It accepts report options (`--format`, `--sections`) plus investigation filters and storage flags.
+
+**Important:** On `session save`, `--search` filters by **log source path** substring. To search indexed line content, use `--content-search` (or `--query` / `--filter`). On `investigate` and `search`, `--search` means line content — see [CLI Reference](CLI_REFERENCE.md#session-save).
 
 ```bash
 # Save only when the source has at least one error line
@@ -277,14 +279,26 @@ logscope session save incident.session /var/log/large-app.log \
   --min-errors 10 \
   --level error \
   --content-search "timeout" \
+  --filter 'level == ERROR' \
   --persist-index \
   --sections executive,errors,charts
+
+# Filter by source path (directory or filename), not line content
+logscope session save api.session /var/log/myapp/api.log --search "api"
 
 # Cap total lines considered
 logscope session save incident.session samples/sample.log --max-lines 50000
 ```
 
-Threshold flags: `--min-errors`, `--min-warnings`, `--min-lines`, `--max-lines`. Content filters: `--level`, `--message`, `--json-key`, `--time-from`, `--time-to`, `--content-search`. Storage: `--persist-index`, `--reuse-index`, `--index-path`.
+| Category | Flags |
+|----------|-------|
+| Thresholds | `--min-errors`, `--min-warnings`, `--min-lines`, `--max-lines` |
+| Content filters | `--content-search`, `--query`, `--filter`, `--regex`, `--case-sensitive`, `--level`, `--message`, `--json-key`, `--time-from`, `--time-to` |
+| Source path | `--search` (path substring only on `session save`) |
+| Report | `--format text\|json\|csv\|markdown`, `--sections`, `--profile` |
+| Storage | `--persist-index`, `--reuse-index`, `--index-path` |
+
+Full flag reference: [CLI Reference — session save](CLI_REFERENCE.md#session-save).
 
 ## 7.2 Save and reload
 
@@ -469,3 +483,4 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | 1.0.0 | 24-07-2026 | Initial Phase 1 user manual. |
 | 1.1.0 | 24-07-2026 | v1.4.2 persist-index performance, progress logging, and Windows build link fix. |
 | 1.2.0 | 24-07-2026 | Complete CLI workflow coverage: CSV/Markdown, session thresholds, extensions, investigate flags. |
+| 1.2.1 | 24-07-2026 | Align session save flags with CLI reference (`--search` path vs `--content-search`). |

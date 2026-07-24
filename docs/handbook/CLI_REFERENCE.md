@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.7.0 |
+| Version | 1.8.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -46,19 +46,11 @@ logscope analyze [options] <log-source>
 | `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
 | `--sections <list>` | Report sections: `executive`, `summary`, `levels`, `errors`, `analytics`, `timeline`, `clusters`, `charts`, `metadata`, `formats`, or `all` |
 | `--output <file>` | Write report to file (required for PDF; creates parent directories) |
-| `--min-errors <n>` | Investigation filter: minimum error lines |
-| `--min-warnings <n>` | Investigation filter: minimum warning lines |
-| `--min-lines <n>` | Investigation filter: minimum total lines |
-| `--max-lines <n>` | Investigation filter: maximum total lines |
-| `--search <query>` | Investigation search query |
-
-Storage options (also on `investigate`, `session save`):
-
-| Option | Description |
-|--------|-------------|
 | `--persist-index` | Persist indexed lines to SQLite (v1.4.2+: batched writes; progress every 10,000 lines at `log.level=info`) |
 | `--reuse-index` | Reuse an existing index when the source fingerprint matches |
 | `--index-path <file>` | Explicit SQLite index file path |
+
+`analyze` does **not** accept threshold flags (`--min-errors`, etc.) or investigation content filters — use `session save` for those.
 
 **Log sources:** file path, directory of `.log` files, or `-` for stdin.
 
@@ -70,6 +62,7 @@ logscope analyze --profile generic-json samples/sample.jsonl
 logscope analyze - < samples/sample.log
 logscope analyze --format html --output report.html samples/sample.log
 logscope analyze --sections executive,errors,charts samples/sample.log
+logscope analyze --persist-index samples/large-app.log
 ```
 
 ---
@@ -230,7 +223,37 @@ logscope extensions describe <extension-id> [--config <file>]
 Run analysis and persist investigation state to a session file.
 
 ```text
-logscope session save <session-file> <log-source> [analyze options]
+logscope session save <session-file> <log-source> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format text\|json\|csv\|markdown` | Report format for the saved session (default: text) |
+| `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
+| `--sections <list>` | Report sections (same values as `analyze`) |
+| `--min-errors <n>` | Minimum error lines required in the source |
+| `--min-warnings <n>` | Minimum warning lines required in the source |
+| `--min-lines <n>` | Minimum total lines required in the source |
+| `--max-lines <n>` | Maximum total lines considered |
+| `--search <query>` | Filter by log source path substring |
+| `--content-search <query>` | Text search over indexed log line content |
+| `--query <expr>` | Boolean search expression (`AND`, `OR`, `NOT`, quotes) |
+| `--filter <dsl>` | Field-aware filter expression (see `query` command) |
+| `--regex` | Treat content search as a regular expression |
+| `--case-sensitive` | Disable default case-insensitive content matching |
+| `--time-from <timestamp>` | Earliest timestamp (ISO-like) |
+| `--time-to <timestamp>` | Latest timestamp (ISO-like) |
+| `--level <name>` | Per-line level filter: `error`, `warning`, `info`, `other` |
+| `--message <text>` | Message/content substring filter |
+| `--json-key <key>` | Require a JSON top-level key on matching lines |
+| `--persist-index` | Persist indexed lines to SQLite (v1.4.2+: batched writes; progress every 10,000 lines at `log.level=info`) |
+| `--reuse-index` | Reuse an existing index when the source fingerprint matches |
+| `--index-path <file>` | Explicit SQLite index file path |
+
+```bash
+logscope session save incident.session samples/sample.log --min-errors 1
+logscope session save incident.session /var/log/large-app.log \
+  --min-errors 10 --level error --content-search "timeout" --persist-index
 ```
 
 ---
@@ -279,3 +302,4 @@ Default directory: current working directory.
 | 1.5.0 | 24-07-2026 | Added `analytics` command, analytics report sections, and M9 config keys. |
 | 1.6.0 | 24-07-2026 | Added `query` command, `--filter` DSL, and `query.saved.*` config keys for M10. |
 | 1.7.0 | 24-07-2026 | Documented v1.4.2 persist-index progress logging on storage flags. |
+| 1.8.0 | 24-07-2026 | Moved threshold and investigation filters from `analyze` to `session save`; expanded session save option table. |
