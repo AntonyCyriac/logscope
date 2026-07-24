@@ -23,6 +23,7 @@ configure_file(
 )
 
 add_custom_target(docs
+    COMMAND ${CMAKE_COMMAND} -E make_directory "${DOXYGEN_OUTPUT_DIR}"
     COMMAND ${DOXYGEN_EXECUTABLE} "${CMAKE_BINARY_DIR}/Doxyfile"
     WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
     COMMENT "Generating LogScope API documentation with Doxygen"
