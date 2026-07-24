@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Component Catalog |
 | Category | Architecture |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -71,6 +71,70 @@ Every component SHALL:
 | C08 | Diagnostics Manager | Logging, diagnostics, metrics, tracing, and health information. |
 | C09 | CLI | Provide the command-line user interface. |
 | C10 | Platform Services | Provide platform abstraction for operating system services. |
+
+## Component structure diagram
+
+Logical components (C01–C10) and supporting domain libraries through **v1.4.2**. Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
+
+```mermaid
+flowchart TB
+  subgraph presentation [Presentation]
+    CLI[C09 CLI]
+  end
+
+  subgraph application [Application components]
+    CFG[C07 Configuration]
+    SRC[C02 Source Manager]
+    ANA[C03 Analysis Engine]
+    INV[C04 Investigation Engine]
+    RPT[C05 Reporting Engine]
+    EXT[C06 Extension Manager]
+  end
+
+  subgraph domain [Domain libraries]
+    QRY[Query DSL]
+    SRCH[Search]
+    ANLY[Analytics]
+    STO[Storage Index]
+    SESS[Workspace Session]
+  end
+
+  subgraph infrastructure [Infrastructure]
+    CORE[C01 Core]
+    DIAG[C08 Diagnostics]
+    PLAT[C10 Platform Services]
+  end
+
+  CLI --> CFG
+  CLI --> SRC
+  CLI --> ANA
+  CLI --> INV
+  CLI --> RPT
+  CLI --> EXT
+  CLI --> SESS
+
+  SRC --> ANA
+  ANA --> INV
+  ANA --> RPT
+  INV --> RPT
+
+  INV -.-> QRY
+  INV -.-> SRCH
+  ANA -.-> STO
+  INV -.-> STO
+  RPT -.-> ANLY
+
+  CFG --> CORE
+  SRC --> CORE
+  ANA --> CORE
+  INV --> CORE
+  RPT --> CORE
+  EXT --> CORE
+  SESS --> CORE
+  DIAG --> CORE
+  SRC --> PLAT
+  STO --> PLAT
+```
 
 ---
 
@@ -321,3 +385,4 @@ Major architectural changes should be documented through Architecture Decision R
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial component catalog. |
 | 1.1.0 | 24-07-2026 | M8 reporting: section registry, contributed sections, HTML/PDF formats (`v1.3.0`). |
+| 1.2.0 | 24-07-2026 | Added Mermaid component structure diagram (`v1.4.2`). |

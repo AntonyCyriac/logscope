@@ -17,11 +17,13 @@ LogScope is an open-source, modular log analysis platform. It helps engineers un
 Configuration → Source → Analysis → Investigation → Reporting → CLI
 ```
 
+Component diagram (Mermaid): [Component Catalog §4](docs/architecture/COMPONENT_CATALOG.md#component-structure-diagram).
+
 | Audience | Start here |
 |----------|------------|
 | **Users** | [User Manual](docs/handbook/USER_MANUAL.md) · [CLI Reference](docs/handbook/CLI_REFERENCE.md) · [Releases](https://github.com/AntonyCyriac/logscope/releases) |
 | **Contributors** | [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
-| **Architecture** | [Product](docs/PRODUCT.md) · [Architecture Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) · [Component Catalog](docs/architecture/COMPONENT_CATALOG.md) |
+| **Architecture** | [Component diagram](docs/architecture/COMPONENT_CATALOG.md#component-structure-diagram) · [Architecture Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) · [Component Catalog](docs/architecture/COMPONENT_CATALOG.md) · [Product](docs/PRODUCT.md) |
 
 Full documentation index: [Document Map](docs/DOCUMENT_MAP.md).
 
