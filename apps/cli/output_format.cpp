@@ -30,6 +30,10 @@ std::optional<OutputFormat> parseOutputFormat(const std::string_view value) noex
         return OutputFormat::Csv;
     case reporting::ReportFormat::Markdown:
         return OutputFormat::Markdown;
+    case reporting::ReportFormat::Html:
+        return OutputFormat::Html;
+    case reporting::ReportFormat::Pdf:
+        return OutputFormat::Pdf;
     }
 
     return std::nullopt;
@@ -47,6 +51,10 @@ std::string_view outputFormatName(const OutputFormat format) noexcept
         return reporting::reportFormatName(reporting::ReportFormat::Csv);
     case OutputFormat::Markdown:
         return reporting::reportFormatName(reporting::ReportFormat::Markdown);
+    case OutputFormat::Html:
+        return reporting::reportFormatName(reporting::ReportFormat::Html);
+    case OutputFormat::Pdf:
+        return reporting::reportFormatName(reporting::ReportFormat::Pdf);
     }
 
     return reporting::reportFormatName(reporting::ReportFormat::Text);
@@ -64,6 +72,10 @@ reporting::ReportFormat toReportFormat(const OutputFormat format) noexcept
         return reporting::ReportFormat::Csv;
     case OutputFormat::Markdown:
         return reporting::ReportFormat::Markdown;
+    case OutputFormat::Html:
+        return reporting::ReportFormat::Html;
+    case OutputFormat::Pdf:
+        return reporting::ReportFormat::Pdf;
     }
 
     return reporting::ReportFormat::Text;

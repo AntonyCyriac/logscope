@@ -34,6 +34,16 @@ std::optional<ReportFormat> parseReportFormat(const std::string_view value) noex
         return ReportFormat::Markdown;
     }
 
+    if (normalized == "html")
+    {
+        return ReportFormat::Html;
+    }
+
+    if (normalized == "pdf")
+    {
+        return ReportFormat::Pdf;
+    }
+
     return std::nullopt;
 }
 
@@ -49,6 +59,10 @@ std::string_view reportFormatName(const ReportFormat format) noexcept
         return "csv";
     case ReportFormat::Markdown:
         return "markdown";
+    case ReportFormat::Html:
+        return "html";
+    case ReportFormat::Pdf:
+        return "pdf";
     }
 
     return "text";

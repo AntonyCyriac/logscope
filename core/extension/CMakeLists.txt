@@ -12,6 +12,8 @@ target_link_libraries(scope_extension
     PUBLIC
         scope_foundation
         scope_runtime
+    PRIVATE
+        scope_reporting
 )
 
 target_include_directories(scope_extension

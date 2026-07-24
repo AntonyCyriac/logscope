@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | FR-003 – Generate Reports |
 | Category | Requirements |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 15-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -147,3 +147,4 @@ This requirement depends on:
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial functional requirement. |
+| 1.1.0 | 24-07-2026 | M8 delivery: HTML/PDF formats, executive/error/chart sections, `--output` file export. |

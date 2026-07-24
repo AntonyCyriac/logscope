@@ -320,8 +320,8 @@ The broader companion product vision:
 | Phase 1 — Stabilize v1.x | Parallel `v1.0.x` track | `v1.0.1`–`v1.0.x` |
 | M6 — Log Format Intelligence | M6 | `v1.1.0` |
 | Phase 2 — Search Engine | M7 | `v1.2.0` |
-| Phase 2 — Reporting Engine | M8 | `v1.2.x` / `v1.3.0` |
-| Phase 2 — Analytics Engine | M9 | `v1.3.0` |
+| Phase 2 — Reporting Engine | M8 | `v1.3.0` |
+| Phase 2 — Analytics Engine | M9 | `v1.3.1`+ |
 | Phase 2 — Query Engine | M10 | `v1.3.0` / `v1.4.0` |
 | Phase 3 — Storage | M11 | `v1.4.0` |
 | Phase 4 — Plugin Ecosystem | M12 | `v1.4.0` / `v1.5.0` |
@@ -357,7 +357,8 @@ flowchart LR
 v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine (+ performance wins)
-v1.3.0  — M8 Reporting + M9 Analytics
+v1.3.0  — M8: Advanced Reporting
+v1.3.1+ — M9: Analytics Engine (planned)
 v1.4.0  — M10 Query + M11 Storage + M12 Plugins
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web + major API evolution
@@ -437,6 +438,7 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | [Product Overview](../vision/PRODUCT_OVERVIEW.md) | Product promise and evolution strategy |
 | [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) | Completed at `v1.1.0` |
 | [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Completed at `v1.2.0` |
+| [M8 – Advanced Reporting](M8-ADVANCED-REPORTING.md) | Completed at `v1.3.0` |
 | [Roadmap](../ROADMAP.md) | Milestone status |
 
 ---
@@ -446,3 +448,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
+| 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |

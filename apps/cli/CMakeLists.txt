@@ -19,6 +19,7 @@ add_executable(logscope
     output_format.cpp
     report_config.cpp
     report_output.cpp
+    report_writer.cpp
 )
 
 target_link_libraries(logscope

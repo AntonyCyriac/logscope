@@ -55,10 +55,28 @@ TEST(ReportFormatterTest, FormatsCsvWithSelectedSections)
     EXPECT_EQ(std::string::npos, report.text().find("levelBreakdown"));
 }
 
+TEST(ReportFormatterTest, FormatsExecutiveAndErrorSections)
+{
+    ReportSections sections;
+    sections.enable(ReportSection::ExecutiveSummary);
+    sections.enable(ReportSection::ErrorSummary);
+
+    const auto report =
+        ReportFormatter::format(createSampleModel(), optionsWithSections(sections, ReportFormat::Text));
+
+    EXPECT_NE(std::string::npos, report.text().find("Executive Summary"));
+    EXPECT_NE(std::string::npos, report.text().find("Error Summary"));
+}
+
 TEST(ReportFormatterTest, FormatsMarkdownWithAllSections)
 {
+    ReportSections sections;
+    sections.enable(ReportSection::Summary);
+    sections.enable(ReportSection::LevelBreakdown);
+    sections.enable(ReportSection::SourceMetadata);
+
     const auto report =
-        ReportFormatter::format(createSampleModel(), optionsWithSections(ReportSections::all(), ReportFormat::Markdown));
+        ReportFormatter::format(createSampleModel(), optionsWithSections(sections, ReportFormat::Markdown));
 
     EXPECT_NE(std::string::npos, report.text().find("# LogScope Report"));
     EXPECT_NE(std::string::npos, report.text().find("## Summary"));
@@ -68,8 +86,13 @@ TEST(ReportFormatterTest, FormatsMarkdownWithAllSections)
 
 TEST(ReportFormatterTest, FormatsJsonWithSectionStructure)
 {
+    ReportSections sections;
+    sections.enable(ReportSection::Summary);
+    sections.enable(ReportSection::LevelBreakdown);
+    sections.enable(ReportSection::SourceMetadata);
+
     const auto report =
-        ReportFormatter::format(createSampleModel(), optionsWithSections(ReportSections::all(), ReportFormat::Json));
+        ReportFormatter::format(createSampleModel(), optionsWithSections(sections, ReportFormat::Json));
 
     EXPECT_NE(std::string::npos, report.text().find("\"summary\""));
     EXPECT_NE(std::string::npos, report.text().find("\"totalLines\": 3"));
@@ -89,8 +112,11 @@ TEST(ReportFormatterTest, IncludesJsonLinesSummaryInSourceMetadata)
                               scope::analysis::LogFormat::JsonLines,
                               summary);
 
+    ReportSections sections;
+    sections.enable(ReportSection::SourceMetadata);
+
     const auto report =
-        ReportFormatter::format(model, optionsWithSections(ReportSections::all(), ReportFormat::Json));
+        ReportFormatter::format(model, optionsWithSections(sections, ReportFormat::Json));
 
     EXPECT_NE(std::string::npos, report.text().find("\"jsonValidLines\": 1"));
     EXPECT_NE(std::string::npos, report.text().find("\"topLevelKeys\""));
@@ -107,8 +133,11 @@ TEST(ReportFormatterTest, IncludesFieldSummaryInSourceMetadata)
 
     const AnalysisModel model(Path("sample.log"), 1U, {}, scope::analysis::LogFormat::PlainText, std::nullopt, fieldSummary);
 
+    ReportSections sections;
+    sections.enable(ReportSection::SourceMetadata);
+
     const auto report =
-        ReportFormatter::format(model, optionsWithSections(ReportSections::all(), ReportFormat::Json));
+        ReportFormatter::format(model, optionsWithSections(sections, ReportFormat::Json));
 
     EXPECT_NE(std::string::npos, report.text().find("\"earliestTimestamp\""));
     EXPECT_NE(std::string::npos, report.text().find("\"topMessages\""));

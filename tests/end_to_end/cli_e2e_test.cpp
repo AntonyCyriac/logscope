@@ -130,6 +130,38 @@ TEST(CliE2eTest, SessionSaveAndLoadRoundTrip)
     std::remove(sessionFile.c_str());
 }
 
+TEST(CliE2eTest, AnalyzeSubcommandProducesHtmlReportToFile)
+{
+    const std::string outputFile = "cli_e2e_report.html";
+
+    std::remove(outputFile.c_str());
+
+    const std::string output =
+        runLogscope("analyze --format html --sections executive,summary,charts --output " + outputFile + " " +
+                    scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    std::ifstream stream(outputFile);
+    ASSERT_TRUE(stream.good());
+
+    std::string html((std::istreambuf_iterator<char>(stream)), std::istreambuf_iterator<char>());
+
+    std::remove(outputFile.c_str());
+
+    EXPECT_NE(std::string::npos, html.find("<!DOCTYPE html>"));
+    EXPECT_NE(std::string::npos, html.find("Executive Summary"));
+    EXPECT_NE(std::string::npos, html.find("<svg"));
+}
+
+TEST(CliE2eTest, AnalyzeExecutiveAndErrorSections)
+{
+    const std::string output = runLogscope("analyze --sections executive,errors " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("Executive Summary"));
+    EXPECT_NE(std::string::npos, output.find("Error Summary"));
+    EXPECT_NE(std::string::npos, output.find("Health verdict"));
+}
+
 TEST(CliE2eTest, HelpDisplaysUsage)
 {
     const std::string output = runLogscope("--help");

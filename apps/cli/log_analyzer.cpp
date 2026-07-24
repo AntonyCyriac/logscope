@@ -9,6 +9,7 @@
 #include "investigation.hpp"
 #include "log_macros.hpp"
 #include "report_output.hpp"
+#include "report_writer.hpp"
 #include "source.hpp"
 
 namespace scope::cli
@@ -17,6 +18,7 @@ namespace scope::cli
 bool LogAnalyzer::analyze(const foundation::Path& filePath,
                           const reporting::ReportOptions& reportOptions,
                           const scope::analysis::AnalysisConfig& analysisConfig,
+                          const std::optional<foundation::Path>& outputFile,
                           std::ostream& output,
                           std::ostream& errorOutput)
 {
@@ -54,7 +56,15 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
 
     SCOPE_LOG_INFO("cli", "Investigation summary: " + view.summary());
 
-    output << formatAnalysisOutput(*modelResult, reportOptions) << std::endl;
+    const reporting::Report report = generateAnalysisReport(*modelResult, reportOptions);
+    const auto writeResult = writeReport(report, outputFile, output, errorOutput);
+
+    if (!writeResult)
+    {
+        errorOutput << writeResult.error().message() << '\n';
+
+        return false;
+    }
 
     return true;
 }

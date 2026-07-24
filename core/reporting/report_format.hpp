@@ -19,7 +19,9 @@ enum class ReportFormat
     Text,
     Json,
     Csv,
-    Markdown
+    Markdown,
+    Html,
+    Pdf
 };
 
 /**

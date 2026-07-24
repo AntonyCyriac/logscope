@@ -10,7 +10,7 @@ The Extension module discovers, configures, and manages supported LogScope exten
 |-----------|-------------|
 | `ExtensionDescriptor` | Built-in extension registration metadata |
 | `ExtensionInfo` | Public extension metadata and status |
-| `ExtensionManager` | Registration, configuration, and lifecycle |
+| `ExtensionManager` | Registration, configuration, lifecycle, and report section contributor hooks |
 
 ## Configuration
 

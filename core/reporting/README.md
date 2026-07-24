@@ -10,11 +10,24 @@ It implements **DO-003 Report** from the domain model.
 
 | Component | Description |
 |-----------|-------------|
-| `Report` | Formatted presentation of analysis results |
-| `ReportSections` | Selectable report sections (summary, levels, metadata) |
-| `ReportOptions` | Format and section selection |
-| `ReportFormatter` | Multi-format report serialization |
+| `Report` | Formatted presentation (text or binary PDF payload) |
+| `ReportSections` | Selectable sections (`executive`, `summary`, `levels`, `errors`, `charts`, `metadata`, `formats`, `all`) |
+| `ReportOptions` | Format, section selection, chart inclusion |
+| `ReportSectionRegistry` | Built-in and contributed section renderers |
+| `ReportFragment` | Per-format section bodies assembled by `FormatRenderer` |
+| `ReportFormatter` | Orchestrates registry + format rendering |
 | `ReportGenerator` | Creates reports from `AnalysisModel` |
+
+## Output Formats
+
+| Format | Description |
+|--------|-------------|
+| `text` | Human-readable sections (default) |
+| `json` | Structured JSON section objects |
+| `csv` | Section/key/value rows |
+| `markdown` | Markdown tables and fenced ASCII charts |
+| `html` | Self-contained HTML with embedded SVG charts |
+| `pdf` | Native PDF via `MinimalPdfWriter` (ADR-003) |
 
 ## Dependencies
 
@@ -29,15 +42,21 @@ It implements **DO-003 Report** from the domain model.
 
 scope::reporting::ReportGenerator generator;
 scope::reporting::ReportOptions options;
-options.format = scope::reporting::ReportFormat::Markdown;
-options.sections = scope::reporting::ReportSections::parse("summary,levels").value();
+options.format = scope::reporting::ReportFormat::Html;
+options.sections = scope::reporting::ReportSections::parse("executive,summary,charts").value();
 
 scope::reporting::Report report = generator.generate(model, options);
 
-std::cout << report.text() << std::endl;
+if (report.isBinary()) {
+    // write report.bytes() to a file
+} else {
+    std::cout << report.text() << std::endl;
+}
 ```
 
 ## CMake Target
 
 - `scope_reporting` — static library
 - `scope_reporting_tests` — unit tests
+
+Planning: [M8 – Advanced Reporting](../../docs/planning/M8-ADVANCED-REPORTING.md)
