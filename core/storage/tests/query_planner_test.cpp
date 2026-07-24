@@ -109,9 +109,45 @@ TEST(QueryPlannerTest, PlansHasKeyFunction)
     EXPECT_NE(std::string::npos, plan->sqlWhere.find("top_level_keys_json"));
 }
 
-TEST(QueryPlannerTest, RejectsUnsupportedComparison)
+TEST(QueryPlannerTest, PlansJsonFieldComparison)
 {
     const auto parsed = parseFilterQuery(R"(service == "PCF")");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+
+    ASSERT_TRUE(plan.has_value());
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("line_json_fields"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("service"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("PCF"));
+}
+
+TEST(QueryPlannerTest, PlansCombinedJsonFieldAndLevel)
+{
+    const auto parsed = parseFilterQuery(R"(service == "PCF" AND level == ERROR)");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+
+    ASSERT_TRUE(plan.has_value());
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("line_json_fields"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("level = 3"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("AND"));
+}
+
+TEST(QueryPlannerTest, RejectsUnsupportedJsonFieldOperator)
+{
+    const auto parsed = parseFilterQuery(R"(service > "PCF")");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+
+    EXPECT_FALSE(plan.has_value());
+}
+
+TEST(QueryPlannerTest, RejectsUnsupportedComparison)
+{
+    const auto parsed = parseFilterQuery(R"(unknownField > "value")");
     ASSERT_TRUE(parsed);
 
     const auto plan = planQueryPushdown(*parsed);

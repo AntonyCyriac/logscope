@@ -156,3 +156,49 @@ TEST(QueryEvaluatorTest, MatchesOrExpression)
     EXPECT_TRUE(evaluator.matches(makeLine(DetectedLogLevel::Warn, "slow")));
     EXPECT_FALSE(evaluator.matches(makeLine(DetectedLogLevel::Info, "ok")));
 }
+
+TEST(QueryEvaluatorTest, MatchesJsonFieldComparison)
+{
+    IndexedLine line;
+    line.jsonFieldValues = {{"service", "PCF"}};
+
+    const auto parsed = parseFilterQuery(R"(service == "PCF")");
+    ASSERT_TRUE(parsed);
+
+    const QueryEvaluator evaluator(*parsed);
+
+    EXPECT_TRUE(evaluator.matches(line));
+
+    line.jsonFieldValues = {{"service", "OTHER"}};
+    EXPECT_FALSE(evaluator.matches(line));
+}
+
+TEST(QueryEvaluatorTest, MatchesCombinedJsonFieldAndLevel)
+{
+    IndexedLine line;
+    line.level = DetectedLogLevel::Error;
+    line.jsonFieldValues = {{"service", "PCF"}};
+
+    const auto parsed = parseFilterQuery(R"(service == "PCF" AND level == ERROR)");
+    ASSERT_TRUE(parsed);
+
+    const QueryEvaluator evaluator(*parsed);
+
+    EXPECT_TRUE(evaluator.matches(line));
+
+    line.level = DetectedLogLevel::Info;
+    EXPECT_FALSE(evaluator.matches(line));
+}
+
+TEST(QueryEvaluatorTest, RejectsUnsupportedJsonFieldOperator)
+{
+    IndexedLine line;
+    line.jsonFieldValues = {{"service", "PCF"}};
+
+    const auto parsed = parseFilterQuery(R"(service > "PCF")");
+    ASSERT_TRUE(parsed);
+
+    const QueryEvaluator evaluator(*parsed);
+
+    EXPECT_FALSE(evaluator.matches(line));
+}

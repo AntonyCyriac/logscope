@@ -284,6 +284,28 @@ TEST(CliE2eTest, InvestigatePersistIndexFindsLinesBeyondMemoryCap)
     EXPECT_NE(std::string::npos, output.find("PERSIST_INDEX_MARKER"));
 }
 
+TEST(CliE2eTest, QueryPersistedJsonFieldFilter)
+{
+    const std::string logFile = "e2e_json_field_filter.jsonl";
+    const std::string indexFile = "e2e_json_field_filter.db";
+
+    {
+        std::ofstream stream(logFile);
+        stream << R"({"level":"error","service":"PCF","message":"JSON_FIELD_MARKER"})" << '\n';
+        stream << R"({"level":"info","service":"OTHER","message":"ignored"})" << '\n';
+    }
+
+    const std::string output =
+        runLogscope("query --persist-index --index-path " + indexFile +
+                    " --filter \"service == \\\"PCF\\\"\" " + scope::test_support::quoteArgument(logFile));
+
+    std::remove(logFile.c_str());
+    std::remove(indexFile.c_str());
+
+    EXPECT_NE(std::string::npos, output.find("JSON_FIELD_MARKER"));
+    EXPECT_EQ(std::string::npos, output.find("ignored"));
+}
+
 TEST(CliE2eTest, SessionLoadReusesPersistedIndex)
 {
     const std::string logFile = "e2e_session_reuse.log";

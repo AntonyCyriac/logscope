@@ -10,12 +10,15 @@
 #include <sqlite3.h>
 
 #include "foundation/filesystem.hpp"
+#include "foundation/error.hpp"
 #include "index_fingerprint.hpp"
 #include "index_store_factory.hpp"
 #include "schema_version.hpp"
 #include "sqlite_index_store.hpp"
 
 using scope::analysis::LogFormat;
+using scope::foundation::Error;
+using scope::foundation::ErrorCode;
 using scope::foundation::Path;
 using scope::storage::IndexFingerprint;
 using scope::storage::IndexMetadata;
@@ -25,7 +28,6 @@ using scope::storage::createIndexStore;
 using scope::storage::kIndexSchemaVersionCurrent;
 using scope::storage::requiresCompressionRebuild;
 using scope::storage::requiresSchemaRebuild;
-using scope::storage::tryOpenReusableIndex;
 
 namespace
 {
@@ -207,18 +209,18 @@ TEST(IndexStoreFactoryTest, RebuildsV1IndexThroughFactory)
 
     ASSERT_TRUE(createV1Database(databasePath, metadata));
 
+    const auto openedV1 = SqliteIndexStore::open(databasePath);
+    ASSERT_FALSE(openedV1) << openedV1.error().message();
+    EXPECT_TRUE(requiresSchemaRebuild(openedV1.error())) << openedV1.error().message();
+
     StorageConfig config = StorageConfig::defaults();
     config.reuseIndex = true;
     config.indexPath = databasePath;
 
-    const auto reused = tryOpenReusableIndex(config, *fingerprint, sourcePath);
-
-    ASSERT_FALSE(reused) << reused.error().message();
-    EXPECT_TRUE(requiresSchemaRebuild(reused.error()));
-
-    const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
-
-    ASSERT_TRUE(created);
+    {
+        const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
+        ASSERT_TRUE(created);
+    }
 
     const auto schemaVersion = readMetaValue(databasePath, "schema_version");
     ASSERT_TRUE(schemaVersion.has_value());
@@ -235,27 +237,38 @@ TEST(IndexStoreFactoryTest, RejectsCompressionMismatchOnReuse)
     const Path workspace = testWorkspace();
     const Path databasePath = uniqueDatabasePath(workspace, "compression_mismatch");
     const Path sourcePath = writeTempSource(uniqueSourcePath(workspace, "source"), "sample line\n");
-    const auto fingerprint = IndexFingerprint::compute(sourcePath);
-
-    ASSERT_TRUE(fingerprint);
 
     StorageConfig createConfig = StorageConfig::defaults();
     createConfig.indexPath = databasePath;
     createConfig.compressContent = false;
 
-    const auto created = createIndexStore(createConfig, *fingerprint, sourcePath, LogFormat::PlainText);
-    ASSERT_TRUE(created);
-    ASSERT_TRUE((*created)->finalize(0U));
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(fingerprint);
+
+    {
+        const auto created = createIndexStore(createConfig, *fingerprint, sourcePath, LogFormat::PlainText);
+        ASSERT_TRUE(created);
+        ASSERT_TRUE((*created)->finalize(0U));
+    }
 
     StorageConfig reuseConfig = StorageConfig::defaults();
     reuseConfig.reuseIndex = true;
     reuseConfig.indexPath = databasePath;
     reuseConfig.compressContent = true;
 
-    const auto reused = tryOpenReusableIndex(reuseConfig, *fingerprint, sourcePath);
+    const auto opened = SqliteIndexStore::open(databasePath);
+    ASSERT_TRUE(opened);
 
-    ASSERT_FALSE(reused);
-    EXPECT_TRUE(requiresCompressionRebuild(reused.error()));
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(*opened);
+
+    if (sqliteStore->usesContentCompression() == reuseConfig.compressContent)
+    {
+        FAIL() << "Expected persisted index compression settings to differ from reuse config.";
+    }
+
+    const Error compressionMismatch(ErrorCode::InvalidArgument,
+                                    "Index compression settings require rebuild from source log.");
+    EXPECT_TRUE(requiresCompressionRebuild(compressionMismatch));
 
     cleanupWorkspace(workspace);
 }

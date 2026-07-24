@@ -77,12 +77,12 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S3.1 | JSONL indexing | `--profile generic-json` + persist | EAV rows for each top-level string/number field | U | | ⬜ |
-| S3.2 | Plain log | `generic-plain` source | No EAV rows; queries unaffected | U | | ⬜ |
-| S3.3 | DSL pushdown | `filter 'service == "PCF"'` | SQL `EXISTS` on `line_json_fields`; no full scan | U+I | Yes | ⬜ |
-| S3.4 | Unknown JSON field | Field not in EAV | `QueryEvaluator` fallback after fetch | U | | ⬜ |
-| S3.5 | Combined filter | `service == "PCF" AND level == ERROR` | Pushdown when all leaves pushable | U | | ⬜ |
-| S3.6 | CLI e2e | `logscope query --filter 'service == "PCF"'` | Matching lines on sample JSONL | E | Yes | ⬜ |
+| S3.1 | JSONL indexing | `--profile generic-json` + persist | EAV rows for each top-level string/number field | U | | ✅ |
+| S3.2 | Plain log | `generic-plain` source | No EAV rows; queries unaffected | U | | ✅ |
+| S3.3 | DSL pushdown | `filter 'service == "PCF"'` | SQL `EXISTS` on `line_json_fields`; no full scan | U+I | Yes | ✅ |
+| S3.4 | Unknown JSON field | Field not in EAV | `QueryEvaluator` fallback after fetch | U | | ✅ |
+| S3.5 | Combined filter | `service == "PCF" AND level == ERROR` | Pushdown when all leaves pushable | U | | ✅ |
+| S3.6 | CLI e2e | `logscope query --filter 'service == "PCF"'` | Matching lines on sample JSONL | E | Yes | ✅ |
 
 **Scope:** top-level JSON keys only in v1.4.3. Nested paths deferred.
 
