@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -72,16 +72,20 @@ git tag -a vX.Y.Z -m "vX.Y.Z — <summary>"
 git push origin vX.Y.Z
 ```
 
-Release tags (`vX.Y.Z`) are the public sync points for related private strategy materials. After the tag is pushed, the maintainer creates a matching `sync/vX.Y.Z` tag on the private strategy repository so long-horizon plans stay aligned with shipped code. See [Git Conventions](../handbook/GIT_CONVENTIONS.md#4-release-tags).
+Release tags (`vX.Y.Z`) are the public sync points for related private strategy materials. See [§8 Post-release housekeeping](#8-post-release-housekeeping) and [Git Conventions](../handbook/GIT_CONVENTIONS.md#4-release-tags).
 
 ## 6. GitHub Release
 
-For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts, runs the bulk-log CLI matrix (100k-line fixtures), and attaches binaries to the GitHub Release.
+For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts, runs the bulk-log CLI matrix, and attaches binaries to the GitHub Release.
 
-1. Open **Releases** → draft for the new tag
-2. Paste changelog summary
-3. Verify attached artifacts: `logscope-linux-amd64`, `logscope-windows-amd64`, `logscope-macos-amd64`
-4. Publish
+**Bulk-log matrix size:** CI and release workflows currently use **10k-line** fixtures (`BULK_LOG_LINES: 10000`). This includes `--persist-index` scenarios and keeps Linux/Windows release runners within budget after M11. Restore **100k-line** fixtures after **`v1.4.2`** bulk index write performance ships (see [M11-STORAGE-LAYER.md](../planning/M11-STORAGE-LAYER.md)).
+
+The workflow creates the GitHub Release draft with attached binaries. Maintainer steps:
+
+1. Open **Releases** for the new tag (workflow may auto-publish)
+2. Paste or verify changelog summary in the release notes body
+3. Verify attached artifacts: `logscope-linux-amd64`, `logscope-macos-amd64`, `logscope-windows-amd64`
+4. Publish if still a draft
 
 ## 7. Source packages (optional)
 
@@ -92,6 +96,26 @@ cmake --build build --target package
 ```
 
 Produces `logscope-<version>.tar.gz` and `.zip` via CPack.
+
+## 8. Post-release housekeeping
+
+Complete after the public tag and GitHub Release are live:
+
+| Step | Action |
+|------|--------|
+| Release notes | Ensure the GitHub Release body summarizes the `[X.Y.Z]` section from [`CHANGELOG.md`](../../CHANGELOG.md) |
+| Private strategy sync | On the private strategy repository: update long-horizon docs for the shipped milestone, then tag `sync/vX.Y.Z` on that commit (annotated message: `sync/vX.Y.Z — public vX.Y.Z <milestone summary>`) and push the tag |
+| Bulk matrix (when ready) | After storage perf lands in `v1.4.2`, raise `BULK_LOG_LINES` to `100000` in [`.github/workflows/release.yml`](../../.github/workflows/release.yml) and align [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) if desired |
+
+Example private strategy sync (run in the strategy repository checkout, not in this repo):
+
+```bash
+git checkout master
+git pull
+# commit strategy doc updates for the shipped milestone
+git tag -a sync/vX.Y.Z -m "sync/vX.Y.Z — public vX.Y.Z <summary>"
+git push origin sync/vX.Y.Z
+```
 
 ---
 
@@ -113,3 +137,4 @@ logscope analyze samples/sample.log
 | 1.0.0 | 18-07-2026 | Initial release process documentation. |
 | 1.1.0 | 24-07-2026 | Note `sync/vX.Y.Z` private strategy alignment after public release tags. |
 | 1.2.0 | 24-07-2026 | Release workflow runs bulk-log CLI matrix before publishing binaries. |
+| 1.3.0 | 24-07-2026 | Document 10k bulk matrix (restore 100k in v1.4.2); add post-release housekeeping checklist. |
