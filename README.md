@@ -60,6 +60,40 @@ Format source files (requires `clang-format`):
 cmake --build build --target format
 ```
 
+## Building on Windows
+
+M11 downloads the SQLite amalgamation during **CMake configure** (`FetchContent`). On some Windows machines, Schannel may fail certificate revocation checks (`CRYPT_E_REVOCATION_OFFLINE`) when contacting `sqlite.org`. This affects **building from source only** — release binaries and normal CLI use do not need this workaround.
+
+Set `CMAKE_TLS_VERIFY=0` for the configure step (PowerShell):
+
+```powershell
+git clone https://github.com/AntonyCyriac/logscope.git
+cd logscope
+
+$env:CMAKE_TLS_VERIFY = "0"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+Run the CLI (Release output path on MSVC):
+
+```powershell
+.\build\apps\cli\Release\logscope.exe analyze samples\sample.log
+```
+
+### Persistent indexes on Windows
+
+Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `--persist-index`, `--reuse-index`, and `storage.*` config keys.
+
+```powershell
+.\build\apps\cli\Release\logscope.exe investigate `
+  --persist-index `
+  --index-path C:\logs\app.index.db `
+  --filter "level == ERROR" `
+  C:\logs\app.log
+```
+
 ## Project layout
 
 ```text
