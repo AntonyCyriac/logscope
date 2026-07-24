@@ -10,6 +10,7 @@
 #include "foundation/result.hpp"
 #include "index_store.hpp"
 #include "log_format.hpp"
+#include "schema_version.hpp"
 
 namespace scope::storage
 {
@@ -23,6 +24,11 @@ class SqliteIndexStore final : public IndexStore
     create(const foundation::Path& databasePath, const IndexMetadata& metadata);
 
     [[nodiscard]] static foundation::Result<IndexStorePtr> open(const foundation::Path& databasePath);
+
+    [[nodiscard]] static constexpr int currentSchemaVersion() noexcept
+    {
+        return kIndexSchemaVersionCurrent;
+    }
 
     [[nodiscard]] foundation::Result<bool> appendLine(const analysis::IndexedLine& line,
                                                       std::string_view fullContent) override;

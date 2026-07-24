@@ -6,6 +6,8 @@
 
 #include <sqlite3.h>
 
+#include <chrono>
+#include <filesystem>
 #include <sstream>
 #include <string>
 
@@ -14,6 +16,7 @@
 #include "foundation/string.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
+#include "schema_version.hpp"
 
 namespace scope::storage
 {
@@ -21,7 +24,24 @@ namespace scope::storage
 namespace
 {
 
-constexpr int schemaVersion = 1;
+[[nodiscard]] foundation::Result<std::int64_t> lastWriteTimeUnix(const foundation::Path& path)
+{
+    std::error_code error;
+    const auto writeTime =
+        std::filesystem::last_write_time(std::filesystem::path(path.string()), error);
+
+    if (error)
+    {
+        return foundation::Result<std::int64_t>(
+            foundation::Error(foundation::ErrorCode::IOError, error.message()));
+    }
+
+    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        writeTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+
+    return foundation::Result<std::int64_t>(
+        std::chrono::duration_cast<std::chrono::seconds>(sctp.time_since_epoch()).count());
+}
 
 [[nodiscard]] foundation::Result<bool> runSql(sqlite3* database, const char* sql)
 {
@@ -184,7 +204,7 @@ constexpr int schemaVersion = 1;
     return foundation::Result<std::string>(std::move(value));
 }
 
-[[nodiscard]] foundation::Result<bool> initializeSchema(sqlite3* database)
+[[nodiscard]] foundation::Result<bool> initializeSchemaV2(sqlite3* database)
 {
     static constexpr const char* schemaSql = R"SQL(
 CREATE TABLE IF NOT EXISTS meta (
@@ -204,6 +224,19 @@ CREATE TABLE IF NOT EXISTS lines (
 CREATE INDEX IF NOT EXISTS idx_lines_level ON lines(level);
 CREATE INDEX IF NOT EXISTS idx_lines_timestamp ON lines(timestamp_unix);
 CREATE INDEX IF NOT EXISTS idx_lines_correlation ON lines(correlation_id);
+CREATE TABLE IF NOT EXISTS line_json_fields (
+  line_id INTEGER NOT NULL REFERENCES lines(id),
+  field TEXT NOT NULL,
+  value TEXT NOT NULL,
+  PRIMARY KEY (line_id, field, value)
+);
+CREATE INDEX IF NOT EXISTS idx_ljf_field_value ON line_json_fields(field, value);
+CREATE TABLE IF NOT EXISTS query_cache (
+  cache_key TEXT PRIMARY KEY,
+  line_ids_blob BLOB NOT NULL,
+  created_at INTEGER NOT NULL,
+  hit_count INTEGER NOT NULL DEFAULT 0
+);
 )SQL";
 
     const auto schemaResult = runSql(database, schemaSql);
@@ -213,7 +246,69 @@ CREATE INDEX IF NOT EXISTS idx_lines_correlation ON lines(correlation_id);
         return schemaResult;
     }
 
-    return setMeta(database, "schema_version", std::to_string(schemaVersion));
+    const auto versionResult =
+        setMeta(database, "schema_version", std::to_string(kIndexSchemaVersionCurrent));
+
+    if (!versionResult)
+    {
+        return versionResult;
+    }
+
+    return setMeta(database, "content_compression", "none");
+}
+
+[[nodiscard]] foundation::Result<int> readStoredSchemaVersion(sqlite3* database)
+{
+    const auto versionResult = getMeta(database, "schema_version");
+
+    if (!versionResult)
+    {
+        return foundation::Result<int>(versionResult.error());
+    }
+
+    if (versionResult->empty())
+    {
+        return foundation::Result<int>(kIndexSchemaVersionV1);
+    }
+
+    try
+    {
+        return foundation::Result<int>(std::stoi(*versionResult));
+    }
+    catch (const std::exception&)
+    {
+        return foundation::Result<int>(foundation::Error(
+            foundation::ErrorCode::ParseError, "Index database has invalid schema_version metadata."));
+    }
+}
+
+[[nodiscard]] foundation::Result<bool> validateStoredSchemaVersion(sqlite3* database)
+{
+    const auto versionResult = readStoredSchemaVersion(database);
+
+    if (!versionResult)
+    {
+        return foundation::Result<bool>(versionResult.error());
+    }
+
+    const int version = *versionResult;
+
+    if (version < kIndexSchemaVersionCurrent)
+    {
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Index schema version " + std::to_string(version) + " requires rebuild from source log."));
+    }
+
+    if (version > kIndexSchemaVersionMaxSupported)
+    {
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Unsupported index schema version " + std::to_string(version) + " (maximum supported: " +
+                std::to_string(kIndexSchemaVersionMaxSupported) + ")."));
+    }
+
+    return foundation::Result<bool>(true);
 }
 
 [[nodiscard]] analysis::IndexedLine rowToIndexedLine(sqlite3_stmt* statement)
@@ -419,6 +514,9 @@ SqliteIndexStore::~SqliteIndexStore()
 foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Path& databasePath,
                                                            const IndexMetadata& metadata)
 {
+    std::error_code removeError;
+    std::filesystem::remove(std::filesystem::path(databasePath.string()), removeError);
+
     if (sqlite3* database = nullptr;
         sqlite3_open(databasePath.string().c_str(), &database) != SQLITE_OK)
     {
@@ -438,7 +536,7 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
         impl->databasePath = databasePath;
         impl->metadata = metadata;
 
-        const auto schemaResult = initializeSchema(database);
+        const auto schemaResult = initializeSchemaV2(database);
 
         if (!schemaResult)
         {
@@ -515,6 +613,15 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
     auto impl = std::make_unique<Impl>();
     impl->database = database;
     impl->databasePath = databasePath;
+
+    const auto schemaValidation = validateStoredSchemaVersion(database);
+
+    if (!schemaValidation)
+    {
+        sqlite3_close(database);
+
+        return foundation::Result<IndexStorePtr>(schemaValidation.error());
+    }
 
     const auto fingerprintResult = getMeta(database, "fingerprint");
 
@@ -616,7 +723,44 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
 
     m_impl->metadata.totalLines = totalLines;
 
-    return setMeta(m_impl->database, "total_lines", std::to_string(totalLines));
+    const auto totalLinesResult = setMeta(m_impl->database, "total_lines", std::to_string(totalLines));
+
+    if (!totalLinesResult)
+    {
+        return totalLinesResult;
+    }
+
+    const auto indexedLineCountResult =
+        setMeta(m_impl->database, "indexed_line_count", std::to_string(m_impl->storedLines));
+
+    if (!indexedLineCountResult)
+    {
+        return indexedLineCountResult;
+    }
+
+    const auto sizeResult = foundation::FileSystem::fileSize(m_impl->metadata.sourcePath);
+
+    if (!sizeResult)
+    {
+        return foundation::Result<bool>(sizeResult.error());
+    }
+
+    const auto sizeMetaResult =
+        setMeta(m_impl->database, "source_size", std::to_string(*sizeResult));
+
+    if (!sizeMetaResult)
+    {
+        return sizeMetaResult;
+    }
+
+    const auto mtimeResult = lastWriteTimeUnix(m_impl->metadata.sourcePath);
+
+    if (!mtimeResult)
+    {
+        return foundation::Result<bool>(mtimeResult.error());
+    }
+
+    return setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
 }
 
 std::uint64_t SqliteIndexStore::storedLineCount() const noexcept
