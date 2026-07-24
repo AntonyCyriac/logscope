@@ -81,18 +81,18 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for arc
 
 # 6. Deferred (v1.4.2+)
 
-## v1.4.2 — Storage performance and cache (priority)
+## v1.4.2 — Storage performance (shipped)
 
 **Bulk index build performance** — product-facing work for `--persist-index` and hybrid spill on large logs:
 
-| Item | Scope |
+| Item | Status |
 |------|--------|
-| Batched SQLite writes | Reuse prepared `INSERT`, `BEGIN`/`COMMIT` every N lines, WAL mode |
-| Indexing feedback | Progress or log line during long persist (e.g. every 10k lines) |
-| Benchmark SLA | Extend `BM_IndexStoreAppend` with 100k-line fixture; record baselines in `baseline.json`; CI regression gate on Windows/Linux/macOS |
-| Acceptance | 100k-line persist-index on release-class runners completes within agreed budget (baseline set in v1.4.2, not regressed thereafter) |
+| Batched SQLite writes | ✅ WAL, prepared `INSERT`, 5k-line commits |
+| Indexing feedback | ✅ Progress log every 10k lines |
+| Benchmark SLA | ✅ `BM_IndexStoreAppend/100000` + `baseline.json` |
 
-## Later v1.4.2+
+## v1.4.3+ — Compression and cache (planned)
+
 
 - zlib compression on `content` column
 - `query_cache` materialized results
