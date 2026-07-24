@@ -174,14 +174,19 @@ Default index directories:
 
 CLI flags `--persist-index`, `--reuse-index`, and `--index-path` override storage settings per run.
 
-## 6.7.1 Storage v1.4.3 (planned)
-
-These keys are **design-complete** for **v1.4.3** — implementation follows [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
+## 6.7.1 Storage v1.4.3
 
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|
 | `storage.compress_content` | boolean | `false` | zlib-compress persisted `content` column |
 | `storage.compress_threshold_bytes` | integer | `256` | Minimum line length to compress |
+
+**Compression toggle:** enabling compression on an existing plain index requires a full rebuild (see USER_MANUAL §8).
+
+### Planned (remaining v1.4.3)
+
+| Key | Values | Default | Description |
+|-----|--------|---------|-------------|
 | `storage.query_cache.enabled` | boolean | `true` | Cache filter results on persisted indexes |
 | `storage.query_cache.max_entries` | integer | `64` | LRU cap for `query_cache` rows |
 | `storage.incremental_append` | boolean | `true` | Append new lines when source file grows |

@@ -114,7 +114,7 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and 
 
 | Benchmark | Description | CI gate |
 |-----------|-------------|---------|
-| `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; compare disk size | TBD |
+| `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; reports `file_bytes` counter | Local only (no CI gate yet) |
 | `BM_QueryCacheHit` | Second identical filter query on persisted index | TBD |
 | `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | TBD |
 

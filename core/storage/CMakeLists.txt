@@ -13,6 +13,18 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(sqlite_amalgamation)
 
+FetchContent_Declare(
+    zlib
+    GIT_REPOSITORY https://github.com/madler/zlib.git
+    GIT_TAG v1.3.1
+    GIT_SHALLOW TRUE
+)
+
+set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(ZLIB_INSTALL OFF CACHE BOOL "" FORCE)
+
+FetchContent_MakeAvailable(zlib)
+
 if(NOT TARGET sqlite3)
     add_library(sqlite3 STATIC ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c)
     target_include_directories(sqlite3 PUBLIC ${sqlite_amalgamation_SOURCE_DIR})
@@ -20,6 +32,7 @@ if(NOT TARGET sqlite3)
 endif()
 
 add_library(scope_storage
+    content_codec.cpp
     index_fingerprint.cpp
     index_reader.cpp
     index_store_factory.cpp
@@ -38,6 +51,7 @@ target_link_libraries(scope_storage
         sqlite3
     PRIVATE
         scope_analysis
+        zlibstatic
 )
 
 target_include_directories(scope_storage

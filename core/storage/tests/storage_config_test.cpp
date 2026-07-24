@@ -85,3 +85,35 @@ TEST(StorageConfigTest, ExposesModeNames)
     EXPECT_EQ("hybrid", storageModeName(StorageMode::Hybrid));
     EXPECT_EQ("persistent", storageModeName(StorageMode::Persistent));
 }
+
+TEST(StorageConfigTest, ResolvesCompressionSettings)
+{
+    Configuration configuration;
+    configuration.set("storage.compress_content", "true");
+    configuration.set("storage.compress_threshold_bytes", "128");
+
+    const StorageConfig resolved = resolveStorageConfig(configuration, StorageConfig{});
+
+    EXPECT_TRUE(resolved.compressContent);
+    EXPECT_EQ(128U, resolved.compressThresholdBytes);
+}
+
+TEST(StorageConfigTest, RejectsInvalidCompressionContent)
+{
+    Configuration configuration;
+    configuration.set("storage.compress_content", "maybe");
+
+    const auto result = validateStorageConfiguration(configuration);
+
+    EXPECT_FALSE(result);
+}
+
+TEST(StorageConfigTest, RejectsInvalidCompressionThreshold)
+{
+    Configuration configuration;
+    configuration.set("storage.compress_threshold_bytes", "not-a-number");
+
+    const auto result = validateStorageConfiguration(configuration);
+
+    EXPECT_FALSE(result);
+}

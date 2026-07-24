@@ -23,15 +23,40 @@ using scope::storage::SqliteIndexStore;
 using scope::storage::StorageConfig;
 using scope::storage::createIndexStore;
 using scope::storage::kIndexSchemaVersionCurrent;
+using scope::storage::requiresCompressionRebuild;
 using scope::storage::requiresSchemaRebuild;
 using scope::storage::tryOpenReusableIndex;
 
 namespace
 {
 
-Path writeTempSource(const std::string& name, const std::string& content)
+Path testWorkspace()
 {
-    const Path sourcePath(name);
+    const auto* testInfo = ::testing::UnitTest::GetInstance()->current_test_info();
+    const std::filesystem::path workspacePath =
+        std::filesystem::temp_directory_path() /
+        ("logscope_" + std::string(testInfo->test_suite_name()) + "_" + testInfo->name() + "_ws");
+    const Path workspace(workspacePath.string());
+
+    std::error_code error;
+    std::filesystem::remove_all(workspacePath, error);
+    std::filesystem::create_directories(workspacePath, error);
+
+    return workspace;
+}
+
+Path uniqueSourcePath(const Path& workspace, const std::string& suffix)
+{
+    return workspace.append(suffix + ".log");
+}
+
+Path uniqueDatabasePath(const Path& workspace, const std::string& suffix)
+{
+    return workspace.append(suffix + ".db");
+}
+
+Path writeTempSource(const Path& sourcePath, const std::string& content)
+{
     std::ofstream output(sourcePath.string());
     output << content;
     output.close();
@@ -39,23 +64,10 @@ Path writeTempSource(const std::string& name, const std::string& content)
     return sourcePath;
 }
 
-Path uniqueDatabasePath(const std::string& suffix)
-{
-    const auto* testInfo = ::testing::UnitTest::GetInstance()->current_test_info();
-    const std::string fileName = std::string(testInfo->test_suite_name()) + "_" + testInfo->name() + "_" + suffix +
-                                 ".db";
-    const Path databasePath(fileName);
-
-    std::error_code error;
-    std::filesystem::remove(databasePath.string(), error);
-
-    return databasePath;
-}
-
-void cleanupPath(const Path& path)
+void cleanupWorkspace(const Path& workspace)
 {
     std::error_code error;
-    std::filesystem::remove(path.string(), error);
+    std::filesystem::remove_all(workspace.string(), error);
 }
 
 std::optional<std::string> readMetaValue(const Path& databasePath, const std::string& key)
@@ -181,8 +193,9 @@ CREATE TABLE lines (
 
 TEST(IndexStoreFactoryTest, RebuildsV1IndexThroughFactory)
 {
-    const Path databasePath = uniqueDatabasePath("rebuild");
-    const Path sourcePath = writeTempSource("factory_test_v1_source.log", "sample line\n");
+    const Path workspace = testWorkspace();
+    const Path databasePath = uniqueDatabasePath(workspace, "rebuild");
+    const Path sourcePath = writeTempSource(uniqueSourcePath(workspace, "source"), "sample line\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -200,7 +213,7 @@ TEST(IndexStoreFactoryTest, RebuildsV1IndexThroughFactory)
 
     const auto reused = tryOpenReusableIndex(config, *fingerprint, sourcePath);
 
-    ASSERT_FALSE(reused);
+    ASSERT_FALSE(reused) << reused.error().message();
     EXPECT_TRUE(requiresSchemaRebuild(reused.error()));
 
     const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
@@ -214,6 +227,35 @@ TEST(IndexStoreFactoryTest, RebuildsV1IndexThroughFactory)
     const auto opened = SqliteIndexStore::open(databasePath);
     ASSERT_TRUE(opened);
 
-    cleanupPath(databasePath);
-    cleanupPath(sourcePath);
+    cleanupWorkspace(workspace);
+}
+
+TEST(IndexStoreFactoryTest, RejectsCompressionMismatchOnReuse)
+{
+    const Path workspace = testWorkspace();
+    const Path databasePath = uniqueDatabasePath(workspace, "compression_mismatch");
+    const Path sourcePath = writeTempSource(uniqueSourcePath(workspace, "source"), "sample line\n");
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+
+    ASSERT_TRUE(fingerprint);
+
+    StorageConfig createConfig = StorageConfig::defaults();
+    createConfig.indexPath = databasePath;
+    createConfig.compressContent = false;
+
+    const auto created = createIndexStore(createConfig, *fingerprint, sourcePath, LogFormat::PlainText);
+    ASSERT_TRUE(created);
+    ASSERT_TRUE((*created)->finalize(0U));
+
+    StorageConfig reuseConfig = StorageConfig::defaults();
+    reuseConfig.reuseIndex = true;
+    reuseConfig.indexPath = databasePath;
+    reuseConfig.compressContent = true;
+
+    const auto reused = tryOpenReusableIndex(reuseConfig, *fingerprint, sourcePath);
+
+    ASSERT_FALSE(reused);
+    EXPECT_TRUE(requiresCompressionRebuild(reused.error()));
+
+    cleanupWorkspace(workspace);
 }

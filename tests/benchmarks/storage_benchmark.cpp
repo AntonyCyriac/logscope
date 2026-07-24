@@ -15,6 +15,7 @@
 #include "query_evaluator.hpp"
 #include "query_parser.hpp"
 #include "query_planner.hpp"
+#include "index_store_options.hpp"
 #include "sqlite_index_store.hpp"
 
 using scope::analysis::DetectedLogLevel;
@@ -25,6 +26,7 @@ using scope::query::QueryEvaluator;
 using scope::query::parseFilterQuery;
 using scope::storage::IndexFingerprint;
 using scope::storage::IndexMetadata;
+using scope::storage::IndexStoreOptions;
 using scope::storage::SqliteIndexStore;
 using scope::storage::planQueryPushdown;
 
@@ -135,6 +137,63 @@ static void BM_IndexStoreAppend(benchmark::State& state)
     state.SetItemsProcessed(state.iterations() * state.range(0));
 }
 
+static void BM_IndexStoreCompressed(benchmark::State& state)
+{
+    const Path databasePath("storage_benchmark_compressed.db");
+    const Path sourcePath = writeBenchmarkSource("storage_benchmark_compressed_source.log");
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+
+    if (!fingerprint)
+    {
+        state.SkipWithError("Failed to compute fingerprint");
+
+        return;
+    }
+
+    IndexMetadata metadata;
+    metadata.fingerprint = fingerprint->value();
+    metadata.sourcePath = sourcePath;
+    metadata.format = LogFormat::PlainText;
+
+    IndexStoreOptions options;
+    options.compressContent = true;
+    options.compressThresholdBytes = 64U;
+
+    for (auto _ : state)
+    {
+        std::error_code error;
+        std::filesystem::remove(databasePath.string(), error);
+
+        const auto created = SqliteIndexStore::create(databasePath, metadata, options);
+
+        if (!created)
+        {
+            state.SkipWithError("Failed to create index store");
+
+            return;
+        }
+
+        for (std::int64_t indexValue = 0; indexValue < state.range(0); ++indexValue)
+        {
+            const std::string message = std::string(512U, 'x') + " line " + std::to_string(indexValue);
+            (void)(*created)->appendLine(
+                makeLine(static_cast<std::uint64_t>(indexValue + 1), DetectedLogLevel::Info, message), message);
+        }
+
+        (void)(*created)->finalize(static_cast<std::uint64_t>(state.range(0)));
+
+        std::error_code sizeError;
+        const auto fileSize = std::filesystem::file_size(std::filesystem::path(databasePath.string()), sizeError);
+
+        if (!sizeError)
+        {
+            state.counters["file_bytes"] = static_cast<double>(fileSize);
+        }
+    }
+
+    state.SetItemsProcessed(state.iterations() * state.range(0));
+}
+
 static void BM_QueryPushdown(benchmark::State& state)
 {
     constexpr std::size_t lineCount = 10000U;
@@ -201,5 +260,6 @@ static void BM_QueryEvaluatorScan(benchmark::State& state)
 }
 
 BENCHMARK(BM_IndexStoreAppend)->Arg(1000)->Arg(100000);
+BENCHMARK(BM_IndexStoreCompressed)->Arg(100000);
 BENCHMARK(BM_QueryPushdown);
 BENCHMARK(BM_QueryEvaluatorScan);
