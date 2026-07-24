@@ -23,7 +23,7 @@ A developer should be able to:
 - Debug the application.
 - Understand the recommended development workflow.
 
-This document focuses on environment setup. Architecture and implementation guidance are provided by the architecture documentation.
+This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
 ---
 
@@ -303,6 +303,7 @@ After environment setup, follow the handbook workflow guides:
 
 | Document | Purpose |
 |----------|---------|
+| [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md) | Contributing workflow, testing, and PR expectations |
 | [GIT_CONVENTIONS.md](GIT_CONVENTIONS.md) | Commit and branch naming |
 | [PULL_REQUEST_GUIDE.md](PULL_REQUEST_GUIDE.md) | Author checklist and definition of done |
 | [CODE_REVIEW_CHECKLIST.md](CODE_REVIEW_CHECKLIST.md) | Reviewer checklist |

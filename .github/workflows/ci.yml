@@ -72,6 +72,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    env:
+      ASAN_OPTIONS: detect_leaks=1:strict_string_checks=1
+      UBSAN_OPTIONS: print_stacktrace=1
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
