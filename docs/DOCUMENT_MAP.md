@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.7.0 |
+| Version | 2.8.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -93,6 +93,11 @@ docs/
 ├── testing/
 │   ├── TESTING.md
 │   └── PERFORMANCE.md
+│
+├── api/
+│   ├── README.md
+│   ├── mainpage.md
+│   └── Doxyfile.in          # CMake-generated Doxygen config
 │
 ├── release/
 │   ├── RELEASE.md
@@ -286,7 +291,7 @@ The following document categories may be introduced as LogScope evolves.
 ```text
 testing/
 release/
-api/
+api/          # Doxygen-generated HTML (build/docs/api/html); see docs/api/README.md
 ```
 
 These categories should be added only when they provide clear value and support the project's engineering goals.
@@ -315,3 +320,4 @@ These categories should be added only when they provide clear value and support 
 | 2.5.0 | 24-07-2026 | Added M10-QUERY-LANGUAGE.md, ADR-004, and reading order for `v1.4.0`. |
 | 2.6.0 | 24-07-2026 | Added M11-STORAGE-LAYER.md, ADR-005, and reading order for `v1.4.1`. |
 | 2.7.0 | 24-07-2026 | Added CONFIGURATION_GUIDE.md (Phase 1 stabilization). |
+| 2.8.0 | 24-07-2026 | Added docs/api/ Doxygen scaffold and CI docs job. |
