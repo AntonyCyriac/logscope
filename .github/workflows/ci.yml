@@ -20,6 +20,9 @@ jobs:
 
     runs-on: ${{ matrix.os }}
 
+    env:
+      CMAKE_TLS_VERIFY: ${{ runner.os == 'Windows' && '0' || '1' }}
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
