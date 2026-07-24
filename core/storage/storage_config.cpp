@@ -21,6 +21,7 @@ constexpr std::string_view storageCompressContentKey = "storage.compress_content
 constexpr std::string_view storageCompressThresholdKey = "storage.compress_threshold_bytes";
 constexpr std::string_view storageQueryCacheEnabledKey = "storage.query_cache.enabled";
 constexpr std::string_view storageQueryCacheMaxEntriesKey = "storage.query_cache.max_entries";
+constexpr std::string_view storageIncrementalAppendKey = "storage.incremental_append";
 
 [[nodiscard]] std::optional<bool> parseBooleanConfig(std::string_view value) noexcept
 {
@@ -166,6 +167,21 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
         }
     }
 
+    if (configuration.has(std::string(storageIncrementalAppendKey)))
+    {
+        const auto incrementalAppend = configuration.get(std::string(storageIncrementalAppendKey));
+
+        if (incrementalAppend && !foundation::isBlank(*incrementalAppend))
+        {
+            const auto parsed = parseBooleanConfig(*incrementalAppend);
+
+            if (parsed.has_value())
+            {
+                config.incrementalAppend = *parsed;
+            }
+        }
+    }
+
     if (cliOverrides.mode != StorageMode::Memory)
     {
         config.mode = cliOverrides.mode;
@@ -220,6 +236,11 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
     if (cliOverrides.queryCacheMaxEntries != StorageConfig::defaults().queryCacheMaxEntries)
     {
         config.queryCacheMaxEntries = cliOverrides.queryCacheMaxEntries;
+    }
+
+    if (!cliOverrides.incrementalAppend)
+    {
+        config.incrementalAppend = false;
     }
 
     return config;
@@ -296,6 +317,16 @@ foundation::Result<bool> validateStorageConfiguration(const runtime::Configurati
         {
             return foundation::Result<bool>(foundation::Error(
                 foundation::ErrorCode::InvalidArgument, "Invalid storage.query_cache.max_entries value."));
+        }
+    }
+
+    if (const auto incrementalAppend = configuration.get(std::string(storageIncrementalAppendKey));
+        incrementalAppend && !foundation::isBlank(*incrementalAppend))
+    {
+        if (!parseBooleanConfig(*incrementalAppend).has_value())
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Invalid storage.incremental_append value."));
         }
     }
 

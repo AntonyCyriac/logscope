@@ -16,6 +16,7 @@
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
 #include "index_fingerprint.hpp"
+#include "source_snapshot.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
 #include "query_cache_codec.hpp"
@@ -317,7 +318,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
 
 [[nodiscard]] foundation::Result<analysis::IndexedLine> decodeIndexedLine(sqlite3_stmt* statement)
 {
-    analysis::IndexedLine line;
+    analysis::IndexedLine line{};
     line.lineNumber = static_cast<std::uint64_t>(sqlite3_column_int64(statement, 1));
     line.level = levelFromInt(sqlite3_column_int(statement, 2));
 
@@ -682,9 +683,8 @@ fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lin
             return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
         }
 
-        analysis::IndexedLine line = *lineResult;
-        line.jsonFieldValues = loadJsonFieldValues(database, lineId);
-        lines.push_back(std::move(line));
+        lines.push_back(std::move(*lineResult));
+        lines.back().jsonFieldValues = loadJsonFieldValues(database, lineId);
     }
 
     sqlite3_finalize(statement);
@@ -1155,7 +1155,24 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
         return foundation::Result<bool>(mtimeResult.error());
     }
 
-    return setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
+    const auto mtimeMetaResult =
+        setMeta(m_impl->database, "source_mtime", std::to_string(*mtimeResult));
+
+    if (!mtimeMetaResult)
+    {
+        return mtimeMetaResult;
+    }
+
+    const auto fingerprintResult = IndexFingerprint::compute(m_impl->metadata.sourcePath);
+
+    if (!fingerprintResult)
+    {
+        return foundation::Result<bool>(fingerprintResult.error());
+    }
+
+    m_impl->metadata.fingerprint = fingerprintResult->value();
+
+    return setMeta(m_impl->database, "fingerprint", m_impl->metadata.fingerprint);
 }
 
 bool SqliteIndexStore::usesContentCompression() const noexcept
@@ -1212,9 +1229,8 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
             return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
         }
 
-        analysis::IndexedLine line = *lineResult;
-        line.jsonFieldValues = loadJsonFieldValues(m_impl->database, lineId);
-        lines.push_back(std::move(line));
+        lines.push_back(std::move(*lineResult));
+        lines.back().jsonFieldValues = loadJsonFieldValues(m_impl->database, lineId);
     }
 
     sqlite3_finalize(statement);
@@ -1236,6 +1252,11 @@ bool SqliteIndexStore::queryCacheEnabled() const noexcept
 void SqliteIndexStore::clearQueryCache() const noexcept
 {
     (void)clearQueryCacheTable(m_impl->database);
+}
+
+foundation::Result<StoredSourceSnapshot> SqliteIndexStore::storedSourceSnapshot() const
+{
+    return readStoredSourceSnapshot(m_impl->database);
 }
 
 std::size_t SqliteIndexStore::queryCacheEntryCount() const noexcept

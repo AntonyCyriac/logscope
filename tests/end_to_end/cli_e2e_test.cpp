@@ -306,6 +306,38 @@ TEST(CliE2eTest, QueryPersistedJsonFieldFilter)
     EXPECT_EQ(std::string::npos, output.find("ignored"));
 }
 
+TEST(CliE2eTest, IncrementalAppendIndexesNewLinesOnReuse)
+{
+    const std::string logFile = "e2e_incremental_append.log";
+    const std::string indexFile = "e2e_incremental_append.db";
+
+    {
+        std::ofstream stream(logFile);
+        stream << "2026-07-11 10:00:00 INFO INCREMENTAL_APPEND_BASE\n";
+    }
+
+    const std::string firstRun =
+        runLogscope("investigate --persist-index --reuse-index --index-path " + indexFile +
+                    " --content-search INCREMENTAL_APPEND_BASE " + scope::test_support::quoteArgument(logFile));
+
+    EXPECT_NE(std::string::npos, firstRun.find("INCREMENTAL_APPEND_BASE"));
+
+    {
+        std::ofstream stream(logFile, std::ios::app);
+        stream << "2026-07-11 10:00:01 ERROR INCREMENTAL_APPEND_NEW\n";
+    }
+
+    const std::string secondRun =
+        runLogscope("investigate --persist-index --reuse-index --index-path " + indexFile +
+                    " --content-search INCREMENTAL_APPEND_NEW " + scope::test_support::quoteArgument(logFile));
+
+    std::remove(logFile.c_str());
+    std::remove(indexFile.c_str());
+
+    EXPECT_NE(std::string::npos, secondRun.find("INCREMENTAL_APPEND_NEW"));
+    EXPECT_NE(std::string::npos, secondRun.find("Matching lines  : 1"));
+}
+
 TEST(CliE2eTest, SessionLoadReusesPersistedIndex)
 {
     const std::string logFile = "e2e_session_reuse.log";

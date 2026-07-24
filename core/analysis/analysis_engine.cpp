@@ -15,6 +15,7 @@
 #include "foundation/error.hpp"
 #include "hybrid_index_writer.hpp"
 #include "index_fingerprint.hpp"
+#include "index_reuse.hpp"
 #include "index_store_factory.hpp"
 #include "foundation/filesystem.hpp"
 #include "json_lines_parser.hpp"
@@ -247,6 +248,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
     const bool isStdinSource = dataset.path().string() == "-";
     std::optional<storage::IndexFingerprint> sourceFingerprint;
+    std::optional<storage::IndexReusePrepareResult> appendReuse;
 
     if (!isStdinSource)
     {
@@ -265,80 +267,178 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
             if (config.storage.reuseIndex)
             {
-                const auto reused =
-                    storage::tryOpenReusableIndex(config.storage, *sourceFingerprint, dataset.path());
+                const auto prepared =
+                    storage::prepareIndexReuse(config.storage, *sourceFingerprint, dataset.path());
 
-                if (reused)
+                if (prepared)
                 {
-                    const storage::IndexMetadata& metadata = (*reused)->metadata();
+                    if (prepared->mode == storage::IndexReuseMode::Unchanged && prepared->store != nullptr)
+                    {
+                        const storage::IndexMetadata& metadata = prepared->store->metadata();
 
-                    return foundation::Result<AnalysisModel>(AnalysisModel(
-                        dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
-                        std::nullopt, std::nullopt, *reused));
+                        return foundation::Result<AnalysisModel>(AnalysisModel(
+                            dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
+                            std::nullopt, std::nullopt, prepared->store));
+                    }
+
+                    if (prepared->mode == storage::IndexReuseMode::Append && prepared->store != nullptr)
+                    {
+                        appendReuse = std::move(*prepared);
+                    }
                 }
             }
         }
     }
 
-    SCOPE_LOG_INFO("analysis", "Analyzing source: " + dataset.path().string());
-
-    std::vector<std::string> sampleLines;
-    sampleLines.reserve(FormatDetector::defaultSampleLineLimit);
-
     std::string line;
     source::LogSource& logSource = dataset.source();
-
-    while (sampleLines.size() < FormatDetector::defaultSampleLineLimit)
-    {
-        const auto readResult = logSource.readLine(line);
-
-        if (!readResult)
-        {
-            SCOPE_LOG_ERROR("analysis", readResult.error().message());
-
-            return foundation::Result<AnalysisModel>(readResult.error());
-        }
-
-        if (!*readResult)
-        {
-            break;
-        }
-
-        sampleLines.push_back(line);
-    }
-
-    const FormatDetectionResult detection = FormatDetector::detect(sampleLines);
-    const auto formatResult = resolveFormat(detection, config.formatHint);
-
-    if (!formatResult)
-    {
-        SCOPE_LOG_ERROR("analysis", formatResult.error().message());
-
-        return foundation::Result<AnalysisModel>(formatResult.error());
-    }
-
-    const LogFormat resolvedFormat = *formatResult;
-
+    LogFormat resolvedFormat{LogFormat::PlainText};
     storage::IndexStorePtr persistentStore;
 
-    if (config.storage.usesPersistentStore() && sourceFingerprint.has_value())
+    if (appendReuse.has_value())
     {
-        const auto created = storage::createIndexStore(config.storage, *sourceFingerprint, dataset.path(),
-                                                         resolvedFormat);
+        SCOPE_LOG_INFO("analysis",
+                       "Appending to persisted index from line " +
+                           std::to_string(appendReuse->linesToSkip + 1U) + ": " + dataset.path().string());
 
-        if (!created)
+        resolvedFormat = appendReuse->store->metadata().format;
+        persistentStore = appendReuse->store;
+
+        for (std::uint64_t skipped = 0U; skipped < appendReuse->linesToSkip; ++skipped)
         {
-            return foundation::Result<AnalysisModel>(created.error());
+            const auto readResult = logSource.readLine(line);
+
+            if (!readResult)
+            {
+                SCOPE_LOG_ERROR("analysis", readResult.error().message());
+
+                return foundation::Result<AnalysisModel>(readResult.error());
+            }
+
+            if (!*readResult)
+            {
+                return foundation::Result<AnalysisModel>(foundation::Error(
+                    foundation::ErrorCode::InvalidArgument,
+                    "Source log ended before indexed line count while appending."));
+            }
+        }
+    }
+    else
+    {
+        SCOPE_LOG_INFO("analysis", "Analyzing source: " + dataset.path().string());
+
+        std::vector<std::string> sampleLines;
+        sampleLines.reserve(FormatDetector::defaultSampleLineLimit);
+
+        while (sampleLines.size() < FormatDetector::defaultSampleLineLimit)
+        {
+            const auto readResult = logSource.readLine(line);
+
+            if (!readResult)
+            {
+                SCOPE_LOG_ERROR("analysis", readResult.error().message());
+
+                return foundation::Result<AnalysisModel>(readResult.error());
+            }
+
+            if (!*readResult)
+            {
+                break;
+            }
+
+            sampleLines.push_back(line);
         }
 
-        persistentStore = *created;
+        const FormatDetectionResult detection = FormatDetector::detect(sampleLines);
+        const auto formatResult = resolveFormat(detection, config.formatHint);
+
+        if (!formatResult)
+        {
+            SCOPE_LOG_ERROR("analysis", formatResult.error().message());
+
+            return foundation::Result<AnalysisModel>(formatResult.error());
+        }
+
+        resolvedFormat = *formatResult;
+
+        if (config.storage.usesPersistentStore() && sourceFingerprint.has_value())
+        {
+            const auto created = storage::createIndexStore(config.storage, *sourceFingerprint, dataset.path(),
+                                                           resolvedFormat);
+
+            if (!created)
+            {
+                return foundation::Result<AnalysisModel>(created.error());
+            }
+
+            persistentStore = *created;
+        }
+
+        SCOPE_LOG_INFO("analysis",
+                       "Detected log format: " + std::string(logFormatName(resolvedFormat)) +
+                           " (sampled " + std::to_string(detection.sampledLines) + " lines)");
+
+        std::uint64_t totalLines = 0;
+        LogLevelCounts levelCounts;
+        FieldSummary fieldSummary;
+        HybridIndexWriter indexWriter(makeLineIndex(config.maxIndexedLines), config.storage, persistentStore);
+        std::optional<JsonLinesSummary> jsonLinesSummary;
+
+        if (resolvedFormat == LogFormat::JsonLines)
+        {
+            jsonLinesSummary.emplace();
+        }
+
+        JsonLinesSummary* jsonSummaryPointer = jsonLinesSummary.has_value() ? &*jsonLinesSummary : nullptr;
+
+        for (const std::string& sampleLine : sampleLines)
+        {
+            ++totalLines;
+            analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
+                        indexWriter, config.jsonFieldMapping);
+        }
+
+        while (true)
+        {
+            const auto readResult = logSource.readLine(line);
+
+            if (!readResult)
+            {
+                SCOPE_LOG_ERROR("analysis", readResult.error().message());
+
+                return foundation::Result<AnalysisModel>(readResult.error());
+            }
+
+            if (!*readResult)
+            {
+                break;
+            }
+
+            ++totalLines;
+            analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
+                        config.jsonFieldMapping);
+        }
+
+        const auto finalizeResult = indexWriter.finalize(totalLines);
+
+        if (!finalizeResult)
+        {
+            return foundation::Result<AnalysisModel>(finalizeResult.error());
+        }
+
+        SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
+
+        return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
+                                                               totalLines,
+                                                               levelCounts,
+                                                               resolvedFormat,
+                                                               std::move(jsonLinesSummary),
+                                                               std::make_optional(std::move(fieldSummary)),
+                                                               std::make_optional(indexWriter.finishLineIndex()),
+                                                               indexWriter.indexStore()));
     }
 
-    SCOPE_LOG_INFO("analysis",
-                   "Detected log format: " + std::string(logFormatName(resolvedFormat)) +
-                       " (sampled " + std::to_string(detection.sampledLines) + " lines)");
-
-    std::uint64_t totalLines = 0;
+    std::uint64_t totalLines = appendReuse->linesToSkip;
     LogLevelCounts levelCounts;
     FieldSummary fieldSummary;
     HybridIndexWriter indexWriter(makeLineIndex(config.maxIndexedLines), config.storage, persistentStore);
@@ -350,13 +450,6 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     }
 
     JsonLinesSummary* jsonSummaryPointer = jsonLinesSummary.has_value() ? &*jsonLinesSummary : nullptr;
-
-    for (const std::string& sampleLine : sampleLines)
-    {
-        ++totalLines;
-        analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                    config.jsonFieldMapping);
-    }
 
     while (true)
     {
@@ -386,7 +479,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         return foundation::Result<AnalysisModel>(finalizeResult.error());
     }
 
-    SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
+    SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines after append");
 
     return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
                                                            totalLines,
