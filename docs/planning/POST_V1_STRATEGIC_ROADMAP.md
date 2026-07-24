@@ -86,7 +86,7 @@ Long-horizon product themes beyond the published public milestones are maintaine
 - Architecture diagrams (update HLD and Component Catalog visuals)
 - Developer guide
 - Plugin development guide
-- Configuration guide
+- Configuration guide — [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) (Phase 1, delivered)
 - User manual
 - Examples and tutorials
 
@@ -391,7 +391,8 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Gap | Proposed delivery |
 |-----|-------------------|
 | Generated Doxygen site + CI publish | `v1.0.1` |
-| User manual, plugin dev guide, config guide, tutorials | `v1.0.x` |
+| User manual, plugin dev guide, tutorials | `v1.0.x` |
+| Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Architecture diagrams | `v1.0.x` |
 | Stress tests with large log fixtures | CI/release CLI matrix at 10k lines (`scripts/`); 100k-line release matrix restores after `v1.4.2` storage perf; `BM_*` benchmarks use larger fixtures |
 | Memory leak / ASan CI hardening | `v1.0.x` |

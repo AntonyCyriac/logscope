@@ -171,7 +171,7 @@ logscope analytics --format json --bucket 60 samples/sample.log
 
 ## Configuration keys
 
-Format-related keys in `logscope.properties` (validated by `config validate`):
+Format-related keys in `logscope.properties` (validated by `config validate`). See [Configuration Guide](CONFIGURATION_GUIDE.md) for file format, environment variables, and the full key catalog.
 
 | Key | Description |
 |-----|-------------|

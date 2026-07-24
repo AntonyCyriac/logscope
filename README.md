@@ -84,7 +84,7 @@ Run the CLI (Release output path on MSVC):
 
 ### Persistent indexes on Windows
 
-Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `--persist-index`, `--reuse-index`, and `storage.*` config keys.
+Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [Configuration Guide](docs/handbook/CONFIGURATION_GUIDE.md) and [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `storage.*` keys and CLI flags.
 
 ```powershell
 .\build\apps\cli\Release\logscope.exe investigate `
