@@ -45,6 +45,15 @@ class SqliteIndexStore final : public IndexStore
 
     explicit SqliteIndexStore(std::unique_ptr<Impl> impl) noexcept;
 
+    [[nodiscard]] foundation::Result<bool> beginWriteBatch();
+
+    [[nodiscard]] foundation::Result<bool> commitWriteBatch();
+
+    void rollbackWriteBatch() noexcept;
+
+    [[nodiscard]] foundation::Result<bool> bindAndInsertLine(const analysis::IndexedLine& line,
+                                                             std::string_view fullContent);
+
     std::unique_ptr<Impl> m_impl;
 };
 

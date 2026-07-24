@@ -184,6 +184,47 @@ TEST(SqliteIndexStoreTest, ReturnsLinesInOrder)
     cleanupPath(sourcePath);
 }
 
+TEST(SqliteIndexStoreTest, AppendsLargeBatchInOrder)
+{
+    constexpr std::size_t lineCount = 12000U;
+    const Path databasePath = uniqueDatabasePath("large_batch");
+    const Path sourcePath = writeTempSource("storage_test_large_batch_source.log", "sample\n");
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+
+    ASSERT_TRUE(fingerprint);
+
+    IndexMetadata metadata;
+    metadata.fingerprint = fingerprint->value();
+    metadata.sourcePath = sourcePath;
+    metadata.format = LogFormat::PlainText;
+
+    const auto created = SqliteIndexStore::create(databasePath, metadata);
+    ASSERT_TRUE(created);
+
+    for (std::size_t index = 0U; index < lineCount; ++index)
+    {
+        const std::string message = "line " + std::to_string(index);
+        ASSERT_TRUE((*created)->appendLine(makeLine(static_cast<std::uint64_t>(index + 1U), DetectedLogLevel::Info,
+                                                    message),
+                                           message));
+    }
+
+    ASSERT_TRUE((*created)->finalize(lineCount));
+
+    const auto opened = SqliteIndexStore::open(databasePath);
+    ASSERT_TRUE(opened);
+    EXPECT_EQ(lineCount, (*opened)->storedLineCount());
+
+    const auto lines = (*opened)->fetchAllLines();
+    ASSERT_TRUE(lines);
+    ASSERT_EQ(lineCount, lines->size());
+    EXPECT_EQ(1U, lines->front().lineNumber);
+    EXPECT_EQ(lineCount, lines->back().lineNumber);
+
+    cleanupPath(databasePath);
+    cleanupPath(sourcePath);
+}
+
 TEST(SqliteIndexStoreTest, RejectsMissingDatabase)
 {
     const auto opened = SqliteIndexStore::open(Path("storage_missing_database.db"));

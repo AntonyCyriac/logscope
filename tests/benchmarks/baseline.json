@@ -13,6 +13,12 @@
       "metric": "lines_per_second",
       "minimum": 1000000,
       "regression_tolerance_percent": 20
+    },
+    {
+      "name": "BM_IndexStoreAppend/100000",
+      "metric": "lines_per_second",
+      "minimum": 50000,
+      "regression_tolerance_percent": 20
     }
   ]
 }
