@@ -149,6 +149,21 @@ Build the project:
 cmake --build build
 ```
 
+### Windows: SQLite FetchContent TLS
+
+M11 downloads the SQLite amalgamation during **CMake configure**. On some Windows machines, Schannel may fail certificate revocation checks (`CRYPT_E_REVOCATION_OFFLINE`) when contacting `sqlite.org`. This affects **building from source only** — release binaries do not need this workaround.
+
+PowerShell (configure step only):
+
+```powershell
+$env:CMAKE_TLS_VERIFY = "0"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+MSVC Release binary path: `build\apps\cli\Release\logscope.exe`. For `--persist-index` on Windows, see [User Manual §8](USER_MANUAL.md#8-large-logs-and-persistent-indexes).
+
 ---
 
 # 9.1 API documentation (optional)
