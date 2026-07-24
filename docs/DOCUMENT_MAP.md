@@ -194,6 +194,7 @@ Developers new to LogScope should read the documentation in the following order.
 | 25 | CONFIGURATION_GUIDE.md | Configure LogScope via properties files and environment variables. |
 | 26 | USER_MANUAL.md | End-user workflows: analyze, investigate, sessions, large logs. |
 | 27 | CLI_REFERENCE.md | Command-line usage reference. |
+| 28 | PLUGIN_DEVELOPMENT_GUIDE.md | Built-in extensions and report contributor hooks. |
 
 ---
 
@@ -325,3 +326,4 @@ These categories should be added only when they provide clear value and support 
 | 2.7.0 | 24-07-2026 | Added CONFIGURATION_GUIDE.md (Phase 1 stabilization). |
 | 2.8.0 | 24-07-2026 | Added docs/api/ Doxygen scaffold and CI docs job. |
 | 2.9.0 | 24-07-2026 | Added USER_MANUAL.md (Phase 1 stabilization). |
+| 3.0.0 | 24-07-2026 | Added PLUGIN_DEVELOPMENT_GUIDE.md (Phase 1 stabilization). |
