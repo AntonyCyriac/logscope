@@ -15,8 +15,11 @@
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
+#include "index_fingerprint.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
+#include "query_cache_codec.hpp"
+#include "query_cache_key.hpp"
 #include "schema_version.hpp"
 
 namespace scope::storage
@@ -444,6 +447,251 @@ CREATE TABLE IF NOT EXISTS query_cache (
     return fieldValues;
 }
 
+[[nodiscard]] std::int64_t currentUnixTime() noexcept
+{
+    return std::chrono::duration_cast<std::chrono::seconds>(
+               std::chrono::system_clock::now().time_since_epoch())
+        .count();
+}
+
+[[nodiscard]] foundation::Result<bool> clearQueryCacheTable(sqlite3* database)
+{
+    return runSql(database, "DELETE FROM query_cache;");
+}
+
+[[nodiscard]] foundation::Result<bool> invalidateCacheOnSourceTruncate(sqlite3* database,
+                                                                        const foundation::Path& sourcePath)
+{
+    const auto sourceSizeMeta = getMeta(database, "source_size");
+
+    if (!sourceSizeMeta || sourceSizeMeta->empty())
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    const auto currentSize = foundation::FileSystem::fileSize(sourcePath);
+
+    if (!currentSize)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    try
+    {
+        if (*currentSize < std::stoull(*sourceSizeMeta))
+        {
+            return clearQueryCacheTable(database);
+        }
+    }
+    catch (const std::exception&)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    return foundation::Result<bool>(true);
+}
+
+[[nodiscard]] std::optional<std::vector<std::uint64_t>> lookupQueryCacheLineNumbers(sqlite3* database,
+                                                                                     const std::string& cacheKey)
+{
+    sqlite3_stmt* statement = nullptr;
+    const char* sql = "SELECT line_ids_blob FROM query_cache WHERE cache_key = ? LIMIT 1;";
+
+    if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
+    {
+        return std::nullopt;
+    }
+
+    sqlite3_bind_text(statement, 1, cacheKey.c_str(), -1, SQLITE_TRANSIENT);
+
+    std::optional<std::vector<std::uint64_t>> lineNumbers;
+
+    if (sqlite3_step(statement) == SQLITE_ROW)
+    {
+        const void* blob = sqlite3_column_blob(statement, 0);
+        const int blobSize = sqlite3_column_bytes(statement, 0);
+
+        if (blob != nullptr && blobSize > 0)
+        {
+            const auto* bytes = static_cast<const char*>(blob);
+            lineNumbers = decodeLineNumbers(std::string(bytes, static_cast<std::size_t>(blobSize)));
+        }
+    }
+
+    sqlite3_finalize(statement);
+
+    if (!lineNumbers.has_value())
+    {
+        return std::nullopt;
+    }
+
+    sqlite3_stmt* touchStatement = nullptr;
+    const char* touchSql =
+        "UPDATE query_cache SET hit_count = hit_count + 1, created_at = ? WHERE cache_key = ?;";
+
+    if (sqlite3_prepare_v2(database, touchSql, -1, &touchStatement, nullptr) == SQLITE_OK)
+    {
+        sqlite3_bind_int64(touchStatement, 1, currentUnixTime());
+        sqlite3_bind_text(touchStatement, 2, cacheKey.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_step(touchStatement);
+        sqlite3_finalize(touchStatement);
+    }
+
+    return lineNumbers;
+}
+
+[[nodiscard]] foundation::Result<bool> evictOldestQueryCacheEntries(sqlite3* database,
+                                                                     const std::size_t maxEntries)
+{
+    if (maxEntries == 0U)
+    {
+        return clearQueryCacheTable(database);
+    }
+
+    sqlite3_stmt* countStatement = nullptr;
+
+    if (sqlite3_prepare_v2(database, "SELECT COUNT(*) FROM query_cache;", -1, &countStatement, nullptr) != SQLITE_OK)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    std::size_t entryCount = 0U;
+
+    if (sqlite3_step(countStatement) == SQLITE_ROW)
+    {
+        entryCount = static_cast<std::size_t>(sqlite3_column_int64(countStatement, 0));
+    }
+
+    sqlite3_finalize(countStatement);
+
+    if (entryCount < maxEntries)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    const std::size_t deleteCount = entryCount - maxEntries + 1U;
+    sqlite3_stmt* deleteStatement = nullptr;
+    const char* deleteSql =
+        "DELETE FROM query_cache WHERE cache_key IN (SELECT cache_key FROM query_cache ORDER BY created_at ASC "
+        "LIMIT ?);";
+
+    if (sqlite3_prepare_v2(database, deleteSql, -1, &deleteStatement, nullptr) != SQLITE_OK)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    sqlite3_bind_int64(deleteStatement, 1, static_cast<sqlite3_int64>(deleteCount));
+    const int stepResult = sqlite3_step(deleteStatement);
+    sqlite3_finalize(deleteStatement);
+
+    if (stepResult != SQLITE_DONE)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    return foundation::Result<bool>(true);
+}
+
+[[nodiscard]] foundation::Result<bool> storeQueryCacheEntry(sqlite3* database, const std::string& cacheKey,
+                                                            const std::vector<std::uint64_t>& lineNumbers,
+                                                            const std::size_t maxEntries)
+{
+    const auto evicted = evictOldestQueryCacheEntries(database, maxEntries);
+
+    if (!evicted)
+    {
+        return evicted;
+    }
+
+    const std::string encoded = encodeLineNumbers(lineNumbers);
+
+    sqlite3_stmt* statement = nullptr;
+    const char* sql =
+        "INSERT INTO query_cache(cache_key, line_ids_blob, created_at, hit_count) VALUES(?, ?, ?, 0) "
+        "ON CONFLICT(cache_key) DO UPDATE SET line_ids_blob = excluded.line_ids_blob, created_at = excluded.created_at, "
+        "hit_count = 0;";
+
+    if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    sqlite3_bind_text(statement, 1, cacheKey.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_blob(statement, 2, encoded.data(), static_cast<int>(encoded.size()), SQLITE_TRANSIENT);
+    sqlite3_bind_int64(statement, 3, currentUnixTime());
+
+    const int stepResult = sqlite3_step(statement);
+    sqlite3_finalize(statement);
+
+    if (stepResult != SQLITE_DONE)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    return foundation::Result<bool>(true);
+}
+
+[[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>>
+fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lineNumbers)
+{
+    if (lineNumbers.empty())
+    {
+        return foundation::Result<std::vector<analysis::IndexedLine>>(std::vector<analysis::IndexedLine>{});
+    }
+
+    std::string sql =
+        "SELECT id, line_number, level, timestamp_unix, message, content, correlation_id, top_level_keys_json "
+        "FROM lines WHERE line_number IN (";
+
+    for (std::size_t index = 0U; index < lineNumbers.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            sql += ',';
+        }
+
+        sql += std::to_string(lineNumbers[index]);
+    }
+
+    sql += ") ORDER BY line_number;";
+
+    sqlite3_stmt* statement = nullptr;
+
+    if (sqlite3_prepare_v2(database, sql.c_str(), -1, &statement, nullptr) != SQLITE_OK)
+    {
+        return foundation::Result<std::vector<analysis::IndexedLine>>(
+            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+    }
+
+    std::vector<analysis::IndexedLine> lines;
+
+    while (sqlite3_step(statement) == SQLITE_ROW)
+    {
+        const sqlite3_int64 lineId = sqlite3_column_int64(statement, 0);
+        const auto lineResult = decodeIndexedLine(statement);
+
+        if (!lineResult)
+        {
+            sqlite3_finalize(statement);
+
+            return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
+        }
+
+        analysis::IndexedLine line = *lineResult;
+        line.jsonFieldValues = loadJsonFieldValues(database, lineId);
+        lines.push_back(std::move(line));
+    }
+
+    sqlite3_finalize(statement);
+
+    return foundation::Result<std::vector<analysis::IndexedLine>>(std::move(lines));
+}
+
 } // namespace
 
 struct SqliteIndexStore::Impl
@@ -461,6 +709,8 @@ struct SqliteIndexStore::Impl
     bool compressContent{false};
     std::size_t compressThresholdBytes{256U};
     bool indexUsesZlib{false};
+    bool queryCacheEnabled{true};
+    std::size_t queryCacheMaxEntries{64U};
 };
 
 namespace
@@ -661,6 +911,8 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
         impl->compressContent = options.compressContent;
         impl->compressThresholdBytes = options.compressThresholdBytes;
         impl->indexUsesZlib = options.compressContent;
+        impl->queryCacheEnabled = options.queryCacheEnabled;
+        impl->queryCacheMaxEntries = options.queryCacheMaxEntries;
 
         const auto schemaResult = initializeSchemaV2(database);
 
@@ -795,6 +1047,10 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
     impl->metadata = metadata;
     impl->indexUsesZlib = compressionResult.hasValue() && *compressionResult == "zlib";
     impl->compressContent = impl->indexUsesZlib;
+    impl->queryCacheEnabled = true;
+    impl->queryCacheMaxEntries = 64U;
+
+    (void)invalidateCacheOnSourceTruncate(database, metadata.sourcePath);
 
     sqlite3_stmt* countStatement = nullptr;
 
@@ -964,6 +1220,102 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
     sqlite3_finalize(statement);
 
     return foundation::Result<std::vector<analysis::IndexedLine>>(std::move(lines));
+}
+
+void SqliteIndexStore::applyQueryCacheOptions(const IndexStoreOptions& options) noexcept
+{
+    m_impl->queryCacheEnabled = options.queryCacheEnabled;
+    m_impl->queryCacheMaxEntries = options.queryCacheMaxEntries;
+}
+
+bool SqliteIndexStore::queryCacheEnabled() const noexcept
+{
+    return m_impl->queryCacheEnabled;
+}
+
+void SqliteIndexStore::clearQueryCache() const noexcept
+{
+    (void)clearQueryCacheTable(m_impl->database);
+}
+
+std::size_t SqliteIndexStore::queryCacheEntryCount() const noexcept
+{
+    sqlite3_stmt* statement = nullptr;
+
+    if (sqlite3_prepare_v2(m_impl->database, "SELECT COUNT(*) FROM query_cache;", -1, &statement, nullptr) != SQLITE_OK)
+    {
+        return 0U;
+    }
+
+    std::size_t entryCount = 0U;
+
+    if (sqlite3_step(statement) == SQLITE_ROW)
+    {
+        entryCount = static_cast<std::size_t>(sqlite3_column_int64(statement, 0));
+    }
+
+    sqlite3_finalize(statement);
+
+    return entryCount;
+}
+
+foundation::Result<QueryCacheFetchResult> SqliteIndexStore::fetchLinesMatchingPushdown(
+    const std::string& canonicalFilter, const std::string& sqlWhere) const
+{
+    QueryCacheFetchResult result;
+
+    if (!m_impl->queryCacheEnabled)
+    {
+        const auto fetched = fetchLinesWhere(sqlWhere);
+
+        if (!fetched)
+        {
+            return foundation::Result<QueryCacheFetchResult>(fetched.error());
+        }
+
+        result.lines = *fetched;
+
+        return foundation::Result<QueryCacheFetchResult>(std::move(result));
+    }
+
+    const std::string cacheKey =
+        computeQueryCacheKey(m_impl->metadata.fingerprint, canonicalFilter, kIndexSchemaVersionCurrent);
+
+    if (const auto cachedLineNumbers = lookupQueryCacheLineNumbers(m_impl->database, cacheKey))
+    {
+        const auto fetched = fetchLinesByLineNumbers(m_impl->database, *cachedLineNumbers);
+
+        if (!fetched)
+        {
+            return foundation::Result<QueryCacheFetchResult>(fetched.error());
+        }
+
+        result.cacheHit = true;
+        result.lines = *fetched;
+
+        return foundation::Result<QueryCacheFetchResult>(std::move(result));
+    }
+
+    const auto fetched = fetchLinesWhere(sqlWhere);
+
+    if (!fetched)
+    {
+        return foundation::Result<QueryCacheFetchResult>(fetched.error());
+    }
+
+    std::vector<std::uint64_t> lineNumbers;
+    lineNumbers.reserve(fetched->size());
+
+    for (const analysis::IndexedLine& line : *fetched)
+    {
+        lineNumbers.push_back(line.lineNumber);
+    }
+
+    (void)storeQueryCacheEntry(m_impl->database, cacheKey, lineNumbers, m_impl->queryCacheMaxEntries);
+
+    result.lines = *fetched;
+
+    return foundation::Result<QueryCacheFetchResult>(std::move(result));
 }
 
 } // namespace scope::storage

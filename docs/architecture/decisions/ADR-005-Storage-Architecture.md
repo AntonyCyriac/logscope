@@ -107,9 +107,9 @@ When `storage.compress_content=true`, lines at or above `storage.compress_thresh
 
 During JSONL indexing, top-level key/value pairs populate `line_json_fields`. `QueryPlanner` maps `field == "value"` to `EXISTS (SELECT 1 FROM line_json_fields ...)`. Non-pushable predicates fall back to `QueryEvaluator`.
 
-### Query cache (v1.4.3 — design)
+### Query cache (v1.4.3 — M11.10 shipped)
 
-`query_cache` stores serialized matching line IDs keyed by `SHA256(fingerprint + canonical_filter + schema_version)`. Invalidated on fingerprint change, source truncate, schema bump, or when disabled via `storage.query_cache.enabled=false`.
+`query_cache` stores serialized matching line numbers keyed by `SHA256(fingerprint + canonical_filter + schema_version)`. Invalidated on fingerprint change, source truncate, schema bump, or when disabled via `storage.query_cache.enabled=false`.
 
 ### Incremental append (v1.4.3 — design)
 

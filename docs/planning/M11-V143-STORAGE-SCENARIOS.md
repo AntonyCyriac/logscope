@@ -92,13 +92,13 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S4.1 | Cache miss | First filter on persisted index | Results stored in `query_cache`; normal SQL path | U+I | | ⬜ |
-| S4.2 | Cache hit | Same fingerprint + normalized filter + schema version | Skip SQL line fetch; return cached line IDs | U+I | Yes | ⬜ |
-| S4.3 | Fingerprint change | Source file replaced | Cache entries invalidated | U | Yes | ⬜ |
-| S4.4 | Source truncate | File size < indexed `source_size` | Cache cleared; full rebuild | U+I | Yes | ⬜ |
-| S4.5 | Schema bump | v1 rebuild → v2 | Cache cleared | U | | ⬜ |
-| S4.6 | Cache disabled | `storage.query_cache.enabled=false` | No cache reads or writes | U | | ⬜ |
-| S4.7 | Eviction | Entries > `storage.query_cache.max_entries` | LRU eviction of oldest entries | U | | ⬜ |
+| S4.1 | Cache miss | First filter on persisted index | Results stored in `query_cache`; normal SQL path | U+I | | ✅ |
+| S4.2 | Cache hit | Same fingerprint + normalized filter + schema version | Skip SQL line fetch; return cached line IDs | U+I | Yes | ✅ |
+| S4.3 | Fingerprint change | Source file replaced | Cache entries invalidated | U | Yes | ✅ |
+| S4.4 | Source truncate | File size < indexed `source_size` | Cache cleared; full rebuild | U+I | Yes | ✅ |
+| S4.5 | Schema bump | v1 rebuild → v2 | Cache cleared | U | | ✅ |
+| S4.6 | Cache disabled | `storage.query_cache.enabled=false` | No cache reads or writes | U | | ✅ |
+| S4.7 | Eviction | Entries > `storage.query_cache.max_entries` | LRU eviction of oldest entries | U | | ✅ |
 | S4.8 | Session reuse | `session load` + same filter | Cache hit when index unchanged | E | | ⬜ |
 
 **Cache key:** `SHA256(fingerprint + canonical_filter_ast + schema_version)`.

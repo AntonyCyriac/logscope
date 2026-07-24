@@ -117,3 +117,35 @@ TEST(StorageConfigTest, RejectsInvalidCompressionThreshold)
 
     EXPECT_FALSE(result);
 }
+
+TEST(StorageConfigTest, ResolvesQueryCacheSettings)
+{
+    Configuration configuration;
+    configuration.set("storage.query_cache.enabled", "false");
+    configuration.set("storage.query_cache.max_entries", "16");
+
+    const StorageConfig resolved = resolveStorageConfig(configuration, StorageConfig{});
+
+    EXPECT_FALSE(resolved.queryCacheEnabled);
+    EXPECT_EQ(16U, resolved.queryCacheMaxEntries);
+}
+
+TEST(StorageConfigTest, RejectsInvalidQueryCacheEnabled)
+{
+    Configuration configuration;
+    configuration.set("storage.query_cache.enabled", "maybe");
+
+    const auto result = validateStorageConfiguration(configuration);
+
+    EXPECT_FALSE(result);
+}
+
+TEST(StorageConfigTest, RejectsInvalidQueryCacheMaxEntries)
+{
+    Configuration configuration;
+    configuration.set("storage.query_cache.max_entries", "not-a-number");
+
+    const auto result = validateStorageConfiguration(configuration);
+
+    EXPECT_FALSE(result);
+}

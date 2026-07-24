@@ -4,6 +4,9 @@
 
 #include "index_reader.hpp"
 
+#include "query_cache_key.hpp"
+#include "sqlite_index_store.hpp"
+
 namespace scope::storage
 {
 
@@ -44,6 +47,32 @@ IndexReader::linesMatchingWhere(const std::string& sqlWhereClause) const
     return foundation::Result<std::vector<analysis::IndexedLine>>(
         foundation::Error(foundation::ErrorCode::InvalidArgument,
                           "SQL pushdown requires a persistent index store."));
+}
+
+foundation::Result<PushdownFetchResult>
+IndexReader::linesMatchingPushdownFilter(const query::QueryNode& filterNode,
+                                         const std::string& sqlWhereClause) const
+{
+    if (m_persistentStore == nullptr)
+    {
+        return foundation::Result<PushdownFetchResult>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "SQL pushdown requires a persistent index store."));
+    }
+
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(m_persistentStore);
+    const auto fetched =
+        sqliteStore->fetchLinesMatchingPushdown(canonicalFilterText(filterNode), sqlWhereClause);
+
+    if (!fetched)
+    {
+        return foundation::Result<PushdownFetchResult>(fetched.error());
+    }
+
+    PushdownFetchResult result;
+    result.cacheHit = fetched->cacheHit;
+    result.lines = std::move(fetched->lines);
+
+    return foundation::Result<PushdownFetchResult>(std::move(result));
 }
 
 std::uint64_t IndexReader::indexedLineCount() const noexcept

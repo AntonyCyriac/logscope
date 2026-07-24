@@ -9,6 +9,7 @@ add_executable(scope_storage_tests
     query_planner_test.cpp
     sqlite_index_store_compression_test.cpp
     sqlite_index_store_json_fields_test.cpp
+    sqlite_index_store_query_cache_test.cpp
     sqlite_index_store_test.cpp
     storage_config_test.cpp
 )

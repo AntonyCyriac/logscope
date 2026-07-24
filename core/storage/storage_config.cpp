@@ -19,6 +19,8 @@ constexpr std::string_view storageIndexPathKey = "storage.index.path";
 constexpr std::string_view storageSpillThresholdKey = "storage.spill_threshold";
 constexpr std::string_view storageCompressContentKey = "storage.compress_content";
 constexpr std::string_view storageCompressThresholdKey = "storage.compress_threshold_bytes";
+constexpr std::string_view storageQueryCacheEnabledKey = "storage.query_cache.enabled";
+constexpr std::string_view storageQueryCacheMaxEntriesKey = "storage.query_cache.max_entries";
 
 [[nodiscard]] std::optional<bool> parseBooleanConfig(std::string_view value) noexcept
 {
@@ -139,6 +141,31 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
         }
     }
 
+    if (configuration.has(std::string(storageQueryCacheEnabledKey)))
+    {
+        const auto queryCacheEnabled = configuration.get(std::string(storageQueryCacheEnabledKey));
+
+        if (queryCacheEnabled && !foundation::isBlank(*queryCacheEnabled))
+        {
+            const auto parsed = parseBooleanConfig(*queryCacheEnabled);
+
+            if (parsed.has_value())
+            {
+                config.queryCacheEnabled = *parsed;
+            }
+        }
+    }
+
+    if (configuration.has(std::string(storageQueryCacheMaxEntriesKey)))
+    {
+        const auto queryCacheMaxEntries = configuration.get(std::string(storageQueryCacheMaxEntriesKey));
+
+        if (queryCacheMaxEntries && !foundation::isBlank(*queryCacheMaxEntries))
+        {
+            config.queryCacheMaxEntries = static_cast<std::size_t>(std::stoull(*queryCacheMaxEntries));
+        }
+    }
+
     if (cliOverrides.mode != StorageMode::Memory)
     {
         config.mode = cliOverrides.mode;
@@ -183,6 +210,16 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
     if (cliOverrides.compressThresholdBytes != StorageConfig::defaults().compressThresholdBytes)
     {
         config.compressThresholdBytes = cliOverrides.compressThresholdBytes;
+    }
+
+    if (!cliOverrides.queryCacheEnabled)
+    {
+        config.queryCacheEnabled = false;
+    }
+
+    if (cliOverrides.queryCacheMaxEntries != StorageConfig::defaults().queryCacheMaxEntries)
+    {
+        config.queryCacheMaxEntries = cliOverrides.queryCacheMaxEntries;
     }
 
     return config;
@@ -235,6 +272,30 @@ foundation::Result<bool> validateStorageConfiguration(const runtime::Configurati
         {
             return foundation::Result<bool>(foundation::Error(
                 foundation::ErrorCode::InvalidArgument, "Invalid storage.compress_threshold_bytes value."));
+        }
+    }
+
+    if (const auto queryCacheEnabled = configuration.get(std::string(storageQueryCacheEnabledKey));
+        queryCacheEnabled && !foundation::isBlank(*queryCacheEnabled))
+    {
+        if (!parseBooleanConfig(*queryCacheEnabled).has_value())
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Invalid storage.query_cache.enabled value."));
+        }
+    }
+
+    if (const auto queryCacheMaxEntries = configuration.get(std::string(storageQueryCacheMaxEntriesKey));
+        queryCacheMaxEntries && !foundation::isBlank(*queryCacheMaxEntries))
+    {
+        try
+        {
+            (void)std::stoull(*queryCacheMaxEntries);
+        }
+        catch (...)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Invalid storage.query_cache.max_entries value."));
         }
     }
 
