@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.4.0 |
+| Version | 1.4.1 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -138,3 +138,4 @@ logscope analyze samples/sample.log
 | 1.1.0 | 24-07-2026 | Note `sync/vX.Y.Z` private strategy alignment after public release tags. |
 | 1.2.0 | 24-07-2026 | Release workflow runs bulk-log CLI matrix before publishing binaries. |
 | 1.3.0 | 24-07-2026 | Document 10k bulk matrix (restore 100k in v1.4.2); add post-release housekeeping checklist. |
+| 1.4.0 | 24-07-2026 | Header bump; 100k release matrix shipped in v1.4.2. |

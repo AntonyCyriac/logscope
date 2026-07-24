@@ -331,3 +331,5 @@ These categories should be added only when they provide clear value and support 
 | 3.0.0 | 24-07-2026 | Added PLUGIN_DEVELOPMENT_GUIDE.md (Phase 1 stabilization). |
 | 3.1.0 | 24-07-2026 | Added DEVELOPER_GUIDE.md; regression tests in document map. |
 | 3.2.0 | 24-07-2026 | Updated M11, ADR-005, and reading order for `v1.4.2` bulk index write performance. |
+| 3.3.0 | 24-07-2026 | v1.4.2 doc sync: USER_MANUAL, PERFORMANCE, handbook revision history. |
+| 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |

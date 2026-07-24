@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Performance Baselines |
 | Category | Testing |
-| Version | 1.1.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -37,6 +37,8 @@ On Windows (MinGW/MSVC), the executable is under `build\tests\benchmarks\`.
 | `BM_DetectLogLevelMixed` | Rotating INFO/WARN/ERROR lines |
 | `BM_AnalysisEngine` | Full analysis of a 100k-line synthetic log file |
 | `BM_SourceReadLoop` | Source read loop without analysis |
+| `BM_IndexStoreAppend` | SQLite index append throughput (`scope_storage`; 1k and 100k line args) |
+| `BM_QueryPushdown` | Filter evaluation against a persisted index |
 
 Synthetic log fixtures are generated at benchmark startup and written to temporary files (not committed to the repository).
 
@@ -48,9 +50,10 @@ Machine-readable baselines: [`tests/benchmarks/baseline.json`](../../tests/bench
 
 | Metric | Baseline (reference) | Tolerance |
 |--------|----------------------|-----------|
-| `BM_AnalysisEngine` lines/sec | ≥ 500,000 | 20% regression warning in CI |
+| `BM_AnalysisEngine/100000` lines/sec | ≥ 500,000 | 20% regression warning in CI |
 | `BM_DetectLogLevel` ns/op | ≤ 500 | Informational |
-| `BM_SourceReadLoop` lines/sec | ≥ 1,000,000 | 20% regression warning in CI |
+| `BM_SourceReadLoop/100000` lines/sec | ≥ 1,000,000 | 20% regression warning in CI |
+| `BM_IndexStoreAppend/100000` lines/sec | ≥ 50,000 | 20% regression warning in CI |
 
 > Reference values were captured on a development workstation. CI uses relative regression checks rather than absolute thresholds across heterogeneous runners.
 
@@ -95,7 +98,15 @@ Target: sub-second search on indexed fixtures on a development workstation.
 
 # CI Integration
 
-The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non-gating initially) and compares `BM_AnalysisEngine` throughput against `baseline.json` with a 20% tolerance.
+The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and compares `BM_AnalysisEngine/100000`, `BM_SourceReadLoop/100000`, and `BM_IndexStoreAppend/100000` throughput against `baseline.json` with a 20% tolerance.
+
+---
+
+# Storage Benchmarks (M11 / v1.4.2)
+
+`BM_IndexStoreAppend` exercises `SqliteIndexStore` batched writes (WAL, prepared `INSERT`, 5,000-line transaction batches). Added in **v1.4.2** with a CI regression gate at the 100k-line argument size.
+
+`BM_QueryPushdown` measures filter evaluation against a persisted index after append — informational; not gated in `baseline.json`.
 
 ---
 
@@ -107,3 +118,4 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non
 | 1.1.0 | 21-07-2026 | Documented configurable investigation index cap (M6.5). |
 | 1.2.0 | 21-07-2026 | Added search engine benchmark (M7). |
 | 1.3.0 | 24-07-2026 | Fixed deprecated `DoNotOptimize` usage in analysis benchmark (M8 housekeeping). |
+| 1.4.0 | 24-07-2026 | Added `BM_IndexStoreAppend/100000` baseline and storage benchmark section (`v1.4.2`). |
