@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Architecture Overview |
 | Category | Architecture |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 15-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -291,6 +291,10 @@ This document provides the architectural context for the following artifacts.
 
 Together these documents provide a complete logical description of the LogScope architecture.
 
+### Storage layer evolution
+
+**M11 (`scope_storage`)** provides SQLite-backed persistent indexes (v1.4.1–v1.4.2 shipped). **v1.4.3** extends the storage layer with schema v2, compression, JSON field indexing, query result cache, incremental append, and FTS5 — see [ADR-005](decisions/ADR-005-Storage-Architecture.md) and [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
+
 ---
 
 # 11. Revision History
@@ -298,3 +302,4 @@ Together these documents provide a complete logical description of the LogScope 
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial architecture overview. |
+| 1.1.0 | 24-07-2026 | Storage layer v1.4.3 evolution note. |

@@ -37,7 +37,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
 | **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
 | **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
-| **M11 – Storage Layer** | ✅ Complete | SQLite-backed hybrid index, session reuse, query pushdown (`v1.4.1`); bulk write perf (`v1.4.2`). |
+| **M11 – Storage Layer** | ✅ Core complete; 🟡 v1.4.3 remainder | SQLite hybrid index (`v1.4.1`); bulk perf (`v1.4.2`); compression, cache, FTS5 (`v1.4.3`). |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
 | **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
 | **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
@@ -407,7 +407,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
 | M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
 | M10 – Query Language | Field-aware filter DSL | `v1.4.0` |
-| M11 – Storage Layer | SQLite hybrid index, session reuse, bulk write perf | `v1.4.1` / `v1.4.2` |
+| M11 – Storage Layer | SQLite hybrid index, session reuse, bulk perf, v1.4.3 remainder | `v1.4.1` / `v1.4.2` / `v1.4.3` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
 | M14 – Desktop Application | Qt GUI | `v2.0.0` |
@@ -425,8 +425,8 @@ v1.3.0  — M8: Advanced Reporting
 v1.4.0  — M10 Query Language (released)
 v1.4.1  — M11 Storage Layer (released)
 v1.4.2  — M11 bulk index write performance (released)
-v1.4.3+ — M11 remainder: compression, query cache; M12 Plugins (`v1.5.0`)
-v1.5.0  — M13 AI
+v1.4.3  — M11 storage remainder (in progress)
+v1.5.0  — M12 Dynamic Plugins; M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
@@ -469,3 +469,4 @@ The roadmap is considered successful when:
 | 3.6.0 | 24-07-2026 | M9 complete; v1.3.1 released with analytics engine. |
 | 3.7.0 | 24-07-2026 | M10 complete; v1.4.0 released with query language DSL. |
 | 3.8.0 | 24-07-2026 | M11 complete; v1.4.1 storage layer and v1.4.2 bulk index write performance released. |
+| 3.9.0 | 24-07-2026 | v1.4.3 M11 remainder in progress; scenario matrix and design docs. |

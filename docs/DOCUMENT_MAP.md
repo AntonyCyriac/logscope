@@ -174,7 +174,8 @@ Developers new to LogScope should read the documentation in the following order.
 | 5 | M8-ADVANCED-REPORTING.md | Understand the completed M8 advanced reporting (`v1.3.0`). |
 | 6 | M9-ANALYTICS-ENGINE.md | Understand the completed M9 analytics engine (`v1.3.1`). |
 | 7 | M10-QUERY-LANGUAGE.md | Understand the completed M10 query language (`v1.4.0`). |
-| 8 | M11-STORAGE-LAYER.md | Understand the completed M11 storage layer (`v1.4.1` core, `v1.4.2` bulk write perf). |
+| 8 | M11-STORAGE-LAYER.md | Understand M11 storage (`v1.4.1` core, `v1.4.2` bulk perf, `v1.4.3` remainder). |
+| 8a | M11-V143-STORAGE-SCENARIOS.md | v1.4.3 acceptance scenarios and test matrix (implement against this). |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -333,3 +334,4 @@ These categories should be added only when they provide clear value and support 
 | 3.2.0 | 24-07-2026 | Updated M11, ADR-005, and reading order for `v1.4.2` bulk index write performance. |
 | 3.3.0 | 24-07-2026 | v1.4.2 doc sync: USER_MANUAL, PERFORMANCE, handbook revision history. |
 | 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |
+| 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |

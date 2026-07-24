@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.5.0 |
+| Version | 1.6.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -27,7 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.4.2`
+**Current release:** `v1.4.2` (shipped)
+
+**In progress:** `v1.4.3` — M11 storage remainder (compression, query cache, JSON field predicates, incremental append, FTS5). See [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
 **Completed milestones:**
 
@@ -50,6 +52,7 @@ The project follows architecture-first development. Every implementation should 
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
+| M11 remainder | `v1.4.3` | Compression, query cache, `line_json_fields`, incremental append, FTS5 |
 | M12 – Dynamic Plugins | `v1.5.0` | `.so`/`.dll` loading, parser/report/search providers |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
@@ -329,3 +332,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.5.0 | 24-07-2026 | M9 complete; v1.3.1 released; M10 is next. |
 | 1.6.0 | 24-07-2026 | M10 complete; v1.4.0 released; M11 is next. |
 | 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |
+| 1.8.0 | 24-07-2026 | v1.4.3 M11 remainder in progress. |

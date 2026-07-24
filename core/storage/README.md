@@ -2,12 +2,24 @@
 
 `scope_storage` implements M11 SQLite-backed persistent investigation indexes with hybrid memory spill.
 
-**v1.4.2** adds batched index writes for `--persist-index`:
+## Shipped
 
-- WAL mode and reused prepared `INSERT`
-- Transaction batching (5,000 lines per commit)
-- Progress logging every 10,000 persisted lines via `HybridIndexWriter` (`[INFO] [analysis] Indexed N lines to persistent store`)
+| Release | Capabilities |
+|---------|--------------|
+| **v1.4.1** | `IndexStore`, `SqliteIndexStore`, `HybridIndexWriter`, `IndexReader`, `QueryPlanner`, session index reuse |
+| **v1.4.2** | Batched writes (WAL, 5k commits), progress every 10k lines, `BM_IndexStoreAppend/100000` |
 
-Performance regression: `BM_IndexStoreAppend/100000` in [`tests/benchmarks/baseline.json`](../../tests/benchmarks/baseline.json).
+## v1.4.3 (in progress — design)
 
-See [M11 planning doc](../../docs/planning/M11-STORAGE-LAYER.md) and [ADR-005](../../docs/architecture/decisions/ADR-005-Storage-Architecture.md).
+| Feature | Status |
+|---------|--------|
+| Schema v2 migration | Design |
+| zlib `content` compression | Design |
+| `line_json_fields` + DSL pushdown | Design |
+| `query_cache` | Design |
+| Incremental append | Design |
+| FTS5 full-text search | Design |
+
+Acceptance scenarios: [M11-V143-STORAGE-SCENARIOS.md](../../docs/planning/M11-V143-STORAGE-SCENARIOS.md)
+
+Architecture: [M11 planning doc](../../docs/planning/M11-STORAGE-LAYER.md) · [ADR-005](../../docs/architecture/decisions/ADR-005-Storage-Architecture.md)
