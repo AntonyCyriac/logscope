@@ -223,7 +223,7 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 | Job | Purpose |
 |-----|---------|
 | Build and Test | Release build, full `ctest` on three OSes |
-| CLI Matrix | 10k-line bulk log, 18+ CLI scenarios |
+| CLI Matrix | 10k-line bulk log in CI; 100k-line in release workflow |
 | Sanitizer | ASan + UBSan (+ LeakSanitizer on Linux) |
 | Coverage | lcov report artifact |
 | Benchmark | Regression check against `baseline.json` |
