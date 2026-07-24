@@ -43,7 +43,7 @@ TEST(StorageRegressionTest, AnalyzeStdinWithReuseIndexDoesNotFail)
     std::streambuf* const previousInput = std::cin.rdbuf(input.rdbuf());
 
     SourceManager sourceManager;
-    const auto datasetResult = sourceManager.open(Path("-"));
+    auto datasetResult = sourceManager.open(Path("-"));
 
     ASSERT_TRUE(datasetResult.hasValue());
 
@@ -72,7 +72,7 @@ TEST_F(StorageRegressionTest, AnalyzeDirectoryWithPersistIndexDoesNotFail)
     output.close();
 
     SourceManager sourceManager;
-    const auto datasetResult = sourceManager.open(m_directoryPath);
+    auto datasetResult = sourceManager.open(m_directoryPath);
 
     ASSERT_TRUE(datasetResult.hasValue());
 
@@ -95,7 +95,7 @@ TEST(StorageRegressionTest, AnalyzeFileWithReuseIndexSucceeds)
     output.close();
 
     SourceManager sourceManager;
-    const auto datasetResult = sourceManager.open(logFile);
+    auto datasetResult = sourceManager.open(logFile);
 
     ASSERT_TRUE(datasetResult.hasValue());
 
