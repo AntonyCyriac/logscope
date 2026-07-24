@@ -15,7 +15,7 @@
 
 This document describes how to configure LogScope through properties files, environment variables, and CLI overrides.
 
-It complements the command reference in [CLI Reference](CLI_REFERENCE.md) with file format rules, validation behavior, and a complete key catalog.
+It complements the command reference in [CLI Reference](CLI_REFERENCE.md) with file format rules, validation behavior, and a complete key catalog. End-user workflows are in [User Manual](USER_MANUAL.md).
 
 Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md#phase-1--stabilize-v1x).
 

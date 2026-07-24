@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.8.0 |
+| Version | 2.9.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -110,7 +110,8 @@ docs/
 │   ├── DEVELOPER_SETUP.md
 │   ├── GIT_CONVENTIONS.md
 │   ├── PULL_REQUEST_GUIDE.md
-│   └── SECURITY_REVIEW.md
+│   ├── SECURITY_REVIEW.md
+│   └── USER_MANUAL.md
 │
 ├── standards/
 │   ├── API_DESIGN_GUIDELINES.md
@@ -190,7 +191,8 @@ Developers new to LogScope should read the documentation in the following order.
 | 23 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
 | 24 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 | 25 | CONFIGURATION_GUIDE.md | Configure LogScope via properties files and environment variables. |
-| 26 | CLI_REFERENCE.md | Command-line usage reference. |
+| 26 | USER_MANUAL.md | End-user workflows: analyze, investigate, sessions, large logs. |
+| 27 | CLI_REFERENCE.md | Command-line usage reference. |
 
 ---
 
@@ -321,3 +323,4 @@ These categories should be added only when they provide clear value and support 
 | 2.6.0 | 24-07-2026 | Added M11-STORAGE-LAYER.md, ADR-005, and reading order for `v1.4.1`. |
 | 2.7.0 | 24-07-2026 | Added CONFIGURATION_GUIDE.md (Phase 1 stabilization). |
 | 2.8.0 | 24-07-2026 | Added docs/api/ Doxygen scaffold and CI docs job. |
+| 2.9.0 | 24-07-2026 | Added USER_MANUAL.md (Phase 1 stabilization). |
