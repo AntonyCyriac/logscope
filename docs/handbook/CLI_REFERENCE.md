@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.5.0 |
+| Version | 1.6.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -81,6 +81,7 @@ logscope investigate [options] <log-source>
 | `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
 | `--search <query>` | Simple text search over indexed log line content |
 | `--query <expr>` | Boolean search expression (`AND`, `OR`, `NOT`, quotes) |
+| `--filter <dsl>` | Field-aware filter expression (see `query` command) |
 | `--regex` | Treat `--search` value as a regular expression |
 | `--case-sensitive` | Disable default case-insensitive matching |
 | `--time-from <timestamp>` | Earliest timestamp (ISO-like) |
@@ -104,7 +105,33 @@ Supports the same search and filter options as `investigate`.
 ```bash
 logscope search --query "error AND timeout" samples/sample.log
 logscope search --search "code=\\d+" --regex samples/sample.jsonl
+logscope investigate --filter 'level == ERROR' samples/sample.log
 ```
+
+---
+
+## query
+
+Run field-aware filter DSL queries over a log source.
+
+```text
+logscope query [options] --filter <dsl> <log-source>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format text\|json` | Output format (default: text) |
+| `--filter <dsl>` | Field-aware filter expression (required) |
+| `--search <query>` | Optional text search over indexed content |
+| `--query <expr>` | Optional boolean text search expression |
+
+```bash
+logscope query --filter 'level == ERROR' samples/sample.log
+logscope query --filter 'contains(message, "timeout")' samples/sample.log
+logscope query --filter 'level == ERROR AND contains(message, "refused")' samples/sample.log
+```
+
+Filter DSL fields: `level`, `time`, `timestamp`, `message`, `content`, `correlationId`, `line`. Functions: `contains(field, "text")`, `hasKey("key")`.
 
 ---
 
@@ -143,6 +170,7 @@ Format-related keys in `logscope.properties` (validated by `config validate`):
 | `source.json.level_field` | JSON level field name override |
 | `investigation.max_indexed_lines` | Investigation index capacity (default: 10000, max: 1000000) |
 | `search.saved.<name>` | Named saved search expression (validated by `config validate`) |
+| `query.saved.<name>` | Named saved filter DSL expression (validated by `config validate`) |
 | `analytics.bucket_seconds` | Timeline bucket size in seconds (optional; auto when unset) |
 | `analytics.top_n` | Top frequency/cluster results (default: 10) |
 | `analytics.min_cluster_count` | Minimum occurrences to surface a cluster (default: 2) |
@@ -234,3 +262,4 @@ Default directory: current working directory.
 | 1.2.0 | 21-07-2026 | Added `--profile`, investigate command, and format configuration keys for M6.5. |
 | 1.3.0 | 21-07-2026 | Added `search` command, boolean/regex query flags for M7. |
 | 1.5.0 | 24-07-2026 | Added `analytics` command, analytics report sections, and M9 config keys. |
+| 1.6.0 | 24-07-2026 | Added `query` command, `--filter` DSL, and `query.saved.*` config keys for M10. |

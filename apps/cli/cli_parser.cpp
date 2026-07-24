@@ -105,6 +105,18 @@ bool parseInvestigationOption(const std::string& argument, int& index, const int
         return true;
     }
 
+    if (argument == "--filter")
+    {
+        if (index + 1 >= argc)
+        {
+            return false;
+        }
+
+        criteria.filterExpression = argv[++index];
+
+        return true;
+    }
+
     if (argument == "--regex")
     {
         criteria.searchMode = search::SearchMode::Regex;
@@ -1140,6 +1152,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
         parsed.command = CliCommand::Search;
         parsed.search = *options;
+
+        return parsed;
+    }
+
+    if (firstArgument == "query")
+    {
+        const auto options = parseInvestigateArguments(argc, argv, 2);
+
+        if (!options)
+        {
+            return std::nullopt;
+        }
+
+        parsed.command = CliCommand::Query;
+        parsed.query = *options;
 
         return parsed;
     }

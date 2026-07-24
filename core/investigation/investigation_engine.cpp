@@ -10,6 +10,7 @@
 #include "correlation_analyzer.hpp"
 #include "log_macros.hpp"
 #include "foundation/string.hpp"
+#include "query_evaluator.hpp"
 #include "search_engine.hpp"
 
 namespace scope::investigation
@@ -124,6 +125,15 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
     }
 
     const search::SearchEngine searchEngine;
+    query::QueryNode activeFilter = query::QueryNode::matchAll();
+    const auto resolvedFilter = criteria.resolvedFilterQuery();
+
+    if (resolvedFilter)
+    {
+        activeFilter = *resolvedFilter;
+    }
+
+    const query::QueryEvaluator filterEvaluator(std::move(activeFilter));
 
     for (const analysis::IndexedLine& line : lineIndex.lines())
     {
@@ -138,6 +148,11 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
         }
 
         if (!criteria.field.matches(line))
+        {
+            continue;
+        }
+
+        if (!filterEvaluator.matches(line))
         {
             continue;
         }

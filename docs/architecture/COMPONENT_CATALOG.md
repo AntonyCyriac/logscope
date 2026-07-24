@@ -146,7 +146,7 @@ Provide capabilities for exploring and understanding analysis results.
 ### Owns
 
 - Search
-- Filtering
+- Filtering (field flags and M10 filter DSL via `scope_query`)
 - Correlation
 - Navigation
 - Result inspection

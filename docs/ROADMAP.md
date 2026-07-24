@@ -36,7 +36,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M7 – Search Engine** | ✅ Complete | Full-text, regex, boolean search; saved searches; session search history. Released as `v1.2.0`. |
 | **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
 | **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
-| **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
+| **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
 | **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
 | **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
@@ -60,6 +60,7 @@ M6  ██████████ 100%  (v1.1.0 released)
 M7  ██████████ 100%  (v1.2.0 released)
 M8  ██████████ 100%  (v1.3.0 released)
 M9  ██████████ 100%  (v1.3.1 released)
+M10 ██████████ 100%  (v1.4.0 released)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -228,6 +229,7 @@ CLI supports subcommands while preserving legacy `logscope <log-file>` invocatio
 |-----------|-------------|--------|
 | `logscope_integration_tests` | Core pipeline tests across Source, Analysis, Investigation, Reporting, and Configuration | Complete |
 | `logscope_e2e_tests` | CLI executable smoke tests using `samples/` fixtures | Complete |
+| `scope_query` | Field-aware filter DSL parser and evaluator | Complete |
 | `scripts/run_cli_matrix.py` | Bulk-log CLI combination matrix (CI and release) | Complete |
 
 Repository tests run through CTest with the project root as the working directory.
@@ -403,7 +405,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M7 – Search Engine | Full-text, regex, boolean search; saved searches | `v1.2.0` |
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
 | M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
-| M10 – Query Language | Structured filter DSL | `v1.4.0` |
+| M10 – Query Language | Field-aware filter DSL | `v1.4.0` |
 | M11 – Storage Layer | SQLite, indexing, compression | `v1.4.0` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
@@ -419,14 +421,14 @@ v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine
 v1.3.0  — M8: Advanced Reporting
-v1.3.1+ — M9: Analytics Engine (planned)
-v1.4.0  — M10 Query + M11 Storage + M12 Plugins
+v1.4.0  — M10 Query Language (released)
+v1.4.1+ — M11 Storage + M12 Plugins
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6, M7, and M8. M9–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M10. M11–M17 plans will be added as preceding milestones near completion.
 
 ---
 
@@ -462,3 +464,4 @@ The roadmap is considered successful when:
 | 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ following M8 release at `v1.3.0`. |
 | 3.5.0 | 24-07-2026 | Revision history wording aligned with shipped `v1.3.0`. |
 | 3.6.0 | 24-07-2026 | M9 complete; v1.3.1 released with analytics engine. |
+| 3.7.0 | 24-07-2026 | M10 complete; v1.4.0 released with query language DSL. |

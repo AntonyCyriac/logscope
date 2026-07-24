@@ -14,6 +14,7 @@ target_link_libraries(scope_workspace
         scope_analysis
         scope_foundation
         scope_investigation
+        scope_query
         scope_reporting
         scope_runtime
         scope_search

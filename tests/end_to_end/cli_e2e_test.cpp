@@ -169,6 +169,7 @@ TEST(CliE2eTest, HelpDisplaysUsage)
     EXPECT_NE(std::string::npos, output.find("Commands:"));
     EXPECT_NE(std::string::npos, output.find("analyze"));
     EXPECT_NE(std::string::npos, output.find("analytics"));
+    EXPECT_NE(std::string::npos, output.find("query"));
     EXPECT_NE(std::string::npos, output.find("config validate"));
     EXPECT_NE(std::string::npos, output.find("extensions list"));
     EXPECT_NE(std::string::npos, output.find("session save"));
@@ -227,6 +228,33 @@ TEST(CliE2eTest, AnalyticsCommandProducesSummary)
     EXPECT_NE(std::string::npos, output.find("Analytics summary"));
     EXPECT_NE(std::string::npos, output.find("Trend verdict"));
     EXPECT_NE(std::string::npos, output.find("Error clusters"));
+}
+
+TEST(CliE2eTest, InvestigateFilterFindsErrorLines)
+{
+    const std::string output = runLogscope("investigate --filter \"level == ERROR\" " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("Matching lines"));
+}
+
+TEST(CliE2eTest, QueryCommandRunsFilterExpression)
+{
+    const std::string output = runLogscope("query --filter \"level == ERROR\" " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("Matching lines"));
+}
+
+TEST(CliE2eTest, InvestigateCombinesTextQueryAndFilter)
+{
+    const std::string output =
+        runLogscope("investigate --query \"error\" --filter \"contains(message, \\\"Connection\\\")\" " +
+                    scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
 }
 
 TEST(CliE2eTest, AnalyzeAnalyticsSections)

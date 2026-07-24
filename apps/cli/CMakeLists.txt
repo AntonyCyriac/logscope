@@ -9,6 +9,7 @@ add_executable(logscope
     analytics_output.cpp
     cli_analysis_config.cpp
     investigate_command.cpp
+    query_command.cpp
     search_command.cpp
     investigation_output.cpp
     cli_application.cpp
@@ -32,6 +33,7 @@ target_link_libraries(logscope
         scope_extension
         scope_foundation
         scope_investigation
+        scope_query
         scope_reporting
         scope_runtime
         scope_search

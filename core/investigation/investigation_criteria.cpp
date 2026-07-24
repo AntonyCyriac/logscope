@@ -6,6 +6,7 @@
 #include "investigation_criteria.hpp"
 
 #include "foundation/string.hpp"
+#include "query_parser.hpp"
 #include "search_query_parser.hpp"
 
 namespace scope::investigation
@@ -14,7 +15,8 @@ namespace scope::investigation
 bool InvestigationCriteria::isActive() const noexcept
 {
     return searchQuery.has_value() || !foundation::isBlank(booleanQuery) || !foundation::isBlank(contentSearch) ||
-           timeRange.isActive() || field.isActive();
+           !foundation::isBlank(filterExpression) || filterQuery.has_value() || timeRange.isActive() ||
+           field.isActive();
 }
 
 foundation::Result<search::SearchQuery> InvestigationCriteria::resolvedSearchQuery() const noexcept
@@ -41,6 +43,21 @@ foundation::Result<search::SearchQuery> InvestigationCriteria::resolvedSearchQue
     }
 
     return foundation::Result<search::SearchQuery>(search::SearchQuery::matchAll());
+}
+
+foundation::Result<query::QueryNode> InvestigationCriteria::resolvedFilterQuery() const noexcept
+{
+    if (filterQuery.has_value())
+    {
+        return foundation::Result<query::QueryNode>(*filterQuery);
+    }
+
+    if (!foundation::isBlank(filterExpression))
+    {
+        return query::parseFilterQuery(filterExpression);
+    }
+
+    return foundation::Result<query::QueryNode>(query::QueryNode::matchAll());
 }
 
 } // namespace scope::investigation
