@@ -119,6 +119,7 @@ tests/          Integration and end-to-end tests
 | Release process | [docs/release/RELEASE.md](docs/release/RELEASE.md) |
 | Changelog | [CHANGELOG.md](CHANGELOG.md) |
 | Developer setup | [docs/handbook/DEVELOPER_SETUP.md](docs/handbook/DEVELOPER_SETUP.md) |
+| Developer guide | [docs/handbook/DEVELOPER_GUIDE.md](docs/handbook/DEVELOPER_GUIDE.md) |
 | Engineering principles | [docs/standards/ENGINEERING_PRINCIPLES.md](docs/standards/ENGINEERING_PRINCIPLES.md) |
 | Foundation coding guidelines | [docs/standards/FOUNDATION_GUIDELINES.md](docs/standards/FOUNDATION_GUIDELINES.md) |
 | Architecture overview | [docs/architecture/ARCHITECTURE_OVERVIEW.md](docs/architecture/ARCHITECTURE_OVERVIEW.md) |

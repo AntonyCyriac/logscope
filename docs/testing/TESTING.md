@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.4.1 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **392** automated tests at **`v1.4.1`** (unit, integration, and end-to-end). Storage coverage includes `scope_storage_tests` (25 cases), persist-index/session-reuse e2e cases, and CLI matrix scenarios.
+**Current baseline:** **395** automated tests (unit, integration, end-to-end, and regression). Storage coverage includes `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, and M11 storage regression guards.
 
 ---
 
@@ -26,6 +26,7 @@ This document describes LogScope test layers, how to run them, and how they map 
 | Unit | Individual modules | `core/*/tests/`, `apps/cli/tests/` |
 | Integration | Core pipeline | `tests/integration/` |
 | End-to-end | CLI executable | `tests/end_to_end/` |
+| Regression | Fixed-bug guards | `tests/regression/` |
 | Benchmark | Performance baselines | `tests/benchmarks/` (optional) |
 | Fuzz | Parser hardening | `tests/fuzz/` (optional, Clang) |
 
@@ -68,6 +69,19 @@ cmake --build build --target logscope_integration_tests logscope_e2e_tests
 ```
 
 Integration tests run with the repository root as the working directory.
+
+---
+
+# Regression Tests
+
+Guards for fixed bugs that must not return (Phase 1 `tests/regression/`):
+
+```bash
+cmake --build build --target logscope_regression_tests
+ctest --test-dir build --output-on-failure -R regression
+```
+
+See [`tests/regression/README.md`](../../tests/regression/README.md).
 
 ---
 
@@ -173,3 +187,4 @@ Requires `clang-tidy` on PATH.
 | 1.2.0 | 24-07-2026 | Updated baseline to 337 tests at `v1.3.1`; noted M9 analytics coverage. |
 | 1.3.0 | 24-07-2026 | Added bulk-log CLI matrix scripts, CI job, and release workflow integration. |
 | 1.4.0 | 24-07-2026 | Updated baseline to 365 tests at `v1.4.0`; noted M10 query language coverage. |
+| 1.5.0 | 24-07-2026 | Added regression test layer; updated baseline to 395 tests; sanitizer CI env hardening. |

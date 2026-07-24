@@ -84,7 +84,7 @@ Long-horizon product themes beyond the published public milestones are maintaine
 
 - Complete API documentation (Doxygen generation and CI publish) — [`docs/api/`](../../docs/api/README.md) scaffold and CI artifact (`v1.0.x`; GitHub Pages optional follow-up)
 - Architecture diagrams (update HLD and Component Catalog visuals)
-- Developer guide
+- Developer guide — [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) (Phase 1, delivered)
 - Plugin development guide — [`PLUGIN_DEVELOPMENT_GUIDE.md`](../handbook/PLUGIN_DEVELOPMENT_GUIDE.md) (Phase 1, delivered)
 - Configuration guide — [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) (Phase 1, delivered)
 - User manual — [`USER_MANUAL.md`](../handbook/USER_MANUAL.md) (Phase 1, delivered)
@@ -97,7 +97,7 @@ Expand and harden beyond the v1.0.0 baseline:
 |------------|---------------|----------------|
 | Integration tests | Done (`tests/integration/`) | Expand coverage |
 | End-to-end tests | Done (`tests/end_to_end/`) | Expand scenarios |
-| Regression tests | Placeholder (`tests/regression/`) | Populate with known issues |
+| Regression tests | Started (`tests/regression/`) | Expand with known issues |
 | Fuzz testing | Done (`tests/fuzz/`) | Add targets for new parsers |
 | Performance benchmarks | Done (`tests/benchmarks/`) | Expand baselines |
 | Memory leak testing | Partial (sanitizer CI) | Harden ASan/LSan jobs |
@@ -394,9 +394,11 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Plugin dev guide | [`PLUGIN_DEVELOPMENT_GUIDE.md`](../handbook/PLUGIN_DEVELOPMENT_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Tutorials | `v1.0.x` |
 | Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
+| Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Architecture diagrams | `v1.0.x` |
 | Stress tests with large log fixtures | CI/release CLI matrix at 10k lines (`scripts/`); 100k-line release matrix restores after `v1.4.2` storage perf; `BM_*` benchmarks use larger fixtures |
-| Memory leak / ASan CI hardening | `v1.0.x` |
+| Regression tests | [`tests/regression/`](../../tests/regression/README.md) — M11 storage edge cases (Phase 1, started) |
+| Memory leak / ASan CI hardening | CI `ASAN_OPTIONS` / `UBSAN_OPTIONS`; LeakSanitizer via ASan on Linux (Phase 1, partial) |
 | Internal metrics / parser stats | `v1.0.x` or early M6 |
 | SIMD / thread pool / zero-copy | M6 perf pass + M7 search indexing |
 
