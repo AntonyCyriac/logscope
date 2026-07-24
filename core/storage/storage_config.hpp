@@ -33,10 +33,12 @@ struct StorageConfig
     bool persistIndex{false};
     bool reuseIndex{false};
     bool compressContent{false};
+    bool queryCacheEnabled{true};
     std::optional<foundation::Path> indexPath;
     foundation::Path indexDirectory;
     std::size_t spillThreshold{0U};
     std::size_t compressThresholdBytes{256U};
+    std::size_t queryCacheMaxEntries{64U};
 
     [[nodiscard]] bool usesPersistentStore() const noexcept;
 

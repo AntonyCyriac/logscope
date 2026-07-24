@@ -42,11 +42,11 @@ std::vector<analysis::IndexedLine> candidateLines(const analysis::AnalysisModel&
             const analysis::LineIndex* memoryIndex =
                 model.lineIndex().has_value() ? &*model.lineIndex() : nullptr;
             const storage::IndexReader reader(memoryIndex, model.indexStore());
-            const auto fetched = reader.linesMatchingWhere(plan->sqlWhere);
+            const auto fetched = reader.linesMatchingPushdownFilter(filterNode, plan->sqlWhere);
 
             if (fetched)
             {
-                return *fetched;
+                return fetched->lines;
             }
         }
     }
