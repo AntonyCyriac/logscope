@@ -15,7 +15,7 @@
 |---------|--------|
 | Schema v2 migration | Shipped (M11.7) |
 | zlib `content` compression | Shipped (M11.8) |
-| `line_json_fields` + DSL pushdown | Design |
+| `line_json_fields` + DSL pushdown | Shipped (M11.9) |
 | `query_cache` | Design |
 | Incremental append | Design |
 | FTS5 full-text search | Design |

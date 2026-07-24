@@ -48,6 +48,69 @@ std::optional<foundation::Timestamp> literalTimestamp(const QueryValue& value)
     return std::nullopt;
 }
 
+[[nodiscard]] bool isReservedComparisonField(const std::string_view field) noexcept
+{
+    const std::string lower = foundation::toLower(field);
+
+    return lower == "level" || lower == "line" || lower == "time" || lower == "timestamp" ||
+           lower == "correlationid" || lower == "message" || lower == "content";
+}
+
+[[nodiscard]] std::optional<std::string_view> jsonFieldValue(const analysis::IndexedLine& line,
+                                                               const std::string_view field) noexcept
+{
+    for (const auto& fieldValue : line.jsonFieldValues)
+    {
+        if (fieldValue.first == field)
+        {
+            return fieldValue.second;
+        }
+    }
+
+    return std::nullopt;
+}
+
+[[nodiscard]] bool evaluateJsonFieldComparison(const QueryNode& node, const analysis::IndexedLine& line) noexcept
+{
+    if (isReservedComparisonField(node.field()))
+    {
+        return false;
+    }
+
+    const auto actual = jsonFieldValue(line, node.field());
+
+    if (!actual.has_value())
+    {
+        return false;
+    }
+
+    const QueryValue& literal = node.value();
+    std::string expected;
+
+    if (literal.kind() == QueryValue::Kind::String)
+    {
+        expected = literal.stringValue();
+    }
+    else if (literal.kind() == QueryValue::Kind::Number)
+    {
+        expected = std::to_string(literal.numberValue());
+    }
+    else
+    {
+        return false;
+    }
+
+    switch (node.comparisonOperator())
+    {
+    case ComparisonOperator::Equal:
+        return *actual == expected;
+    case ComparisonOperator::NotEqual:
+        return *actual != expected;
+    default:
+        return false;
+    }
+}
+
 } // namespace
 
 QueryEvaluator::QueryEvaluator(QueryNode root) noexcept : m_root(std::move(root)) {}
@@ -255,7 +318,7 @@ bool QueryEvaluator::evaluateComparison(const QueryNode& node, const analysis::I
         }
     }
 
-    return false;
+    return evaluateJsonFieldComparison(node, line);
 }
 
 bool QueryEvaluator::evaluateFunction(const QueryNode& node, const analysis::IndexedLine& line) const noexcept

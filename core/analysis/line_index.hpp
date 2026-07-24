@@ -35,6 +35,7 @@ struct IndexedLine
     std::string correlationId;
     std::string contentExcerpt;
     std::vector<std::string> topLevelKeys;
+    std::vector<std::pair<std::string, std::string>> jsonFieldValues;
 };
 
 /**

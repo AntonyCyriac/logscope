@@ -70,7 +70,8 @@ void recordExtractedFields(FieldSummary& fieldSummary, const std::optional<found
 IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLevel level,
                              const std::optional<foundation::Timestamp>& timestamp,
                              const std::string_view messageExcerpt, const std::string_view correlationId,
-                             const std::string_view content, std::vector<std::string> topLevelKeys) noexcept
+                             const std::string_view content, std::vector<std::string> topLevelKeys,
+                             std::vector<std::pair<std::string, std::string>> jsonFieldValues = {}) noexcept
 {
     IndexedLine indexedLine;
     indexedLine.lineNumber = lineNumber;
@@ -80,6 +81,7 @@ IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLe
     indexedLine.correlationId = std::string(correlationId);
     indexedLine.contentExcerpt = truncateExcerpt(content, maxLineContentExcerptLength);
     indexedLine.topLevelKeys = std::move(topLevelKeys);
+    indexedLine.jsonFieldValues = std::move(jsonFieldValues);
 
     return indexedLine;
 }
@@ -113,7 +115,7 @@ void indexJsonLine(const std::uint64_t lineNumber, const std::string& line, cons
     const std::string correlationId = extractCorrelationId(line, parsed.correlationValue);
 
     (void)writer.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
-                                             parsed.topLevelKeys),
+                                             parsed.topLevelKeys, parsed.topLevelFieldValues),
                             line);
 }
 

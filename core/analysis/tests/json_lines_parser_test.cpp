@@ -29,6 +29,23 @@ TEST(JsonLinesParserTest, ParsesValidObjectWithLevelField)
     ASSERT_EQ(2U, result.topLevelKeys.size());
     EXPECT_EQ("level", result.topLevelKeys[0]);
     EXPECT_EQ("message", result.topLevelKeys[1]);
+    ASSERT_EQ(2U, result.topLevelFieldValues.size());
+    EXPECT_EQ("level", result.topLevelFieldValues[0].first);
+    EXPECT_EQ("error", result.topLevelFieldValues[0].second);
+}
+
+TEST(JsonLinesParserTest, CapturesTopLevelStringAndNumberFields)
+{
+    const auto result =
+        JsonLinesParser::parse(R"({"service":"PCF","count":42,"nested":{"ignored":true}})");
+
+    ASSERT_EQ(JsonLineParseOutcome::Valid, result.outcome);
+    ASSERT_EQ(3U, result.topLevelKeys.size());
+    ASSERT_EQ(2U, result.topLevelFieldValues.size());
+    EXPECT_EQ("service", result.topLevelFieldValues[0].first);
+    EXPECT_EQ("PCF", result.topLevelFieldValues[0].second);
+    EXPECT_EQ("count", result.topLevelFieldValues[1].first);
+    EXPECT_EQ("42", result.topLevelFieldValues[1].second);
 }
 
 TEST(JsonLinesParserTest, ParsesSeverityField)

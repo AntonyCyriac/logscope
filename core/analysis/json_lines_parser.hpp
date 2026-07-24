@@ -7,6 +7,7 @@
 
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 #include "json_field_mapping.hpp"
@@ -35,6 +36,9 @@ struct JsonLineParseResult
 
     /// Top-level object keys when @p outcome is Valid.
     std::vector<std::string> topLevelKeys;
+
+    /// Top-level string and number field values when @p outcome is Valid.
+    std::vector<std::pair<std::string, std::string>> topLevelFieldValues;
 
     /// Raw level field value when a supported key is present.
     std::string levelValue;

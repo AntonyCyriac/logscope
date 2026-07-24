@@ -370,6 +370,80 @@ CREATE TABLE IF NOT EXISTS query_cache (
     return foundation::Result<analysis::IndexedLine>(std::move(line));
 }
 
+[[nodiscard]] foundation::Result<bool> insertJsonFields(sqlite3* database, sqlite3_stmt*& insertStatement,
+                                                          const sqlite3_int64 lineId,
+                                                          const std::vector<std::pair<std::string, std::string>>&
+                                                              fieldValues)
+{
+    if (fieldValues.empty())
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    if (insertStatement == nullptr)
+    {
+        const char* sql = "INSERT INTO line_json_fields(line_id, field, value) VALUES(?, ?, ?);";
+
+        if (sqlite3_prepare_v2(database, sql, -1, &insertStatement, nullptr) != SQLITE_OK)
+        {
+            return foundation::Result<bool>(
+                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+        }
+    }
+
+    for (const auto& fieldValue : fieldValues)
+    {
+        sqlite3_reset(insertStatement);
+        sqlite3_clear_bindings(insertStatement);
+
+        sqlite3_bind_int64(insertStatement, 1, lineId);
+        sqlite3_bind_text(insertStatement, 2, fieldValue.first.c_str(), -1, SQLITE_TRANSIENT);
+        sqlite3_bind_text(insertStatement, 3, fieldValue.second.c_str(), -1, SQLITE_TRANSIENT);
+
+        const int stepResult = sqlite3_step(insertStatement);
+
+        if (stepResult != SQLITE_DONE)
+        {
+            return foundation::Result<bool>(
+                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+        }
+    }
+
+    return foundation::Result<bool>(true);
+}
+
+[[nodiscard]] std::vector<std::pair<std::string, std::string>> loadJsonFieldValues(sqlite3* database,
+                                                                                     const sqlite3_int64 lineId)
+{
+    std::vector<std::pair<std::string, std::string>> fieldValues;
+
+    sqlite3_stmt* statement = nullptr;
+    const char* sql = "SELECT field, value FROM line_json_fields WHERE line_id = ? ORDER BY field;";
+
+    if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
+    {
+        return fieldValues;
+    }
+
+    sqlite3_bind_int64(statement, 1, lineId);
+
+    while (sqlite3_step(statement) == SQLITE_ROW)
+    {
+        const unsigned char* field = sqlite3_column_text(statement, 0);
+        const unsigned char* value = sqlite3_column_text(statement, 1);
+
+        if (field != nullptr && value != nullptr)
+        {
+            fieldValues.emplace_back(reinterpret_cast<const char*>(field),
+                                     reinterpret_cast<const char*>(value));
+        }
+    }
+
+    sqlite3_finalize(statement);
+
+    return fieldValues;
+}
+
 } // namespace
 
 struct SqliteIndexStore::Impl
@@ -381,6 +455,7 @@ struct SqliteIndexStore::Impl
     IndexMetadata metadata;
     std::uint64_t storedLines{0U};
     sqlite3_stmt* insertStatement{nullptr};
+    sqlite3_stmt* jsonFieldInsertStatement{nullptr};
     bool inWriteBatch{false};
     std::size_t linesInWriteBatch{0U};
     bool compressContent{false};
@@ -521,7 +596,8 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
             foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
     }
 
-    return foundation::Result<bool>(true);
+    return insertJsonFields(m_impl->database, m_impl->jsonFieldInsertStatement,
+                            sqlite3_last_insert_rowid(m_impl->database), line.jsonFieldValues);
 }
 
 SqliteIndexStore::SqliteIndexStore(std::unique_ptr<Impl> impl) noexcept
@@ -542,6 +618,12 @@ SqliteIndexStore::~SqliteIndexStore()
     {
         sqlite3_finalize(m_impl->insertStatement);
         m_impl->insertStatement = nullptr;
+    }
+
+    if (m_impl->jsonFieldInsertStatement != nullptr)
+    {
+        sqlite3_finalize(m_impl->jsonFieldInsertStatement);
+        m_impl->jsonFieldInsertStatement = nullptr;
     }
 
     if (m_impl->database != nullptr)
@@ -864,6 +946,7 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
 
     while (sqlite3_step(statement) == SQLITE_ROW)
     {
+        const sqlite3_int64 lineId = sqlite3_column_int64(statement, 0);
         const auto lineResult = decodeIndexedLine(statement);
 
         if (!lineResult)
@@ -873,7 +956,9 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
             return foundation::Result<std::vector<analysis::IndexedLine>>(lineResult.error());
         }
 
-        lines.push_back(*lineResult);
+        analysis::IndexedLine line = *lineResult;
+        line.jsonFieldValues = loadJsonFieldValues(m_impl->database, lineId);
+        lines.push_back(std::move(line));
     }
 
     sqlite3_finalize(statement);
