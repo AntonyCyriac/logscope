@@ -55,6 +55,57 @@ namespace
     return 4;
 }
 
+[[nodiscard]] bool isReservedComparisonField(const std::string_view field) noexcept
+{
+    const std::string lower = foundation::toLower(field);
+
+    return lower == "level" || lower == "line" || lower == "time" || lower == "timestamp" ||
+           lower == "correlationid" || lower == "message" || lower == "content";
+}
+
+[[nodiscard]] std::optional<std::string> jsonFieldComparisonSql(const query::QueryNode& node)
+{
+    if (isReservedComparisonField(node.field()))
+    {
+        return std::nullopt;
+    }
+
+    const query::QueryValue& literal = node.value();
+    std::string valueText;
+
+    if (literal.kind() == query::QueryValue::Kind::String)
+    {
+        valueText = literal.stringValue();
+    }
+    else if (literal.kind() == query::QueryValue::Kind::Number)
+    {
+        valueText = std::to_string(literal.numberValue());
+    }
+    else
+    {
+        return std::nullopt;
+    }
+
+    const std::string escapedField = escapeSqlLiteral(node.field());
+    const std::string escapedValue = escapeSqlLiteral(valueText);
+
+    auto wrap = [](const std::string& expression) {
+        return std::optional<std::string>(expression);
+    };
+
+    switch (node.comparisonOperator())
+    {
+    case query::ComparisonOperator::Equal:
+        return wrap("EXISTS (SELECT 1 FROM line_json_fields ljf WHERE ljf.line_id = lines.id AND ljf.field = '" +
+                    escapedField + "' AND ljf.value = '" + escapedValue + "')");
+    case query::ComparisonOperator::NotEqual:
+        return wrap("NOT EXISTS (SELECT 1 FROM line_json_fields ljf WHERE ljf.line_id = lines.id AND ljf.field = '" +
+                    escapedField + "' AND ljf.value = '" + escapedValue + "')");
+    default:
+        return std::nullopt;
+    }
+}
+
 [[nodiscard]] std::optional<std::string> comparisonSql(const query::QueryNode& node)
 {
     const std::string field = foundation::toLower(node.field());
@@ -204,7 +255,7 @@ namespace
         return wrap(column + " = '" + escaped + "'");
     }
 
-    return std::nullopt;
+    return jsonFieldComparisonSql(node);
 }
 
 [[nodiscard]] std::optional<std::string> functionSql(const query::QueryNode& node)

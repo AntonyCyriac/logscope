@@ -439,28 +439,83 @@ bool tryCaptureNestedLogObject(JsonLineParseResult& result, std::string_view& in
     }
 }
 
+bool tryCaptureScalarValue(std::string_view& input, std::string& value) noexcept
+{
+    if (!skipWhitespace(input))
+    {
+        return false;
+    }
+
+    if (!input.empty() && input.front() == '"')
+    {
+        return parseJsonString(input, value);
+    }
+
+    const std::string_view before = input;
+
+    if (!skipNumber(input))
+    {
+        return false;
+    }
+
+    value.assign(before.data(), before.size() - input.size());
+
+    return true;
+}
+
 bool tryCaptureKnownField(JsonLineParseResult& result, const std::string_view key, std::string_view& input,
                           const JsonFieldMapping& mapping) noexcept
 {
-    if (matchesLevelKey(key, mapping))
+    if (key == "log")
     {
-        return tryAssignStringField(result.levelValue, input);
+        if (!skipWhitespace(input))
+        {
+            return false;
+        }
+
+        if (!input.empty() && input.front() == '{')
+        {
+            return tryCaptureNestedLogObject(result, input, mapping);
+        }
     }
 
-    if (matchesTimestampKey(key, mapping))
-    {
-        return tryAssignStringField(result.timestampValue, input);
-    }
+    std::string scalar;
 
-    if (key == "message" || key == "msg")
+    if (tryCaptureScalarValue(input, scalar))
     {
-        return tryAssignStringField(result.messageValue, input);
-    }
+        result.topLevelFieldValues.emplace_back(std::string(key), scalar);
 
-    if (key == "trace_id" || key == "traceId" || key == "correlation_id" || key == "correlationId" ||
-        key == "request_id" || key == "requestId")
-    {
-        return tryAssignStringField(result.correlationValue, input);
+        if (matchesLevelKey(key, mapping))
+        {
+            if (result.levelValue.empty())
+            {
+                result.levelValue = scalar;
+            }
+        }
+        else if (matchesTimestampKey(key, mapping))
+        {
+            if (result.timestampValue.empty())
+            {
+                result.timestampValue = scalar;
+            }
+        }
+        else if (key == "message" || key == "msg")
+        {
+            if (result.messageValue.empty())
+            {
+                result.messageValue = scalar;
+            }
+        }
+        else if (key == "trace_id" || key == "traceId" || key == "correlation_id" || key == "correlationId" ||
+                 key == "request_id" || key == "requestId")
+        {
+            if (result.correlationValue.empty())
+            {
+                result.correlationValue = scalar;
+            }
+        }
+
+        return true;
     }
 
     if (key == "log")
@@ -562,6 +617,7 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line,
     {
         result.outcome = JsonLineParseOutcome::Invalid;
         result.topLevelKeys.clear();
+        result.topLevelFieldValues.clear();
         result.levelValue.clear();
         result.timestampValue.clear();
         result.messageValue.clear();
@@ -574,6 +630,7 @@ JsonLineParseResult JsonLinesParser::parse(const std::string_view line,
     {
         result.outcome = JsonLineParseOutcome::Invalid;
         result.topLevelKeys.clear();
+        result.topLevelFieldValues.clear();
         result.levelValue.clear();
         result.timestampValue.clear();
         result.messageValue.clear();
