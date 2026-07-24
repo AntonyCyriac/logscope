@@ -338,6 +338,7 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | [Configuration Guide](CONFIGURATION_GUIDE.md) | Properties files and environment variables |
 | [M10 – Query Language](../planning/M10-QUERY-LANGUAGE.md) | Filter DSL grammar details |
 | [M11 – Storage Layer](../planning/M11-STORAGE-LAYER.md) | Persistent index design |
+| [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) | Built-in extensions and report hooks |
 | [Developer Setup](DEVELOPER_SETUP.md) | Building and contributing |
 
 ---

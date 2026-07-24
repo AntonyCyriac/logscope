@@ -188,6 +188,8 @@ extensions.reporting.multi-format.enabled=true
 
 List extensions with `logscope extensions list --config <file>`.
 
+See [Plugin Development Guide](../handbook/PLUGIN_DEVELOPMENT_GUIDE.md) for adding built-in extensions.
+
 ---
 
 # 7. Example configuration
