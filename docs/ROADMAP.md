@@ -407,7 +407,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
 | M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
 | M10 – Query Language | Field-aware filter DSL | `v1.4.0` |
-| M11 – Storage Layer | SQLite hybrid index, session reuse | `v1.4.1` |
+| M11 – Storage Layer | SQLite hybrid index, session reuse, bulk write perf | `v1.4.1` / `v1.4.2` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
 | M14 – Desktop Application | Qt GUI | `v2.0.0` |

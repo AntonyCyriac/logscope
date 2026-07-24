@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M11 – Storage Layer |
 | Category | Project Planning |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -15,7 +15,7 @@
 
 This document defines **M11 – Storage Layer**, introducing SQLite-backed persistent log line indexes with hybrid memory spill, session index reuse, and basic M10 query pushdown.
 
-Target release: **`v1.4.1`** (core scope). Compression and query cache follow in **`v1.4.2`**.
+Target releases: **`v1.4.1`** (core scope), **`v1.4.2`** (bulk index write performance). Compression and query cache follow in **`v1.4.3+`**.
 
 See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for architecture and compatibility rules.
 
@@ -42,6 +42,7 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for arc
 | M11.3 | `IndexReader`, investigation pushdown, analytics adapter | ✅ Complete |
 | M11.4 | Session 1.3 index metadata, fingerprint reuse on load | ✅ Complete |
 | M11.5 | CLI flags, e2e/matrix/benchmarks, `v1.4.1` release | ✅ Complete |
+| M11.6 | Batched SQLite writes, indexing progress, `v1.4.2` release | ✅ Complete |
 
 ---
 
@@ -79,7 +80,7 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) for arc
 
 ---
 
-# 6. Deferred (v1.4.2+)
+# 6. Follow-on delivery
 
 ## v1.4.2 — Storage performance (shipped)
 
