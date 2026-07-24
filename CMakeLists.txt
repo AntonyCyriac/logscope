@@ -20,6 +20,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(LOGSCOPE_BENCHMARKS "Build performance benchmarks" OFF)
 option(LOGSCOPE_FUZZING "Build libFuzzer targets (requires Clang)" OFF)
+option(LOGSCOPE_DOCS "Build API documentation with Doxygen" OFF)
 
 # ----------------------------------------------------------
 # Toolchain helpers
@@ -76,6 +77,10 @@ add_subdirectory(tests)
 
 include(cmake/Format.cmake)
 include(cmake/Tidy.cmake)
+
+if(LOGSCOPE_DOCS)
+    include(cmake/Doxygen.cmake)
+endif()
 
 # ----------------------------------------------------------
 # Packaging

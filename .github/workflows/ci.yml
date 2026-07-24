@@ -155,6 +155,30 @@ jobs:
           name: benchmark-results
           path: benchmark_results.json
 
+  docs:
+    name: API Documentation (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install Doxygen
+        run: sudo apt-get update && sudo apt-get install -y doxygen
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DLOGSCOPE_DOCS=ON
+
+      - name: Build API Documentation
+        run: cmake --build build --target docs
+
+      - name: Upload API Documentation
+        uses: actions/upload-artifact@v6
+        with:
+          name: api-docs
+          path: build/docs/api/html
+
   fuzz:
     name: Fuzz Targets (Ubuntu Clang)
 

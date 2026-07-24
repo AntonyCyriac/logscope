@@ -84,7 +84,7 @@ Run the CLI (Release output path on MSVC):
 
 ### Persistent indexes on Windows
 
-Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `--persist-index`, `--reuse-index`, and `storage.*` config keys.
+Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [Configuration Guide](docs/handbook/CONFIGURATION_GUIDE.md) and [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `storage.*` keys and CLI flags.
 
 ```powershell
 .\build\apps\cli\Release\logscope.exe investigate `
@@ -113,6 +113,8 @@ tests/          Integration and end-to-end tests
 | M5 production readiness | [docs/planning/M5-PRODUCTION-READINESS.md](docs/planning/M5-PRODUCTION-READINESS.md) |
 | Testing guide | [docs/testing/TESTING.md](docs/testing/TESTING.md) |
 | CLI reference | [docs/handbook/CLI_REFERENCE.md](docs/handbook/CLI_REFERENCE.md) |
+| User manual | [docs/handbook/USER_MANUAL.md](docs/handbook/USER_MANUAL.md) |
+| Configuration guide | [docs/handbook/CONFIGURATION_GUIDE.md](docs/handbook/CONFIGURATION_GUIDE.md) |
 | Release process | [docs/release/RELEASE.md](docs/release/RELEASE.md) |
 | Changelog | [CHANGELOG.md](CHANGELOG.md) |
 | Developer setup | [docs/handbook/DEVELOPER_SETUP.md](docs/handbook/DEVELOPER_SETUP.md) |
