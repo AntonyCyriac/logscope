@@ -59,14 +59,24 @@ jobs:
         shell: pwsh
         run: Compress-Archive -Path dist/* -DestinationPath ${{ matrix.archive_file }}
 
-      - name: Smoke Test
+      - name: CLI Matrix Smoke Test
         shell: bash
+        env:
+          BULK_LOG_LINES: 100000
         run: |
+          python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format plain --output /tmp/bulk.log
+          python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format jsonl --output /tmp/bulk.jsonl
+
           if [ "${{ runner.os }}" = "Windows" ]; then
-            ./build/apps/cli/Release/logscope.exe analyze samples/sample.log
+            LOGSCOPE=./build/apps/cli/Release/logscope.exe
           else
-            ./build/apps/cli/logscope analyze samples/sample.log
+            LOGSCOPE=./build/apps/cli/logscope
           fi
+
+          python3 scripts/run_cli_matrix.py \
+            --logscope "${LOGSCOPE}" \
+            --plain-log /tmp/bulk.log \
+            --jsonl-log /tmp/bulk.jsonl
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v6

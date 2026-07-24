@@ -56,6 +56,7 @@ Lightweight security review checklist for LogScope releases. This is not a forma
 |------|--------|
 | Sanitizer CI job passes | [x] |
 | Fuzz smoke tests pass (1000+ runs) | [x] |
+| Bulk-log CLI matrix passes in CI and release workflows | [x] |
 | Multi-OS CI green before release | [x] |
 | Release workflow does not embed secrets | [x] |
 

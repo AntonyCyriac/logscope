@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -76,7 +76,7 @@ Release tags (`vX.Y.Z`) are the public sync points for related private strategy 
 
 ## 6. GitHub Release
 
-For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts and attaches them to the GitHub Release.
+For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts, runs the bulk-log CLI matrix (100k-line fixtures), and attaches binaries to the GitHub Release.
 
 1. Open **Releases** → draft for the new tag
 2. Paste changelog summary
@@ -112,3 +112,4 @@ logscope analyze samples/sample.log
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial release process documentation. |
 | 1.1.0 | 24-07-2026 | Note `sync/vX.Y.Z` private strategy alignment after public release tags. |
+| 1.2.0 | 24-07-2026 | Release workflow runs bulk-log CLI matrix before publishing binaries. |

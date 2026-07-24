@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.1.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -68,6 +68,23 @@ cmake --build build --target logscope_integration_tests logscope_e2e_tests
 ```
 
 Integration tests run with the repository root as the working directory.
+
+---
+
+# CLI Matrix
+
+Cross-platform Python scripts exercise many CLI command combinations against generated bulk logs:
+
+```bash
+python3 scripts/generate_bulk_log.py --lines 10000 --format plain --output /tmp/bulk.log
+python3 scripts/generate_bulk_log.py --lines 10000 --format jsonl --output /tmp/bulk.jsonl
+python3 scripts/run_cli_matrix.py \
+  --logscope build/apps/cli/logscope \
+  --plain-log /tmp/bulk.log \
+  --jsonl-log /tmp/bulk.jsonl
+```
+
+CI runs this matrix on Ubuntu with 10,000-line fixtures. Release builds use 100,000-line fixtures on every OS before publishing binaries.
 
 ---
 
@@ -154,3 +171,4 @@ Requires `clang-tidy` on PATH.
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial testing guide. |
 | 1.2.0 | 24-07-2026 | Updated baseline to 337 tests at `v1.3.1`; noted M9 analytics coverage. |
+| 1.3.0 | 24-07-2026 | Added bulk-log CLI matrix scripts, CI job, and release workflow integration. |

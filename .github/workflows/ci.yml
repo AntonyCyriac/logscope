@@ -33,6 +33,33 @@ jobs:
       - name: Run Tests
         run: ctest --test-dir build --output-on-failure --build-config Release
 
+  cli-matrix:
+    name: CLI Matrix (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Generate Bulk Logs
+        run: |
+          python3 scripts/generate_bulk_log.py --lines 10000 --format plain --output /tmp/bulk.log
+          python3 scripts/generate_bulk_log.py --lines 10000 --format jsonl --output /tmp/bulk.jsonl
+
+      - name: Run CLI Matrix
+        run: |
+          python3 scripts/run_cli_matrix.py \
+            --logscope build/apps/cli/logscope \
+            --plain-log /tmp/bulk.log \
+            --jsonl-log /tmp/bulk.jsonl
+
   sanitize:
     name: Sanitizer Build (Ubuntu)
 

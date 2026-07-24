@@ -22,7 +22,7 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 - **Extension library** (`scope_extension`) — `ExtensionManager` with configuration-based enablement
 - **Workspace library** (`scope_workspace`) — `InvestigationSession` and `SessionStore` for `.logscope-session` persistence
 - **CLI application** (`apps/cli`) — `analyze`, `analytics`, `config validate`, `extensions`, and `session` subcommands; stdin and directory input; `--format text|json|csv|markdown|html|pdf`; `--output <file>`
-- **CI** — build, unit tests, integration tests, and CLI end-to-end tests on every push to `master`
+- **CI** — multi-OS build, unit/integration/e2e tests, and Ubuntu CLI matrix (10k-line bulk logs, 18 command scenarios) on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
 ## Requirements
@@ -66,6 +66,7 @@ apps/           Applications (CLI)
 core/           Core libraries (foundation, runtime, configuration, source, analysis, investigation, reporting, extension, workspace)
 docs/           Product, architecture, standards, and handbook
 samples/        Sample log files and configuration
+scripts/        Bulk-log generation and CLI matrix runners
 tests/          Integration and end-to-end tests
 ```
 

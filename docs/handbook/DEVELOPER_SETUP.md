@@ -308,7 +308,7 @@ Before starting development:
 - [ ] Git working tree is clean.
 - [ ] Architecture documents reviewed.
 
-For benchmarks, fuzz tests, sanitizers, and coverage, see [Testing Guide](../testing/TESTING.md).
+For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, see [Testing Guide](../testing/TESTING.md).
 
 ---
 

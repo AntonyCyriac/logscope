@@ -10,6 +10,16 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Added
+
+- `scripts/generate_bulk_log.py` and `scripts/run_cli_matrix.py` for bulk-log CLI combination testing.
+- CI `cli-matrix` job (Ubuntu, 10k-line fixtures, 18 command scenarios).
+- Release workflow bulk CLI matrix (100k-line fixtures per OS before publishing binaries).
+
+### Changed
+
+- Release smoke test replaced by cross-command bulk-log matrix across analyze, investigate, search, analytics, config, extensions, and session flows.
+
 ---
 
 ## [1.3.1] - 2026-07-24

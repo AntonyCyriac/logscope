@@ -228,6 +228,7 @@ CLI supports subcommands while preserving legacy `logscope <log-file>` invocatio
 |-----------|-------------|--------|
 | `logscope_integration_tests` | Core pipeline tests across Source, Analysis, Investigation, Reporting, and Configuration | Complete |
 | `logscope_e2e_tests` | CLI executable smoke tests using `samples/` fixtures | Complete |
+| `scripts/run_cli_matrix.py` | Bulk-log CLI combination matrix (CI and release) | Complete |
 
 Repository tests run through CTest with the project root as the working directory.
 
@@ -356,7 +357,7 @@ M5 prepares LogScope for the first stable production release (`v1.0.0`). Detaile
 - Comprehensive testing (integration, end-to-end, performance, fuzz)
 - Documentation refinement
 - Packaging and distribution (source install, then binary GitHub Releases)
-- Continuous Integration enhancements (static analysis, coverage, multi-platform builds, release workflow)
+- Continuous Integration enhancements (static analysis, coverage, multi-platform builds, bulk-log CLI matrix, release workflow)
 - Security review
 - Release validation
 
