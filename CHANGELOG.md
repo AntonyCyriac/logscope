@@ -10,15 +10,26 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
-### Added
-
-- Batched SQLite index writes: WAL mode, prepared-statement reuse, and transaction batching (5000 lines per commit) for `--persist-index` builds.
-- Indexing progress log lines every 10,000 persisted lines during analysis.
-- `BM_IndexStoreAppend/100000` benchmark and CI regression baseline.
-
-### Planned (v1.4.2 remainder)
+### Planned
 
 - zlib compression on `content` column, query cache, incremental append indexing, `line_json_fields` table, FTS5.
+
+---
+
+## [1.4.2] - 2026-07-24
+
+M11 storage follow-up — bulk index build performance for `--persist-index`. 396 automated tests.
+
+### Added
+
+- Batched SQLite index writes: WAL mode, prepared-statement reuse, and transaction batching (5000 lines per commit).
+- Indexing progress log lines every 10,000 persisted lines during analysis.
+- `BM_IndexStoreAppend/100000` benchmark and CI regression baseline.
+- `AppendsLargeBatchInOrder` storage unit test (12k lines across transaction batches).
+
+### Changed
+
+- `SqliteIndexStore` commits write batches on finalize and teardown to avoid partial transactions.
 
 ---
 

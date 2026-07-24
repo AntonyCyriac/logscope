@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) is complete; **bulk index build performance**, compression, and query cache target **`v1.4.2`**. See [Roadmap](../ROADMAP.md) and [M11-STORAGE-LAYER.md](M11-STORAGE-LAYER.md).
+**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) and bulk index write performance (`v1.4.2`) are complete; **compression** and **query cache** follow in **`v1.4.3`**. See [Roadmap](../ROADMAP.md) and [M11-STORAGE-LAYER.md](M11-STORAGE-LAYER.md).
 
 ---
 
@@ -183,8 +183,7 @@ Evolves toward a SQL-like or DSL-based query language over indexed log data.
 
 Improve storage beyond flat files:
 
-- SQLite-backed indexed storage (shipped `v1.4.1`)
-- **Bulk index build performance** — batched SQLite writes, benchmark SLA (`v1.4.2`)
+- SQLite-backed indexed storage (shipped `v1.4.1`; bulk write perf `v1.4.2`)
 - Compression
 - Incremental indexing
 - Cached queries
@@ -323,7 +322,7 @@ The broader companion product vision:
 | Phase 2 — Reporting Engine | M8 | `v1.3.0` |
 | Phase 2 — Analytics Engine | M9 | `v1.3.1`+ |
 | Phase 2 — Query Engine | M10 | `v1.4.0` |
-| Phase 3 — Storage | M11 | `v1.4.1` |
+| Phase 3 — Storage | M11 | `v1.4.1` / `v1.4.2` |
 | Phase 4 — Plugin Ecosystem | M12 | `v1.4.0` / `v1.5.0` |
 | Phase 5 — AI | M13 | `v1.5.0` |
 | Phase 6 — GUI | M14 | `v2.0.0` |
@@ -396,7 +395,7 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Architecture diagrams | `v1.0.x` |
-| Stress tests with large log fixtures | CI/release CLI matrix at 10k lines (`scripts/`); 100k-line release matrix restores after `v1.4.2` storage perf; `BM_*` benchmarks use larger fixtures |
+| Stress tests with large log fixtures | CI/release CLI matrix at 10k lines (`scripts/`); `v1.4.2` bulk write perf shipped — restore 100k-line release matrix in `v1.4.3+` remainder; `BM_*` benchmarks use larger fixtures |
 | Regression tests | [`tests/regression/`](../../tests/regression/README.md) — M11 storage edge cases (Phase 1, started) |
 | Memory leak / ASan CI hardening | CI `ASAN_OPTIONS` / `UBSAN_OPTIONS`; LeakSanitizer via ASan on Linux (Phase 1, partial) |
 | Internal metrics / parser stats | `v1.0.x` or early M6 |

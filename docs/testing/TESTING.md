@@ -188,3 +188,4 @@ Requires `clang-tidy` on PATH.
 | 1.3.0 | 24-07-2026 | Added bulk-log CLI matrix scripts, CI job, and release workflow integration. |
 | 1.4.0 | 24-07-2026 | Updated baseline to 365 tests at `v1.4.0`; noted M10 query language coverage. |
 | 1.5.0 | 24-07-2026 | Added regression test layer; updated baseline to 395 tests; sanitizer CI env hardening. |
+| 1.6.0 | 24-07-2026 | Updated baseline to 396 tests at `v1.4.2`; noted M11 bulk index write performance coverage. |

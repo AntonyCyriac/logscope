@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.4.1`
+**Current release:** `v1.4.2`
 
 **Completed milestones:**
 
@@ -44,7 +44,7 @@ The project follows architecture-first development. Every implementation should 
 | M8 – Advanced Reporting | Section registry, executive/error/chart sections, HTML/PDF, `--output` (`v1.3.0`) |
 | M9 – Analytics Engine | Frequency, clustering, timeline, trends, `logscope analytics` (`v1.3.1`) |
 | M10 – Query Language | Field-aware filter DSL, `--filter`, `logscope query` (`v1.4.0`) |
-| M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session index reuse (`v1.4.1`) |
+| M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session index reuse (`v1.4.1`); bulk write perf (`v1.4.2`) |
 
 **Next:**
 
@@ -191,7 +191,7 @@ Includes:
 - Code coverage
 - Benchmark regression checks
 - Fuzz smoke tests (where applicable)
-- CLI matrix on bulk-generated logs (Ubuntu CI: 10k lines; release: 100k lines per OS)
+- CLI matrix on bulk-generated logs (Ubuntu CI and release: 10k lines; 100k-line matrix planned for `v1.4.3+` remainder)
 
 Do not introduce changes that weaken CI quality.
 
