@@ -4,8 +4,17 @@
 
 #include "hybrid_index_writer.hpp"
 
+#include "log_macros.hpp"
+
 namespace scope::analysis
 {
+
+namespace
+{
+
+constexpr std::uint64_t persistProgressInterval = 10000U;
+
+} // namespace
 
 HybridIndexWriter::HybridIndexWriter(LineIndex lineIndex, storage::StorageConfig storageConfig,
                                      storage::IndexStorePtr persistentStore) noexcept
@@ -26,7 +35,18 @@ bool HybridIndexWriter::tryAddLine(IndexedLine line, const std::string_view full
 
         if (spillToStore)
         {
-            (void)m_persistentStore->appendLine(line, fullContent);
+            const auto appendResult = m_persistentStore->appendLine(line, fullContent);
+
+            if (appendResult)
+            {
+                ++m_persistedLineCount;
+
+                if (m_persistedLineCount % persistProgressInterval == 0U)
+                {
+                    SCOPE_LOG_INFO("analysis",
+                                   "Indexed " + std::to_string(m_persistedLineCount) + " lines to persistent store");
+                }
+            }
         }
     }
 

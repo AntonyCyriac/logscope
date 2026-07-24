@@ -131,6 +131,8 @@ static void BM_IndexStoreAppend(benchmark::State& state)
         (void)(*created)->finalize(static_cast<std::uint64_t>(state.range(0)));
         benchmark::DoNotOptimize(created);
     }
+
+    state.SetItemsProcessed(state.iterations() * state.range(0));
 }
 
 static void BM_QueryPushdown(benchmark::State& state)
@@ -198,6 +200,6 @@ static void BM_QueryEvaluatorScan(benchmark::State& state)
     }
 }
 
-BENCHMARK(BM_IndexStoreAppend)->Arg(1000);
+BENCHMARK(BM_IndexStoreAppend)->Arg(1000)->Arg(100000);
 BENCHMARK(BM_QueryPushdown);
 BENCHMARK(BM_QueryEvaluatorScan);

@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **395** automated tests (unit, integration, end-to-end, and regression). Storage coverage includes `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, and M11 storage regression guards.
+**Current baseline:** **396** automated tests (unit, integration, end-to-end, and regression). Storage coverage includes `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, and M11 storage regression guards.
 
 ---
 
