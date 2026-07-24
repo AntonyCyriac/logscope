@@ -56,9 +56,11 @@ jobs:
         run: cmake --build build --config Release
 
       - name: Generate Bulk Logs
+        env:
+          BULK_LOG_LINES: 100000
         run: |
-          python3 scripts/generate_bulk_log.py --lines 10000 --format plain --output /tmp/bulk.log
-          python3 scripts/generate_bulk_log.py --lines 10000 --format jsonl --output /tmp/bulk.jsonl
+          python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format plain --output /tmp/bulk.log
+          python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format jsonl --output /tmp/bulk.jsonl
 
       - name: Run CLI Matrix
         run: |

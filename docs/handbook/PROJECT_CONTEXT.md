@@ -191,7 +191,7 @@ Includes:
 - Code coverage
 - Benchmark regression checks
 - Fuzz smoke tests (where applicable)
-- CLI matrix on bulk-generated logs (Ubuntu CI and release: 10k lines; 100k-line matrix planned for `v1.4.3+` remainder)
+- CLI matrix on bulk-generated logs (Ubuntu CI and Linux/Windows release: 100k lines; macOS release: 10k lines)
 
 Do not introduce changes that weaken CI quality.
 

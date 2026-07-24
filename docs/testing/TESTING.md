@@ -90,8 +90,8 @@ See [`tests/regression/README.md`](../../tests/regression/README.md).
 Cross-platform Python scripts exercise many CLI command combinations against generated bulk logs:
 
 ```bash
-python3 scripts/generate_bulk_log.py --lines 10000 --format plain --output /tmp/bulk.log
-python3 scripts/generate_bulk_log.py --lines 10000 --format jsonl --output /tmp/bulk.jsonl
+python3 scripts/generate_bulk_log.py --lines 100000 --format plain --output /tmp/bulk.log
+python3 scripts/generate_bulk_log.py --lines 100000 --format jsonl --output /tmp/bulk.jsonl
 python3 scripts/run_cli_matrix.py \
   --logscope build/apps/cli/logscope \
   --plain-log /tmp/bulk.log \
