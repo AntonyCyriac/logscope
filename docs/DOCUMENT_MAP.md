@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.6.0 |
+| Version | 2.9.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -94,6 +94,11 @@ docs/
 │   ├── TESTING.md
 │   └── PERFORMANCE.md
 │
+├── api/
+│   ├── README.md
+│   ├── mainpage.md
+│   └── Doxyfile.in          # CMake-generated Doxygen config
+│
 ├── release/
 │   ├── RELEASE.md
 │   └── V1_VALIDATION.md
@@ -101,10 +106,12 @@ docs/
 ├── handbook/
 │   ├── PROJECT_CONTEXT.md
 │   ├── CODE_REVIEW_CHECKLIST.md
+│   ├── CONFIGURATION_GUIDE.md
 │   ├── DEVELOPER_SETUP.md
 │   ├── GIT_CONVENTIONS.md
 │   ├── PULL_REQUEST_GUIDE.md
-│   └── SECURITY_REVIEW.md
+│   ├── SECURITY_REVIEW.md
+│   └── USER_MANUAL.md
 │
 ├── standards/
 │   ├── API_DESIGN_GUIDELINES.md
@@ -183,6 +190,9 @@ Developers new to LogScope should read the documentation in the following order.
 | 22 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
 | 23 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
 | 24 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
+| 25 | CONFIGURATION_GUIDE.md | Configure LogScope via properties files and environment variables. |
+| 26 | USER_MANUAL.md | End-user workflows: analyze, investigate, sessions, large logs. |
+| 27 | CLI_REFERENCE.md | Command-line usage reference. |
 
 ---
 
@@ -244,7 +254,7 @@ IMPLEMENTATION
 | architecture/decisions/ | Records Architecture Decision Records (ADRs). |
 | architecture/foundation/ | Documents foundation-layer component designs. |
 | implementation/ | Describes how architectural concepts map to the codebase. |
-| handbook/ | Developer onboarding, workflow, and contribution checklists. |
+| handbook/ | Developer onboarding, configuration, workflow, and contribution checklists. |
 
 ---
 
@@ -283,7 +293,7 @@ The following document categories may be introduced as LogScope evolves.
 ```text
 testing/
 release/
-api/
+api/          # Doxygen-generated HTML (build/docs/api/html); see docs/api/README.md
 ```
 
 These categories should be added only when they provide clear value and support the project's engineering goals.
@@ -311,3 +321,6 @@ These categories should be added only when they provide clear value and support 
 | 2.4.0 | 24-07-2026 | Documented `scripts/` bulk-log CLI matrix tooling and CI integration. |
 | 2.5.0 | 24-07-2026 | Added M10-QUERY-LANGUAGE.md, ADR-004, and reading order for `v1.4.0`. |
 | 2.6.0 | 24-07-2026 | Added M11-STORAGE-LAYER.md, ADR-005, and reading order for `v1.4.1`. |
+| 2.7.0 | 24-07-2026 | Added CONFIGURATION_GUIDE.md (Phase 1 stabilization). |
+| 2.8.0 | 24-07-2026 | Added docs/api/ Doxygen scaffold and CI docs job. |
+| 2.9.0 | 24-07-2026 | Added USER_MANUAL.md (Phase 1 stabilization). |

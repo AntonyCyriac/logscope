@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.1.0 |
+| Version | 2.3.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -148,6 +148,19 @@ Build the project:
 ```bash
 cmake --build build
 ```
+
+---
+
+# 9.1 API documentation (optional)
+
+Generate the Doxygen HTML reference when [Doxygen](https://www.doxygen.org/) is installed:
+
+```bash
+cmake -S . -B build -DLOGSCOPE_DOCS=ON
+cmake --build build --target docs
+```
+
+Open `build/docs/api/html/index.html`. See [API Documentation](../api/README.md) for CI integration and input scope.
 
 ---
 
@@ -319,3 +332,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.0.0 | 15-07-2026 | Updated to align with the completed engineering design baseline and architecture-driven development workflow. |
 | 2.1.0 | 18-07-2026 | Added contribution workflow section linking to handbook guides. |
 | 2.2.0 | 18-07-2026 | Linked M5 testing guide from verification checklist. |
+| 2.3.0 | 24-07-2026 | Added optional Doxygen API documentation build (`LOGSCOPE_DOCS`). |
