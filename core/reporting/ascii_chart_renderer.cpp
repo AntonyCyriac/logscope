@@ -55,4 +55,25 @@ std::string renderMarkdownLevelChart(const LevelBarChart& chart, const std::size
     return output.str();
 }
 
+std::string renderAsciiTimeSeriesChart(const TimeSeriesChart& chart, const std::size_t maxBarWidth)
+{
+    LevelBarChart converted;
+
+    for (const TimeSeriesPoint& point : chart.points)
+    {
+        converted.bars.push_back(ChartBar{point.label, point.errorCount, "#dc3545"});
+    }
+
+    return renderAsciiChartBody(converted, maxBarWidth);
+}
+
+std::string renderMarkdownTimeSeriesChart(const TimeSeriesChart& chart, const std::size_t maxBarWidth)
+{
+    std::ostringstream output;
+
+    output << "```\n" << renderAsciiTimeSeriesChart(chart, maxBarWidth) << "```\n";
+
+    return output.str();
+}
+
 } // namespace scope::reporting

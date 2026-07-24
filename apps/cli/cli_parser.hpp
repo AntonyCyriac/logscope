@@ -17,6 +17,8 @@
 #include "output_format.hpp"
 #include "report_section.hpp"
 
+#include "analytics_command.hpp"
+
 namespace scope::cli
 {
 
@@ -29,6 +31,7 @@ enum class CliCommand
     Analyze,
     Investigate,
     Search,
+    Analytics,
     ConfigValidate,
     ExtensionsList,
     ExtensionsDescribe,
@@ -143,6 +146,7 @@ struct ParsedCli
     AnalyzeOptions analyze;
     InvestigateOptions investigate;
     InvestigateOptions search;
+    AnalyticsOptions analytics;
     ConfigValidateOptions configValidate;
     ExtensionsListOptions extensionsList;
     ExtensionsDescribeOptions extensionsDescribe;

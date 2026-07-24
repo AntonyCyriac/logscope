@@ -6,6 +6,7 @@
 #include "cli_application.hpp"
 
 #include "analyze_command.hpp"
+#include "analytics_command.hpp"
 #include "config_validate_command.hpp"
 #include "extensions_command.hpp"
 #include "investigate_command.hpp"
@@ -24,6 +25,7 @@ void CliApplication::printUsage(std::ostream& output)
            << "  analyze            Analyze a log file, directory, or stdin\n"
            << "  investigate        Search and filter indexed log content\n"
            << "  search             Alias for investigate focused on search queries\n"
+           << "  analytics            Run frequency, clustering, and timeline analytics\n"
            << "  config validate    Validate configuration\n"
            << "  extensions list    List available extensions\n"
            << "  extensions describe Describe an extension\n"
@@ -56,6 +58,8 @@ int CliApplication::run(const ParsedCli& parsed,
         return runInvestigateCommand(parsed.investigate, configurationManager, output, errorOutput);
     case CliCommand::Search:
         return runSearchCommand(parsed.search, configurationManager, output, errorOutput);
+    case CliCommand::Analytics:
+        return runAnalyticsCommand(parsed.analytics, configurationManager, output, errorOutput);
     case CliCommand::ConfigValidate:
         return runConfigValidateCommand(parsed.configValidate, configurationManager, output, errorOutput);
     case CliCommand::ExtensionsList:

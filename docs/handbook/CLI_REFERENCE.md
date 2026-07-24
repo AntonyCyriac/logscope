@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.4.0 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -44,7 +44,7 @@ logscope analyze [options] <log-source>
 | `--format text\|json\|csv\|markdown\|html\|pdf` | Output format (default: text) |
 | `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
 | `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
-| `--sections <list>` | Report sections: `executive`, `summary`, `levels`, `errors`, `charts`, `metadata`, `formats`, or `all` |
+| `--sections <list>` | Report sections: `executive`, `summary`, `levels`, `errors`, `analytics`, `timeline`, `clusters`, `charts`, `metadata`, `formats`, or `all` |
 | `--output <file>` | Write report to file (required for PDF; creates parent directories) |
 | `--min-errors <n>` | Investigation filter: minimum error lines |
 | `--min-warnings <n>` | Investigation filter: minimum warning lines |
@@ -108,6 +108,29 @@ logscope search --search "code=\\d+" --regex samples/sample.jsonl
 
 ---
 
+## analytics
+
+Run frequency, clustering, timeline, and correlation analytics over a log source.
+
+```text
+logscope analytics [options] <log-source>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format text\|json` | Output format (default: text) |
+| `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
+| `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
+| `--bucket <seconds>` | Timeline bucket size (default: auto from time span) |
+| `--top <n>` | Top frequency/cluster results (default: 10) |
+
+```bash
+logscope analytics samples/sample.log
+logscope analytics --format json --bucket 60 samples/sample.log
+```
+
+---
+
 ## Configuration keys
 
 Format-related keys in `logscope.properties` (validated by `config validate`):
@@ -120,6 +143,10 @@ Format-related keys in `logscope.properties` (validated by `config validate`):
 | `source.json.level_field` | JSON level field name override |
 | `investigation.max_indexed_lines` | Investigation index capacity (default: 10000, max: 1000000) |
 | `search.saved.<name>` | Named saved search expression (validated by `config validate`) |
+| `analytics.bucket_seconds` | Timeline bucket size in seconds (optional; auto when unset) |
+| `analytics.top_n` | Top frequency/cluster results (default: 10) |
+| `analytics.min_cluster_count` | Minimum occurrences to surface a cluster (default: 2) |
+| `report.include_timeline` | Include timeline chart in `charts` section (default: true) |
 
 CLI `--profile` and `--log-format` override configuration for a single run.
 
@@ -206,4 +233,4 @@ Default directory: current working directory.
 | 1.1.0 | 21-07-2026 | Added `--log-format` for M6.1 format detection. |
 | 1.2.0 | 21-07-2026 | Added `--profile`, investigate command, and format configuration keys for M6.5. |
 | 1.3.0 | 21-07-2026 | Added `search` command, boolean/regex query flags for M7. |
-| 1.4.0 | 24-07-2026 | Added HTML/PDF formats, `--output`, and M8 report sections for M8. |
+| 1.5.0 | 24-07-2026 | Added `analytics` command, analytics report sections, and M9 config keys. |

@@ -168,6 +168,7 @@ TEST(CliE2eTest, HelpDisplaysUsage)
 
     EXPECT_NE(std::string::npos, output.find("Commands:"));
     EXPECT_NE(std::string::npos, output.find("analyze"));
+    EXPECT_NE(std::string::npos, output.find("analytics"));
     EXPECT_NE(std::string::npos, output.find("config validate"));
     EXPECT_NE(std::string::npos, output.find("extensions list"));
     EXPECT_NE(std::string::npos, output.find("session save"));
@@ -216,4 +217,23 @@ TEST(CliE2eTest, InvestigateQueryFindsMatches)
 
     EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
     EXPECT_NE(std::string::npos, output.find("Matching lines"));
+}
+
+TEST(CliE2eTest, AnalyticsCommandProducesSummary)
+{
+    const std::string output = runLogscope("analytics " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("Analytics summary"));
+    EXPECT_NE(std::string::npos, output.find("Trend verdict"));
+    EXPECT_NE(std::string::npos, output.find("Error clusters"));
+}
+
+TEST(CliE2eTest, AnalyzeAnalyticsSections)
+{
+    const std::string output = runLogscope("analyze --sections analytics,clusters " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("Analytics"));
+    EXPECT_NE(std::string::npos, output.find("Error Clusters"));
 }

@@ -18,6 +18,9 @@ TEST(ReportSectionTest, AllIncludesEverySection)
     EXPECT_TRUE(sections.includes(ReportSection::Summary));
     EXPECT_TRUE(sections.includes(ReportSection::LevelBreakdown));
     EXPECT_TRUE(sections.includes(ReportSection::ErrorSummary));
+    EXPECT_TRUE(sections.includes(ReportSection::AnalyticsSummary));
+    EXPECT_TRUE(sections.includes(ReportSection::Timeline));
+    EXPECT_TRUE(sections.includes(ReportSection::Clusters));
     EXPECT_TRUE(sections.includes(ReportSection::Charts));
     EXPECT_TRUE(sections.includes(ReportSection::SourceMetadata));
     EXPECT_TRUE(sections.includes(ReportSection::FormatsFooter));
@@ -51,6 +54,16 @@ TEST(ReportSectionTest, ParsesAllKeyword)
     EXPECT_TRUE(sections->includes(ReportSection::ExecutiveSummary));
     EXPECT_TRUE(sections->includes(ReportSection::Summary));
     EXPECT_TRUE(sections->includes(ReportSection::Charts));
+}
+
+TEST(ReportSectionTest, ParsesAnalyticsSectionNames)
+{
+    const auto sections = ReportSections::parse("analytics,timeline,clusters");
+
+    ASSERT_TRUE(sections);
+    EXPECT_TRUE(sections->includes(ReportSection::AnalyticsSummary));
+    EXPECT_TRUE(sections->includes(ReportSection::Timeline));
+    EXPECT_TRUE(sections->includes(ReportSection::Clusters));
 }
 
 TEST(ReportSectionTest, RejectsUnknownSection)

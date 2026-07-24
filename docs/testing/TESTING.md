@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **326** automated tests at **`v1.3.0`** (unit, integration, and end-to-end). Reporting coverage includes `chart_renderer_test`, `report_section_renderer_test`, and CLI/e2e cases for HTML output and executive/error sections.
+**Current baseline:** **337** automated tests at **`v1.3.1`** (unit, integration, and end-to-end). Reporting and analytics coverage includes chart renderers, analytics analyzers, and CLI/e2e cases for `logscope analytics` and analytics report sections.
 
 ---
 
@@ -151,4 +151,4 @@ Requires `clang-tidy` on PATH.
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial testing guide. |
-| 1.1.0 | 24-07-2026 | Updated baseline to 326 tests at `v1.3.0`; noted M8 reporting test coverage. |
+| 1.2.0 | 24-07-2026 | Updated baseline to 337 tests at `v1.3.1`; noted M9 analytics coverage. |

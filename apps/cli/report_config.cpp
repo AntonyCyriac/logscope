@@ -89,6 +89,64 @@ reporting::ReportOptions buildReportOptions(const AnalyzeOptions& options,
         }
     }
 
+    if (configuration.has("analytics.bucket_seconds"))
+    {
+        const auto bucketValue = configuration.get("analytics.bucket_seconds");
+
+        if (bucketValue)
+        {
+            try
+            {
+                reportOptions.analyticsConfig.bucketSeconds = std::stoll(*bucketValue);
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+
+    if (configuration.has("analytics.top_n"))
+    {
+        const auto topValue = configuration.get("analytics.top_n");
+
+        if (topValue)
+        {
+            try
+            {
+                reportOptions.analyticsConfig.topN = static_cast<std::size_t>(std::stoull(*topValue));
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+
+    if (configuration.has("analytics.min_cluster_count"))
+    {
+        const auto minClusterValue = configuration.get("analytics.min_cluster_count");
+
+        if (minClusterValue)
+        {
+            try
+            {
+                reportOptions.analyticsConfig.minClusterCount = std::stoull(*minClusterValue);
+            }
+            catch (...)
+            {
+            }
+        }
+    }
+
+    if (configuration.has("report.include_timeline"))
+    {
+        const auto includeTimelineValue = configuration.get("report.include_timeline");
+
+        if (includeTimelineValue)
+        {
+            reportOptions.includeTimeline = parseBoolean(*includeTimelineValue);
+        }
+    }
+
     return reportOptions;
 }
 

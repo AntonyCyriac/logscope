@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <string_view>
 
+#include "analytics_command.hpp"
 #include "foundation/string.hpp"
 #include "foundation/timestamp.hpp"
 #include "log_format.hpp"
@@ -19,6 +20,8 @@ namespace scope::cli
 
 namespace
 {
+
+std::optional<std::uint64_t> parseUnsignedArgument(const char* value);
 
 bool isOption(const std::string& argument) noexcept
 {
@@ -415,6 +418,140 @@ std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv
         }
 
         if (parseInvestigationOption(argument, index, argc, argv, options.criteria))
+        {
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (!options.logFile.string().empty())
+        {
+            return std::nullopt;
+        }
+
+        options.logFile = foundation::Path(argument);
+    }
+
+    if (options.showHelp)
+    {
+        return options;
+    }
+
+    if (options.logFile.string().empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<AnalyticsOptions> parseAnalyticsArguments(int argc, char* argv[], int startIndex)
+{
+    AnalyticsOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        if (argument == "--format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto format = parseOutputFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+
+            continue;
+        }
+
+        if (argument == "--log-format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto logFormat = analysis::parseLogFormat(argv[++index]);
+
+            if (!logFormat || *logFormat == analysis::LogFormat::Unknown)
+            {
+                return std::nullopt;
+            }
+
+            options.logFormat = *logFormat;
+
+            continue;
+        }
+
+        if (argument == "--bucket")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            try
+            {
+                options.analyticsConfig.bucketSeconds = std::stoll(argv[++index]);
+            }
+            catch (...)
+            {
+                return std::nullopt;
+            }
+
+            continue;
+        }
+
+        if (argument == "--top")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto value = parseUnsignedArgument(argv[++index]);
+
+            if (!value)
+            {
+                return std::nullopt;
+            }
+
+            options.analyticsConfig.topN = static_cast<std::size_t>(*value);
+
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.profile))
         {
             continue;
         }
@@ -1003,6 +1140,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
         parsed.command = CliCommand::Search;
         parsed.search = *options;
+
+        return parsed;
+    }
+
+    if (firstArgument == "analytics")
+    {
+        const auto options = parseAnalyticsArguments(argc, argv, 2);
+
+        if (!options)
+        {
+            return std::nullopt;
+        }
+
+        parsed.command = CliCommand::Analytics;
+        parsed.analytics = *options;
 
         return parsed;
     }

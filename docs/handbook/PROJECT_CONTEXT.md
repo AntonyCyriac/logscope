@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.4.0 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.3.0`
+**Current release:** `v1.3.1`
 
 **Completed milestones:**
 
@@ -42,14 +42,15 @@ The project follows architecture-first development. Every implementation should 
 | M6 – Log Format Intelligence | Format detection, JSON Lines, field extraction, content investigation, format profiles (`v1.1.0`) |
 | M7 – Search Engine | Boolean/regex search, `logscope search`, session search history (`v1.2.0`) |
 | M8 – Advanced Reporting | Section registry, executive/error/chart sections, HTML/PDF, `--output` (`v1.3.0`) |
+| M9 – Analytics Engine | Frequency, clustering, timeline, trends, `logscope analytics` (`v1.3.1`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M9 – Analytics Engine | `v1.3.1`+ | Frequency, clustering, correlation, timeline, trends |
+| M10 – Query Language | `v1.4.0` | Structured filter DSL |
 
-See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M8 planning](../planning/M8-ADVANCED-REPORTING.md), and [Roadmap](../ROADMAP.md).
+See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M9 planning](../planning/M9-ANALYTICS-ENGINE.md), and [Roadmap](../ROADMAP.md).
 
 The engineering foundation is complete. Future work should **extend** the product rather than redesign the infrastructure.
 
@@ -322,3 +323,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.2.0 | 21-07-2026 | M6 complete; v1.1.0 released; M7 is next. |
 | 1.3.0 | 21-07-2026 | M7 complete; v1.2.0 released; M8 is next. |
 | 1.4.0 | 24-07-2026 | M8 complete; v1.3.0 released; M9 is next. |
+| 1.5.0 | 24-07-2026 | M9 complete; v1.3.1 released; M10 is next. |

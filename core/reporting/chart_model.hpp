@@ -11,6 +11,13 @@
 
 #include "log_level_counts.hpp"
 
+namespace scope::analytics
+{
+
+class TimelineResult;
+
+} // namespace scope::analytics
+
 namespace scope::reporting
 {
 
@@ -35,8 +42,33 @@ struct LevelBarChart
 };
 
 /**
+ * @brief One point in a time-series chart bucket.
+ */
+struct TimeSeriesPoint
+{
+    std::string label;
+    std::uint64_t errorCount{0U};
+    std::uint64_t totalCount{0U};
+};
+
+/**
+ * @brief Error counts over timeline buckets.
+ */
+struct TimeSeriesChart
+{
+    std::vector<TimeSeriesPoint> points;
+
+    [[nodiscard]] std::uint64_t maxValue() const noexcept;
+};
+
+/**
  * @brief Builds a level bar chart from log level counts.
  */
 [[nodiscard]] LevelBarChart buildLevelBarChart(const analysis::LogLevelCounts& levels);
+
+/**
+ * @brief Builds a time-series chart from analytics timeline output.
+ */
+[[nodiscard]] TimeSeriesChart buildTimelineChart(const analytics::TimelineResult& timeline);
 
 } // namespace scope::reporting

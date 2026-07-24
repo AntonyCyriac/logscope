@@ -7,6 +7,7 @@
 
 #include <unordered_map>
 
+#include "correlation_analyzer.hpp"
 #include "log_macros.hpp"
 #include "foundation/string.hpp"
 #include "search_engine.hpp"
@@ -25,6 +26,31 @@ std::vector<analysis::IndexedLine> indexedLines(const analysis::AnalysisModel& m
     }
 
     return model.lineIndex()->lines();
+}
+
+CorrelationSummary toCorrelationSummary(const analytics::CorrelationResult& result)
+{
+    CorrelationSummary summary;
+
+    for (const analytics::CorrelationEntry& entry : result.repeatedErrors())
+    {
+        CorrelationEntry converted;
+        converted.key = entry.key;
+        converted.count = entry.count;
+        converted.lineNumbers = entry.lineNumbers;
+        summary.addRepeatedError(std::move(converted));
+    }
+
+    for (const analytics::CorrelationEntry& entry : result.sharedCorrelationIds())
+    {
+        CorrelationEntry converted;
+        converted.key = entry.key;
+        converted.count = entry.count;
+        converted.lineNumbers = entry.lineNumbers;
+        summary.addSharedCorrelationId(std::move(converted));
+    }
+
+    return summary;
 }
 
 } // namespace
@@ -126,47 +152,9 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
 
 CorrelationSummary InvestigationEngine::findCorrelations(const analysis::AnalysisModel& model) const
 {
-    CorrelationSummary summary;
+    const analytics::CorrelationAnalyzer analyzer;
 
-    std::unordered_map<std::string, CorrelationEntry> repeatedErrors;
-    std::unordered_map<std::string, CorrelationEntry> sharedIds;
-
-    for (const analysis::IndexedLine& line : indexedLines(model))
-    {
-        if (line.level == analysis::DetectedLogLevel::Error && !line.messageExcerpt.empty())
-        {
-            CorrelationEntry& entry = repeatedErrors[line.messageExcerpt];
-            entry.key = line.messageExcerpt;
-            ++entry.count;
-            entry.lineNumbers.push_back(line.lineNumber);
-        }
-
-        if (!line.correlationId.empty())
-        {
-            CorrelationEntry& entry = sharedIds[line.correlationId];
-            entry.key = line.correlationId;
-            ++entry.count;
-            entry.lineNumbers.push_back(line.lineNumber);
-        }
-    }
-
-    for (auto& entry : repeatedErrors)
-    {
-        if (entry.second.count > 1U)
-        {
-            summary.addRepeatedError(std::move(entry.second));
-        }
-    }
-
-    for (auto& entry : sharedIds)
-    {
-        if (entry.second.count > 1U)
-        {
-            summary.addSharedCorrelationId(std::move(entry.second));
-        }
-    }
-
-    return summary;
+    return toCorrelationSummary(analyzer.analyze(model));
 }
 
 } // namespace scope::investigation

@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M9 – Analytics Engine (`v1.3.1`+). Search (M7 / `v1.2.0`) and Advanced Reporting (M8 / `v1.3.0`) are complete; see [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** M10 – Query Language (`v1.4.0`). Search (M7 / `v1.2.0`), Advanced Reporting (M8 / `v1.3.0`), and Analytics Engine (M9 / `v1.3.1`) are complete; see [Roadmap](../ROADMAP.md).
 
 ---
 

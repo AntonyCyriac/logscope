@@ -9,6 +9,7 @@ add_library(scope_reporting
     format_renderer.cpp
     minimal_pdf_writer.cpp
     report.cpp
+    report_analytics_sections.cpp
     report_builtin_sections.cpp
     report_contributors.cpp
     report_format.cpp
@@ -25,6 +26,7 @@ add_library(scope_reporting
 target_link_libraries(scope_reporting
     PUBLIC
         scope_analysis
+        scope_analytics
         scope_foundation
         scope_runtime
 )

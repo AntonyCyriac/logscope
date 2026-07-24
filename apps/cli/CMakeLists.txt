@@ -5,6 +5,8 @@
 add_executable(logscope
     log_analyzer.cpp
     analyze_command.cpp
+    analytics_command.cpp
+    analytics_output.cpp
     cli_analysis_config.cpp
     investigate_command.cpp
     search_command.cpp
@@ -25,6 +27,7 @@ add_executable(logscope
 target_link_libraries(logscope
     PRIVATE
         scope_analysis
+        scope_analytics
         scope_configuration
         scope_extension
         scope_foundation
