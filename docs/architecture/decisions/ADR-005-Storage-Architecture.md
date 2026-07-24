@@ -66,11 +66,13 @@ M7 text search remains in-memory over fetched rows until a future FTS milestone.
 
 `SqliteIndexStore` uses WAL mode, a reused prepared `INSERT`, and transaction batching (5,000 lines per commit). `HybridIndexWriter` logs progress every 10,000 persisted lines. `BM_IndexStoreAppend/100000` is gated in CI via `baseline.json`.
 
-### Schema v2 and migration (v1.4.3 — design)
+### Schema v2 and migration (v1.4.3 — M11.7 shipped)
 
 Schema version bumps from **1** to **2**. New `meta` keys: `source_size`, `source_mtime`, `indexed_line_count`, `content_compression` (`none` | `zlib`).
 
-**v1 → v2 policy:** opening a schema v1 index triggers a **full rebuild** from the authoritative source log file. No in-place row migration.
+**v1 → v2 policy:** opening a schema v1 index returns an error requiring rebuild; `SqliteIndexStore::create` removes any stale index file and builds schema v2 from the authoritative source log file. No in-place row migration.
+
+**M11.7** creates stub v2 tables `line_json_fields` and `query_cache` (populated in M11.9 and M11.10). **`lines_fts`** is deferred to **M11.12** (requires `SQLITE_ENABLE_FTS5`).
 
 ```sql
 -- lines table: content may be TEXT (plain) or BLOB (zlib) per meta.content_compression
@@ -91,6 +93,7 @@ CREATE TABLE query_cache (
   hit_count INTEGER NOT NULL DEFAULT 0
 );
 
+-- M11.12:
 CREATE VIRTUAL TABLE lines_fts USING fts5(
   message, content, content='lines', content_rowid='id'
 );
