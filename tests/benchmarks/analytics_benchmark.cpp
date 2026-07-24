@@ -43,7 +43,7 @@ AnalysisModel buildIndexedModel(const std::size_t lineCount)
         line.contentExcerpt = line.messageExcerpt;
         line.timestamp = Timestamp::fromUnixSeconds(static_cast<std::int64_t>(1000 + indexValue));
         fieldSummary.recordTimestamp(*line.timestamp);
-        index.tryAddLine(line);
+        (void)index.tryAddLine(line);
     }
 
     LogLevelCounts counts;
