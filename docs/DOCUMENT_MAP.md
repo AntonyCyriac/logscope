@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.3.0 |
+| Version | 2.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -60,6 +60,11 @@ Repository-level documents:
 ```text
 README.md
 CHANGELOG.md
+scripts/                 # Bulk log generation and CLI matrix runners
+│   ├── README.md
+│   ├── generate_bulk_log.py
+│   ├── run_cli_matrix.py
+│   └── check_benchmark_regression.py
 ```
 
 `docs/` structure:
@@ -84,6 +89,7 @@ docs/
 │    outside this repository; public Mn docs are added when implementation starts.)
 │
 ├── testing/
+│   ├── TESTING.md
 │   └── PERFORMANCE.md
 │
 ├── release/
@@ -296,3 +302,4 @@ These categories should be added only when they provide clear value and support 
 | 2.1.0 | 24-07-2026 | Note that long-horizon strategy beyond published Mn plans is private (no private URL). |
 | 2.2.0 | 24-07-2026 | Merged M8 document map with private-strategy documentation note. |
 | 2.3.0 | 24-07-2026 | Added M9-ANALYTICS-ENGINE.md and reading order for `v1.3.1`. |
+| 2.4.0 | 24-07-2026 | Documented `scripts/` bulk-log CLI matrix tooling and CI integration. |

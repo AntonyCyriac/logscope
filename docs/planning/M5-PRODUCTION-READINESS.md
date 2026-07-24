@@ -141,7 +141,7 @@ flowchart TD
 
 **Branch naming:** `feat/m5.3-ci-quality-gates`
 
-**Acceptance:** Green CI on three OSes; coverage and clang-tidy run on PRs.
+**Acceptance:** Green CI on three OSes; coverage and clang-tidy run on PRs; Ubuntu `cli-matrix` job exercises 18 CLI scenarios on 10k-line bulk logs.
 
 ---
 

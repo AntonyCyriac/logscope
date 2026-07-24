@@ -376,6 +376,7 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Unit tests | `core/*/tests/`, `apps/cli/tests/` (246 tests) |
 | Integration tests | `tests/integration/` |
 | End-to-end tests | `tests/end_to_end/` |
+| CLI matrix (bulk logs) | `scripts/generate_bulk_log.py`, `scripts/run_cli_matrix.py`; CI `cli-matrix` job; release workflow |
 | Fuzz testing | `tests/fuzz/` (libFuzzer targets) |
 | Benchmarks | `tests/benchmarks/`, [`PERFORMANCE.md`](../testing/PERFORMANCE.md) |
 | Multi-OS CI | Ubuntu, Windows, macOS (`.github/workflows/ci.yml`) |
@@ -391,7 +392,7 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Generated Doxygen site + CI publish | `v1.0.1` |
 | User manual, plugin dev guide, config guide, tutorials | `v1.0.x` |
 | Architecture diagrams | `v1.0.x` |
-| Stress tests with large log fixtures | `v1.0.x` |
+| Stress tests with large log fixtures | Addressed via CI/release CLI matrix (`scripts/`, 10k/100k-line bulk logs) |
 | Memory leak / ASan CI hardening | `v1.0.x` |
 | Internal metrics / parser stats | `v1.0.x` or early M6 |
 | SIMD / thread pool / zero-copy | M6 perf pass + M7 search indexing |

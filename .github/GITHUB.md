@@ -41,15 +41,10 @@ The badge reflects the status of the default branch (`master`).
 │
 ├── GITHUB.md
 ├── workflows/
-│   └── ci.yml
+│   ├── ci.yml
+│   └── release.yml
 │
-├── PULL_REQUEST_TEMPLATE.md
-│
-├── ISSUE_TEMPLATE/          (Future)
-│
-├── CODEOWNERS               (Future)
-│
-└── dependabot.yml           (Future)
+└── PULL_REQUEST_TEMPLATE.md
 ```
 
 ---
@@ -58,19 +53,28 @@ The badge reflects the status of the default branch (`master`).
 
 The `workflows/` directory contains GitHub Actions pipelines.
 
-### Current Workflow
+### `ci.yml` — Continuous Integration
 
-| Workflow | Purpose |
-|----------|---------|
-| `ci.yml` | Configure, build and test the project on every push and pull request |
+| Job | Purpose |
+|-----|---------|
+| `build` | Configure, build, and test on Ubuntu, Windows, and macOS |
+| `cli-matrix` | Ubuntu bulk-log CLI matrix (10k-line fixtures, 18 command scenarios) |
+| `sanitize` | AddressSanitizer build and test on Ubuntu |
+| `coverage` | `gcov`/`lcov` coverage capture and artifact upload |
+| `benchmark` | Benchmark regression check against committed baseline |
+| `fuzz` | libFuzzer smoke tests (Clang, Ubuntu) |
+| `tidy` | clang-tidy static analysis (`continue-on-error`) |
 
-### Future Workflows
+Runs on every push and pull request to `master`.
 
-- Release Automation
-- Documentation Validation
-- Code Coverage
-- Static Analysis
-- Security Scanning
+### `release.yml` — Release Binaries
+
+Triggered by tags matching `v*`.
+
+1. Build and test on Ubuntu, Windows, and macOS
+2. Run bulk-log CLI matrix (100k-line fixtures per OS)
+3. Package per-OS archives with `samples/`
+4. Publish GitHub Release assets
 
 ---
 
@@ -85,19 +89,6 @@ The template should describe:
 - Testing performed
 - Documentation updates
 - Additional notes
-
----
-
-## Future Enhancements
-
-As the project evolves, this directory may include:
-
-- Issue templates
-- CODEOWNERS
-- Dependabot configuration
-- Release workflows
-- Security workflows
-- Community health files
 
 ---
 
