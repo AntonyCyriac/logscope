@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.0.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 21-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** [M8 – Advanced Reporting](POST_V1_STRATEGIC_ROADMAP.md) (`v1.3.0`).
+**Immediate next milestone:** M9 – Analytics Engine (`v1.3.1`+). Search (M7) and Advanced Reporting (M8) are complete or releasing; see [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -60,15 +60,15 @@ The primary responsibility remains helping engineers **understand existing log d
 # 4. Documentation Model
 
 ```text
-POST_V1_STRATEGIC_ROADMAP.md  ← strategic vision (this document)
+POST_V1_STRATEGIC_ROADMAP.md  ← public strategic layer (this document)
         │
-        ├── M6-LOG-FORMAT-INTELLIGENCE.md
-        ├── M7-SEARCH-ENGINE.md
-        └── M8–M17 (future tactical plans)
+        ├── M6–Mn planning docs  ← public tactical plans when implementation starts
         │
         ▼
-    ROADMAP.md  ← summary and status
+    ROADMAP.md  ← public milestone status
 ```
+
+Long-horizon product strategy (for example multi-artifact investigation, crash analysis, and playbooks) is maintained in a **private** strategy repository. Those themes are published here as public `Mn` planning documents only when implementation is about to start. This repository does not link to the private strategy location.
 
 ---
 
@@ -357,7 +357,8 @@ flowchart LR
 v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine (+ performance wins)
-v1.3.0  — M8 Reporting + M9 Analytics
+v1.3.0  — M8: Advanced Reporting
+v1.3.1+ — M9: Analytics Engine (planned)
 v1.4.0  — M10 Query + M11 Storage + M12 Plugins
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web + major API evolution
@@ -446,3 +447,5 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
+| 1.1.0 | 21-07-2026 | M7/M8 status alignment updates. |
+| 1.2.0 | 24-07-2026 | Next milestone M9; private strategy documentation model (no private URL). |
