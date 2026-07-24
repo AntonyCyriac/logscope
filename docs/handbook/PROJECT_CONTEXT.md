@@ -191,7 +191,7 @@ Includes:
 - Code coverage
 - Benchmark regression checks
 - Fuzz smoke tests (where applicable)
-- CLI matrix on bulk-generated logs (Ubuntu CI and release: 10k lines; 100k-line matrix planned for `v1.4.3+` remainder)
+- CLI matrix on bulk-generated logs (Ubuntu CI: 10k lines; release: 100k lines per OS)
 
 Do not introduce changes that weaken CI quality.
 
@@ -328,3 +328,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.4.0 | 24-07-2026 | M8 complete; v1.3.0 released; M9 is next. |
 | 1.5.0 | 24-07-2026 | M9 complete; v1.3.1 released; M10 is next. |
 | 1.6.0 | 24-07-2026 | M10 complete; v1.4.0 released; M11 is next. |
+| 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |

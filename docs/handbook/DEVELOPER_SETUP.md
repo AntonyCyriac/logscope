@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.3.0 |
+| Version | 2.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -24,6 +24,8 @@ A developer should be able to:
 - Understand the recommended development workflow.
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
+
+**Current release:** [`v1.4.2`](../../CHANGELOG.md) — **396** automated tests. See [Testing Guide](../testing/TESTING.md) for verification commands.
 
 ---
 
@@ -148,6 +150,21 @@ Build the project:
 ```bash
 cmake --build build
 ```
+
+### Windows: SQLite FetchContent TLS
+
+M11 downloads the SQLite amalgamation during **CMake configure**. On some Windows machines, Schannel may fail certificate revocation checks (`CRYPT_E_REVOCATION_OFFLINE`) when contacting `sqlite.org`. This affects **building from source only** — release binaries do not need this workaround.
+
+PowerShell (configure step only):
+
+```powershell
+$env:CMAKE_TLS_VERIFY = "0"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+cmake --build build --config Release
+ctest --test-dir build -C Release --output-on-failure
+```
+
+MSVC Release binary path: `build\apps\cli\Release\logscope.exe`. For `--persist-index` on Windows, see [User Manual §8](USER_MANUAL.md#8-large-logs-and-persistent-indexes).
 
 ---
 
@@ -334,3 +351,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.1.0 | 18-07-2026 | Added contribution workflow section linking to handbook guides. |
 | 2.2.0 | 18-07-2026 | Linked M5 testing guide from verification checklist. |
 | 2.3.0 | 24-07-2026 | Added optional Doxygen API documentation build (`LOGSCOPE_DOCS`). |
+| 2.4.0 | 24-07-2026 | Current release baseline (`v1.4.2`, 396 tests). |

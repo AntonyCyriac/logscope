@@ -3,133 +3,88 @@
 [![CI](https://github.com/AntonyCyriac/logscope/actions/workflows/ci.yml/badge.svg)](https://github.com/AntonyCyriac/logscope/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 
-A generic, extensible, high-performance log analysis platform.
+Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
+**Status:** [`v1.4.2`](CHANGELOG.md) — M11 storage performance. M0–M11 complete. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
-**Status:** v1.4.2 — M11 storage performance ([`CHANGELOG.md`](CHANGELOG.md)). M0–M11 complete — see [Roadmap](docs/ROADMAP.md).
+---
 
-## What works today
+## Overview
 
-- **Foundation library** (`scope_foundation`) — `Status`, `Error`, `Result<T>`, `Version`, `Uuid`, `Time`, `Date`, `DateTime`, `Duration`, `Timestamp`, `Clock`, `Stopwatch`, `Random`, `String`, `Hash`, `Path`, `FileSystem`
-- **Runtime library** (`scope_runtime`) — `Configuration`, `Diagnostics`, `PluginRegistry`, `ServiceRegistry`
-- **Configuration library** (`scope_configuration`) — `ConfigurationManager` for file and environment config
-- **Source library** (`scope_source`) — `SourceManager`, `FileLogSource`, and `SourceDataset`
-- **Analysis library** (`scope_analysis`) — `AnalysisEngine` and `AnalysisModel`
-- **Investigation library** (`scope_investigation`) — `InvestigationEngine`, `InvestigationView`, `LineCountFilter`, and `LogLevelFilter`
-- **Reporting library** (`scope_reporting`) — `ReportGenerator`, section registry, text, JSON, CSV, Markdown, HTML, and PDF output; analytics sections
-- **Analytics library** (`scope_analytics`) — frequency, clustering, timeline, trend, and correlation analysis
-- **Query library** (`scope_query`) — field-aware filter DSL parser and evaluator
-- **Extension library** (`scope_extension`) — `ExtensionManager` with configuration-based enablement
-- **Workspace library** (`scope_workspace`) — `InvestigationSession` and `SessionStore` for `.logscope-session` persistence
-- **CLI application** (`apps/cli`) — `analyze`, `analytics`, `query`, `config validate`, `extensions`, and `session` subcommands; `--filter` DSL on investigate/search; stdin and directory input; `--format text|json|csv|markdown|html|pdf`; `--output <file>`
-- **CI** — multi-OS build, unit/integration/e2e tests, and Ubuntu CLI matrix (10k-line bulk logs, 18 command scenarios) on every push to `master`
-- **Documentation** — requirements, architecture, standards, and developer handbook
+LogScope is an open-source, modular log analysis platform. It helps engineers understand system behavior from plain-text or JSONL logs using a consistent pipeline:
 
-## Requirements
+```text
+Configuration → Source → Analysis → Investigation → Reporting → CLI
+```
 
-- CMake 3.20 or later
-- C++17 compiler (GCC, Clang, or MSVC)
-- Git
+Component diagram (Mermaid): [Component Catalog §4](docs/architecture/COMPONENT_CATALOG.md#component-structure-diagram).
 
-GoogleTest is fetched automatically by CMake.
+| Audience | Start here |
+|----------|------------|
+| **Users** | [User Manual](docs/handbook/USER_MANUAL.md) · [CLI Reference](docs/handbook/CLI_REFERENCE.md) · [Releases](https://github.com/AntonyCyriac/logscope/releases) |
+| **Contributors** | [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
+| **Architecture** | [Component diagram](docs/architecture/COMPONENT_CATALOG.md#component-structure-diagram) · [Architecture Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) · [Component Catalog](docs/architecture/COMPONENT_CATALOG.md) · [Product](docs/PRODUCT.md) |
+
+Full documentation index: [Document Map](docs/DOCUMENT_MAP.md).
+
+---
 
 ## Quick start
 
+**Install** — download a pre-built binary for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.2`+), or build from source below.
+
 ```bash
 git clone https://github.com/AntonyCyriac/logscope.git
 cd logscope
-
 cmake -S . -B build
 cmake --build build
 ctest --test-dir build --output-on-failure
+
+./build/apps/cli/logscope analyze samples/sample.log
 ```
 
-Run the CLI:
+More examples (formats, config, investigation, sessions): [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started).
 
-```bash
-./build/apps/cli/logscope samples/sample.log
-./build/apps/cli/logscope analyze --format json samples/sample.log
-./build/apps/cli/logscope --config samples/logscope.properties samples/sample.log
-./build/apps/cli/logscope config validate --config samples/logscope.properties --require log.level
-```
+---
 
-Format source files (requires `clang-format`):
+## Build from source
 
-```bash
-cmake --build build --target format
-```
+| Requirement | Version |
+|-------------|---------|
+| CMake | 3.20+ |
+| Compiler | C++17 (GCC, Clang, or MSVC) |
+| Git | any recent |
 
-## Building on Windows
+GoogleTest and SQLite (amalgamation) are fetched automatically by CMake.
 
-M11 downloads the SQLite amalgamation during **CMake configure** (`FetchContent`). On some Windows machines, Schannel may fail certificate revocation checks (`CRYPT_E_REVOCATION_OFFLINE`) when contacting `sqlite.org`. This affects **building from source only** — release binaries and normal CLI use do not need this workaround.
+| Topic | Document |
+|-------|----------|
+| Windows / MSYS2, debugging, formatting | [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) |
+| Properties and `storage.*` keys | [Configuration Guide](docs/handbook/CONFIGURATION_GUIDE.md) |
+| `--persist-index`, large logs | [User Manual §8](docs/handbook/USER_MANUAL.md#8-large-logs-and-persistent-indexes) |
 
-Set `CMAKE_TLS_VERIFY=0` for the configure step (PowerShell):
+---
 
-```powershell
-git clone https://github.com/AntonyCyriac/logscope.git
-cd logscope
-
-$env:CMAKE_TLS_VERIFY = "0"
-cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-cmake --build build --config Release
-ctest --test-dir build -C Release --output-on-failure
-```
-
-Run the CLI (Release output path on MSVC):
-
-```powershell
-.\build\apps\cli\Release\logscope.exe analyze samples\sample.log
-```
-
-### Persistent indexes on Windows
-
-Use `--persist-index` for large logs or `--index-path` for an explicit SQLite file. Auto-generated indexes default to `%LOCALAPPDATA%\logscope\indexes\`. See [Configuration Guide](docs/handbook/CONFIGURATION_GUIDE.md) and [CLI Reference](docs/handbook/CLI_REFERENCE.md) for `storage.*` keys and CLI flags.
-
-```powershell
-.\build\apps\cli\Release\logscope.exe investigate `
-  --persist-index `
-  --index-path C:\logs\app.index.db `
-  --filter "level == ERROR" `
-  C:\logs\app.log
-```
-
-## Project layout
+## Repository layout
 
 ```text
-apps/           Applications (CLI)
-core/           Core libraries (foundation, runtime, configuration, source, analysis, investigation, reporting, extension, workspace)
-docs/           Product, architecture, standards, and handbook
-samples/        Sample log files and configuration
-scripts/        Bulk-log generation and CLI matrix runners
-tests/          Integration and end-to-end tests
+apps/       CLI application
+core/       Libraries (foundation, source, analysis, investigation, reporting, …)
+docs/       Product, architecture, handbook, planning
+samples/    Example logs and configuration
+scripts/    Bulk-log fixtures and CLI matrix runners
+tests/      Unit, integration, e2e, regression, benchmarks
 ```
 
-## Documentation
-
-| Topic | Location |
-|-------|----------|
-| Roadmap and milestones | [docs/ROADMAP.md](docs/ROADMAP.md) |
-| M5 production readiness | [docs/planning/M5-PRODUCTION-READINESS.md](docs/planning/M5-PRODUCTION-READINESS.md) |
-| Testing guide | [docs/testing/TESTING.md](docs/testing/TESTING.md) |
-| CLI reference | [docs/handbook/CLI_REFERENCE.md](docs/handbook/CLI_REFERENCE.md) |
-| User manual | [docs/handbook/USER_MANUAL.md](docs/handbook/USER_MANUAL.md) |
-| Configuration guide | [docs/handbook/CONFIGURATION_GUIDE.md](docs/handbook/CONFIGURATION_GUIDE.md) |
-| Plugin development guide | [docs/handbook/PLUGIN_DEVELOPMENT_GUIDE.md](docs/handbook/PLUGIN_DEVELOPMENT_GUIDE.md) |
-| Release process | [docs/release/RELEASE.md](docs/release/RELEASE.md) |
-| Changelog | [CHANGELOG.md](CHANGELOG.md) |
-| Developer setup | [docs/handbook/DEVELOPER_SETUP.md](docs/handbook/DEVELOPER_SETUP.md) |
-| Developer guide | [docs/handbook/DEVELOPER_GUIDE.md](docs/handbook/DEVELOPER_GUIDE.md) |
-| Engineering principles | [docs/standards/ENGINEERING_PRINCIPLES.md](docs/standards/ENGINEERING_PRINCIPLES.md) |
-| Foundation coding guidelines | [docs/standards/FOUNDATION_GUIDELINES.md](docs/standards/FOUNDATION_GUIDELINES.md) |
-| Architecture overview | [docs/architecture/ARCHITECTURE_OVERVIEW.md](docs/architecture/ARCHITECTURE_OVERVIEW.md) |
-| Full documentation index | [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) |
+---
 
 ## Contributing
 
-1. Read [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) and [Foundation Guidelines](docs/standards/FOUNDATION_GUIDELINES.md).
-2. Follow [Git Conventions](docs/handbook/GIT_CONVENTIONS.md) and the [Pull Request Guide](docs/handbook/PULL_REQUEST_GUIDE.md).
-3. Ensure the project builds, tests pass, and code is formatted before opening a PR.
+1. [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) → [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md)
+2. [Git Conventions](docs/handbook/GIT_CONVENTIONS.md) · [Pull Request Guide](docs/handbook/PULL_REQUEST_GUIDE.md)
+3. Build, test, and format before opening a PR (`cmake --build build --target format`)
+
+---
 
 ## License
 

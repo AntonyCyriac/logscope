@@ -98,7 +98,7 @@ python3 scripts/run_cli_matrix.py \
   --jsonl-log /tmp/bulk.jsonl
 ```
 
-CI runs this matrix on Ubuntu with 10,000-line fixtures. Release builds use 100,000-line fixtures on every OS before publishing binaries.
+CI runs this matrix on Ubuntu with 10,000-line fixtures. Release builds use 100,000-line fixtures on every OS before publishing binaries (pass `--lines 100000` locally to match release).
 
 ---
 

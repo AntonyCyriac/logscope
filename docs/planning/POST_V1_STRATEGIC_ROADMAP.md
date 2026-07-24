@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -357,9 +357,12 @@ v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine (+ performance wins)
 v1.3.0  — M8: Advanced Reporting
-v1.3.1+ — M9: Analytics Engine (planned)
-v1.4.0  — M10 Query + M11 Storage + M12 Plugins
-v1.5.0  — M13 AI
+v1.3.1+ — M9: Analytics Engine
+v1.4.0  — M10: Query Language
+v1.4.1  — M11: Storage Layer (core)
+v1.4.2  — M11: bulk index write performance
+v1.4.3  — M11 remainder: compression, query cache
+v1.5.0  — M12: Dynamic Plugins; M13: AI
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.x    — M16 Enterprise, M17 Cloud, ecosystem
 ```
@@ -395,7 +398,7 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) — Phase 1 (`v1.0.x`) |
 | Architecture diagrams | `v1.0.x` |
-| Stress tests with large log fixtures | CI/release CLI matrix at 10k lines (`scripts/`); `v1.4.2` bulk write perf shipped — restore 100k-line release matrix in `v1.4.3+` remainder; `BM_*` benchmarks use larger fixtures |
+| Stress tests with large log fixtures | CI CLI matrix at 10k lines; release matrix at 100k lines per OS (`scripts/`); `BM_*` benchmarks use larger fixtures |
 | Regression tests | [`tests/regression/`](../../tests/regression/README.md) — M11 storage edge cases (Phase 1, started) |
 | Memory leak / ASan CI hardening | CI `ASAN_OPTIONS` / `UBSAN_OPTIONS`; LeakSanitizer via ASan on Linux (Phase 1, partial) |
 | Internal metrics / parser stats | `v1.0.x` or early M6 |
@@ -455,3 +458,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
 | 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |
 | 1.2.0 | 24-07-2026 | Next milestone M9; private themes stay unpublished until graduated. |
+| 1.3.0 | 24-07-2026 | Version roadmap split M10/M11/M12; v1.4.2 bulk perf shipped. |

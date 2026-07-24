@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.6.0 |
+| Version | 1.7.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -56,7 +56,7 @@ Storage options (also on `investigate`, `session save`):
 
 | Option | Description |
 |--------|-------------|
-| `--persist-index` | Persist indexed lines to SQLite |
+| `--persist-index` | Persist indexed lines to SQLite (v1.4.2+: batched writes; progress every 10,000 lines at `log.level=info`) |
 | `--reuse-index` | Reuse an existing index when the source fingerprint matches |
 | `--index-path <file>` | Explicit SQLite index file path |
 
@@ -97,7 +97,7 @@ logscope investigate [options] <log-source>
 | `--level <name>` | Filter by line level: `error`, `warning`, `info`, `other` |
 | `--message <text>` | Filter by message/content substring |
 | `--json-key <key>` | Require a JSON top-level key on matching lines |
-| `--persist-index` | Persist indexed lines to SQLite |
+| `--persist-index` | Persist indexed lines to SQLite (v1.4.2+: batched writes; progress every 10,000 lines at `log.level=info`) |
 | `--reuse-index` | Reuse an existing index when the source fingerprint matches |
 | `--index-path <file>` | Explicit SQLite index file path |
 
@@ -278,3 +278,4 @@ Default directory: current working directory.
 | 1.3.0 | 21-07-2026 | Added `search` command, boolean/regex query flags for M7. |
 | 1.5.0 | 24-07-2026 | Added `analytics` command, analytics report sections, and M9 config keys. |
 | 1.6.0 | 24-07-2026 | Added `query` command, `--filter` DSL, and `query.saved.*` config keys for M10. |
+| 1.7.0 | 24-07-2026 | Documented v1.4.2 persist-index progress logging on storage flags. |

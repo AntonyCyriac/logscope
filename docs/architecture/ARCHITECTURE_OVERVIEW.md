@@ -77,6 +77,8 @@ LogScope is organized into four logical layers.
 
 Each layer has a distinct responsibility and communicates only through well-defined interfaces.
 
+For a visual map of components C01–C10 and domain libraries, see the [component structure diagram](COMPONENT_CATALOG.md#component-structure-diagram) in the Component Catalog.
+
 ---
 
 # 5. Layer Responsibilities
