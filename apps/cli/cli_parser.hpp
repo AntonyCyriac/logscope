@@ -53,6 +53,9 @@ struct AnalyzeOptions
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
     std::string profile;
     std::optional<reporting::ReportSections> sections;
+    bool persistIndex = false;
+    bool reuseIndex = false;
+    std::optional<foundation::Path> indexPath;
     bool showHelp = false;
 };
 
@@ -67,6 +70,9 @@ struct InvestigateOptions
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
     std::string profile;
     investigation::InvestigationCriteria criteria;
+    bool persistIndex = false;
+    bool reuseIndex = false;
+    std::optional<foundation::Path> indexPath;
     bool showHelp = false;
 };
 
@@ -116,6 +122,9 @@ struct SessionSaveOptions
     std::string searchQuery;
     std::string profile;
     investigation::InvestigationCriteria contentCriteria;
+    bool persistIndex = false;
+    bool reuseIndex = false;
+    std::optional<foundation::Path> indexPath;
     bool showHelp = false;
 };
 

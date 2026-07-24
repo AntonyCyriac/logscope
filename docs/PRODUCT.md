@@ -19,7 +19,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v1.4.0** delivers M10 Query Language on top of the v1.3.1 analytics baseline. M0–M10 are complete.
+LogScope **v1.4.1** delivers M11 Storage Layer on top of the v1.4.0 query language baseline. M0–M11 are complete.
 
 ```text
 Configuration → Source → Analysis → Investigation → Reporting → CLI

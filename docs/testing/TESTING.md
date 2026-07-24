@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.4.0 |
+| Version | 1.4.1 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **365** automated tests at **`v1.4.0`** (unit, integration, and end-to-end). Query language coverage includes `scope_query` parser/evaluator tests (≥20 cases), `--filter`/`logscope query` CLI/e2e cases, and CLI matrix scenarios.
+**Current baseline:** **392** automated tests at **`v1.4.1`** (unit, integration, and end-to-end). Storage coverage includes `scope_storage_tests` (25 cases), persist-index/session-reuse e2e cases, and CLI matrix scenarios.
 
 ---
 

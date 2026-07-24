@@ -13,6 +13,10 @@
 #include "field_summary.hpp"
 #include "format_detector.hpp"
 #include "foundation/error.hpp"
+#include "hybrid_index_writer.hpp"
+#include "index_fingerprint.hpp"
+#include "index_store_factory.hpp"
+#include "foundation/filesystem.hpp"
 #include "json_lines_parser.hpp"
 #include "json_lines_summary.hpp"
 #include "line_index.hpp"
@@ -81,17 +85,18 @@ IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLe
 }
 
 void indexPlainTextLine(const std::uint64_t lineNumber, const std::string& line, const DetectedLogLevel level,
-                        LineIndex& lineIndex) noexcept
+                        HybridIndexWriter& writer) noexcept
 {
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     const std::string correlationId = extractCorrelationId(line, std::string_view{});
 
-    (void)lineIndex.tryAddLine(buildIndexedLine(lineNumber, level, fields.timestamp, fields.messageExcerpt, correlationId,
-                                          line, {}));
+    (void)writer.tryAddLine(buildIndexedLine(lineNumber, level, fields.timestamp, fields.messageExcerpt, correlationId,
+                                             line, {}),
+                            line);
 }
 
 void indexJsonLine(const std::uint64_t lineNumber, const std::string& line, const JsonLineParseResult& parsed,
-                   const DetectedLogLevel level, LineIndex& lineIndex) noexcept
+                   const DetectedLogLevel level, HybridIndexWriter& writer) noexcept
 {
     std::optional<foundation::Timestamp> timestamp;
 
@@ -107,23 +112,24 @@ void indexJsonLine(const std::uint64_t lineNumber, const std::string& line, cons
 
     const std::string correlationId = extractCorrelationId(line, parsed.correlationValue);
 
-    (void)lineIndex.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
-                                          parsed.topLevelKeys));
+    (void)writer.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
+                                             parsed.topLevelKeys),
+                            line);
 }
 
 void analyzePlainTextLine(const std::string& line, const std::uint64_t lineNumber, LogLevelCounts& levelCounts,
-                          FieldSummary& fieldSummary, LineIndex& lineIndex) noexcept
+                          FieldSummary& fieldSummary, HybridIndexWriter& writer) noexcept
 {
     const DetectedLogLevel level = detectLogLevel(line);
     recordLevel(levelCounts, level);
 
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     recordExtractedFields(fieldSummary, fields.timestamp, fields.messageExcerpt);
-    indexPlainTextLine(lineNumber, line, level, lineIndex);
+    indexPlainTextLine(lineNumber, line, level, writer);
 }
 
 void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, LogLevelCounts& levelCounts,
-                     JsonLinesSummary& summary, FieldSummary& fieldSummary, LineIndex& lineIndex,
+                     JsonLinesSummary& summary, FieldSummary& fieldSummary, HybridIndexWriter& writer,
                      const JsonFieldMapping& mapping) noexcept
 {
     const JsonLineParseResult parsed = JsonLinesParser::parse(line, mapping);
@@ -139,7 +145,7 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
     {
         summary.recordParseFailure();
         levelCounts.recordOther();
-        indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, lineIndex);
+        indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
 
         return;
     }
@@ -180,21 +186,21 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
         recordExtractedFields(fieldSummary, timestamp, std::string_view{});
     }
 
-    indexJsonLine(lineNumber, line, parsed, level, lineIndex);
+    indexJsonLine(lineNumber, line, parsed, level, writer);
 }
 
 void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
                  LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary, FieldSummary& fieldSummary,
-                 LineIndex& lineIndex, const JsonFieldMapping& mapping) noexcept
+                 HybridIndexWriter& writer, const JsonFieldMapping& mapping) noexcept
 {
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
-        analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, lineIndex, mapping);
+        analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping);
 
         return;
     }
 
-    analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, lineIndex);
+    analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer);
 }
 
 [[nodiscard]] foundation::Result<LogFormat> resolveFormat(const FormatDetectionResult& detection,
@@ -237,6 +243,41 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Source dataset is not valid."));
     }
 
+    const bool isStdinSource = dataset.path().string() == "-";
+    std::optional<storage::IndexFingerprint> sourceFingerprint;
+
+    if (!isStdinSource)
+    {
+        const auto isFileResult = foundation::FileSystem::isFile(dataset.path());
+
+        if (isFileResult && *isFileResult)
+        {
+            const auto fingerprintResult = storage::IndexFingerprint::compute(dataset.path());
+
+            if (!fingerprintResult)
+            {
+                return foundation::Result<AnalysisModel>(fingerprintResult.error());
+            }
+
+            sourceFingerprint = *fingerprintResult;
+
+            if (config.storage.reuseIndex)
+            {
+                const auto reused =
+                    storage::tryOpenReusableIndex(config.storage, *sourceFingerprint, dataset.path());
+
+                if (reused)
+                {
+                    const storage::IndexMetadata& metadata = (*reused)->metadata();
+
+                    return foundation::Result<AnalysisModel>(AnalysisModel(
+                        dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
+                        std::nullopt, std::nullopt, *reused));
+                }
+            }
+        }
+    }
+
     SCOPE_LOG_INFO("analysis", "Analyzing source: " + dataset.path().string());
 
     std::vector<std::string> sampleLines;
@@ -276,6 +317,21 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
     const LogFormat resolvedFormat = *formatResult;
 
+    storage::IndexStorePtr persistentStore;
+
+    if (config.storage.usesPersistentStore() && sourceFingerprint.has_value())
+    {
+        const auto created = storage::createIndexStore(config.storage, *sourceFingerprint, dataset.path(),
+                                                         resolvedFormat);
+
+        if (!created)
+        {
+            return foundation::Result<AnalysisModel>(created.error());
+        }
+
+        persistentStore = *created;
+    }
+
     SCOPE_LOG_INFO("analysis",
                    "Detected log format: " + std::string(logFormatName(resolvedFormat)) +
                        " (sampled " + std::to_string(detection.sampledLines) + " lines)");
@@ -283,7 +339,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     std::uint64_t totalLines = 0;
     LogLevelCounts levelCounts;
     FieldSummary fieldSummary;
-    LineIndex lineIndex = makeLineIndex(config.maxIndexedLines);
+    HybridIndexWriter indexWriter(makeLineIndex(config.maxIndexedLines), config.storage, persistentStore);
     std::optional<JsonLinesSummary> jsonLinesSummary;
 
     if (resolvedFormat == LogFormat::JsonLines)
@@ -296,7 +352,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     for (const std::string& sampleLine : sampleLines)
     {
         ++totalLines;
-        analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex,
+        analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
                     config.jsonFieldMapping);
     }
 
@@ -317,8 +373,15 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         }
 
         ++totalLines;
-        analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, lineIndex,
+        analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
                     config.jsonFieldMapping);
+    }
+
+    const auto finalizeResult = indexWriter.finalize(totalLines);
+
+    if (!finalizeResult)
+    {
+        return foundation::Result<AnalysisModel>(finalizeResult.error());
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
@@ -329,7 +392,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                                                            resolvedFormat,
                                                            std::move(jsonLinesSummary),
                                                            std::make_optional(std::move(fieldSummary)),
-                                                           std::make_optional(std::move(lineIndex))));
+                                                           std::make_optional(indexWriter.finishLineIndex()),
+                                                           indexWriter.indexStore()));
 }
 
 } // namespace

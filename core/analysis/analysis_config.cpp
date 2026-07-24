@@ -195,6 +195,8 @@ AnalysisConfig resolveAnalysisConfig(const runtime::Configuration& configuration
         config.maxIndexedLines = minConfigurableIndexedLines;
     }
 
+    config.storage = storage::resolveStorageConfig(configuration, cliOverrides.storage);
+
     return config;
 }
 

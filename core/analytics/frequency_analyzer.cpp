@@ -8,6 +8,8 @@
 #include <algorithm>
 #include <unordered_map>
 
+#include "indexed_line_access.hpp"
+
 namespace scope::analytics
 {
 
@@ -52,7 +54,7 @@ FrequencyResult FrequencyAnalyzer::analyze(const analysis::AnalysisModel& model,
     FrequencyResult result;
     result.setLevelCounts(model.levelCounts());
 
-    if (!model.lineIndex().has_value())
+    if (!analysis::hasQueryableIndex(model))
     {
         return result;
     }
@@ -60,7 +62,7 @@ FrequencyResult FrequencyAnalyzer::analyze(const analysis::AnalysisModel& model,
     std::unordered_map<std::string, std::uint64_t> messageCounts;
     std::unordered_map<std::string, std::uint64_t> correlationCounts;
 
-    for (const analysis::IndexedLine& line : model.lineIndex()->lines())
+    for (const analysis::IndexedLine& line : analysis::fetchIndexedLines(model))
     {
         if (!line.messageExcerpt.empty())
         {

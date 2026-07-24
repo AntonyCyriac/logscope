@@ -6,10 +6,12 @@
 #pragma once
 
 #include <cstdint>
+#include <memory>
 #include <optional>
 
 #include "field_summary.hpp"
 #include "foundation/path.hpp"
+#include "index_store.hpp"
 #include "json_lines_summary.hpp"
 #include "line_index.hpp"
 #include "log_format.hpp"
@@ -36,7 +38,8 @@ class AnalysisModel
                   LogLevelCounts levelCounts = {}, LogFormat format = LogFormat::PlainText,
                   std::optional<JsonLinesSummary> jsonLinesSummary = std::nullopt,
                   std::optional<FieldSummary> fieldSummary = std::nullopt,
-                  std::optional<LineIndex> lineIndex = std::nullopt) noexcept;
+                  std::optional<LineIndex> lineIndex = std::nullopt,
+                  storage::IndexStorePtr indexStore = nullptr) noexcept;
 
     /**
      * @brief Returns the path of the analyzed source.
@@ -73,6 +76,16 @@ class AnalysisModel
      */
     [[nodiscard]] const std::optional<LineIndex>& lineIndex() const noexcept;
 
+    /**
+     * @brief Returns the persistent index store when analysis used storage.
+     */
+    [[nodiscard]] storage::IndexStorePtr indexStore() const noexcept;
+
+    /**
+     * @brief Returns whether investigation can query indexed lines.
+     */
+    [[nodiscard]] bool hasQueryableIndex() const noexcept;
+
   private:
     foundation::Path m_sourcePath;
     std::uint64_t m_totalLines;
@@ -81,6 +94,7 @@ class AnalysisModel
     std::optional<JsonLinesSummary> m_jsonLinesSummary;
     std::optional<FieldSummary> m_fieldSummary;
     std::optional<LineIndex> m_lineIndex;
+    storage::IndexStorePtr m_indexStore;
 };
 
 } // namespace scope::analysis

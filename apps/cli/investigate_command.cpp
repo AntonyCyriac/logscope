@@ -33,6 +33,9 @@ void printInvestigateUsage(std::ostream& output)
            << "  --level <name>          Filter by line level: error, warning, info, other\n"
            << "  --message <text>        Filter by message/content substring\n"
            << "  --json-key <key>        Require a JSON top-level key on matching lines\n"
+           << "  --persist-index         Persist indexed lines to SQLite\n"
+           << "  --reuse-index           Reuse an existing index when the source fingerprint matches\n"
+           << "  --index-path <file>     Explicit SQLite index file path\n"
            << "\n"
            << "Log source may be a file path, a directory of .log files, or \"-\" for stdin.\n";
 }

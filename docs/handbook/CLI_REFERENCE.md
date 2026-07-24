@@ -52,6 +52,14 @@ logscope analyze [options] <log-source>
 | `--max-lines <n>` | Investigation filter: maximum total lines |
 | `--search <query>` | Investigation search query |
 
+Storage options (also on `investigate`, `session save`):
+
+| Option | Description |
+|--------|-------------|
+| `--persist-index` | Persist indexed lines to SQLite |
+| `--reuse-index` | Reuse an existing index when the source fingerprint matches |
+| `--index-path <file>` | Explicit SQLite index file path |
+
 **Log sources:** file path, directory of `.log` files, or `-` for stdin.
 
 ```bash
@@ -89,6 +97,9 @@ logscope investigate [options] <log-source>
 | `--level <name>` | Filter by line level: `error`, `warning`, `info`, `other` |
 | `--message <text>` | Filter by message/content substring |
 | `--json-key <key>` | Require a JSON top-level key on matching lines |
+| `--persist-index` | Persist indexed lines to SQLite |
+| `--reuse-index` | Reuse an existing index when the source fingerprint matches |
+| `--index-path <file>` | Explicit SQLite index file path |
 
 ---
 
@@ -175,6 +186,10 @@ Format-related keys in `logscope.properties` (validated by `config validate`):
 | `analytics.top_n` | Top frequency/cluster results (default: 10) |
 | `analytics.min_cluster_count` | Minimum occurrences to surface a cluster (default: 2) |
 | `report.include_timeline` | Include timeline chart in `charts` section (default: true) |
+| `storage.mode` | Index storage mode: `memory`, `hybrid`, `persistent` (default: memory) |
+| `storage.index.directory` | Workspace directory for auto-generated index files |
+| `storage.index.path` | Explicit SQLite index file path |
+| `storage.spill_threshold` | Optional spill threshold override (lines) |
 
 CLI `--profile` and `--log-format` override configuration for a single run.
 

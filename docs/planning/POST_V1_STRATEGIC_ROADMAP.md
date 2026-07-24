@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M11 – Storage Layer (`v1.4.1`+). Search (M7 / `v1.2.0`), Advanced Reporting (M8 / `v1.3.0`), Analytics Engine (M9 / `v1.3.1`), and Query Language (M10 / `v1.4.0`) are complete; see [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** M12 – Dynamic Plugins (`v1.5.0`). M11 Storage Layer (`v1.4.1`) is complete; compression and query cache defer to `v1.4.2`. See [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -323,7 +323,7 @@ The broader companion product vision:
 | Phase 2 — Reporting Engine | M8 | `v1.3.0` |
 | Phase 2 — Analytics Engine | M9 | `v1.3.1`+ |
 | Phase 2 — Query Engine | M10 | `v1.4.0` |
-| Phase 3 — Storage | M11 | `v1.4.0` |
+| Phase 3 — Storage | M11 | `v1.4.1` |
 | Phase 4 — Plugin Ecosystem | M12 | `v1.4.0` / `v1.5.0` |
 | Phase 5 — AI | M13 | `v1.5.0` |
 | Phase 6 — GUI | M14 | `v2.0.0` |

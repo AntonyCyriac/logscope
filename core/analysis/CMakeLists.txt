@@ -11,6 +11,8 @@ add_library(scope_analysis
     field_summary.cpp
     format_detector.cpp
     format_parser.cpp
+    hybrid_index_writer.cpp
+    indexed_line_access.cpp
     json_field_mapping.cpp
     json_lines_parser.cpp
     json_lines_summary.cpp
@@ -26,6 +28,7 @@ target_link_libraries(scope_analysis
         scope_foundation
         scope_source
         scope_runtime
+        scope_storage
 )
 
 target_include_directories(scope_analysis

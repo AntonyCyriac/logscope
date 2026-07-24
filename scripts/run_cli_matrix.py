@@ -118,6 +118,16 @@ def default_scenarios(plain_log: Path, jsonl_log: Path, config_file: Path, work_
             ("session", "load", str(session_file)),
             expect_stdout="Matches     : yes",
         ),
+        Scenario(
+            "investigate-persist-index",
+            ("investigate", "--persist-index", "--filter", "level == ERROR", str(plain_log)),
+            expect_stdout="INVESTIGATION RESULT",
+        ),
+        Scenario(
+            "analyze-persist-index",
+            ("analyze", "--persist-index", str(plain_log)),
+            expect_stdout="Total log lines",
+        ),
     ]
 
 

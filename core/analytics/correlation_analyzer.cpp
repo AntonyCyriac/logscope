@@ -8,6 +8,7 @@
 #include <unordered_map>
 
 #include "log_line_classifier.hpp"
+#include "indexed_line_access.hpp"
 
 namespace scope::analytics
 {
@@ -16,7 +17,7 @@ CorrelationResult CorrelationAnalyzer::analyze(const analysis::AnalysisModel& mo
 {
     CorrelationResult result;
 
-    if (!model.lineIndex().has_value())
+    if (!analysis::hasQueryableIndex(model))
     {
         return result;
     }
@@ -24,7 +25,7 @@ CorrelationResult CorrelationAnalyzer::analyze(const analysis::AnalysisModel& mo
     std::unordered_map<std::string, CorrelationEntry> repeatedErrors;
     std::unordered_map<std::string, CorrelationEntry> sharedIds;
 
-    for (const analysis::IndexedLine& line : model.lineIndex()->lines())
+    for (const analysis::IndexedLine& line : analysis::fetchIndexedLines(model))
     {
         if (line.level == analysis::DetectedLogLevel::Error && !line.messageExcerpt.empty())
         {

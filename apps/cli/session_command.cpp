@@ -65,6 +65,9 @@ void printSessionSaveUsage(std::ostream& output)
            << "  --level <name>        Per-line level filter: error, warning, info, other\n"
            << "  --message <text>      Message/content substring filter\n"
            << "  --json-key <key>      Require JSON top-level key on matching lines\n"
+           << "  --persist-index       Persist indexed lines to SQLite\n"
+           << "  --reuse-index         Reuse an existing index when the source fingerprint matches\n"
+           << "  --index-path <file>   Explicit SQLite index file path\n"
            << "  --help, -h            Show this help message\n";
 }
 
@@ -197,14 +200,14 @@ int runSessionLoadCommand(const SessionLoadOptions& options, std::ostream& outpu
     const scope::workspace::InvestigationSession& session = *sessionResult;
     analysis::AnalysisModel model = session.analysisModel();
 
-    if (session.contentCriteria().isActive())
+    if (session.contentCriteria().isActive() && !model.hasQueryableIndex())
     {
         scope::source::SourceManager sourceManager;
 
         if (auto datasetResult = sourceManager.open(session.sourcePath()))
         {
-            const scope::analysis::AnalysisConfig analysisConfig =
-                scope::analysis::AnalysisConfig::defaults();
+            scope::analysis::AnalysisConfig analysisConfig = scope::analysis::AnalysisConfig::defaults();
+            analysisConfig.storage.reuseIndex = true;
 
             if (auto refreshedModel = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig))
             {

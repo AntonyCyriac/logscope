@@ -12,7 +12,8 @@ AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t to
                              LogLevelCounts levelCounts, const LogFormat format,
                              std::optional<JsonLinesSummary> jsonLinesSummary,
                              std::optional<FieldSummary> fieldSummary,
-                             std::optional<LineIndex> lineIndex) noexcept
+                             std::optional<LineIndex> lineIndex,
+                             storage::IndexStorePtr indexStore) noexcept
     : m_sourcePath(std::move(sourcePath))
     , m_totalLines(totalLines)
     , m_levelCounts(levelCounts)
@@ -20,6 +21,7 @@ AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t to
     , m_jsonLinesSummary(std::move(jsonLinesSummary))
     , m_fieldSummary(std::move(fieldSummary))
     , m_lineIndex(std::move(lineIndex))
+    , m_indexStore(std::move(indexStore))
 {
 }
 
@@ -56,6 +58,16 @@ const std::optional<FieldSummary>& AnalysisModel::fieldSummary() const noexcept
 const std::optional<LineIndex>& AnalysisModel::lineIndex() const noexcept
 {
     return m_lineIndex;
+}
+
+storage::IndexStorePtr AnalysisModel::indexStore() const noexcept
+{
+    return m_indexStore;
+}
+
+bool AnalysisModel::hasQueryableIndex() const noexcept
+{
+    return m_lineIndex.has_value() || m_indexStore != nullptr;
 }
 
 } // namespace scope::analysis
