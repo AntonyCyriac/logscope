@@ -306,6 +306,18 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             continue;
         }
 
+        if (argument == "--output")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.outputFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
         if (isOption(argument))
         {
             return std::nullopt;
@@ -789,6 +801,18 @@ std::optional<SessionLoadOptions> parseSessionLoadArguments(int argc, char* argv
             options.showHelp = true;
 
             return options;
+        }
+
+        if (argument == "--output")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.outputFile = foundation::Path(argv[++index]);
+
+            continue;
         }
 
         if (isOption(argument))

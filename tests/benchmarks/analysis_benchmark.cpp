@@ -114,7 +114,7 @@ static void BM_AnalysisEngine(benchmark::State& state)
             return;
         }
 
-        benchmark::DoNotOptimize(*analysisResult);
+        benchmark::DoNotOptimize(analysisResult->totalLines());
     }
 
     state.SetItemsProcessed(state.iterations() * state.range(0));

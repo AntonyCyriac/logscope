@@ -4,9 +4,22 @@
  */
 
 #include "extension_manager.hpp"
+#include "report_section_renderer.hpp"
 
 namespace scope::extension
 {
+
+namespace
+{
+
+foundation::Result<bool> initializeReportingMultiFormat()
+{
+    reporting::registerReportingContributors(reporting::ReportSectionRegistry::instance());
+
+    return foundation::Result<bool>(true);
+}
+
+} // namespace
 
 void registerBuiltInExtensions(ExtensionManager& manager)
 {
@@ -26,9 +39,9 @@ void registerBuiltInExtensions(ExtensionManager& manager)
 
     manager.registerBuiltIn(ExtensionDescriptor{
         "reporting.multi-format",
-        "1.0.0",
-        "Text, JSON, CSV, and Markdown report output with selectable sections.",
-        nullptr,
+        "1.3.0",
+        "Text, JSON, CSV, Markdown, HTML, and PDF report output with selectable sections.",
+        initializeReportingMultiFormat,
         true});
 }
 

@@ -21,7 +21,9 @@ enum class OutputFormat
     Text,
     Json,
     Csv,
-    Markdown
+    Markdown,
+    Html,
+    Pdf
 };
 
 /**

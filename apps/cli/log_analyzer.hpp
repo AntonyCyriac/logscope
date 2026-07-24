@@ -6,6 +6,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <optional>
 
 #include "analysis.hpp"
 #include "foundation/path.hpp"
@@ -26,6 +27,7 @@ class LogAnalyzer
     bool analyze(const foundation::Path& filePath,
                  const reporting::ReportOptions& reportOptions,
                  const scope::analysis::AnalysisConfig& analysisConfig,
+                 const std::optional<foundation::Path>& outputFile,
                  std::ostream& output,
                  std::ostream& errorOutput);
 };

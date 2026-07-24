@@ -106,3 +106,4 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu (non
 | 1.0.0 | 18-07-2026 | Initial performance baseline documentation. |
 | 1.1.0 | 21-07-2026 | Documented configurable investigation index cap (M6.5). |
 | 1.2.0 | 21-07-2026 | Added search engine benchmark (M7). |
+| 1.3.0 | 24-07-2026 | Fixed deprecated `DoNotOptimize` usage in analysis benchmark (M8 housekeeping). |

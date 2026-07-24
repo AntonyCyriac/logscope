@@ -68,7 +68,7 @@ TEST(CliParserTest, ParsesLegacyAnalyzeInvocation)
     EXPECT_EQ(CliCommand::Analyze, parsed->command);
     EXPECT_EQ("logscope.properties", parsed->analyze.configFile.string());
     EXPECT_EQ("sample.log", parsed->analyze.logFile.string());
-    EXPECT_EQ(OutputFormat::Text, parsed->analyze.format);
+    EXPECT_FALSE(parsed->analyze.format.has_value());
 }
 
 TEST(CliParserTest, ParsesConfigValidateSubcommand)

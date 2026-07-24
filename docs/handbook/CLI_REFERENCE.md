@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.1.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 21-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -41,10 +41,11 @@ logscope analyze [options] <log-source>
 
 | Option | Description |
 |--------|-------------|
-| `--format text\|json\|csv\|markdown` | Output format (default: text) |
+| `--format text\|json\|csv\|markdown\|html\|pdf` | Output format (default: text) |
 | `--log-format auto\|plain\|jsonl` | Input log format hint (default: auto) |
 | `--profile <name>` | Built-in format profile: `generic-plain`, `generic-json` |
-| `--sections <list>` | Report sections: `summary`, `levels`, `source`, or `all` |
+| `--sections <list>` | Report sections: `executive`, `summary`, `levels`, `errors`, `charts`, `metadata`, `formats`, or `all` |
+| `--output <file>` | Write report to file (required for PDF; creates parent directories) |
 | `--min-errors <n>` | Investigation filter: minimum error lines |
 | `--min-warnings <n>` | Investigation filter: minimum warning lines |
 | `--min-lines <n>` | Investigation filter: minimum total lines |
@@ -59,7 +60,8 @@ logscope analyze --format json samples/sample.log
 logscope analyze --log-format plain samples/sample.log
 logscope analyze --profile generic-json samples/sample.jsonl
 logscope analyze - < samples/sample.log
-logscope analyze ./logs/
+logscope analyze --format html --output report.html samples/sample.log
+logscope analyze --sections executive,errors,charts samples/sample.log
 ```
 
 ---
@@ -168,8 +170,10 @@ logscope session save <session-file> <log-source> [analyze options]
 Load a session file and print a report without re-analyzing.
 
 ```text
-logscope session load <session-file>
+logscope session load <session-file> [--output <file>]
 ```
+
+`--output` writes the reproduced report to a file instead of stdout.
 
 ---
 
@@ -202,3 +206,4 @@ Default directory: current working directory.
 | 1.1.0 | 21-07-2026 | Added `--log-format` for M6.1 format detection. |
 | 1.2.0 | 21-07-2026 | Added `--profile`, investigate command, and format configuration keys for M6.5. |
 | 1.3.0 | 21-07-2026 | Added `search` command, boolean/regex query flags for M7. |
+| 1.4.0 | 24-07-2026 | Added HTML/PDF formats, `--output`, and M8 report sections for M8. |

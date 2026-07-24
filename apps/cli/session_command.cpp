@@ -14,6 +14,7 @@
 #include "log_macros.hpp"
 #include "report_config.hpp"
 #include "report_output.hpp"
+#include "report_writer.hpp"
 #include "search_history.hpp"
 #include "source.hpp"
 #include "workspace.hpp"
@@ -69,11 +70,12 @@ void printSessionSaveUsage(std::ostream& output)
 
 void printSessionLoadUsage(std::ostream& output)
 {
-    output << "Usage: logscope session load <session-file>\n"
+    output << "Usage: logscope session load <session-file> [--output <file>]\n"
            << "\n"
            << "Loads a saved session and reproduces the report without re-analyzing the log source.\n"
            << "\n"
            << "Options:\n"
+           << "  --output <file>       Write report to file instead of stdout\n"
            << "  --help, -h            Show this help message\n";
 }
 
@@ -230,7 +232,17 @@ int runSessionLoadCommand(const SessionLoadOptions& options, std::ostream& outpu
         output << '\n' << formatInvestigationOutput(investigationResult, OutputFormat::Text) << '\n';
     }
 
-    output << '\n' << formatAnalysisOutput(model, session.reportOptions()) << std::endl;
+    output << '\n';
+
+    const reporting::Report report = generateAnalysisReport(model, session.reportOptions());
+    const auto writeResult = writeReport(report, options.outputFile, output, errorOutput);
+
+    if (!writeResult)
+    {
+        errorOutput << writeResult.error().message() << std::endl;
+
+        return 1;
+    }
 
     return 0;
 }

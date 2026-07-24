@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 18-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -72,6 +72,8 @@ git tag -a vX.Y.Z -m "vX.Y.Z — <summary>"
 git push origin vX.Y.Z
 ```
 
+Release tags (`vX.Y.Z`) are the public sync points for related private strategy materials. After the tag is pushed, the maintainer creates a matching `sync/vX.Y.Z` tag on the private strategy repository so long-horizon plans stay aligned with shipped code. See [Git Conventions](../handbook/GIT_CONVENTIONS.md#4-release-tags).
+
 ## 6. GitHub Release
 
 For tags matching `v*`, the [release workflow](../../.github/workflows/release.yml) builds per-OS artifacts and attaches them to the GitHub Release.
@@ -109,3 +111,4 @@ logscope analyze samples/sample.log
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-07-2026 | Initial release process documentation. |
+| 1.1.0 | 24-07-2026 | Note `sync/vX.Y.Z` private strategy alignment after public release tags. |

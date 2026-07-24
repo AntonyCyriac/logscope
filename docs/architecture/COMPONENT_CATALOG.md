@@ -167,7 +167,8 @@ Generate reusable reports from analysis results.
 ### Owns
 
 - Report generation
-- Output formatting
+- Section registry and contributed sections
+- Output formatting (text, JSON, CSV, Markdown, HTML, PDF)
 - Export workflow
 
 ### Depends On

@@ -30,11 +30,14 @@ logscope [--config <file>] <log-source>
 ```bash
 logscope analyze samples/sample.log
 logscope analyze --format csv --sections summary,levels samples/sample.log
+logscope analyze --sections executive,errors,charts samples/sample.log
+logscope analyze --format html --output report.html samples/sample.log
+logscope analyze --format pdf --output report.pdf samples/sample.log
 logscope analyze --format markdown samples
 logscope extensions list
 logscope extensions describe analysis.log-levels
 logscope session save sample.logscope-session samples/sample.log --min-errors 1
-logscope session load sample.logscope-session
+logscope session load sample.logscope-session --output report.txt
 logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log
@@ -48,7 +51,11 @@ logscope config validate --config samples/logscope.properties --require log.leve
 | `text` | Human-readable report with sections (default) |
 | `json` | Structured JSON with section objects |
 | `csv` | Section/key/value rows for spreadsheets |
-| `markdown` | Markdown tables for documentation |
+| `markdown` | Markdown tables and ASCII charts |
+| `html` | Self-contained HTML with embedded SVG charts |
+| `pdf` | Binary PDF (use `--output`; cannot write to stdout) |
+
+Use `--output <file>` to write any format to a file instead of stdout.
 
 ## Components
 
@@ -59,6 +66,7 @@ logscope config validate --config samples/logscope.properties --require log.leve
 | `AnalyzeCommand` | Analyze workflow |
 | `ConfigValidateCommand` | Configuration validation |
 | `LogAnalyzer` | End-to-end analysis pipeline |
+| `ReportWriter` | File or stdout report output |
 
 ## Tests
 

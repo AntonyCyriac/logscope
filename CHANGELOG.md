@@ -12,6 +12,26 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.3.0] - 2026-07-24
+
+M8 – Advanced Reporting complete. Introduces section registry architecture, executive/error/chart sections, HTML and PDF formats, and `--output` file writing. 326 automated tests.
+
+### Added
+
+- M8.1 `ReportSectionRegistry`, `ReportFragment`, `FormatRenderer`; refactored `ReportFormatter`; `M8-ADVANCED-REPORTING.md`.
+- M8.2 `executive` and `errors` report sections across text, JSON, CSV, and Markdown.
+- M8.3 `chart_model`, ASCII and SVG level bar chart renderers; `charts` section.
+- M8.4 `ReportFormat::Html`, self-contained HTML reports, CLI `--output <file>`.
+- M8.5 ADR-003 minimal PDF writer, `ReportFormat::Pdf`, `ReportSectionContributor` hook, `formats` footer section.
+- Config keys: `report.format`, `report.include_charts`, `report.template`.
+
+### Changed
+
+- `Report` supports binary PDF payloads via `bytes()` and `mimeType()`.
+- `reporting.multi-format` extension registers report section contributor on init.
+
+---
+
 ## [1.2.0] - 2026-07-21
 
 M7 – Search Engine complete. Introduces a dedicated search subsystem with boolean queries, regex mode, CLI search workflow, and session search history. 318 automated tests.

@@ -15,21 +15,34 @@ namespace scope::reporting
 namespace
 {
 
-constexpr unsigned summaryBit = 1U << 0U;
-constexpr unsigned levelBreakdownBit = 1U << 1U;
-constexpr unsigned sourceMetadataBit = 1U << 2U;
-constexpr unsigned allBits = summaryBit | levelBreakdownBit | sourceMetadataBit;
+constexpr unsigned executiveSummaryBit = 1U << 0U;
+constexpr unsigned summaryBit = 1U << 1U;
+constexpr unsigned levelBreakdownBit = 1U << 2U;
+constexpr unsigned errorSummaryBit = 1U << 3U;
+constexpr unsigned chartsBit = 1U << 4U;
+constexpr unsigned sourceMetadataBit = 1U << 5U;
+constexpr unsigned formatsFooterBit = 1U << 6U;
+constexpr unsigned allBits = executiveSummaryBit | summaryBit | levelBreakdownBit | errorSummaryBit |
+                             chartsBit | sourceMetadataBit | formatsFooterBit;
 
 unsigned sectionBit(const ReportSection section) noexcept
 {
     switch (section)
     {
+    case ReportSection::ExecutiveSummary:
+        return executiveSummaryBit;
     case ReportSection::Summary:
         return summaryBit;
     case ReportSection::LevelBreakdown:
         return levelBreakdownBit;
+    case ReportSection::ErrorSummary:
+        return errorSummaryBit;
+    case ReportSection::Charts:
+        return chartsBit;
     case ReportSection::SourceMetadata:
         return sourceMetadataBit;
+    case ReportSection::FormatsFooter:
+        return formatsFooterBit;
     }
 
     return 0U;
@@ -38,6 +51,13 @@ unsigned sectionBit(const ReportSection section) noexcept
 bool parseSectionName(const std::string& name, ReportSections& sections)
 {
     const std::string normalized = foundation::toLower(foundation::trim(name));
+
+    if (normalized == "executive" || normalized == "executive-summary")
+    {
+        sections.enable(ReportSection::ExecutiveSummary);
+
+        return true;
+    }
 
     if (normalized == "summary")
     {
@@ -53,9 +73,30 @@ bool parseSectionName(const std::string& name, ReportSections& sections)
         return true;
     }
 
+    if (normalized == "errors" || normalized == "error-summary")
+    {
+        sections.enable(ReportSection::ErrorSummary);
+
+        return true;
+    }
+
+    if (normalized == "charts")
+    {
+        sections.enable(ReportSection::Charts);
+
+        return true;
+    }
+
     if (normalized == "metadata" || normalized == "source-metadata")
     {
         sections.enable(ReportSection::SourceMetadata);
+
+        return true;
+    }
+
+    if (normalized == "formats-footer" || normalized == "formats")
+    {
+        sections.enable(ReportSection::FormatsFooter);
 
         return true;
     }

@@ -44,7 +44,8 @@ struct AnalyzeOptions
 {
     foundation::Path logFile;
     foundation::Path configFile;
-    OutputFormat format = OutputFormat::Text;
+    std::optional<foundation::Path> outputFile;
+    std::optional<OutputFormat> format;
     analysis::LogFormat logFormat = analysis::LogFormat::Auto;
     std::string profile;
     std::optional<reporting::ReportSections> sections;
@@ -120,6 +121,7 @@ struct SessionSaveOptions
 struct SessionLoadOptions
 {
     foundation::Path sessionFile;
+    std::optional<foundation::Path> outputFile;
     bool showHelp = false;
 };
 

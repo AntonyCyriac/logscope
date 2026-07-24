@@ -51,9 +51,13 @@ bool assignUint64Field(std::string_view value, std::uint64_t& field)
 
 std::string sectionsToString(const reporting::ReportSections& sections)
 {
-    if (sections.includes(reporting::ReportSection::Summary) &&
+    if (sections.includes(reporting::ReportSection::ExecutiveSummary) &&
+        sections.includes(reporting::ReportSection::Summary) &&
         sections.includes(reporting::ReportSection::LevelBreakdown) &&
-        sections.includes(reporting::ReportSection::SourceMetadata))
+        sections.includes(reporting::ReportSection::ErrorSummary) &&
+        sections.includes(reporting::ReportSection::Charts) &&
+        sections.includes(reporting::ReportSection::SourceMetadata) &&
+        sections.includes(reporting::ReportSection::FormatsFooter))
     {
         return "all";
     }
@@ -61,31 +65,49 @@ std::string sectionsToString(const reporting::ReportSections& sections)
     std::ostringstream output;
     bool wroteSection = false;
 
+    auto appendSection = [&](const char* name) {
+        if (wroteSection)
+        {
+            output << ',';
+        }
+
+        output << name;
+        wroteSection = true;
+    };
+
+    if (sections.includes(reporting::ReportSection::ExecutiveSummary))
+    {
+        appendSection("executive");
+    }
+
     if (sections.includes(reporting::ReportSection::Summary))
     {
-        output << "summary";
-        wroteSection = true;
+        appendSection("summary");
     }
 
     if (sections.includes(reporting::ReportSection::LevelBreakdown))
     {
-        if (wroteSection)
-        {
-            output << ',';
-        }
+        appendSection("levels");
+    }
 
-        output << "levels";
-        wroteSection = true;
+    if (sections.includes(reporting::ReportSection::ErrorSummary))
+    {
+        appendSection("errors");
+    }
+
+    if (sections.includes(reporting::ReportSection::Charts))
+    {
+        appendSection("charts");
     }
 
     if (sections.includes(reporting::ReportSection::SourceMetadata))
     {
-        if (wroteSection)
-        {
-            output << ',';
-        }
+        appendSection("metadata");
+    }
 
-        output << "metadata";
+    if (sections.includes(reporting::ReportSection::FormatsFooter))
+    {
+        appendSection("formats");
     }
 
     return output.str();

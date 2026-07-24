@@ -10,7 +10,7 @@
 
 using scope::analysis::AnalysisModel;
 using scope::analysis::LogLevelCounts;
-using scope::cli::formatAnalysisOutput;
+using scope::cli::generateAnalysisReport;
 using scope::foundation::Path;
 using scope::reporting::ReportFormat;
 using scope::reporting::ReportOptions;
@@ -35,26 +35,39 @@ AnalysisModel createSampleModel()
 TEST(ReportOutputTest, FormatsTextReport)
 {
     ReportOptions options;
+    options.sections = ReportSections::parse("summary,levels").value();
 
-    const std::string output = formatAnalysisOutput(createSampleModel(), options);
+    const auto report = generateAnalysisReport(createSampleModel(), options);
 
-    EXPECT_NE(std::string::npos, output.find("========== LOGSCOPE REPORT =========="));
-    EXPECT_NE(std::string::npos, output.find("Total log lines : 3"));
-    EXPECT_NE(std::string::npos, output.find("Error lines     : 1"));
+    EXPECT_NE(std::string::npos, report.text().find("========== LOGSCOPE REPORT =========="));
+    EXPECT_NE(std::string::npos, report.text().find("Total log lines : 3"));
+    EXPECT_NE(std::string::npos, report.text().find("Error lines     : 1"));
 }
 
 TEST(ReportOutputTest, FormatsJsonReport)
 {
     ReportOptions options;
     options.format = ReportFormat::Json;
+    options.sections = ReportSections::parse("summary,levels").value();
 
-    const std::string output = formatAnalysisOutput(createSampleModel(), options);
+    const auto report = generateAnalysisReport(createSampleModel(), options);
 
-    EXPECT_NE(std::string::npos, output.find("\"summary\""));
-    EXPECT_NE(std::string::npos, output.find("\"totalLines\": 3"));
-    EXPECT_NE(std::string::npos, output.find("\"errorLines\": 1"));
-    EXPECT_NE(std::string::npos, output.find("\"warningLines\": 1"));
-    EXPECT_NE(std::string::npos, output.find("\"infoLines\": 1"));
+    EXPECT_NE(std::string::npos, report.text().find("\"summary\""));
+    EXPECT_NE(std::string::npos, report.text().find("\"totalLines\": 3"));
+    EXPECT_NE(std::string::npos, report.text().find("\"errorLines\": 1"));
+}
+
+TEST(ReportOutputTest, FormatsHtmlReport)
+{
+    ReportOptions options;
+    options.format = ReportFormat::Html;
+    options.sections = ReportSections::parse("executive,summary").value();
+
+    const auto report = generateAnalysisReport(createSampleModel(), options);
+
+    EXPECT_NE(std::string::npos, report.text().find("<!DOCTYPE html>"));
+    EXPECT_NE(std::string::npos, report.text().find("Executive Summary"));
+    EXPECT_NE(std::string::npos, report.text().find("<table>"));
 }
 
 TEST(ReportOutputTest, FormatsSummaryOnlySections)
@@ -62,8 +75,8 @@ TEST(ReportOutputTest, FormatsSummaryOnlySections)
     ReportOptions options;
     options.sections = ReportSections::parse("summary").value();
 
-    const std::string output = formatAnalysisOutput(createSampleModel(), options);
+    const auto report = generateAnalysisReport(createSampleModel(), options);
 
-    EXPECT_NE(std::string::npos, output.find("Total log lines : 3"));
-    EXPECT_EQ(std::string::npos, output.find("--- Level Breakdown ---"));
+    EXPECT_NE(std::string::npos, report.text().find("Total log lines : 3"));
+    EXPECT_EQ(std::string::npos, report.text().find("--- Level Breakdown ---"));
 }

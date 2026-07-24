@@ -10,11 +10,10 @@
 namespace scope::cli
 {
 
-std::string formatAnalysisOutput(const analysis::AnalysisModel& model, const reporting::ReportOptions& options)
+reporting::Report generateAnalysisReport(const analysis::AnalysisModel& model,
+                                         const reporting::ReportOptions& options)
 {
-    const reporting::Report report = reporting::ReportGenerator{}.generate(model, options);
-
-    return report.text();
+    return reporting::ReportGenerator{}.generate(model, options);
 }
 
 } // namespace scope::cli

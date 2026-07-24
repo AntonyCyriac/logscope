@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.0.0 |
+| Version | 3.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 21-07-2026 |
+| Last Updated | 24-07-2026 |
 
 ---
 
@@ -34,8 +34,8 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **v1.0.0** | ✅ Complete | First stable production release. |
 | **M6 – Log Format Intelligence** | ✅ Complete | Format detection, structured parsing, field extraction, content investigation, format profiles. Released as `v1.1.0`. |
 | **M7 – Search Engine** | ✅ Complete | Full-text, regex, boolean search; saved searches; session search history. Released as `v1.2.0`. |
-| **M8 – Advanced Reporting** | ⏳ Planned | HTML, PDF, charts, executive summaries. Target: `v1.3.0`. |
-| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.0`. |
+| **M8 – Advanced Reporting** | ✅ Complete | HTML, PDF, charts, executive summaries. Released: `v1.3.0`. |
+| **M9 – Analytics Engine** | ⏳ Planned | Frequency, clustering, correlation, timeline, trends. Target: `v1.3.1`+. |
 | **M10 – Query Language** | ⏳ Planned | Structured filter DSL; evolves toward SQL-like queries. Target: `v1.4.0`. |
 | **M11 – Storage Layer** | ⏳ Planned | SQLite, indexing, compression, cached queries. Target: `v1.4.0`. |
 | **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
@@ -58,9 +58,10 @@ M4  ██████████ 100%
 M5  ██████████ 100%
 M6  ██████████ 100%  (v1.1.0 released)
 M7  ██████████ 100%  (v1.2.0 released)
+M8  ██████████ 100%  (v1.3.0 released)
 ```
 
-Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** is released as [`v1.2.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
+Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
 ---
 
@@ -399,7 +400,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 |-----------|-------|----------------|
 | M7 – Search Engine | Full-text, regex, boolean search; saved searches | `v1.2.0` |
 | M8 – Advanced Reporting | HTML, PDF, charts, executive summaries | `v1.3.0` |
-| M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.0` |
+| M9 – Analytics Engine | Frequency, clustering, correlation, trends | `v1.3.1`+ |
 | M10 – Query Language | Structured filter DSL | `v1.4.0` |
 | M11 – Storage Layer | SQLite, indexing, compression | `v1.4.0` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
@@ -415,14 +416,15 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine
-v1.3.0  — M8 Reporting + M9 Analytics
+v1.3.0  — M8: Advanced Reporting
+v1.3.1+ — M9: Analytics Engine (planned)
 v1.4.0  — M10 Query + M11 Storage + M12 Plugins
 v1.5.0  — M13 AI
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6 and M7. M8–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6, M7, and M8. M9–M17 plans will be added as preceding milestones near completion.
 
 ---
 
@@ -454,3 +456,5 @@ The roadmap is considered successful when:
 | 3.0.0 | 21-07-2026 | Added post-v1 strategic roadmap; M7–M17 milestone table and version evolution. |
 | 3.1.0 | 21-07-2026 | M6 complete; v1.1.0 released with format profiles and configuration. |
 | 3.2.0 | 21-07-2026 | M7 complete; v1.2.0 released with search engine. |
+| 3.3.0 | 24-07-2026 | M8 complete; v1.3.0 released with advanced reporting. |
+| 3.4.0 | 24-07-2026 | M9 target clarified as `v1.3.1`+ after M8 ships as `v1.3.0`. |

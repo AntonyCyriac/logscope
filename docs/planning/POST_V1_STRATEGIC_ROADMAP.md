@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** M9 – Analytics Engine (`v1.3.1`+). Search (M7) and Advanced Reporting (M8) are complete or releasing; see [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** M9 – Analytics Engine (`v1.3.1`+). Search (M7 / `v1.2.0`) and Advanced Reporting (M8 / `v1.3.0`) are complete; see [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -68,7 +68,7 @@ POST_V1_STRATEGIC_ROADMAP.md  ← public strategic layer (this document)
     ROADMAP.md  ← public milestone status
 ```
 
-Long-horizon product strategy (for example multi-artifact investigation, crash analysis, and playbooks) is maintained in a **private** strategy repository. Those themes are published here as public `Mn` planning documents only when implementation is about to start. This repository does not link to the private strategy location.
+Long-horizon product themes beyond the published public milestones are maintained privately. They appear in this repository only as public `Mn` planning documents when implementation is about to start. This repository does not link to any private strategy location.
 
 ---
 
@@ -320,9 +320,9 @@ The broader companion product vision:
 | Phase 1 — Stabilize v1.x | Parallel `v1.0.x` track | `v1.0.1`–`v1.0.x` |
 | M6 — Log Format Intelligence | M6 | `v1.1.0` |
 | Phase 2 — Search Engine | M7 | `v1.2.0` |
-| Phase 2 — Reporting Engine | M8 | `v1.2.x` / `v1.3.0` |
-| Phase 2 — Analytics Engine | M9 | `v1.3.0` |
-| Phase 2 — Query Engine | M10 | `v1.3.0` / `v1.4.0` |
+| Phase 2 — Reporting Engine | M8 | `v1.3.0` |
+| Phase 2 — Analytics Engine | M9 | `v1.3.1`+ |
+| Phase 2 — Query Engine | M10 | `v1.4.0` |
 | Phase 3 — Storage | M11 | `v1.4.0` |
 | Phase 4 — Plugin Ecosystem | M12 | `v1.4.0` / `v1.5.0` |
 | Phase 5 — AI | M13 | `v1.5.0` |
@@ -438,6 +438,7 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | [Product Overview](../vision/PRODUCT_OVERVIEW.md) | Product promise and evolution strategy |
 | [M6 – Log Format Intelligence](M6-LOG-FORMAT-INTELLIGENCE.md) | Completed at `v1.1.0` |
 | [M7 – Search Engine](M7-SEARCH-ENGINE.md) | Completed at `v1.2.0` |
+| [M8 – Advanced Reporting](M8-ADVANCED-REPORTING.md) | Completed at `v1.3.0` |
 | [Roadmap](../ROADMAP.md) | Milestone status |
 
 ---
@@ -447,5 +448,5 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
-| 1.1.0 | 21-07-2026 | M7/M8 status alignment updates. |
-| 1.2.0 | 24-07-2026 | Next milestone M9; private strategy documentation model (no private URL). |
+| 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |
+| 1.2.0 | 24-07-2026 | Next milestone M9; private themes stay unpublished until graduated. |

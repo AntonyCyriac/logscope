@@ -16,9 +16,13 @@ namespace scope::reporting
  */
 enum class ReportSection
 {
+    ExecutiveSummary,
     Summary,
     LevelBreakdown,
-    SourceMetadata
+    ErrorSummary,
+    Charts,
+    SourceMetadata,
+    FormatsFooter
 };
 
 /**
@@ -35,7 +39,7 @@ class ReportSections
     /**
      * @brief Parses a comma-separated section list.
      *
-     * Supported names: summary, levels, metadata, all.
+     * Supported names: executive, summary, levels, errors, charts, metadata, all.
      */
     [[nodiscard]] static std::optional<ReportSections> parse(std::string_view value);
 

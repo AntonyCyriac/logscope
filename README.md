@@ -7,7 +7,7 @@ A generic, extensible, high-performance log analysis platform.
 
 LogScope is an open-source framework for parsing, normalizing, and analyzing logs from any system or format. The goal is a modular platform that helps engineers investigate system behavior through a consistent workflow.
 
-**Status:** v1.2.0 — M7 Search Engine ([`CHANGELOG.md`](CHANGELOG.md)). M0–M7 complete — see [Roadmap](docs/ROADMAP.md).
+**Status:** v1.3.0 — M8 Advanced Reporting ([`CHANGELOG.md`](CHANGELOG.md)). M0–M8 complete — see [Roadmap](docs/ROADMAP.md).
 
 ## What works today
 
@@ -17,10 +17,10 @@ LogScope is an open-source framework for parsing, normalizing, and analyzing log
 - **Source library** (`scope_source`) — `SourceManager`, `FileLogSource`, and `SourceDataset`
 - **Analysis library** (`scope_analysis`) — `AnalysisEngine` and `AnalysisModel`
 - **Investigation library** (`scope_investigation`) — `InvestigationEngine`, `InvestigationView`, `LineCountFilter`, and `LogLevelFilter`
-- **Reporting library** (`scope_reporting`) — `ReportGenerator`, section selection, and text, JSON, CSV, and Markdown output
+- **Reporting library** (`scope_reporting`) — `ReportGenerator`, section registry, text, JSON, CSV, Markdown, HTML, and PDF output
 - **Extension library** (`scope_extension`) — `ExtensionManager` with configuration-based enablement
 - **Workspace library** (`scope_workspace`) — `InvestigationSession` and `SessionStore` for `.logscope-session` persistence
-- **CLI application** (`apps/cli`) — `analyze`, `config validate`, `extensions`, and `session` subcommands; stdin and directory input; `--format text|json|csv|markdown`
+- **CLI application** (`apps/cli`) — `analyze`, `config validate`, `extensions`, and `session` subcommands; stdin and directory input; `--format text|json|csv|markdown|html|pdf`; `--output <file>`
 - **CI** — build, unit tests, integration tests, and CLI end-to-end tests on every push to `master`
 - **Documentation** — requirements, architecture, standards, and developer handbook
 
