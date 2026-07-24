@@ -6,6 +6,7 @@
 add_executable(logscope_benchmarks
     analysis_benchmark.cpp
     analytics_benchmark.cpp
+    query_benchmark.cpp
     search_benchmark.cpp
 )
 
@@ -15,6 +16,7 @@ target_link_libraries(logscope_benchmarks
         benchmark_main
         scope_analysis
         scope_analytics
+        scope_query
         scope_search
         scope_source
         scope_foundation
@@ -24,7 +26,7 @@ target_include_directories(logscope_benchmarks
     PRIVATE
         ${CMAKE_SOURCE_DIR}/core/analysis
         ${CMAKE_SOURCE_DIR}/core/analytics
-        ${CMAKE_SOURCE_DIR}/core/search
+        ${CMAKE_SOURCE_DIR}/core/query
         ${CMAKE_SOURCE_DIR}/core/source
         ${CMAKE_SOURCE_DIR}/core/foundation
 )

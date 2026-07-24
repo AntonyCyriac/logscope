@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **337** automated tests at **`v1.3.1`** (unit, integration, and end-to-end). Reporting and analytics coverage includes chart renderers, analytics analyzers, and CLI/e2e cases for `logscope analytics` and analytics report sections.
+**Current baseline:** **365** automated tests at **`v1.4.0`** (unit, integration, and end-to-end). Query language coverage includes `scope_query` parser/evaluator tests (≥20 cases), `--filter`/`logscope query` CLI/e2e cases, and CLI matrix scenarios.
 
 ---
 
@@ -172,3 +172,4 @@ Requires `clang-tidy` on PATH.
 | 1.0.0 | 18-07-2026 | Initial testing guide. |
 | 1.2.0 | 24-07-2026 | Updated baseline to 337 tests at `v1.3.1`; noted M9 analytics coverage. |
 | 1.3.0 | 24-07-2026 | Added bulk-log CLI matrix scripts, CI job, and release workflow integration. |
+| 1.4.0 | 24-07-2026 | Updated baseline to 365 tests at `v1.4.0`; noted M10 query language coverage. |

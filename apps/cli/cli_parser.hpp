@@ -31,6 +31,7 @@ enum class CliCommand
     Analyze,
     Investigate,
     Search,
+    Query,
     Analytics,
     ConfigValidate,
     ExtensionsList,
@@ -146,6 +147,7 @@ struct ParsedCli
     AnalyzeOptions analyze;
     InvestigateOptions investigate;
     InvestigateOptions search;
+    InvestigateOptions query;
     AnalyticsOptions analytics;
     ConfigValidateOptions configValidate;
     ExtensionsListOptions extensionsList;

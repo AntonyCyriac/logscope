@@ -10,15 +10,24 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [1.4.0] - 2026-07-24
+
+M10 – Query Language complete. Introduces `scope_query`, field-aware filter DSL, `--filter` on investigate/search, and `logscope query`. 365 automated tests.
+
 ### Added
 
-- `scripts/generate_bulk_log.py` and `scripts/run_cli_matrix.py` for bulk-log CLI combination testing.
-- CI `cli-matrix` job (Ubuntu, 10k-line fixtures, 18 command scenarios).
-- Release workflow bulk CLI matrix (100k-line fixtures per OS before publishing binaries).
+- M10.0 `ADR-004` query DSL grammar and `M10-QUERY-LANGUAGE.md`.
+- M10.1–M10.3 `scope_query` module with lexer, parser, `QueryEvaluator`, and unit tests.
+- M10.4 Investigation integration, session `filter.expression`, and `query.saved.*` config validation.
+- M10.5 `--filter` CLI flag, `logscope query` subcommand, e2e/matrix coverage, `BM_QueryEvaluator`.
+- Bulk-log CLI matrix scripts and CI/release smoke coverage (from prior merge).
 
 ### Changed
 
-- Release smoke test replaced by cross-command bulk-log matrix across analyze, investigate, search, analytics, config, extensions, and session flows.
+- `InvestigationEngine::investigate()` applies DSL filters after M7 text search and legacy field filters.
+- Release workflow runs bulk-log CLI matrix before publishing binaries.
 
 ---
 

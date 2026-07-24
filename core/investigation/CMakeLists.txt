@@ -19,6 +19,7 @@ target_link_libraries(scope_investigation
         scope_analysis
         scope_analytics
         scope_foundation
+        scope_query
         scope_runtime
         scope_search
 )

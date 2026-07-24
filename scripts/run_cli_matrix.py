@@ -83,6 +83,16 @@ def default_scenarios(plain_log: Path, jsonl_log: Path, config_file: Path, work_
             expect_stdout='"matchingLineCount"',
         ),
         Scenario(
+            "investigate-filter",
+            ("investigate", "--filter", "level == ERROR", str(plain_log)),
+            expect_stdout="INVESTIGATION RESULT",
+        ),
+        Scenario(
+            "query-filter",
+            ("query", "--filter", "level == ERROR", str(plain_log)),
+            expect_stdout="INVESTIGATION RESULT",
+        ),
+        Scenario(
             "analytics-text",
             ("analytics", str(plain_log)),
             expect_stdout="Analytics summary",

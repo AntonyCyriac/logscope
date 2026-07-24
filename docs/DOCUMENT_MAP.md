@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 2.4.0 |
+| Version | 2.5.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -83,7 +83,8 @@ docs/
 │   ├── M6-LOG-FORMAT-INTELLIGENCE.md
 │   ├── M7-SEARCH-ENGINE.md
 │   ├── M8-ADVANCED-REPORTING.md
-│   └── M9-ANALYTICS-ENGINE.md
+│   ├── M9-ANALYTICS-ENGINE.md
+│   └── M10-QUERY-LANGUAGE.md
 │
 │   (Long-horizon strategy beyond published Mn plans is maintained privately
 │    outside this repository; public Mn docs are added when implementation starts.)
@@ -136,7 +137,8 @@ docs/
 │   ├── decisions/
 │   │   ├── ADR-001-Testing-Framework.md
 │   │   ├── ADR-002-Benchmark-Framework.md
-│   │   └── ADR-003-PDF-Report-Generation.md
+│   │   ├── ADR-003-PDF-Report-Generation.md
+│   │   └── ADR-004-Query-DSL-Grammar.md
 │   │
 │   └── foundation/
 │       └── RESULT.md
@@ -160,23 +162,24 @@ Developers new to LogScope should read the documentation in the following order.
 | 4 | M7-SEARCH-ENGINE.md | Understand the completed M7 search engine (`v1.2.0`). |
 | 5 | M8-ADVANCED-REPORTING.md | Understand the completed M8 advanced reporting (`v1.3.0`). |
 | 6 | M9-ANALYTICS-ENGINE.md | Understand the completed M9 analytics engine (`v1.3.1`). |
-| 6 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
-| 7 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
-| 8 | PROJECT_CHARTER.md | Understand why LogScope exists. |
-| 9 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
-| 10 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
-| 11 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
-| 12 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
-| 13 | Functional Requirements | Understand the required capabilities. |
-| 14 | NFR-001 – Quality Attributes | Understand the quality expectations. |
-| 15 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
-| 16 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
-| 17 | COMPONENT_CATALOG.md | Understand component responsibilities. |
-| 18 | DOMAIN_MODEL.md | Understand the primary business concepts. |
-| 19 | DATA_FLOW.md | Understand how information moves through the system. |
-| 20 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
-| 21 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
-| 22 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
+| 7 | M10-QUERY-LANGUAGE.md | Understand the completed M10 query language (`v1.4.0`). |
+| 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
+| 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
+| 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
+| 11 | PRODUCT_OVERVIEW.md | Understand what LogScope aims to build. |
+| 12 | ENGINEERING_PRINCIPLES.md | Understand the engineering philosophy. |
+| 13 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
+| 14 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
+| 15 | Functional Requirements | Understand the required capabilities. |
+| 16 | NFR-001 – Quality Attributes | Understand the quality expectations. |
+| 17 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
+| 18 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
+| 19 | COMPONENT_CATALOG.md | Understand component responsibilities. |
+| 20 | DOMAIN_MODEL.md | Understand the primary business concepts. |
+| 21 | DATA_FLOW.md | Understand how information moves through the system. |
+| 22 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
+| 23 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
+| 24 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 
 ---
 
@@ -303,3 +306,4 @@ These categories should be added only when they provide clear value and support 
 | 2.2.0 | 24-07-2026 | Merged M8 document map with private-strategy documentation note. |
 | 2.3.0 | 24-07-2026 | Added M9-ANALYTICS-ENGINE.md and reading order for `v1.3.1`. |
 | 2.4.0 | 24-07-2026 | Documented `scripts/` bulk-log CLI matrix tooling and CI integration. |
+| 2.5.0 | 24-07-2026 | Added M10-QUERY-LANGUAGE.md, ADR-004, and reading order for `v1.4.0`. |

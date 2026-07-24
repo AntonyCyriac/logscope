@@ -25,6 +25,7 @@ void printInvestigateUsage(std::ostream& output)
            << "Investigation options:\n"
            << "  --search <query>        Search indexed log line content\n"
            << "  --query <expr>          Boolean search expression (AND, OR, NOT, quotes)\n"
+           << "  --filter <dsl>          Field-aware filter expression\n"
            << "  --regex                 Treat --search value as a regular expression\n"
            << "  --case-sensitive        Disable default case-insensitive matching\n"
            << "  --time-from <timestamp> Earliest timestamp (ISO-like)\n"
@@ -90,6 +91,15 @@ int runInvestigateCommand(const InvestigateOptions& options,
         if (!queryResult)
         {
             errorOutput << queryResult.error().message() << '\n';
+
+            return 1;
+        }
+
+        const auto filterResult = options.criteria.resolvedFilterQuery();
+
+        if (!filterResult)
+        {
+            errorOutput << filterResult.error().message() << '\n';
 
             return 1;
         }

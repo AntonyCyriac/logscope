@@ -11,11 +11,13 @@
 
 #include "foundation/error.hpp"
 #include "foundation/string.hpp"
+#include "foundation/string.hpp"
 #include "investigation_criteria.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
 #include "report_format.hpp"
 #include "foundation/string.hpp"
+#include "query_parser.hpp"
 #include "search_query_parser.hpp"
 
 namespace scope::workspace
@@ -221,6 +223,7 @@ void appendContentCriteria(std::ostringstream& output, const investigation::Inve
 
     output << "filter.messageContains=" << criteria.field.messageContains() << '\n';
     output << "filter.jsonKey=" << criteria.field.requiredJsonKey() << '\n';
+    output << "filter.expression=" << criteria.filterExpression << '\n';
 
     if (!criteria.booleanQuery.empty())
     {
@@ -242,10 +245,12 @@ void appendContentCriteria(std::ostringstream& output, const investigation::Inve
 
 investigation::InvestigationCriteria contentCriteriaFromValues(
     const std::string& contentSearch, const std::string& timeFromValue, const std::string& timeToValue,
-    const std::string& lineLevelValue, const std::string& messageContains, const std::string& jsonKey)
+    const std::string& lineLevelValue, const std::string& messageContains, const std::string& jsonKey,
+    const std::string& filterExpression)
 {
     investigation::InvestigationCriteria criteria;
     criteria.contentSearch = contentSearch;
+    criteria.filterExpression = filterExpression;
 
     if (!foundation::isBlank(timeFromValue))
     {
@@ -355,6 +360,7 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     std::string lineLevelValue;
     std::string messageContains;
     std::string jsonKey;
+    std::string filterExpressionValue;
     std::string searchQueryExpression;
     std::string searchHistoryValue;
     std::string reportFormatValue = "text";
@@ -498,6 +504,10 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
         {
             jsonKey = value;
         }
+        else if (key == "filter.expression")
+        {
+            filterExpressionValue = value;
+        }
         else if (key == "search.query")
         {
             searchQueryExpression = value;
@@ -564,7 +574,17 @@ foundation::Result<InvestigationSession> SessionSerializer::deserialize(const st
     reportOptions.sections = sectionsFromString(reportSectionsValue);
 
     investigation::InvestigationCriteria contentCriteria = contentCriteriaFromValues(
-        contentSearch, timeFromValue, timeToValue, lineLevelValue, messageContains, jsonKey);
+        contentSearch, timeFromValue, timeToValue, lineLevelValue, messageContains, jsonKey, filterExpressionValue);
+
+    if (!foundation::isBlank(filterExpressionValue))
+    {
+        const auto parsedFilter = query::parseFilterQuery(filterExpressionValue);
+
+        if (parsedFilter)
+        {
+            contentCriteria.filterQuery = *parsedFilter;
+        }
+    }
 
     if (!foundation::isBlank(searchQueryExpression))
     {

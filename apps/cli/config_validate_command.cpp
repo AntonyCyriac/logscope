@@ -5,6 +5,7 @@
 
 #include "config_validate_command.hpp"
 
+#include "query.hpp"
 #include "search.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
@@ -63,6 +64,15 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!searchValidation)
     {
         errorOutput << searchValidation.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto queryValidation = scope::query::validateQueryConfiguration(configurationManager.configuration());
+
+    if (!queryValidation)
+    {
+        errorOutput << queryValidation.error().message() << std::endl;
 
         return 1;
     }
