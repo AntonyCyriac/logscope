@@ -27,9 +27,16 @@ class StorageRegressionTest : public ::testing::Test
     {
         std::error_code error;
         std::filesystem::remove_all(m_directoryPath.string(), error);
+
+        if (!m_logFilePath.isEmpty())
+        {
+            std::filesystem::remove(m_logFilePath.string(), error);
+            m_logFilePath = Path{};
+        }
     }
 
     Path m_directoryPath{"regression_log_directory"};
+    Path m_logFilePath;
 };
 
 } // namespace
@@ -71,42 +78,46 @@ TEST_F(StorageRegressionTest, AnalyzeDirectoryWithPersistIndexDoesNotFail)
     output << "2026-07-11 10:00:02 ERROR directory error\n";
     output.close();
 
-    SourceManager sourceManager;
-    auto datasetResult = sourceManager.open(m_directoryPath);
+    {
+        SourceManager sourceManager;
+        auto datasetResult = sourceManager.open(m_directoryPath);
 
-    ASSERT_TRUE(datasetResult.hasValue());
+        ASSERT_TRUE(datasetResult.hasValue());
 
-    AnalysisConfig config = AnalysisConfig::defaults();
-    config.storage.persistIndex = true;
+        AnalysisConfig config = AnalysisConfig::defaults();
+        config.storage.persistIndex = true;
 
-    const AnalysisEngine engine;
-    const auto result = engine.analyze(*datasetResult, config);
+        const AnalysisEngine engine;
+        const auto result = engine.analyze(*datasetResult, config);
 
-    ASSERT_TRUE(result.hasValue()) << result.error().message();
-    EXPECT_EQ(2U, result->totalLines());
+        ASSERT_TRUE(result.hasValue()) << result.error().message();
+        EXPECT_EQ(2U, result->totalLines());
+    }
 }
 
 // M11 v1.4.1: analyze on a regular file with reuse-index enabled must remain stable.
 TEST_F(StorageRegressionTest, AnalyzeFileWithReuseIndexSucceeds)
 {
-    const Path logFile("regression_reuse_index.log");
-    std::ofstream output(logFile.string());
-    output << "2026-07-11 10:00:01 INFO reuse test\n";
-    output.close();
+    m_logFilePath = Path("regression_reuse_index.log");
 
-    SourceManager sourceManager;
-    auto datasetResult = sourceManager.open(logFile);
+    {
+        std::ofstream output(m_logFilePath.string());
+        output << "2026-07-11 10:00:01 INFO reuse test\n";
+    }
 
-    ASSERT_TRUE(datasetResult.hasValue());
+    {
+        SourceManager sourceManager;
+        auto datasetResult = sourceManager.open(m_logFilePath);
 
-    AnalysisConfig config = AnalysisConfig::defaults();
-    config.storage.reuseIndex = true;
+        ASSERT_TRUE(datasetResult.hasValue());
 
-    const AnalysisEngine engine;
-    const auto result = engine.analyze(*datasetResult, config);
+        AnalysisConfig config = AnalysisConfig::defaults();
+        config.storage.reuseIndex = true;
 
-    ASSERT_TRUE(result.hasValue()) << result.error().message();
-    EXPECT_EQ(1U, result->totalLines());
+        const AnalysisEngine engine;
+        const auto result = engine.analyze(*datasetResult, config);
 
-    std::filesystem::remove(logFile.string());
+        ASSERT_TRUE(result.hasValue()) << result.error().message();
+        EXPECT_EQ(1U, result->totalLines());
+    }
 }
