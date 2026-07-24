@@ -9,6 +9,7 @@
 
 #include "foundation/result.hpp"
 #include "index_store.hpp"
+#include "index_store_options.hpp"
 #include "log_format.hpp"
 #include "schema_version.hpp"
 
@@ -21,7 +22,8 @@ class SqliteIndexStore final : public IndexStore
     ~SqliteIndexStore() override;
 
     [[nodiscard]] static foundation::Result<IndexStorePtr>
-    create(const foundation::Path& databasePath, const IndexMetadata& metadata);
+    create(const foundation::Path& databasePath, const IndexMetadata& metadata,
+           const IndexStoreOptions& options = IndexStoreOptions{});
 
     [[nodiscard]] static foundation::Result<IndexStorePtr> open(const foundation::Path& databasePath);
 
@@ -29,6 +31,8 @@ class SqliteIndexStore final : public IndexStore
     {
         return kIndexSchemaVersionCurrent;
     }
+
+    [[nodiscard]] bool usesContentCompression() const noexcept;
 
     [[nodiscard]] foundation::Result<bool> appendLine(const analysis::IndexedLine& line,
                                                       std::string_view fullContent) override;

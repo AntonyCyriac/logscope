@@ -32,9 +32,11 @@ struct StorageConfig
     StorageMode mode{StorageMode::Memory};
     bool persistIndex{false};
     bool reuseIndex{false};
+    bool compressContent{false};
     std::optional<foundation::Path> indexPath;
     foundation::Path indexDirectory;
     std::size_t spillThreshold{0U};
+    std::size_t compressThresholdBytes{256U};
 
     [[nodiscard]] bool usesPersistentStore() const noexcept;
 
