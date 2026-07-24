@@ -468,3 +468,4 @@ The roadmap is considered successful when:
 | 3.5.0 | 24-07-2026 | Revision history wording aligned with shipped `v1.3.0`. |
 | 3.6.0 | 24-07-2026 | M9 complete; v1.3.1 released with analytics engine. |
 | 3.7.0 | 24-07-2026 | M10 complete; v1.4.0 released with query language DSL. |
+| 3.8.0 | 24-07-2026 | M11 complete; v1.4.1 storage layer and v1.4.2 bulk index write performance released. |

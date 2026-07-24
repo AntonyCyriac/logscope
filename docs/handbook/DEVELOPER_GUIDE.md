@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Guide |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -45,7 +45,7 @@ core/               Libraries (one CMake target per module, scope_<name>)
   analysis/         AnalysisEngine, line index, format detection
   search/           Text and boolean search
   query/            Filter DSL
-  storage/          SQLite indexes (M11)
+  storage/          SQLite indexes (M11; batched writes in v1.4.2)
   analytics/        Frequency, clustering, timeline
   investigation/    Investigation engine
   reporting/        Report formats and sections
@@ -191,6 +191,20 @@ python3 scripts/run_cli_matrix.py --logscope build/apps/cli/logscope \
   --plain-log /tmp/bulk.log --jsonl-log /tmp/bulk.jsonl
 ```
 
+CI uses **10k-line** fixtures; release workflows use **100k-line** fixtures (including `--persist-index` scenarios). Pass `--lines 100000` to `generate_bulk_log.py` to match release locally.
+
+### Storage performance (v1.4.2+)
+
+When changing `core/storage/` or `HybridIndexWriter`, run storage benchmarks and verify the CI baseline:
+
+```bash
+cmake -S . -B build -DLOGSCOPE_BENCHMARKS=ON -DCMAKE_BUILD_TYPE=Release
+cmake --build build --target logscope_benchmarks
+./build/tests/benchmarks/logscope_benchmarks --benchmark_filter=BM_IndexStoreAppend
+```
+
+Regression gate: `BM_IndexStoreAppend/100000` in [`tests/benchmarks/baseline.json`](../../tests/benchmarks/baseline.json). See [Performance Baselines](../testing/PERFORMANCE.md).
+
 ---
 
 # 8. Documentation expectations
@@ -250,3 +264,4 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 developer guide. |
+| 1.1.0 | 24-07-2026 | v1.4.2 storage benchmark guidance; CI vs release bulk matrix sizes. |

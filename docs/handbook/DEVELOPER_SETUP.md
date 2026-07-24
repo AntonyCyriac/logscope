@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.3.0 |
+| Version | 2.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -24,6 +24,8 @@ A developer should be able to:
 - Understand the recommended development workflow.
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
+
+**Current release:** [`v1.4.2`](../../CHANGELOG.md) — **396** automated tests. See [Testing Guide](../testing/TESTING.md) for verification commands.
 
 ---
 
@@ -349,3 +351,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.1.0 | 18-07-2026 | Added contribution workflow section linking to handbook guides. |
 | 2.2.0 | 18-07-2026 | Linked M5 testing guide from verification checklist. |
 | 2.3.0 | 24-07-2026 | Added optional Doxygen API documentation build (`LOGSCOPE_DOCS`). |
+| 2.4.0 | 24-07-2026 | Current release baseline (`v1.4.2`, 396 tests). |

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | User Manual |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -260,7 +260,29 @@ Default index directory:
 
 Configure defaults in `logscope.properties` — see [Configuration Guide](CONFIGURATION_GUIDE.md) (`storage.*` keys).
 
-**Note:** v1.4.2+ batches SQLite writes for faster `--persist-index` builds; progress is logged every 10,000 lines.
+## 8.1 Index build performance (v1.4.2+)
+
+From **v1.4.2**, `--persist-index` uses batched SQLite writes (WAL mode, prepared `INSERT`, 5,000 lines per commit) for faster first-time index builds on large logs.
+
+Progress is written to **stderr** every 10,000 persisted lines when `log.level` is `info` or lower (default). Example:
+
+```text
+[INFO] [analysis] Indexed 10000 lines to persistent store
+[INFO] [analysis] Indexed 20000 lines to persistent store
+```
+
+To see progress during long runs:
+
+```bash
+# Default — info level shows progress
+logscope investigate --persist-index /var/log/large-app.log
+
+# Explicit via environment or config
+SCOPE_LOG_LEVEL=info logscope investigate --persist-index /var/log/large-app.log
+log.level=info
+```
+
+Set `log.level=warn` or `SCOPE_LOG_LEVEL=warn` to suppress progress lines. See [Configuration Guide](CONFIGURATION_GUIDE.md) (`log.level`).
 
 ---
 
@@ -325,7 +347,7 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | No matches in investigate | Confirm level spelling (`error`, not `ERROR` for `--level`; use `level == ERROR` in DSL) |
 | Index cap hit | Raise `investigation.max_indexed_lines` in config, or use `--persist-index` |
 | Slow persist on large logs | Use `--index-path` to reuse index on later runs; v1.4.2+ batches writes for faster first-time persist |
-| Windows build SSL error | `CMAKE_TLS_VERIFY=0` at configure only — see [README](../../README.md#building-on-windows) |
+| Windows build SSL error | `CMAKE_TLS_VERIFY=0` at configure only — see [Developer Setup](DEVELOPER_SETUP.md#windows-sqlite-fetchcontent-tls) |
 | Config rejected | `logscope config validate --config <file>` for the exact error |
 
 ---
@@ -348,3 +370,4 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 user manual. |
+| 1.1.0 | 24-07-2026 | v1.4.2 persist-index performance, progress logging, and Windows build link fix. |

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -357,9 +357,12 @@ v1.0.x  — Stabilize: docs, bugfixes, observability, stress tests
 v1.1.0  — M6: Log Format Intelligence
 v1.2.0  — M7: Search Engine (+ performance wins)
 v1.3.0  — M8: Advanced Reporting
-v1.3.1+ — M9: Analytics Engine (planned)
-v1.4.0  — M10 Query + M11 Storage + M12 Plugins
-v1.5.0  — M13 AI
+v1.3.1+ — M9: Analytics Engine
+v1.4.0  — M10: Query Language
+v1.4.1  — M11: Storage Layer (core)
+v1.4.2  — M11: bulk index write performance
+v1.4.3  — M11 remainder: compression, query cache
+v1.5.0  — M12: Dynamic Plugins; M13: AI
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.x    — M16 Enterprise, M17 Cloud, ecosystem
 ```
@@ -455,3 +458,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.0.0 | 21-07-2026 | Initial post-v1 strategic roadmap. |
 | 1.1.0 | 24-07-2026 | M8 complete at `v1.3.0`; M9 analytics deferred to follow-on release. |
 | 1.2.0 | 24-07-2026 | Next milestone M9; private themes stay unpublished until graduated. |
+| 1.3.0 | 24-07-2026 | Version roadmap split M10/M11/M12; v1.4.2 bulk perf shipped. |

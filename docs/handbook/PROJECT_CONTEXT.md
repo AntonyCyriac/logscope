@@ -328,3 +328,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.4.0 | 24-07-2026 | M8 complete; v1.3.0 released; M9 is next. |
 | 1.5.0 | 24-07-2026 | M9 complete; v1.3.1 released; M10 is next. |
 | 1.6.0 | 24-07-2026 | M10 complete; v1.4.0 released; M11 is next. |
+| 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |
