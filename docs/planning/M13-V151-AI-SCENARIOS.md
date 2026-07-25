@@ -83,10 +83,10 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A4.1 | Noop summary | `--summarize`, noop provider | Structured output with summary + evidence sections | U+I | Yes | ⬜ |
-| A4.2 | Empty investigation | No matching lines | Summary states no matches | U | | ⬜ |
+| A4.1 | Noop summary | `--summarize`, noop provider | Structured output with summary + evidence sections | U+I | Yes | ✅ |
+| A4.2 | Empty investigation | No matching lines | Summary states no matches | U | | ✅ |
 | A4.3 | HTTP summary | Mock server returns summary JSON/text | Rendered in agent output | I | | ⬜ |
-| A4.4 | Evidence cites lines | Summary with matches | Evidence references line numbers | U | | ⬜ |
+| A4.4 | Evidence cites lines | Summary with matches | Evidence references line numbers | U | | ✅ |
 
 ---
 

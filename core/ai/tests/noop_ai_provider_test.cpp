@@ -34,14 +34,37 @@ TEST(NoOpAiProviderTest, SummarizeUsesInvestigationContext)
     const NoOpAiProvider provider;
 
     AiInvestigationContext context;
-    context.sourceSummary = "2 ERROR lines in sample.log";
+    context.sourceSummary = "source=sample.log, lines=4, errors=2, warnings=0, info=0";
     context.matchCount = 2U;
+    context.indexedLineCount = 4U;
+    context.searchQuerySummary = "content:refused";
+    context.repeatedErrorPatternCount = 1U;
+    context.topRepeatedErrorKey = "Connection refused";
+    context.topRepeatedErrorCount = 2U;
 
     const auto result = provider.summarize(context);
 
     ASSERT_TRUE(result);
-    EXPECT_EQ(result->summary, "2 ERROR lines in sample.log");
+    EXPECT_NE(std::string::npos, result->summary.find("2 matching lines"));
+    EXPECT_NE(std::string::npos, result->summary.find("content:refused"));
+    EXPECT_NE(std::string::npos, result->reasoning.find("Connection refused"));
+    EXPECT_EQ("medium", result->confidence);
     EXPECT_FALSE(result->suggestedActions.empty());
+}
+
+TEST(NoOpAiProviderTest, SummarizeHandlesNoMatches)
+{
+    const NoOpAiProvider provider;
+
+    AiInvestigationContext context;
+    context.matchCount = 0U;
+    context.searchQuerySummary = "level == ERROR";
+
+    const auto result = provider.summarize(context);
+
+    ASSERT_TRUE(result);
+    EXPECT_NE(std::string::npos, result->summary.find("No lines matched"));
+    EXPECT_EQ("low", result->confidence);
 }
 
 TEST(NoOpAiProviderTest, SuggestAnomaliesUsesAnalyticsSignals)
