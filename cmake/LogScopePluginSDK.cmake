@@ -2,6 +2,25 @@
 # LogScope Plugin SDK helpers (M12)
 # ==========================================================
 
+function(logscope_set_flat_output_directory target output_dir)
+    set_target_properties(${target} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${output_dir}"
+        LIBRARY_OUTPUT_DIRECTORY "${output_dir}"
+        ARCHIVE_OUTPUT_DIRECTORY "${output_dir}"
+    )
+
+    if(CMAKE_CONFIGURATION_TYPES)
+        foreach(config IN LISTS CMAKE_CONFIGURATION_TYPES)
+            string(TOUPPER "${config}" config_upper)
+            set_target_properties(${target} PROPERTIES
+                "RUNTIME_OUTPUT_DIRECTORY_${config_upper}" "${output_dir}"
+                "LIBRARY_OUTPUT_DIRECTORY_${config_upper}" "${output_dir}"
+                "ARCHIVE_OUTPUT_DIRECTORY_${config_upper}" "${output_dir}"
+            )
+        endforeach()
+    endif()
+endfunction()
+
 function(logscope_add_plugin target)
     cmake_parse_arguments(ARG "" "" "SOURCES;LINK_LIBS" ${ARGN})
 
@@ -25,9 +44,5 @@ function(logscope_add_plugin target)
         target_link_libraries(${target} PRIVATE ${ARG_LINK_LIBS})
     endif()
 
-    set_target_properties(${target} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-        ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
-    )
+    logscope_set_flat_output_directory(${target} "${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()

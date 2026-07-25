@@ -28,23 +28,9 @@ set_target_properties(logscope_test_storage_plugin PROPERTIES WINDOWS_EXPORT_ALL
 target_compile_definitions(logscope_test_storage_plugin PRIVATE LOGSCOPE_PLUGIN_EXPORT)
 target_link_libraries(logscope_test_storage_plugin PRIVATE logscope_plugin_sdk)
 
-set_target_properties(logscope_test_report_plugin PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/report
-    LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/report
-    ARCHIVE_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/report
-)
-
-set_target_properties(logscope_test_full_plugin PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/full
-    LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/full
-    ARCHIVE_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/full
-)
-
-set_target_properties(logscope_test_storage_plugin PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/storage
-    LIBRARY_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/storage
-    ARCHIVE_OUTPUT_DIRECTORY ${PLUGIN_TEST_OUTPUT_DIR}/storage
-)
+logscope_set_flat_output_directory(logscope_test_report_plugin "${PLUGIN_TEST_OUTPUT_DIR}/report")
+logscope_set_flat_output_directory(logscope_test_full_plugin "${PLUGIN_TEST_OUTPUT_DIR}/full")
+logscope_set_flat_output_directory(logscope_test_storage_plugin "${PLUGIN_TEST_OUTPUT_DIR}/storage")
 
 add_executable(scope_plugin_tests
     plugin_loader_test.cpp
