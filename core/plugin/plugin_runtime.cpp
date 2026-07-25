@@ -43,16 +43,16 @@ bool pluginProvidersMayDestroy() noexcept
     return g_pluginProvidersMayDestroy.load();
 }
 
-void shutdownPluginRuntime() noexcept
+void releasePluginRuntimeResources() noexcept
 {
-    static bool shutdownComplete = false;
+    static bool resourcesReleased = false;
 
-    if (shutdownComplete)
+    if (resourcesReleased)
     {
         return;
     }
 
-    shutdownComplete = true;
+    resourcesReleased = true;
 
     analysis::ParserRegistry::instance().clear();
     search::SearchProviderRegistry::instance().clear();
@@ -60,7 +60,11 @@ void shutdownPluginRuntime() noexcept
     reporting::ReportSectionRegistry::instance().clearPluginContributors();
 
     g_pluginProvidersMayDestroy.store(false);
+}
 
+void shutdownPluginRuntime() noexcept
+{
+    releasePluginRuntimeResources();
     unloadAllPersistentLibraries();
 }
 

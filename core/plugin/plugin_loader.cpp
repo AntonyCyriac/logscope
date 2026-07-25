@@ -32,11 +32,27 @@ void collectLibraryFiles(const foundation::Path& directory, std::vector<foundati
     }
 }
 
+struct PersistentPluginLibraries
+{
+    std::vector<LoadedPluginLibrary> libraries;
+
+    ~PersistentPluginLibraries()
+    {
+        releasePluginRuntimeResources();
+        libraries.clear();
+    }
+};
+
+PersistentPluginLibraries& persistentPluginState()
+{
+    static PersistentPluginLibraries state;
+
+    return state;
+}
+
 std::vector<LoadedPluginLibrary>& persistentLoadedLibraries()
 {
-    static std::vector<LoadedPluginLibrary> libraries;
-
-    return libraries;
+    return persistentPluginState().libraries;
 }
 
 } // namespace
@@ -165,6 +181,7 @@ foundation::Result<std::size_t> loadPluginsForManager(extension::ExtensionManage
 
 void unloadAllPersistentLibraries() noexcept
 {
+    releasePluginRuntimeResources();
     persistentLoadedLibraries().clear();
 }
 

@@ -16,6 +16,11 @@ namespace scope::plugin
 createConfiguredExtensionManager(const runtime::Configuration& configuration);
 
 /**
+ * @brief Destroys plugin-backed providers while their libraries are still loaded.
+ */
+void releasePluginRuntimeResources() noexcept;
+
+/**
  * @brief Releases plugin providers and unloads libraries before process exit.
  */
 void shutdownPluginRuntime() noexcept;
