@@ -103,7 +103,7 @@ CREATE VIRTUAL TABLE lines_fts USING fts5(
 
 When `storage.compress_content=true`, lines at or above `storage.compress_threshold_bytes` store zlib-compressed `content` BLOBs. Reads decompress transparently. Toggling compression on an existing index requires rebuild.
 
-### JSON field predicates (v1.4.3 — design)
+### JSON field predicates (v1.4.3 — M11.9 shipped)
 
 During JSONL indexing, top-level key/value pairs populate `line_json_fields`. `QueryPlanner` maps `field == "value"` to `EXISTS (SELECT 1 FROM line_json_fields ...)`. Non-pushable predicates fall back to `QueryEvaluator`.
 
@@ -111,11 +111,11 @@ During JSONL indexing, top-level key/value pairs populate `line_json_fields`. `Q
 
 `query_cache` stores serialized matching line numbers keyed by `SHA256(fingerprint + canonical_filter + schema_version)`. Invalidated on fingerprint change, source truncate, schema bump, or when disabled via `storage.query_cache.enabled=false`.
 
-### Incremental append (v1.4.3 — design)
+### Incremental append (v1.4.3 — M11.11 shipped)
 
 When `storage.incremental_append=true` (default) and source file **grows** (size increase, mtime newer) with matching path, reuse opens the store in append mode starting at `indexed_line_count + 1`. **Truncate** (size decrease) deletes the index and rebuilds.
 
-### FTS5 (v1.4.3 — design)
+### FTS5 (v1.4.3 — M11.12 shipped)
 
 SQLite built with `SQLITE_ENABLE_FTS5`. `lines_fts` maintained on insert. `contains(message|content, ...)` and M7 text search use FTS `MATCH` when a persisted store is attached; otherwise existing in-memory paths apply.
 
@@ -132,7 +132,7 @@ Shipped in **`v1.4.2`:**
 
 - Batched SQLite bulk writes and `BM_IndexStoreAppend/100000` benchmark SLA (see [M11-STORAGE-LAYER.md](../../planning/M11-STORAGE-LAYER.md))
 
-**v1.4.3 (in progress — see [M11-V143-STORAGE-SCENARIOS.md](../../planning/M11-V143-STORAGE-SCENARIOS.md)):**
+**v1.4.3 (shipped — see [M11-V143-STORAGE-SCENARIOS.md](../../planning/M11-V143-STORAGE-SCENARIOS.md)):**
 
 - Schema v2 migration, zlib compression, `line_json_fields`, `query_cache`, incremental append, FTS5
 

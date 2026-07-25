@@ -293,7 +293,7 @@ Together these documents provide a complete logical description of the LogScope 
 
 ### Storage layer evolution
 
-**M11 (`scope_storage`)** provides SQLite-backed persistent indexes (v1.4.1–v1.4.2 shipped). **v1.4.3** extends the storage layer with schema v2, compression, JSON field indexing, query result cache, incremental append, and FTS5 — see [ADR-005](decisions/ADR-005-Storage-Architecture.md) and [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
+**M11 (`scope_storage`)** provides SQLite-backed persistent indexes (v1.4.1–v1.4.3 shipped): hybrid memory spill, session reuse, schema v2, compression, JSON field indexing, query result cache, incremental append, and FTS5 — see [ADR-005](decisions/ADR-005-Storage-Architecture.md) and [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
 ---
 

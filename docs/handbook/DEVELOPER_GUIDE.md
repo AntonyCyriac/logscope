@@ -45,7 +45,7 @@ core/               Libraries (one CMake target per module, scope_<name>)
   analysis/         AnalysisEngine, line index, format detection
   search/           Text and boolean search
   query/            Filter DSL
-  storage/          SQLite indexes (M11; v1.4.3 remainder in progress)
+  storage/          SQLite indexes (M11; v1.4.3 shipped)
   analytics/        Frequency, clustering, timeline
   investigation/    Investigation engine
   reporting/        Report formats and sections
@@ -205,22 +205,9 @@ cmake --build build --target logscope_benchmarks
 
 Regression gate: `BM_IndexStoreAppend/100000` in [`tests/benchmarks/baseline.json`](../../tests/benchmarks/baseline.json). See [Performance Baselines](../testing/PERFORMANCE.md).
 
-### v1.4.3 storage remainder (after design merge)
+### v1.4.3 storage (shipped)
 
-Implementation order and acceptance scenarios: [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
-
-| Branch | Feature |
-|--------|---------|
-| `feat/v1.4.3-schema-v2` | Schema v2 migration |
-| `feat/v1.4.3-compression` | zlib compression |
-| `feat/v1.4.3-json-fields` | `line_json_fields` |
-| `feat/v1.4.3-query-cache` | `query_cache` |
-| `feat/v1.4.3-incremental-append` | Incremental append |
-| `feat/v1.4.3-fts5` | FTS5 pushdown |
-
-**Do not open `feat/v1.4.3-*` until `docs/v1.4.3-design` is merged.**
-
----
+Acceptance scenarios and test matrix: [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
 # 8. Documentation expectations
 
