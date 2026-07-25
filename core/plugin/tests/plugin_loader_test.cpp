@@ -60,6 +60,7 @@ TEST(PluginLoaderTest, LoadsTestReportPlugin)
     const auto loaded = loadPluginsForManager(manager, config);
 
     ASSERT_TRUE(loaded.hasValue());
+    ASSERT_GT(*loaded, 0U);
 
     const auto describeResult = manager.describe("test.report");
 

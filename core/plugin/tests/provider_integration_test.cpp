@@ -66,7 +66,10 @@ void loadFullTestPlugin()
     config.enabled = true;
     config.paths = {fullPluginDirectory()};
 
-    ASSERT_TRUE(loadPluginsForManager(manager, config).hasValue());
+    const auto loaded = loadPluginsForManager(manager, config);
+
+    ASSERT_TRUE(loaded.hasValue());
+    ASSERT_GT(*loaded, 0U);
 }
 
 void loadStorageTestPlugin()
@@ -79,7 +82,10 @@ void loadStorageTestPlugin()
     config.enabled = true;
     config.paths = {storagePluginDirectory()};
 
-    ASSERT_TRUE(loadPluginsForManager(manager, config).hasValue());
+    const auto loaded = loadPluginsForManager(manager, config);
+
+    ASSERT_TRUE(loaded.hasValue());
+    ASSERT_GT(*loaded, 0U);
 }
 
 } // namespace
@@ -117,7 +123,10 @@ TEST(PluginProviderIntegrationTest, RegistersReportContributor)
     PluginConfig config;
     config.enabled = true;
     config.paths = {fullPluginDirectory()};
-    ASSERT_TRUE(loadPluginsForManager(manager, config).hasValue());
+    const auto loaded = loadPluginsForManager(manager, config);
+
+    ASSERT_TRUE(loaded.hasValue());
+    ASSERT_GT(*loaded, 0U);
 
     const auto describeResult = manager.describe("test.full");
 

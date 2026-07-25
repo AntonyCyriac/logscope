@@ -7,6 +7,12 @@ include(${CMAKE_SOURCE_DIR}/cmake/LogScopePluginSDK.cmake)
 
 set(PLUGIN_TEST_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/plugins)
 
+# Use forward slashes so Windows paths like D:\a\... are not corrupted in C string literals.
+string(REPLACE "\\" "/" PLUGIN_TEST_REPORT_DIR "${PLUGIN_TEST_OUTPUT_DIR}/report")
+string(REPLACE "\\" "/" PLUGIN_TEST_FULL_DIR "${PLUGIN_TEST_OUTPUT_DIR}/full")
+string(REPLACE "\\" "/" PLUGIN_TEST_STORAGE_DIR "${PLUGIN_TEST_OUTPUT_DIR}/storage")
+string(REPLACE "\\" "/" PLUGIN_TESTDATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/testdata")
+
 add_library(logscope_test_report_plugin SHARED test_report_plugin.cpp)
 set_target_properties(logscope_test_report_plugin PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
 target_compile_definitions(logscope_test_report_plugin PRIVATE LOGSCOPE_PLUGIN_EXPORT)
@@ -60,10 +66,10 @@ target_link_libraries(scope_plugin_tests
 )
 
 target_compile_definitions(scope_plugin_tests PRIVATE
-    PLUGIN_TEST_REPORT_DIR="${PLUGIN_TEST_OUTPUT_DIR}/report"
-    PLUGIN_TEST_FULL_DIR="${PLUGIN_TEST_OUTPUT_DIR}/full"
-    PLUGIN_TEST_STORAGE_DIR="${PLUGIN_TEST_OUTPUT_DIR}/storage"
-    PLUGIN_TESTDATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/testdata"
+    PLUGIN_TEST_REPORT_DIR="${PLUGIN_TEST_REPORT_DIR}"
+    PLUGIN_TEST_FULL_DIR="${PLUGIN_TEST_FULL_DIR}"
+    PLUGIN_TEST_STORAGE_DIR="${PLUGIN_TEST_STORAGE_DIR}"
+    PLUGIN_TESTDATA_DIR="${PLUGIN_TESTDATA_DIR}"
 )
 
 add_dependencies(scope_plugin_tests logscope_test_report_plugin logscope_test_full_plugin logscope_test_storage_plugin)
