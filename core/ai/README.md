@@ -2,13 +2,15 @@
 
 `scope_ai` implements M13 pluggable AI providers for investigation assistance.
 
-## Shipped (M13.1–M13.5)
+## Shipped (M13.1–M13.6)
 
 | Component | Purpose |
 |-----------|---------|
 | `AiProvider` | Virtual interface: NL→DSL, summarize, anomaly hints |
 | `NoOpAiProvider` | Deterministic offline provider (default; CI) |
-| `HttpAiProvider` | Stub for M13.6 HTTP/OpenAI-compatible backend |
+| `HttpAiProvider` | OpenAI-compatible chat completions via cpp-httplib |
+| `HttpAiClient` | `/v1/chat/completions` client with bounded timeouts |
+| `ai_json_util` | Minimal JSON helpers for HTTP request/response parsing |
 | `NlQueryTranslator` | NL → DSL with `parseFilterQuery` validation |
 | `AiInvestigationAssistant` | Config + provider holder; NL translation, summaries, and anomaly hints |
 | `ai_context_builder` | Bounded evidence samples from investigation output |

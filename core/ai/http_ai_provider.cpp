@@ -4,10 +4,11 @@
 
 #include "http_ai_provider.hpp"
 
-#include <cstdlib>
+#include <sstream>
 
 #include "foundation/error.hpp"
 #include "foundation/string.hpp"
+#include "http_ai_client.hpp"
 
 namespace scope::ai
 {
@@ -15,26 +16,104 @@ namespace scope::ai
 namespace
 {
 
-foundation::Error notImplementedError()
-{
-    return foundation::Error(foundation::ErrorCode::Unknown,
-                             "HTTP AI provider is not implemented until M13.6.");
-}
+constexpr const char* kNlSystemPrompt =
+    "You translate natural language log investigation requests into LogScope filter DSL. "
+    "Respond with ONLY the filter expression, with no markdown or explanation.";
 
-foundation::Error missingApiKeyError()
-{
-    return foundation::Error(foundation::ErrorCode::InvalidArgument,
-                             "LOGSCOPE_AI_API_KEY is required when ai.provider=http.");
-}
+constexpr const char* kSummarySystemPrompt =
+    "You summarize log investigations. Respond with a concise plain-text summary only.";
 
-bool hasApiKey()
+constexpr const char* kHintsSystemPrompt =
+    "You surface anomaly hints from analytics signals. Respond with one hint per line, without bullets.";
+
+std::string buildSummaryPrompt(const AiInvestigationContext& context)
 {
-    if (const char* apiKey = std::getenv("LOGSCOPE_AI_API_KEY"))
+    std::ostringstream prompt;
+
+    prompt << "Investigation context:\n";
+    prompt << "- match_count=" << context.matchCount << "\n";
+    prompt << "- indexed_line_count=" << context.indexedLineCount << "\n";
+    prompt << "- truncated_line_count=" << context.truncatedLineCount << "\n";
+
+    if (!context.searchQuerySummary.empty())
     {
-        return !foundation::isBlank(apiKey);
+        prompt << "- query=" << context.searchQuerySummary << "\n";
     }
 
-    return false;
+    if (!context.sourceSummary.empty())
+    {
+        prompt << "- source=" << context.sourceSummary << "\n";
+    }
+
+    if (!context.sampleLines.empty())
+    {
+        prompt << "Sample lines:\n";
+
+        for (const auto& evidence : context.sampleLines)
+        {
+            prompt << "- line " << evidence.lineNumber << ": " << evidence.text << "\n";
+        }
+    }
+
+    return prompt.str();
+}
+
+std::string buildHintsPrompt(const AiAnalyticsContext& context)
+{
+    std::ostringstream prompt;
+
+    prompt << "Analytics context:\n";
+    prompt << "- has_spike=" << (context.hasSpike ? "true" : "false") << "\n";
+
+    if (!context.spikeVerdict.empty())
+    {
+        prompt << "- spike_verdict=" << context.spikeVerdict << "\n";
+    }
+
+    prompt << "- cluster_count=" << context.clusterCount << "\n";
+
+    if (!context.topClusterMessage.empty())
+    {
+        prompt << "- top_cluster=" << context.topClusterMessage << "\n";
+    }
+
+    prompt << "- repeated_error_patterns=" << context.repeatedErrorPatternCount << "\n";
+
+    if (!context.topRepeatedErrorKey.empty())
+    {
+        prompt << "- top_repeated_error=" << context.topRepeatedErrorKey << "\n";
+    }
+
+    return prompt.str();
+}
+
+std::vector<AiAnomalyHint> parseHintLines(const std::string& content)
+{
+    std::vector<AiAnomalyHint> hints;
+    const std::vector<std::string> lines = foundation::split(content, '\n');
+
+    for (std::string line : lines)
+    {
+        line = foundation::trim(line);
+
+        while (!line.empty() && (line.front() == '-' || line.front() == '*'))
+        {
+            line.erase(line.begin());
+            line = foundation::trim(line);
+        }
+
+        if (line.empty())
+        {
+            continue;
+        }
+
+        AiAnomalyHint hint;
+        hint.severity = "medium";
+        hint.message = std::move(line);
+        hints.push_back(std::move(hint));
+    }
+
+    return hints;
 }
 
 } // namespace
@@ -46,35 +125,56 @@ std::string HttpAiProvider::id() const
     return kProviderHttp;
 }
 
-foundation::Result<std::string> HttpAiProvider::translateNlToFilter(std::string_view /*naturalLanguageQuery*/) const
+foundation::Result<std::string> HttpAiProvider::translateNlToFilter(
+    const std::string_view naturalLanguageQuery) const
 {
-    if (!hasApiKey())
-    {
-        return foundation::Result<std::string>(missingApiKeyError());
-    }
+    const HttpAiClient client(m_config);
 
-    return foundation::Result<std::string>(notImplementedError());
+    return client.chatCompletion(kNlSystemPrompt, naturalLanguageQuery);
 }
 
-foundation::Result<AiSummary> HttpAiProvider::summarize(const AiInvestigationContext& /*context*/) const
+foundation::Result<AiSummary> HttpAiProvider::summarize(const AiInvestigationContext& context) const
 {
-    if (!hasApiKey())
+    const HttpAiClient client(m_config);
+    const auto content = client.chatCompletion(kSummarySystemPrompt, buildSummaryPrompt(context));
+
+    if (!content)
     {
-        return foundation::Result<AiSummary>(missingApiKeyError());
+        return foundation::Result<AiSummary>(content.error());
     }
 
-    return foundation::Result<AiSummary>(notImplementedError());
+    AiSummary summary;
+    summary.summary = *content;
+    summary.reasoning = "Generated by HTTP AI provider.";
+    summary.confidence = "medium";
+    summary.evidence = context.sampleLines;
+    summary.suggestedActions.push_back("Review cited evidence lines for root-cause patterns.");
+
+    return foundation::Result<AiSummary>(std::move(summary));
 }
 
 foundation::Result<std::vector<AiAnomalyHint>> HttpAiProvider::suggestAnomalies(
-    const AiAnalyticsContext& /*context*/) const
+    const AiAnalyticsContext& context) const
 {
-    if (!hasApiKey())
+    const HttpAiClient client(m_config);
+    const auto content = client.chatCompletion(kHintsSystemPrompt, buildHintsPrompt(context));
+
+    if (!content)
     {
-        return foundation::Result<std::vector<AiAnomalyHint>>(missingApiKeyError());
+        return foundation::Result<std::vector<AiAnomalyHint>>(content.error());
     }
 
-    return foundation::Result<std::vector<AiAnomalyHint>>(notImplementedError());
+    std::vector<AiAnomalyHint> hints = parseHintLines(*content);
+
+    if (hints.empty())
+    {
+        AiAnomalyHint hint;
+        hint.severity = "info";
+        hint.message = "No anomaly signals detected in analytics context.";
+        hints.push_back(std::move(hint));
+    }
+
+    return foundation::Result<std::vector<AiAnomalyHint>>(std::move(hints));
 }
 
 } // namespace scope::ai
