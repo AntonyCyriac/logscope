@@ -22,4 +22,20 @@ const AiProvider& AiInvestigationAssistant::provider() const noexcept
     return *m_provider;
 }
 
+foundation::Result<std::string> AiInvestigationAssistant::translateNaturalLanguageQuery(
+    std::string_view naturalLanguageQuery) const
+{
+    const NlQueryTranslator translator(*m_provider);
+
+    return translator.translateToFilterExpression(naturalLanguageQuery);
+}
+
+foundation::Result<query::QueryNode> AiInvestigationAssistant::translateNaturalLanguageFilter(
+    std::string_view naturalLanguageQuery) const
+{
+    const NlQueryTranslator translator(*m_provider);
+
+    return translator.translateToFilterQuery(naturalLanguageQuery);
+}
+
 } // namespace scope::ai

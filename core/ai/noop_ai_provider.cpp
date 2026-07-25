@@ -6,7 +6,6 @@
 
 #include "foundation/error.hpp"
 #include "foundation/string.hpp"
-#include "query_parser.hpp"
 
 namespace scope::ai
 {
@@ -52,13 +51,6 @@ foundation::Result<std::string> NoOpAiProvider::translateNlToFilter(std::string_
         return foundation::Result<std::string>(foundation::Error(
             foundation::ErrorCode::InvalidArgument,
             "Noop provider could not map natural language query to filter DSL."));
-    }
-
-    const auto parsed = query::parseFilterQuery(filter);
-
-    if (!parsed)
-    {
-        return foundation::Result<std::string>(parsed.error());
     }
 
     return foundation::Result<std::string>(filter);

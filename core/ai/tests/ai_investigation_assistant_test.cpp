@@ -18,3 +18,18 @@ TEST(AiInvestigationAssistantTest, ResolvesNoopProvider)
     EXPECT_EQ(assistant.provider().id(), kProviderNoOp);
     EXPECT_FALSE(assistant.config().enabled);
 }
+
+TEST(AiInvestigationAssistantTest, TranslatesNaturalLanguageQuery)
+{
+    const AiConfig config;
+    const AiInvestigationAssistant assistant(config);
+
+    const auto expression = assistant.translateNaturalLanguageQuery("errors");
+
+    ASSERT_TRUE(expression);
+    EXPECT_EQ(*expression, "level == ERROR");
+
+    const auto query = assistant.translateNaturalLanguageFilter("warnings");
+
+    ASSERT_TRUE(query);
+}

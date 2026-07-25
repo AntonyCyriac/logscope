@@ -72,8 +72,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A3.1 | Noop heuristic | `--ask "errors"`, noop provider | Valid DSL (e.g. `level == ERROR`); investigate runs | U+I | Yes | ⬜ |
-| A3.2 | Invalid DSL rejected | Provider returns malformed DSL | Error; investigate not run with bad filter | U | Yes | ⬜ |
+| A3.1 | Noop heuristic | `--ask "errors"`, noop provider | Valid DSL (e.g. `level == ERROR`); investigate runs | U+I | Yes | ✅ |
+| A3.2 | Invalid DSL rejected | Provider returns malformed DSL | Error; investigate not run with bad filter | U | Yes | ✅ |
 | A3.3 | HTTP translation | Mock server returns `level == ERROR` | Parsed and applied to investigate | I | | ⬜ |
 | A3.4 | Existing DSL unchanged | `investigate --filter 'level == ERROR'` | No AI path; same as pre-M13 | I+E | Yes | ⬜ |
 

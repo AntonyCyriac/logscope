@@ -8,6 +8,7 @@ add_library(scope_ai
     ai_investigation_assistant.cpp
     ai_provider.cpp
     http_ai_provider.cpp
+    nl_query_translator.cpp
     noop_ai_provider.cpp
 )
 
