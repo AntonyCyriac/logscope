@@ -7,6 +7,7 @@ add_executable(scope_ai_tests
     ai_config_test.cpp
     ai_investigation_assistant_test.cpp
     ai_provider_test.cpp
+    nl_query_translator_test.cpp
     noop_ai_provider_test.cpp
 )
 

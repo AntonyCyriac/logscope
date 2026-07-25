@@ -9,7 +9,8 @@
 | `AiProvider` | Virtual interface: NL→DSL, summarize, anomaly hints |
 | `NoOpAiProvider` | Deterministic offline provider (default; CI) |
 | `HttpAiProvider` | Stub for M13.6 HTTP/OpenAI-compatible backend |
-| `AiInvestigationAssistant` | Config + provider holder |
+| `NlQueryTranslator` | NL → DSL with `parseFilterQuery` validation |
+| `AiInvestigationAssistant` | Config + provider holder; `translateNaturalLanguageQuery` |
 | `ai.*` config keys | See [CONFIGURATION_GUIDE](../../docs/handbook/CONFIGURATION_GUIDE.md) |
 
 Architecture: [ADR-007](../../docs/architecture/decisions/ADR-007-AI-Integration.md) · [M13 planning](../../docs/planning/M13-AI-ASSISTANT.md)
