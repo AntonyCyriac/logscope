@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.6.0 |
+| Version | 1.7.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -27,9 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.4.2` (shipped)
+**Current release:** `v1.4.3` (shipped)
 
-**In progress:** `v1.4.3` — M11 storage remainder (compression, query cache, JSON field predicates, incremental append, FTS5). See [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
+**Next milestone:** **M12 – Dynamic Plugins** (`v1.5.0`). See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -46,14 +46,14 @@ The project follows architecture-first development. Every implementation should 
 | M8 – Advanced Reporting | Section registry, executive/error/chart sections, HTML/PDF, `--output` (`v1.3.0`) |
 | M9 – Analytics Engine | Frequency, clustering, timeline, trends, `logscope analytics` (`v1.3.1`) |
 | M10 – Query Language | Field-aware filter DSL, `--filter`, `logscope query` (`v1.4.0`) |
-| M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session index reuse (`v1.4.1`); bulk write perf (`v1.4.2`) |
+| M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session reuse (`v1.4.1`); bulk write perf (`v1.4.2`); schema v2, compression, cache, append, FTS5 (`v1.4.3`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M11 remainder | `v1.4.3` | Compression, query cache, `line_json_fields`, incremental append, FTS5 |
 | M12 – Dynamic Plugins | `v1.5.0` | `.so`/`.dll` loading, parser/report/search providers |
+| M13 – AI Assistant | `v1.5.0` | Summaries, anomaly hints, NL queries |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -333,3 +333,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.6.0 | 24-07-2026 | M10 complete; v1.4.0 released; M11 is next. |
 | 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |
 | 1.8.0 | 24-07-2026 | v1.4.3 M11 remainder in progress. |
+| 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |

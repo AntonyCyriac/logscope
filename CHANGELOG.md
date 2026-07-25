@@ -10,20 +10,28 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
-### Added (v1.4.3 — planned)
+---
 
-- Schema v2 migration framework with v1 index rebuild policy.
-- zlib compression on persisted `content` column (`storage.compress_content`, `storage.compress_threshold_bytes`).
-- `line_json_fields` EAV table and `QueryPlanner` pushdown for top-level JSON field predicates.
-- `query_cache` table for materialized filter results (`storage.query_cache.enabled`, `storage.query_cache.max_entries`).
-- Incremental append indexing when source log grows (`storage.incremental_append`).
-- FTS5 virtual table (`lines_fts`) with search and `contains()` pushdown on persisted indexes.
-- Planned benchmarks: `BM_IndexStoreCompressed`, `BM_QueryCacheHit`, `BM_FtsSearch`.
+## [1.4.3] - 2026-07-25
 
-### Changed (v1.4.3 — planned)
+M11 storage remainder — schema v2, compression, JSON field predicates, query cache, incremental append, and FTS5 full-text search. **451** automated tests.
 
-- Opening a schema v1 index rebuilds to schema v2 from source.
-- `IndexFingerprint` semantics extended for append vs full rebuild on source growth/truncation.
+### Added
+
+- Schema v2 persistent index (`meta` snapshot keys, `line_json_fields`, `query_cache`); v1 indexes rebuild on open.
+- zlib compression on persisted `content` (`storage.compress_content`, `storage.compress_threshold_bytes`).
+- `line_json_fields` EAV table and `QueryPlanner` pushdown for top-level JSON field predicates on JSONL sources.
+- `query_cache` materialized filter results (`storage.query_cache.enabled`, `storage.query_cache.max_entries`).
+- Incremental append indexing when source log grows (`storage.incremental_append`, default `true`).
+- FTS5 `lines_fts` virtual table with `contains()` and M7 text-search pushdown on persisted indexes (`SQLITE_ENABLE_FTS5`).
+- `BM_IndexStoreCompressed`, `BM_FtsSearch` benchmarks (informational; not CI-gated).
+- `.clang-tidy` with `clang-analyzer-*`; static analysis warnings fail CI.
+
+### Changed
+
+- Opening a schema v1 index rebuilds to schema v2 from the authoritative source log.
+- `IndexFingerprint` / `prepareIndexReuse()` distinguish append, rebuild, and unchanged source snapshots.
+- `contains(message|content, …)` SQL pushdown uses FTS `MATCH` instead of `LIKE` when a persisted store is attached.
 
 ---
 

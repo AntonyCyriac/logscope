@@ -5,7 +5,7 @@
 | Document | M11 v1.4.3 Storage Scenarios |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | Draft (design) |
+| Status | Complete |
 | Created | 24-07-2026 |
 | Last Updated | 24-07-2026 |
 
@@ -137,10 +137,10 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Expected behavior | Test | Status |
 |----|----------|-------------------|------|--------|
-| X.1 | Release CLI matrix | 100k-line persist + filter + search on all OSes | E (release.yml) | ⬜ |
-| X.2 | Windows zlib link | Build + test on Windows CI | CI | ⬜ |
-| X.3 | Config validate | New `storage.*` keys accepted by `config validate` | U | ⬜ |
-| X.4 | Backward CLI | v1.4.2 commands unchanged without new config | E | ⬜ |
+| X.1 | Release CLI matrix | 100k-line persist + filter + search on all OSes | E (release.yml) | ✅ |
+| X.2 | Windows zlib link | Build + test on Windows CI | CI | ✅ |
+| X.3 | Config validate | New `storage.*` keys accepted by `config validate` | U | ✅ |
+| X.4 | Backward CLI | v1.4.2 commands unchanged without new config | E | ✅ |
 
 ---
 

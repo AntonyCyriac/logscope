@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | M11 – Storage Layer |
 | Category | Project Planning |
-| Version | 1.2.0 |
-| Status | Approved |
+| Version | 1.3.0 |
+| Status | Complete |
 | Created | 24-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -98,18 +98,18 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | Indexing feedback | ✅ Progress log every 10k lines |
 | Benchmark SLA | ✅ `BM_IndexStoreAppend/100000` + `baseline.json` |
 
-## v1.4.3 — Storage remainder (in progress)
+## v1.4.3 — Storage remainder (released)
 
 **M11 completion** — compression, query cache, JSON field predicates, incremental append, FTS5. See [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md).
 
 | Item | Status |
 |------|--------|
-| Schema v2 migration | 🟡 Design |
-| zlib compression on `content` | 🟡 Design |
-| `line_json_fields` EAV + pushdown | 🟡 Design |
+| Schema v2 migration | ✅ |
+| zlib compression on `content` | ✅ |
+| `line_json_fields` EAV + pushdown | ✅ |
 | `query_cache` | ✅ |
-| Incremental append | 🟡 Design |
-| FTS5 | 🟡 Design |
+| Incremental append | ✅ |
+| FTS5 | ✅ |
 
 ## Deferred to M12 (`v1.5.0`)
 
@@ -124,3 +124,4 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | 1.0.0 | 24-07-2026 | Initial M11 planning document. |
 | 1.1.0 | 24-07-2026 | v1.4.1 shipped; v1.4.2 bulk write perf. |
 | 1.2.0 | 24-07-2026 | v1.4.3 phases M11.7–M11.12; scenario matrix link. |
+| 1.3.0 | 25-07-2026 | v1.4.3 shipped; M11 complete. |

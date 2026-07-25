@@ -25,7 +25,7 @@ Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../plannin
 
 ## 2.1 Install
 
-**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.2` or later) and add `logscope` to your `PATH`.
+**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.3` or later) and add `logscope` to your `PATH`.
 
 **Build from source** — see [Developer Setup](DEVELOPER_SETUP.md) or the [README](../../README.md) quick start.
 
@@ -377,15 +377,15 @@ log.level=info
 
 Set `log.level=warn` or `SCOPE_LOG_LEVEL=warn` to suppress progress lines. See [Configuration Guide](CONFIGURATION_GUIDE.md) (`log.level`).
 
-## 8.2 Incremental re-index (v1.4.3+ — planned)
+## 8.2 Incremental re-index (v1.4.3+)
 
-When a log file **grows** (new lines appended on disk), `--reuse-index` can append only new lines to an existing SQLite index instead of rebuilding from scratch. Configure with `storage.incremental_append=true` (default when shipped).
+When a log file **grows** (new lines appended on disk), `--reuse-index` appends only new lines to an existing SQLite index instead of rebuilding from scratch. Configure with `storage.incremental_append=true` (default).
 
 If the file **shrinks** (truncated or rotated), LogScope rebuilds the index from the source file.
 
 Opening a **v1.4.2** (schema v1) index with v1.4.3 triggers a one-time rebuild to schema v2.
 
-## 8.3 JSON field filters (v1.4.3+ — planned)
+## 8.3 JSON field filters (v1.4.3+)
 
 On JSON Lines logs, filter by top-level fields:
 
@@ -396,9 +396,18 @@ logscope investigate --filter 'service == "PCF" AND level == ERROR' samples/samp
 
 Requires `--profile generic-json` or auto-detected JSONL format.
 
-## 8.4 Query cache (v1.4.3+ — planned)
+## 8.4 Query cache (v1.4.3+)
 
-Repeat investigations with the same filter on an unchanged index reuse cached line IDs (`storage.query_cache.enabled=true`). Cache invalidates when the source file changes or the index is rebuilt.
+Repeat investigations with the same filter on an unchanged index reuse cached line IDs (`storage.query_cache.enabled=true`, default). Cache invalidates when the source file changes or the index is rebuilt.
+
+## 8.5 FTS full-text search (v1.4.3+)
+
+On persisted indexes, `contains(message|content, …)` and content search use SQLite FTS5 for faster matching. Memory-only indexes keep the existing in-memory search path.
+
+```bash
+logscope investigate --persist-index --content-search "timeout" samples/large-app.log
+logscope query --filter 'contains(message, "timeout")' --persist-index samples/large-app.log
+```
 
 ---
 

@@ -110,13 +110,14 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and 
 
 ---
 
-# Planned benchmarks (v1.4.3)
+# v1.4.3 storage benchmarks
 
 | Benchmark | Description | CI gate |
 |-----------|-------------|---------|
-| `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; reports `file_bytes` counter | Local only (no CI gate yet) |
-| `BM_QueryCacheHit` | Second identical filter query on persisted index | TBD |
-| `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | Informational (not gated) |
+| `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; reports `file_bytes` counter | Informational |
+| `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | Informational |
+
+`BM_QueryCacheHit` remains a future benchmark candidate.
 
 See [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
@@ -132,3 +133,4 @@ See [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
 | 1.3.0 | 24-07-2026 | Fixed deprecated `DoNotOptimize` usage in analysis benchmark (M8 housekeeping). |
 | 1.4.0 | 24-07-2026 | Added `BM_IndexStoreAppend/100000` baseline and storage benchmark section (`v1.4.2`). |
 | 1.5.0 | 24-07-2026 | Planned v1.4.3 storage benchmarks (compression, cache, FTS). |
+| 1.6.0 | 25-07-2026 | Documented shipped v1.4.3 benchmarks (`BM_IndexStoreCompressed`, `BM_FtsSearch`). |

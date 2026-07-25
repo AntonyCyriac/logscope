@@ -17,8 +17,6 @@ This document describes LogScope test layers, how to run them, and how they map 
 
 **Current baseline:** **451** automated tests (unit, integration, end-to-end, and regression). Storage coverage includes `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, M11 storage regression guards, and FTS5 pushdown tests.
 
-**v1.4.3:** implement tests per [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md) scenario matrix (target ~435 tests at release).
-
 ---
 
 # Test Layers
@@ -192,4 +190,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.5.0 | 24-07-2026 | Added regression test layer; updated baseline to 395 tests; sanitizer CI env hardening. |
 | 1.6.0 | 24-07-2026 | Updated baseline to 396 tests at `v1.4.2`; noted M11 bulk index write performance coverage. |
 | 1.7.0 | 24-07-2026 | v1.4.3 scenario test matrix; target ~435 tests at release. |
-| 1.8.0 | 25-07-2026 | Updated baseline to 451 tests; noted M11.12 FTS5 pushdown coverage. |
+| 1.8.0 | 25-07-2026 | v1.4.3 release baseline (451 tests). |
