@@ -481,9 +481,8 @@ The architecture should remain extensible so that additional agents can be intro
 
 | Phase | Milestone | Agent relevance |
 |-------|-----------|-----------------|
-| Now | M11 complete (`v1.4.3`) | Operational IDE agents only (no product runtime) |
-| Next | M12 Dynamic Plugins (`v1.5.0`) | Plugin SDK enables future AI analyzer providers |
-| Then | M13 AI Assistant (`v1.5.0`) | First product AI: summaries, anomaly hints, NL queries |
+| Now | M12 complete (`v1.5.0`) | Plugin SDK enables future AI analyzer providers |
+| Next | M13 AI Assistant (`v1.5.1+`) | First product AI: summaries, anomaly hints, NL queries |
 | Later | M14–M16 | GUI, Web, Enterprise agents and orchestration |
 
 An **ADR for AI integration** is required before M13 implementation starts.
@@ -497,6 +496,6 @@ An **ADR for AI integration** is required before M13 implementation starts.
 | [README.md](README.md) | Future requirements folder scope and graduation |
 | [POST_V1_STRATEGIC_ROADMAP.md](../../planning/POST_V1_STRATEGIC_ROADMAP.md) | Post-v1.x strategic direction |
 | [PRODUCT_OVERVIEW.md](../../vision/PRODUCT_OVERVIEW.md) | Current product scope |
-| [ROADMAP.md](../../ROADMAP.md) | Near-term milestone planning (M12, M13) |
+| [ROADMAP.md](../../ROADMAP.md) | Near-term milestone planning (M13) |
 | [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) | Public AI session bootstrap |
 | [ENGINEERING_PRINCIPLES.md](../../standards/ENGINEERING_PRINCIPLES.md) | Agent design constraints |

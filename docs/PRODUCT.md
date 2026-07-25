@@ -19,7 +19,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v1.4.3** completes M11 storage: schema v2, compression, JSON field pushdown, query cache, incremental append, and FTS5. M0–M11 are complete.
+LogScope **v1.5.0** ships M12 Dynamic Plugins: runtime `.so`/`.dll` loading, parser/report/search/storage provider registration, and a Plugin SDK. M0–M12 are complete (M11 storage: schema v2, compression, JSON field pushdown, query cache, incremental append, and FTS5 at `v1.4.3`).
 
 ```text
 Configuration → Source → Analysis → Investigation → Reporting → CLI

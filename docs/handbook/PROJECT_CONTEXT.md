@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.0.0 |
+| Version | 2.1.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -47,13 +47,13 @@ The project follows architecture-first development. Every implementation should 
 | M9 – Analytics Engine | Frequency, clustering, timeline, trends, `logscope analytics` (`v1.3.1`) |
 | M10 – Query Language | Field-aware filter DSL, `--filter`, `logscope query` (`v1.4.0`) |
 | M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session reuse (`v1.4.1`); bulk write perf (`v1.4.2`); schema v2, compression, cache, append, FTS5 (`v1.4.3`) |
+| M12 – Dynamic Plugins | `.so`/`.dll` loading, parser/report/search/storage providers, Plugin SDK (`v1.5.0`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M12 – Dynamic Plugins | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`) |
-| M13 – AI Assistant | `v1.5.0` | Summaries, anomaly hints, NL queries |
+| M13 – AI Assistant | `v1.5.1`+ | Summaries, anomaly hints, NL queries |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -348,4 +348,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |
 | 1.8.0 | 24-07-2026 | v1.4.3 M11 remainder in progress. |
 | 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |
-| 2.0.0 | 25-07-2026 | AI agent context: operational vs product layers; link to PRD-001 v1.1.0. |
+| 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |

@@ -295,6 +295,8 @@ Together these documents provide a complete logical description of the LogScope 
 
 **M11 (`scope_storage`)** provides SQLite-backed persistent indexes (v1.4.1–v1.4.3 shipped): hybrid memory spill, session reuse, schema v2, compression, JSON field indexing, query result cache, incremental append, and FTS5 — see [ADR-005](decisions/ADR-005-Storage-Architecture.md) and [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md).
 
+**M12 (`scope_plugin`)** adds runtime `.so`/`.dll` loading and provider registration for parsers, reports, search, and storage backends — see [ADR-006](decisions/ADR-006-Plugin-Loading.md) and [M12-DYNAMIC-PLUGINS.md](../planning/M12-DYNAMIC-PLUGINS.md).
+
 ---
 
 # 11. Revision History
@@ -302,4 +304,4 @@ Together these documents provide a complete logical description of the LogScope 
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial architecture overview. |
-| 1.1.0 | 24-07-2026 | Storage layer v1.4.3 evolution note. |
+| 1.2.0 | 25-07-2026 | M12 plugin module (`scope_plugin`) evolution note. |
