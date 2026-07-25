@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 1.7.0 |
+| Version | 2.0.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -307,11 +307,25 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 
 ---
 
+# AI Agent Context
+
+Two layers apply to AI-assisted LogScope work. Do not conflate them.
+
+| Layer | Scope | Where |
+|-------|--------|-------|
+| **Operational (today)** | AI IDE instructions for contributors building LogScope | This file; detailed agent specs live in a private strategy `.ai/` layer (not linked publicly) |
+| **Product (future)** | User-facing agents analyzing logs, cores, and workflows via LogScope itself | [PRD-001 v1.1.0](../requirements/future/PRD-001-AI-Engineering-Agents.md); first delivery **M13 – AI Assistant** |
+
+See [Future Requirements README](../requirements/future/README.md) for scope and graduation. **M12 – Dynamic Plugins** enables provider registration; it is not the AI agent runtime.
+
+---
+
 # Key References
 
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
+| [PRD-001 AI Engineering Agents](../requirements/future/PRD-001-AI-Engineering-Agents.md) | Future product agent vision (not current milestone scope) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |
 | [CLI Reference](CLI_REFERENCE.md) | CLI commands and flags |
@@ -334,3 +348,4 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 | 1.7.0 | 24-07-2026 | M11 complete; v1.4.2 released; M12 is next. |
 | 1.8.0 | 24-07-2026 | v1.4.3 M11 remainder in progress. |
 | 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |
+| 2.0.0 | 25-07-2026 | AI agent context: operational vs product layers; link to PRD-001 v1.1.0. |
