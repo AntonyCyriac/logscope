@@ -24,6 +24,7 @@
 #include "correlation_id_extractor.hpp"
 #include "log_line_classifier.hpp"
 #include "log_macros.hpp"
+#include "parser_registry.hpp"
 #include "plain_text_field_extractor.hpp"
 
 namespace scope::analysis
@@ -194,8 +195,67 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
 
 void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
                  LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary, FieldSummary& fieldSummary,
-                 HybridIndexWriter& writer, const JsonFieldMapping& mapping) noexcept
+                 HybridIndexWriter& writer, const JsonFieldMapping& mapping,
+                 const FormatParser* pluginParser) noexcept
 {
+    if (pluginParser != nullptr)
+    {
+        const JsonLineParseResult parsed = pluginParser->parseLine(line);
+
+        if (parsed.outcome == JsonLineParseOutcome::Blank)
+        {
+            levelCounts.recordBlank();
+
+            return;
+        }
+
+        if (parsed.outcome == JsonLineParseOutcome::Invalid)
+        {
+            levelCounts.recordOther();
+            indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
+
+            return;
+        }
+
+        DetectedLogLevel level = DetectedLogLevel::Other;
+
+        if (!parsed.levelValue.empty())
+        {
+            level = detectLogLevelFromJsonField(parsed.levelValue);
+        }
+        else
+        {
+            level = detectLogLevel(line);
+        }
+
+        recordLevel(levelCounts, level);
+
+        std::optional<foundation::Timestamp> timestamp;
+
+        if (!parsed.timestampValue.empty())
+        {
+            const auto timestampResult = parseLogTimestamp(parsed.timestampValue);
+
+            if (timestampResult.hasValue())
+            {
+                timestamp = *timestampResult;
+            }
+        }
+
+        if (!parsed.messageValue.empty())
+        {
+            recordExtractedFields(fieldSummary, timestamp, parsed.messageValue);
+        }
+        else
+        {
+            recordExtractedFields(fieldSummary, timestamp, std::string_view{});
+        }
+
+        indexJsonLine(lineNumber, line, parsed, level, writer);
+
+        return;
+    }
+
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
         analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping);
@@ -249,6 +309,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     const bool isStdinSource = dataset.path().string() == "-";
     std::optional<storage::IndexFingerprint> sourceFingerprint;
     std::optional<storage::IndexReusePrepareResult> appendReuse;
+    const FormatParser* pluginParser = nullptr;
+
+    if (config.pluginFormatId.has_value())
+    {
+        pluginParser = ParserRegistry::instance().findParser(*config.pluginFormatId);
+    }
 
     if (!isStdinSource)
     {
@@ -350,7 +416,9 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         }
 
         const FormatDetectionResult detection = FormatDetector::detect(sampleLines);
-        const auto formatResult = resolveFormat(detection, config.formatHint);
+        const auto formatResult = pluginParser != nullptr
+                                      ? foundation::Result<LogFormat>(LogFormat::PlainText)
+                                      : resolveFormat(detection, config.formatHint);
 
         if (!formatResult)
         {
@@ -395,7 +463,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         {
             ++totalLines;
             analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
-                        indexWriter, config.jsonFieldMapping);
+                        indexWriter, config.jsonFieldMapping, pluginParser);
         }
 
         while (true)
@@ -416,7 +484,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
             ++totalLines;
             analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                        config.jsonFieldMapping);
+                        config.jsonFieldMapping, pluginParser);
         }
 
         const auto finalizeResult = indexWriter.finalize(totalLines);
@@ -469,7 +537,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
         ++totalLines;
         analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                    config.jsonFieldMapping);
+                    config.jsonFieldMapping, pluginParser);
     }
 
     const auto finalizeResult = indexWriter.finalize(totalLines);

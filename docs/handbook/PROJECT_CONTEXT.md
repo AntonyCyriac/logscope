@@ -27,9 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.4.3` (shipped)
+**Current release:** `v1.5.0` (shipped)
 
-**Next milestone:** **M12 – Dynamic Plugins** (`v1.5.0`). See [Roadmap](../ROADMAP.md).
+**Next milestone:** **M13 – AI Assistant** (`v1.5.1+`). See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -52,7 +52,7 @@ The project follows architecture-first development. Every implementation should 
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M12 – Dynamic Plugins | `v1.5.0` | `.so`/`.dll` loading, parser/report/search providers |
+| M12 – Dynamic Plugins | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`) |
 | M13 – AI Assistant | `v1.5.0` | Summaries, anomaly hints, NL queries |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).

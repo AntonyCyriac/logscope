@@ -12,9 +12,11 @@
 #include "index_reader.hpp"
 #include "log_macros.hpp"
 #include "foundation/string.hpp"
+#include "parser_registry.hpp"
 #include "query_evaluator.hpp"
 #include "query_planner.hpp"
 #include "search_engine.hpp"
+#include "search_provider_registry.hpp"
 
 namespace scope::investigation
 {
@@ -158,6 +160,43 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
     }
 
     const query::QueryEvaluator filterEvaluator(activeFilter);
+
+    if (criteria.searchProviderId.has_value())
+    {
+        const search::SearchProvider* provider =
+            search::SearchProviderRegistry::instance().findProvider(*criteria.searchProviderId);
+
+        if (provider != nullptr && model.lineIndex().has_value())
+        {
+            std::vector<analysis::IndexedLine> providerLines =
+                provider->search(*model.lineIndex(), activeQuery);
+
+            for (const analysis::IndexedLine& line : providerLines)
+            {
+                if (!criteria.timeRange.matches(line))
+                {
+                    continue;
+                }
+
+                if (!criteria.field.matches(line))
+                {
+                    continue;
+                }
+
+                if (!filterEvaluator.matches(line))
+                {
+                    continue;
+                }
+
+                result.matchingLines.push_back(line);
+            }
+
+            result.correlations = findCorrelations(model);
+
+            return result;
+        }
+    }
+
     std::vector<analysis::IndexedLine> lines;
     bool usedFtsSearch = false;
 

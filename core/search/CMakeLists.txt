@@ -4,6 +4,7 @@
 # ==========================================================
 
 add_library(scope_search
+    search_provider_registry.cpp
     search_config.cpp
     search_engine.cpp
     search_history.cpp

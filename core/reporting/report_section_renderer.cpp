@@ -52,6 +52,7 @@ ReportSectionRegistry::ReportSectionRegistry()
     registerBuiltInSectionRenderers(*this);
     registerAnalyticsSectionRenderers(*this);
     registerReportingContributors(*this);
+    m_builtInRendererCount = m_renderers.size();
 }
 
 ReportSectionRegistry& ReportSectionRegistry::instance()
@@ -69,6 +70,14 @@ void ReportSectionRegistry::registerRenderer(std::unique_ptr<ReportSectionRender
 void ReportSectionRegistry::registerContributor(std::unique_ptr<ReportSectionContributor> contributor)
 {
     registerRenderer(std::make_unique<ContributorRenderer>(std::move(contributor)));
+}
+
+void ReportSectionRegistry::clearPluginContributors()
+{
+    if (m_renderers.size() > m_builtInRendererCount)
+    {
+        m_renderers.resize(m_builtInRendererCount);
+    }
 }
 
 const ReportSectionRenderer* ReportSectionRegistry::findRenderer(const ReportSection section) const
@@ -96,18 +105,19 @@ std::vector<ReportFragment> ReportSectionRegistry::renderFragments(const analysi
             continue;
         }
 
-        const ReportSectionRenderer* renderer = findRenderer(section);
-
-        if (renderer == nullptr)
+        for (const std::unique_ptr<ReportSectionRenderer>& renderer : m_renderers)
         {
-            continue;
-        }
+            if (renderer->section() != section)
+            {
+                continue;
+            }
 
-        ReportFragment fragment = renderer->render(model, options);
+            ReportFragment fragment = renderer->render(model, options);
 
-        if (!fragment.empty())
-        {
-            fragments.push_back(std::move(fragment));
+            if (!fragment.empty())
+            {
+                fragments.push_back(std::move(fragment));
+            }
         }
     }
 

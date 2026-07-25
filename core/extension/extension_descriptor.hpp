@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <string>
 
 #include "foundation/result.hpp"
@@ -31,6 +32,12 @@ struct ExtensionDescriptor
     ExtensionInitializeFn initialize = nullptr;
 
     bool enabledByDefault = true;
+
+    bool dynamic = false;
+
+    std::uint32_t apiVersion = 0U;
+
+    std::string libraryPath;
 };
 
 } // namespace scope::extension

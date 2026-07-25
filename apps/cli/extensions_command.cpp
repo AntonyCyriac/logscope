@@ -9,6 +9,7 @@
 
 #include "cli_config.hpp"
 #include "extension.hpp"
+#include "plugin_runtime.hpp"
 
 namespace scope::cli
 {
@@ -48,11 +49,7 @@ bool prepareConfiguration(const foundation::Path& configFile,
 scope::extension::ExtensionManager createConfiguredExtensionManager(
     const configuration::ConfigurationManager& configurationManager)
 {
-    scope::extension::ExtensionManager manager = scope::extension::ExtensionManager::createWithBuiltIns();
-    manager.applyConfiguration(configurationManager.configuration());
-    manager.initializeEnabled();
-
-    return manager;
+    return scope::plugin::createConfiguredExtensionManager(configurationManager.configuration());
 }
 
 } // namespace
@@ -137,8 +134,20 @@ int runExtensionsDescribeCommand(const ExtensionsDescribeOptions& options,
     output << "ID          : " << infoResult->id << '\n'
            << "Version     : " << infoResult->version << '\n'
            << "Enabled     : " << (infoResult->enabled ? "yes" : "no") << '\n'
-           << "Status      : " << extensionStatusName(infoResult->status) << '\n'
-           << "Description : " << infoResult->description << '\n';
+           << "Status      : " << extensionStatusName(infoResult->status) << '\n';
+
+    if (infoResult->dynamic)
+    {
+        output << "Source      : dynamic\n"
+               << "API version : " << infoResult->apiVersion << '\n';
+
+        if (!infoResult->libraryPath.empty())
+        {
+            output << "Library     : " << infoResult->libraryPath << '\n';
+        }
+    }
+
+    output << "Description : " << infoResult->description << '\n';
 
     return 0;
 }

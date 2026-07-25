@@ -4,6 +4,7 @@
  */
 
 #include <fstream>
+#include <string>
 
 #include <gtest/gtest.h>
 
@@ -25,7 +26,8 @@ void writeConfigFile(const Path& path, const std::string& content)
 
 TEST(ConfigurationMalformedTest, RejectsMissingEqualsSign)
 {
-    const Path configFile("configuration_malformed_missing_equals.properties");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path configFile(std::string("configuration_malformed_") + testName + ".properties");
     writeConfigFile(configFile, "invalid line without separator\n");
 
     const auto result = ConfigurationManager::loadFromFile(configFile);
@@ -36,7 +38,8 @@ TEST(ConfigurationMalformedTest, RejectsMissingEqualsSign)
 
 TEST(ConfigurationMalformedTest, RejectsEmptyKey)
 {
-    const Path configFile("configuration_malformed_empty_key.properties");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path configFile(std::string("configuration_malformed_") + testName + ".properties");
     writeConfigFile(configFile, "=value\n");
 
     const auto result = ConfigurationManager::loadFromFile(configFile);
@@ -47,7 +50,8 @@ TEST(ConfigurationMalformedTest, RejectsEmptyKey)
 
 TEST(ConfigurationMalformedTest, IgnoresCommentsAndBlankLines)
 {
-    const Path configFile("configuration_malformed_comments.properties");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path configFile(std::string("configuration_malformed_") + testName + ".properties");
     writeConfigFile(configFile,
                      "# comment\n"
                      "\n"
@@ -64,7 +68,8 @@ TEST(ConfigurationMalformedTest, IgnoresCommentsAndBlankLines)
 
 TEST(ConfigurationMalformedTest, RejectsNonexistentFile)
 {
-    const Path configFile("configuration_malformed_missing.properties");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path configFile(std::string("configuration_malformed_") + testName + "_missing.properties");
 
     const auto result = ConfigurationManager::loadFromFile(configFile);
 

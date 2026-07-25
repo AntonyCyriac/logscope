@@ -20,6 +20,7 @@ add_executable(scope_storage_tests
 
 target_link_libraries(scope_storage_tests
     PRIVATE
+        logscope_gtest_support
         scope_storage
         scope_analysis
         scope_runtime

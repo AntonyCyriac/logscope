@@ -21,7 +21,8 @@ class FileSystemTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_testFile = Path("filesystem_test_temp.log");
+        const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+        m_testFile = Path(std::string("filesystem_test_") + testName + ".log");
 
         std::ofstream stream(m_testFile.string());
 
@@ -80,7 +81,8 @@ TEST_F(FileSystemTest, MissingPath)
 
 TEST_F(FileSystemTest, ListRegularFiles)
 {
-    const Path directoryPath("filesystem_test_dir");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path directoryPath(std::string("filesystem_test_dir_") + testName);
 
     std::filesystem::create_directory(directoryPath.string());
 

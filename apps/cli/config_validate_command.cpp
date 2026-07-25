@@ -10,7 +10,7 @@
 #include "storage.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
-#include "search_history.hpp"
+#include "plugin_config.hpp"
 
 namespace scope::cli
 {
@@ -83,6 +83,16 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!storageValidation)
     {
         errorOutput << storageValidation.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto pluginValidation =
+        scope::plugin::validatePluginConfiguration(configurationManager.configuration());
+
+    if (!pluginValidation)
+    {
+        errorOutput << pluginValidation.error().message() << std::endl;
 
         return 1;
     }

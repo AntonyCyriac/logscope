@@ -4,6 +4,7 @@
 # ==========================================================
 
 add_library(scope_analysis
+    parser_registry.cpp
     analysis_config.cpp
     analysis_engine.cpp
     analysis_model.cpp

@@ -27,3 +27,10 @@ target_link_libraries(session_serializer_fuzz PRIVATE scope_workspace)
 
 add_logscope_fuzz_target(configuration_fuzz configuration_fuzz.cpp)
 target_link_libraries(configuration_fuzz PRIVATE scope_configuration scope_foundation)
+
+add_logscope_fuzz_target(plugin_loader_path_fuzz plugin_loader_path_fuzz.cpp)
+target_link_libraries(plugin_loader_path_fuzz PRIVATE scope_plugin scope_extension)
+target_include_directories(plugin_loader_path_fuzz PRIVATE
+    ${CMAKE_SOURCE_DIR}/core/plugin
+    ${CMAKE_SOURCE_DIR}/core/extension
+)

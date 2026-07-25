@@ -5,6 +5,7 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <string>
 
 #if defined(_WIN32)
 #include <stdlib.h>
@@ -27,7 +28,8 @@ class ConfigurationManagerTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_configFile = Path("configuration_manager_test.properties");
+        const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+        m_configFile = Path(std::string("configuration_manager_") + testName + ".properties");
 
         std::ofstream stream(m_configFile.string());
 
@@ -88,7 +90,8 @@ TEST_F(ConfigurationManagerTest, LoadMissingFile)
 
 TEST_F(ConfigurationManagerTest, LoadInvalidLine)
 {
-    const Path invalidFile("configuration_manager_invalid_test.properties");
+    const char* testName = ::testing::UnitTest::GetInstance()->current_test_info()->name();
+    const Path invalidFile(std::string("configuration_manager_") + testName + "_invalid.properties");
 
     {
         std::ofstream stream(invalidFile.string(), std::ios::trunc);

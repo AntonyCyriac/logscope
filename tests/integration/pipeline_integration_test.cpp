@@ -8,6 +8,8 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
+#include "gtest_temp_path.hpp"
+
 #include "analysis.hpp"
 #include "configuration_manager.hpp"
 #include "extension.hpp"
@@ -41,7 +43,7 @@ class PipelineIntegrationTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_testFile = Path("pipeline_integration_test.log");
+        m_testFile = Path(logscope::gtest::uniqueTestPath(".log"));
 
         std::ofstream stream(m_testFile.string());
 
@@ -88,7 +90,7 @@ TEST_F(PipelineIntegrationTest, RunsSourceToReportPipeline)
     EXPECT_EQ(4U, modelResult->levelCounts().errorLines());
     EXPECT_TRUE(investigationEngine.matches(*modelResult, LineCountFilter::nonEmpty()));
     EXPECT_TRUE(investigationEngine.matches(*modelResult, LogLevelFilter::any().withMinimumErrors(1U)));
-    EXPECT_TRUE(investigationEngine.searchSource(*modelResult, "pipeline_integration"));
+    EXPECT_TRUE(investigationEngine.searchSource(*modelResult, "logscope_test"));
 
     const auto report = ReportGenerator{}.generate(*modelResult);
 
@@ -99,7 +101,7 @@ TEST_F(PipelineIntegrationTest, RunsSourceToReportPipeline)
 
 TEST_F(PipelineIntegrationTest, LoadsConfigurationBeforePipeline)
 {
-    const Path configFile("pipeline_integration_config.properties");
+    const Path configFile(logscope::gtest::uniqueTestPath("_config.properties"));
 
     {
         std::ofstream stream(configFile.string());
@@ -134,7 +136,7 @@ TEST_F(PipelineIntegrationTest, LoadsConfigurationBeforePipeline)
 
 TEST_F(PipelineIntegrationTest, InvestigationFilterExcludesEmptyAnalysis)
 {
-    const Path emptyFile("pipeline_integration_empty.log");
+    const Path emptyFile(logscope::gtest::uniqueTestPath("_empty.log"));
 
     {
         std::ofstream stream(emptyFile.string());
@@ -164,7 +166,7 @@ TEST_F(PipelineIntegrationTest, InvestigationFilterExcludesEmptyAnalysis)
 
 TEST_F(PipelineIntegrationTest, AnalyzesDirectoryOfLogFiles)
 {
-    const Path directoryPath("pipeline_integration_dir");
+    const Path directoryPath(logscope::gtest::uniqueTestPath("_dir"));
 
     std::filesystem::create_directory(directoryPath.string());
 
@@ -209,7 +211,7 @@ TEST_F(PipelineIntegrationTest, AnalyzesDirectoryOfLogFiles)
 
 TEST_F(PipelineIntegrationTest, AppliesExtensionConfiguration)
 {
-    const Path configFile("pipeline_integration_extensions.properties");
+    const Path configFile(logscope::gtest::uniqueTestPath("_extensions.properties"));
 
     {
         std::ofstream stream(configFile.string());
@@ -236,12 +238,12 @@ TEST_F(PipelineIntegrationTest, AppliesExtensionConfiguration)
 
 TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
 {
-    const Path sessionFile("pipeline_integration_session.logscope-session");
+    const Path sessionFile(logscope::gtest::uniqueTestPath(".logscope-session"));
     const LogLevelCounts levelCounts = LogLevelCounts::fromCounts(3U, 1U, 4U, 0U, 0U);
     const AnalysisModel model(m_testFile, 8U, levelCounts);
 
     const InvestigationSession session = InvestigationSession::fromAnalysis(
-        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline",
+        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "logscope_test",
         InvestigationCriteria{}, SearchHistory{}, ReportOptions{}, Path());
 
     SessionStore store;
@@ -253,7 +255,7 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
     ASSERT_TRUE(loaded.hasValue());
     EXPECT_EQ(8U, loaded->analysisModel().totalLines());
     EXPECT_EQ(1U, loaded->levelFilter().minimumErrors());
-    EXPECT_EQ("pipeline", loaded->searchQuery());
+    EXPECT_EQ("logscope_test", loaded->searchQuery());
 
     InvestigationEngine investigationEngine;
 
@@ -266,7 +268,7 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
 
 TEST_F(PipelineIntegrationTest, RejectsCorruptSessionFile)
 {
-    const Path sessionFile("pipeline_integration_corrupt.logscope-session");
+    const Path sessionFile(logscope::gtest::uniqueTestPath("_corrupt.logscope-session"));
 
     {
         std::ofstream stream(sessionFile.string());
@@ -284,7 +286,7 @@ TEST_F(PipelineIntegrationTest, RejectsCorruptSessionFile)
 
 TEST_F(PipelineIntegrationTest, RejectsCorruptConfigurationFile)
 {
-    const Path configFile("pipeline_integration_corrupt.properties");
+    const Path configFile(logscope::gtest::uniqueTestPath("_corrupt.properties"));
 
     {
         std::ofstream stream(configFile.string());

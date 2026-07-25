@@ -11,9 +11,27 @@
 #include "index_reuse.hpp"
 #include "index_store_options.hpp"
 #include "sqlite_index_store.hpp"
+#include "storage_backend_registry.hpp"
 
 namespace scope::storage
 {
+
+namespace
+{
+
+std::string resolvePluginBackendId(std::string_view backend)
+{
+    constexpr std::string_view pluginPrefix = "plugin:";
+
+    if (backend.rfind(pluginPrefix, 0) == 0)
+    {
+        return std::string(backend.substr(pluginPrefix.size()));
+    }
+
+    return std::string(backend);
+}
+
+} // namespace
 
 foundation::Path resolveIndexPath(const StorageConfig& config, const foundation::Path& sourcePath,
                                   const IndexFingerprint& fingerprint)
@@ -41,6 +59,21 @@ foundation::Result<IndexStorePtr> createIndexStore(const StorageConfig& config,
                                                    const foundation::Path& sourcePath,
                                                    const analysis::LogFormat format)
 {
+    if (config.backend != "sqlite")
+    {
+        const std::string backendId = resolvePluginBackendId(config.backend);
+        const StorageBackendFactory factory =
+            StorageBackendRegistry::instance().findFactory(backendId);
+
+        if (factory)
+        {
+            return factory(config, fingerprint, sourcePath, format);
+        }
+
+        return foundation::Result<IndexStorePtr>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Unknown storage backend: " + config.backend));
+    }
+
     const foundation::Path databasePath = resolveIndexPath(config, sourcePath, fingerprint);
 
     if (!config.indexPath.has_value())

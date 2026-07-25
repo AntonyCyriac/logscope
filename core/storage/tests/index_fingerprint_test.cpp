@@ -6,6 +6,7 @@
 
 #include <fstream>
 
+#include "gtest_temp_path.hpp"
 #include "index_fingerprint.hpp"
 
 using scope::foundation::Path;
@@ -13,7 +14,7 @@ using scope::storage::IndexFingerprint;
 
 TEST(IndexFingerprintTest, ComputesStableFingerprint)
 {
-    const Path tempFile("storage_fingerprint_test.log");
+    const Path tempFile(logscope::gtest::uniqueTestPath("_stable.log"));
     std::ofstream output(tempFile.string());
     output << "sample line\n";
     output.close();
@@ -26,7 +27,7 @@ TEST(IndexFingerprintTest, ComputesStableFingerprint)
 
 TEST(IndexFingerprintTest, RestoresStoredFingerprint)
 {
-    const Path tempFile("storage_fingerprint_restore.log");
+    const Path tempFile(logscope::gtest::uniqueTestPath("_restore.log"));
     std::ofstream output(tempFile.string());
     output << "restore me\n";
     output.close();
@@ -41,7 +42,7 @@ TEST(IndexFingerprintTest, RestoresStoredFingerprint)
 
 TEST(IndexFingerprintTest, DetectsChangedSource)
 {
-    const Path tempFile("storage_fingerprint_change.log");
+    const Path tempFile(logscope::gtest::uniqueTestPath("_change.log"));
     std::ofstream output(tempFile.string());
     output << "first\n";
     output.close();
@@ -61,8 +62,8 @@ TEST(IndexFingerprintTest, DetectsChangedSource)
 
 TEST(IndexFingerprintTest, ComputesStablePathKeyIndependentOfContent)
 {
-    const Path firstFile("storage_stable_path_first.log");
-    const Path secondFile("storage_stable_path_second.log");
+    const Path firstFile(logscope::gtest::uniqueTestPath("_path_first.log"));
+    const Path secondFile(logscope::gtest::uniqueTestPath("_path_second.log"));
 
     std::ofstream firstOutput(firstFile.string());
     firstOutput << "alpha\n";

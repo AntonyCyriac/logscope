@@ -8,6 +8,7 @@
 #include <gtest/gtest.h>
 
 #include "analysis.hpp"
+#include "gtest_temp_path.hpp"
 #include "source.hpp"
 
 using scope::analysis::AnalysisEngine;
@@ -23,7 +24,7 @@ class AnalysisEngineTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_testFile = Path("analysis_engine_test.log");
+        m_testFile = Path(logscope::gtest::uniqueTestPath(".log"));
 
         std::ofstream stream(m_testFile.string());
 
@@ -34,7 +35,7 @@ class AnalysisEngineTest : public ::testing::Test
 
     void writeLevelTestFile()
     {
-        m_levelTestFile = Path("analysis_engine_levels_test.log");
+        m_levelTestFile = Path(logscope::gtest::uniqueTestPath("_levels.log"));
 
         std::ofstream stream(m_levelTestFile.string());
 
@@ -75,7 +76,7 @@ TEST_F(AnalysisEngineTest, AnalyzesSourceDataset)
 
 TEST_F(AnalysisEngineTest, AnalyzesEmptyFile)
 {
-    const Path emptyFile("analysis_engine_empty_test.log");
+    const Path emptyFile(logscope::gtest::uniqueTestPath("_empty.log"));
 
     {
         std::ofstream stream(emptyFile.string());
@@ -143,7 +144,7 @@ TEST_F(AnalysisEngineTest, DetectsPlainFormat)
 
 TEST_F(AnalysisEngineTest, RejectsBinaryInput)
 {
-    const Path binaryFile("analysis_engine_binary_test.bin");
+    const Path binaryFile(logscope::gtest::uniqueTestPath(".bin"));
 
     {
         std::ofstream stream(binaryFile.string(), std::ios::binary);
@@ -186,7 +187,7 @@ TEST_F(AnalysisEngineTest, HonorsPlainFormatOverride)
 
 TEST_F(AnalysisEngineTest, AnalyzesJsonLinesWithFieldAwareLevels)
 {
-    const Path jsonFile("analysis_engine_json_test.jsonl");
+    const Path jsonFile(logscope::gtest::uniqueTestPath("_json.jsonl"));
 
     {
         std::ofstream stream(jsonFile.string());
@@ -220,7 +221,7 @@ TEST_F(AnalysisEngineTest, AnalyzesJsonLinesWithFieldAwareLevels)
 
 TEST_F(AnalysisEngineTest, ContinuesAfterMalformedJsonLines)
 {
-    const Path jsonFile("analysis_engine_json_mixed_test.jsonl");
+    const Path jsonFile(logscope::gtest::uniqueTestPath("_json_mixed.jsonl"));
 
     {
         std::ofstream stream(jsonFile.string());
@@ -273,7 +274,7 @@ TEST_F(AnalysisEngineTest, ExtractsPlainTextTimeRange)
 
 TEST_F(AnalysisEngineTest, ExtractsJsonLinesTimeRange)
 {
-    const Path jsonFile("analysis_engine_json_fields_test.jsonl");
+    const Path jsonFile(logscope::gtest::uniqueTestPath("_json_fields.jsonl"));
 
     {
         std::ofstream stream(jsonFile.string());

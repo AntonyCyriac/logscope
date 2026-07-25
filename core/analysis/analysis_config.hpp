@@ -35,6 +35,7 @@ struct AnalysisConfig
     JsonFieldMapping jsonFieldMapping;
     std::size_t maxIndexedLines{defaultIndexedLineCapacity};
     storage::StorageConfig storage{storage::StorageConfig::defaults()};
+    std::optional<std::string> pluginFormatId;
 
     [[nodiscard]] static AnalysisConfig defaults() noexcept;
 };

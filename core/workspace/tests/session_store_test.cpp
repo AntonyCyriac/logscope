@@ -8,6 +8,7 @@
 
 #include <gtest/gtest.h>
 
+#include "gtest_temp_path.hpp"
 #include "workspace.hpp"
 #include "search_history.hpp"
 
@@ -44,7 +45,7 @@ InvestigationSession createSampleSession()
 
 TEST(SessionStoreTest, SavesAndLoadsSession)
 {
-    const Path sessionFile("session_store_test.logscope-session");
+    const Path sessionFile(logscope::gtest::uniqueTestPath(".logscope-session"));
     const SessionStore store;
 
     const auto saveResult = store.save(createSampleSession(), sessionFile);
@@ -67,7 +68,7 @@ TEST(SessionStoreTest, SavesAndLoadsSession)
 
 TEST(SessionStoreTest, RoundTripsContentInvestigationFilters)
 {
-    const Path sessionFile("session_store_content_test.logscope-session");
+    const Path sessionFile(logscope::gtest::uniqueTestPath("_content.logscope-session"));
     const SessionStore store;
 
     LogLevelCounts levelCounts = LogLevelCounts::fromCounts(1U, 0U, 1U, 0U, 0U);
@@ -96,7 +97,7 @@ TEST(SessionStoreTest, RoundTripsContentInvestigationFilters)
 
 TEST(SessionStoreTest, ListsSessionFilesInDirectory)
 {
-    const Path directoryPath("session_store_dir");
+    const Path directoryPath(logscope::gtest::uniqueTestPath("_dir"));
 
     std::filesystem::create_directory(directoryPath.string());
 

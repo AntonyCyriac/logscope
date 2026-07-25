@@ -234,11 +234,32 @@ report.include_charts=true
 # Storage (optional — enable for large or repeat investigations)
 # storage.mode=hybrid
 # storage.index.directory=~/.logscope/indexes
+
+# Dynamic plugins (v1.5.0+)
+# plugins.enabled=true
+# plugins.paths=/opt/logscope/plugins
+# analysis.plugin_format=pipe-delimited
+# investigation.search_provider=sample.search
+# storage.backend=sqlite
 ```
 
 ---
 
-# 8. Related documents
+# 8. Plugin configuration (v1.5.0+)
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `plugins.enabled` | `false` | When `true`, scan `plugins.paths` and `LOGSCOPE_PLUGIN_PATH` for `.so`/`.dll` libraries. |
+| `plugins.paths` | (unset) | Semicolon-separated (Windows) or colon-separated (Unix) directories or library paths. |
+| `analysis.plugin_format` | (unset) | Format id registered by a parser plugin (e.g. `pipe-delimited`). |
+| `investigation.search_provider` | (unset) | Plugin search provider id for investigation/search paths. |
+| `storage.backend` | `sqlite` | `sqlite` or `plugin:<backend-id>` for plugin storage backends. |
+
+Environment: `LOGSCOPE_PLUGIN_PATH` augments `plugins.paths`.
+
+---
+
+# 9. Related documents
 
 | Document | Purpose |
 |----------|---------|
@@ -257,4 +278,4 @@ report.include_charts=true
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 configuration guide. |
-| 1.1.0 | 24-07-2026 | Draft v1.4.3 storage keys (compression, cache, incremental append). |
+| 1.2.0 | 25-07-2026 | M12 plugin configuration keys (`plugins.*`, provider selectors). |

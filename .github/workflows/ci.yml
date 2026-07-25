@@ -35,10 +35,10 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
 
       - name: Run Tests
-        run: ctest --test-dir build --output-on-failure --build-config Release
+        run: ctest --test-dir build --output-on-failure --build-config Release --parallel
 
   cli-matrix:
     name: CLI Matrix (Ubuntu)
@@ -53,7 +53,7 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 
       - name: Build
-        run: cmake --build build --config Release
+        run: cmake --build build --config Release --parallel
 
       - name: Generate Bulk Logs
         env:
@@ -86,10 +86,10 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug -DLOGSCOPE_SANITIZE=ON
 
       - name: Build
-        run: cmake --build build
+        run: cmake --build build --parallel
 
       - name: Run Tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --parallel
 
   coverage:
     name: Code Coverage (Ubuntu)
@@ -111,10 +111,10 @@ jobs:
                 -DCMAKE_EXE_LINKER_FLAGS="--coverage"
 
       - name: Build
-        run: cmake --build build -j 2
+        run: cmake --build build --parallel
 
       - name: Run Tests
-        run: ctest --test-dir build --output-on-failure
+        run: ctest --test-dir build --output-on-failure --parallel
 
       - name: Generate Coverage Report
         run: |
@@ -147,7 +147,7 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_BENCHMARKS=ON
 
       - name: Build Benchmarks
-        run: cmake --build build --target logscope_benchmarks
+        run: cmake --build build --target logscope_benchmarks --parallel
 
       - name: Run Benchmarks
         run: ./build/tests/benchmarks/logscope_benchmarks --benchmark_format=json --benchmark_out=benchmark_results.json
@@ -177,7 +177,7 @@ jobs:
         run: cmake -S . -B build -DLOGSCOPE_DOCS=ON
 
       - name: Build API Documentation
-        run: cmake --build build --target docs
+        run: cmake --build build --target docs --parallel
 
       - name: Upload API Documentation
         uses: actions/upload-artifact@v6
@@ -206,12 +206,33 @@ jobs:
                 -DLOGSCOPE_FUZZING=ON
 
       - name: Build Fuzz Targets
-        run: cmake --build build --target session_serializer_fuzz configuration_fuzz
+        run: cmake --build build --target session_serializer_fuzz configuration_fuzz plugin_loader_path_fuzz --parallel
 
       - name: Run Fuzz Smoke Test
         run: |
           ./build/tests/fuzz/session_serializer_fuzz -runs=1000
           ./build/tests/fuzz/configuration_fuzz -runs=1000
+          ./build/tests/fuzz/plugin_loader_path_fuzz -runs=1000
+
+  sample-plugins:
+    name: Sample Plugins (${{ matrix.os }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_BUILD_SAMPLE_PLUGINS=ON
+
+      - name: Build Sample Plugins
+        run: cmake --build build --config Release --target sample_report_plugin sample_parser_plugin sample_search_plugin sample_storage_plugin --parallel
 
   tidy:
     name: Static Analysis (clang-tidy)
@@ -229,4 +250,4 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 
       - name: Run clang-tidy
-        run: cmake --build build --target tidy
+        run: cmake --build build --target tidy --parallel

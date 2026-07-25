@@ -4,6 +4,7 @@ add_executable(logscope_integration_tests
 
 target_link_libraries(logscope_integration_tests
     PRIVATE
+        logscope_gtest_support
         scope_workspace
         scope_configuration
         scope_extension

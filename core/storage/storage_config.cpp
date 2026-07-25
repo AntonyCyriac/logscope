@@ -22,6 +22,7 @@ constexpr std::string_view storageCompressThresholdKey = "storage.compress_thres
 constexpr std::string_view storageQueryCacheEnabledKey = "storage.query_cache.enabled";
 constexpr std::string_view storageQueryCacheMaxEntriesKey = "storage.query_cache.max_entries";
 constexpr std::string_view storageIncrementalAppendKey = "storage.incremental_append";
+constexpr std::string_view storageBackendKey = "storage.backend";
 
 [[nodiscard]] std::optional<bool> parseBooleanConfig(std::string_view value) noexcept
 {
@@ -182,6 +183,16 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
         }
     }
 
+    if (configuration.has(std::string(storageBackendKey)))
+    {
+        const auto backend = configuration.get(std::string(storageBackendKey));
+
+        if (backend && !foundation::isBlank(*backend))
+        {
+            config.backend = *backend;
+        }
+    }
+
     if (cliOverrides.mode != StorageMode::Memory)
     {
         config.mode = cliOverrides.mode;
@@ -241,6 +252,11 @@ StorageConfig resolveStorageConfig(const runtime::Configuration& configuration,
     if (!cliOverrides.incrementalAppend)
     {
         config.incrementalAppend = false;
+    }
+
+    if (!cliOverrides.backend.empty() && cliOverrides.backend != "sqlite")
+    {
+        config.backend = cliOverrides.backend;
     }
 
     return config;

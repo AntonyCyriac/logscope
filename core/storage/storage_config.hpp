@@ -40,6 +40,7 @@ struct StorageConfig
     std::size_t spillThreshold{0U};
     std::size_t compressThresholdBytes{256U};
     std::size_t queryCacheMaxEntries{64U};
+    std::string backend{"sqlite"};
 
     [[nodiscard]] bool usesPersistentStore() const noexcept;
 

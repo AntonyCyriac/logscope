@@ -8,7 +8,7 @@
 #include "cli_analysis_config.hpp"
 #include "log_analyzer.hpp"
 #include "cli_config.hpp"
-#include "extension.hpp"
+#include "cli_extension_runtime.hpp"
 #include "log_macros.hpp"
 #include "report_config.hpp"
 
@@ -54,9 +54,8 @@ int runAnalyzeCommand(const AnalyzeOptions& options,
         return 1;
     }
 
-    scope::extension::ExtensionManager extensionManager = scope::extension::ExtensionManager::createWithBuiltIns();
-    extensionManager.applyConfiguration(configurationManager.configuration());
-    extensionManager.initializeEnabled();
+    const scope::extension::ExtensionManager extensionManager =
+        createConfiguredExtensionManager(configurationManager.configuration());
 
     SCOPE_LOG_INFO("cli", "Analyzing " + options.logFile.string());
 
