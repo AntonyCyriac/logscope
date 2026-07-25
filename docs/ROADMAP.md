@@ -38,7 +38,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M9 – Analytics Engine** | ✅ Complete | Frequency, clustering, timeline, trends, correlations. Released: `v1.3.1`. |
 | **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
 | **M11 – Storage Layer** | ✅ Complete | SQLite hybrid index (`v1.4.1`); bulk perf (`v1.4.2`); compression, cache, FTS5 (`v1.4.3`). |
-| **M12 – Dynamic Plugins** | ⏳ Planned | `.so`/`.dll` loading, parser/report/search providers. Target: `v1.5.0`. |
+| **M12 – Dynamic Plugins** | ✅ Complete | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`). |
 | **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
 | **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
 | **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |

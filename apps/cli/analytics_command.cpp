@@ -10,7 +10,7 @@
 #include "analysis.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
-#include "extension.hpp"
+#include "cli_extension_runtime.hpp"
 #include "log_macros.hpp"
 #include "source.hpp"
 
@@ -53,9 +53,8 @@ int runAnalyticsCommand(const AnalyticsOptions& options,
         return 1;
     }
 
-    scope::extension::ExtensionManager extensionManager = scope::extension::ExtensionManager::createWithBuiltIns();
-    extensionManager.applyConfiguration(configurationManager.configuration());
-    extensionManager.initializeEnabled();
+    const scope::extension::ExtensionManager extensionManager =
+        createConfiguredExtensionManager(configurationManager.configuration());
 
     SCOPE_LOG_INFO("cli", "Running analytics on " + options.logFile.string());
 

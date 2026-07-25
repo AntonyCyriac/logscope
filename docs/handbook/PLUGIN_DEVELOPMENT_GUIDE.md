@@ -4,18 +4,20 @@
 |-------|-------|
 | Document | Plugin Development Guide |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 2.0.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
 # 1. Purpose
 
-This guide explains how LogScope extensions work today and how contributors add new **built-in** extensions in the core repository.
+This guide explains how LogScope extensions work and how to add **built-in** extensions in-tree or **dynamic** plugins via the M12 C ABI (`v1.5.0`).
 
-**Current scope (v1.4.2):** static, compile-time extensions registered through `ExtensionManager`. There is no `.so`/`.dll` loading yet — that is planned for **M12 – Dynamic Plugins** (`v1.5.0`).
+**Built-in extensions:** static registration through `ExtensionManager` (unchanged from v1.4.x).
+
+**Dynamic plugins (v1.5.0+):** shared libraries (`.so`/`.dll`) discovered from `plugins.paths` / `LOGSCOPE_PLUGIN_PATH`, registered through `logscope_plugin_register`. See [ADR-006](../architecture/decisions/ADR-006-Plugin-Loading.md) and `examples/plugins/`.
 
 Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md#phase-1--stabilize-v1x).
 
@@ -246,28 +248,33 @@ extensions.reporting.multi-format.enabled=false
 | No formal extension type enum | Use ID prefix convention |
 | Single hook type (`ReportSectionContributor`) | Parser/search/storage hooks planned M12 |
 | `ExtensionManager` not a runtime service bus | Init hooks register into core singletons |
-| Third-party out-of-tree plugins | Not supported until M12 |
+| Third-party out-of-tree plugins | Supported via M12 C ABI (`include/logscope/plugin/plugin.h`) |
 
 ---
 
-# 11. Roadmap: M12 dynamic plugins
+# 11. Out-of-tree dynamic plugins (M12)
 
-From [Roadmap](../ROADMAP.md) and [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md):
+Shipped in **v1.5.0**. Plugins are shared libraries exporting:
 
-| M12 target | Description |
-|------------|-------------|
-| Shared-library loading | `.so` (Linux/macOS), `.dll` (Windows) |
-| Provider types | Parsers, report generators, search providers, storage backends |
-| Extension SDK | Stable C ABI or documented C++ surface (ADR required) |
-| Marketplace prep | Versioning, signing, sandboxing (later) |
+```c
+int logscope_plugin_register(const LogScopeHostApi* host);
+```
 
-**Guardrails:**
+Register providers through C vtables (`LogScopeFormatParserVTable`, `LogScopeReportContributorVTable`, etc.). See `examples/plugins/` and `cmake/LogScopePluginSDK.cmake` (`logscope_add_plugin`).
 
-- Configuration and format profiles (M6.5) before dynamic parsers.
-- ADR required before M12 implementation starts.
-- CLI-first: extensions consume the same core APIs as built-ins.
+**Configuration:**
 
-When M12 lands, this guide will gain an out-of-tree plugin section. Built-in registration in `builtin_extensions.cpp` remains the pattern for first-party extensions.
+```properties
+plugins.enabled=true
+plugins.paths=/opt/logscope/plugins
+analysis.plugin_format=pipe-delimited
+investigation.search_provider=sample.search
+storage.backend=plugin:sample-memory
+```
+
+**Discovery:** `logscope extensions list` / `extensions describe <id>`.
+
+Built-in registration in `builtin_extensions.cpp` remains the pattern for first-party in-tree extensions.
 
 ---
 
@@ -281,7 +288,8 @@ When M12 lands, this guide will gain an out-of-tree plugin section. Built-in reg
 | [Component Catalog §C06](../architecture/COMPONENT_CATALOG.md) | Extension Manager responsibilities |
 | [Configuration Guide](CONFIGURATION_GUIDE.md) | `extensions.*` keys |
 | [CLI Reference](CLI_REFERENCE.md) | `extensions list` / `describe` |
-| [core/extension/README.md](../../core/extension/README.md) | Module quick reference |
+| [ADR-006 Plugin Loading](../architecture/decisions/ADR-006-Plugin-Loading.md) | Dynamic plugin architecture |
+| [M12 Dynamic Plugins](../planning/M12-DYNAMIC-PLUGINS.md) | Implementation plan |
 
 ---
 
@@ -289,4 +297,5 @@ When M12 lands, this guide will gain an out-of-tree plugin section. Built-in reg
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 2.0.0 | 25-07-2026 | M12 dynamic plugins shipped; out-of-tree C ABI guide. |
 | 1.0.0 | 24-07-2026 | Initial Phase 1 plugin development guide (built-in extensions, M12 preview). |

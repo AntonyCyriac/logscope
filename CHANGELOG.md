@@ -12,6 +12,43 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.5.0] - 2026-07-25
+
+M12 Dynamic Plugins — runtime `.so`/`.dll` loading, C ABI provider registration, Plugin SDK, and sample plugins. **462** automated tests.
+
+### Added
+
+- `scope_plugin` module: `SharedLibrary`, `PluginLoader`, `PluginHostApi`, `createConfiguredExtensionManager()`.
+- C plugin ABI (`include/logscope/plugin/plugin.h`) with vtable-based parser, report, search, and storage providers.
+- `ParserRegistry`, `SearchProviderRegistry`, `StorageBackendRegistry` with host-side adapters.
+- Config keys: `plugins.enabled`, `plugins.paths`, `analysis.plugin_format`, `investigation.search_provider`, `storage.backend=sqlite|plugin:<id>`.
+- Sample plugins under `examples/plugins/` (report, parser, search, storage) and `logscope_plugin_sdk` CMake helper.
+- CI: sample plugin matrix (Ubuntu, Windows, macOS); `plugin_loader_path_fuzz` smoke target.
+- Plugin integration tests (`scope_plugin_tests`, 10 cases).
+
+### Changed
+
+- `ExtensionManager` registers dynamic extensions from loaded libraries; `extensions list/describe` shows plugin metadata.
+- CLI commands load plugins via `createConfiguredExtensionManager()` (analyze, investigate, query, session, analytics, extensions).
+- `ReportSectionRegistry` renders all contributors for a section (built-in + plugin).
+- `config validate` checks `plugins.paths` when set.
+
+### Documentation
+
+- ADR-006 Plugin Loading (Accepted); M12 planning docs; PLUGIN_DEVELOPMENT_GUIDE v2.0.0.
+
+### Upgrade notes
+
+- Default config unchanged: plugins opt-in via `plugins.enabled=true` and `plugins.paths`.
+- Built-in SQLite storage remains default (`storage.backend=sqlite`).
+
+### Known limitations
+
+- No marketplace, signing, or sandboxing (documented threat model in ADR-006).
+- M13 AI Assistant not included (planned `v1.5.1+`).
+
+---
+
 ## [1.4.3] - 2026-07-25
 
 M11 storage remainder — schema v2, compression, JSON field predicates, query cache, incremental append, and FTS5 full-text search. **451** automated tests.

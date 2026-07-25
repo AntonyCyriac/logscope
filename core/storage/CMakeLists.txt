@@ -32,6 +32,7 @@ if(NOT TARGET sqlite3)
 endif()
 
 add_library(scope_storage
+    storage_backend_registry.cpp
     content_codec.cpp
     fts_index.cpp
     index_fingerprint.cpp

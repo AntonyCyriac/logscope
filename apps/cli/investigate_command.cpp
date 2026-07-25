@@ -8,7 +8,7 @@
 #include "analysis.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
-#include "extension.hpp"
+#include "cli_extension_runtime.hpp"
 #include "investigation.hpp"
 #include "investigation_output.hpp"
 #include "log_macros.hpp"
@@ -57,9 +57,8 @@ int runInvestigateCommand(const InvestigateOptions& options,
         return 1;
     }
 
-    scope::extension::ExtensionManager extensionManager = scope::extension::ExtensionManager::createWithBuiltIns();
-    extensionManager.applyConfiguration(configurationManager.configuration());
-    extensionManager.initializeEnabled();
+    const scope::extension::ExtensionManager extensionManager =
+        createConfiguredExtensionManager(configurationManager.configuration());
 
     SCOPE_LOG_INFO("cli", "Investigating " + options.logFile.string());
 
@@ -87,9 +86,13 @@ int runInvestigateCommand(const InvestigateOptions& options,
     scope::investigation::InvestigationEngine investigationEngine;
     scope::investigation::InvestigationResult result;
 
-    if (options.criteria.isActive())
+    scope::investigation::InvestigationCriteria criteria = options.criteria;
+    scope::investigation::applyInvestigationConfiguration(criteria,
+                                                          configurationManager.configuration());
+
+    if (criteria.isActive())
     {
-        const auto queryResult = options.criteria.resolvedSearchQuery();
+        const auto queryResult = criteria.resolvedSearchQuery();
 
         if (!queryResult)
         {
@@ -98,7 +101,7 @@ int runInvestigateCommand(const InvestigateOptions& options,
             return 1;
         }
 
-        const auto filterResult = options.criteria.resolvedFilterQuery();
+        const auto filterResult = criteria.resolvedFilterQuery();
 
         if (!filterResult)
         {
@@ -107,7 +110,7 @@ int runInvestigateCommand(const InvestigateOptions& options,
             return 1;
         }
 
-        result = investigationEngine.investigate(*modelResult, options.criteria);
+        result = investigationEngine.investigate(*modelResult, criteria);
     }
     else
     {

@@ -58,6 +58,13 @@ void ExtensionManager::registerBuiltIn(ExtensionDescriptor descriptor)
     SCOPE_LOG_DEBUG("extension", "Registered extension: " + m_extensions.back().descriptor.id);
 }
 
+void ExtensionManager::registerDynamic(ExtensionDescriptor descriptor)
+{
+    descriptor.dynamic = true;
+
+    registerBuiltIn(std::move(descriptor));
+}
+
 void ExtensionManager::applyConfiguration(const runtime::Configuration& configuration)
 {
     for (RegisteredExtension& extension : m_extensions)
@@ -165,6 +172,9 @@ ExtensionInfo ExtensionManager::toInfo(const RegisteredExtension& extension) con
     info.version = extension.descriptor.version;
     info.description = extension.descriptor.description;
     info.enabled = extension.enabled;
+    info.dynamic = extension.descriptor.dynamic;
+    info.apiVersion = extension.descriptor.apiVersion;
+    info.libraryPath = extension.descriptor.libraryPath;
 
     if (!extension.enabled)
     {

@@ -75,6 +75,16 @@ void applyConfigValue(const std::string& key, const std::string& value, Analysis
         {
             config.maxIndexedLines = parsed;
         }
+
+        return;
+    }
+
+    if (key == "analysis.plugin_format")
+    {
+        if (!foundation::isBlank(value))
+        {
+            config.pluginFormatId = value;
+        }
     }
 }
 
@@ -84,7 +94,8 @@ void applyConfiguration(const runtime::Configuration& configuration, AnalysisCon
                                            "source.format",
                                            "source.json.timestamp_field",
                                            "source.json.level_field",
-                                           "investigation.max_indexed_lines"};
+                                           "investigation.max_indexed_lines",
+                                           "analysis.plugin_format"};
 
     if (configuration.has("profile"))
     {
@@ -138,6 +149,11 @@ void mergeCliOverrides(const AnalysisConfig& cliOverrides, AnalysisConfig& confi
     if (cliOverrides.maxIndexedLines != defaultIndexedLineCapacity)
     {
         config.maxIndexedLines = cliOverrides.maxIndexedLines;
+    }
+
+    if (cliOverrides.pluginFormatId.has_value())
+    {
+        config.pluginFormatId = cliOverrides.pluginFormatId;
     }
 }
 

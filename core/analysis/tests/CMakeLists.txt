@@ -9,6 +9,7 @@ add_executable(scope_analysis_tests
     plain_text_field_extractor_test.cpp
     field_summary_test.cpp
     line_index_test.cpp
+    parser_registry_test.cpp
 )
 
 target_link_libraries(scope_analysis_tests

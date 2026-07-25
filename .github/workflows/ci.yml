@@ -206,12 +206,33 @@ jobs:
                 -DLOGSCOPE_FUZZING=ON
 
       - name: Build Fuzz Targets
-        run: cmake --build build --target session_serializer_fuzz configuration_fuzz
+        run: cmake --build build --target session_serializer_fuzz configuration_fuzz plugin_loader_path_fuzz
 
       - name: Run Fuzz Smoke Test
         run: |
           ./build/tests/fuzz/session_serializer_fuzz -runs=1000
           ./build/tests/fuzz/configuration_fuzz -runs=1000
+          ./build/tests/fuzz/plugin_loader_path_fuzz -runs=1000
+
+  sample-plugins:
+    name: Sample Plugins (${{ matrix.os }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_BUILD_SAMPLE_PLUGINS=ON
+
+      - name: Build Sample Plugins
+        run: cmake --build build --config Release --target sample_report_plugin sample_parser_plugin sample_search_plugin sample_storage_plugin
 
   tidy:
     name: Static Analysis (clang-tidy)

@@ -10,6 +10,7 @@
 
 #include "extension_descriptor.hpp"
 #include "extension_info.hpp"
+#include "foundation/path.hpp"
 #include "foundation/result.hpp"
 #include "runtime/configuration.hpp"
 
@@ -45,6 +46,11 @@ class ExtensionManager
      * @brief Initializes all enabled extensions without affecting unrelated capabilities.
      */
     void initializeEnabled();
+
+    /**
+     * @brief Registers a dynamically loaded extension.
+     */
+    void registerDynamic(ExtensionDescriptor descriptor);
 
     /**
      * @brief Returns metadata for all registered extensions.

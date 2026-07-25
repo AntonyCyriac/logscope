@@ -1,0 +1,3 @@
+ERROR|2024-01-01T00:00:00Z|disk full
+INFO|2024-01-01T00:00:01Z|service started
+WARNING|2024-01-01T00:00:02Z|retry scheduled

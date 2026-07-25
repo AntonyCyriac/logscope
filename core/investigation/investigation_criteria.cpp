@@ -60,4 +60,18 @@ foundation::Result<query::QueryNode> InvestigationCriteria::resolvedFilterQuery(
     return foundation::Result<query::QueryNode>(query::QueryNode::matchAll());
 }
 
+void applyInvestigationConfiguration(InvestigationCriteria& criteria,
+                                     const runtime::Configuration& configuration) noexcept
+{
+    if (configuration.has("investigation.search_provider"))
+    {
+        const auto providerResult = configuration.get("investigation.search_provider");
+
+        if (providerResult && !providerResult->empty())
+        {
+            criteria.searchProviderId = *providerResult;
+        }
+    }
+}
+
 } // namespace scope::investigation

@@ -96,18 +96,19 @@ std::vector<ReportFragment> ReportSectionRegistry::renderFragments(const analysi
             continue;
         }
 
-        const ReportSectionRenderer* renderer = findRenderer(section);
-
-        if (renderer == nullptr)
+        for (const std::unique_ptr<ReportSectionRenderer>& renderer : m_renderers)
         {
-            continue;
-        }
+            if (renderer->section() != section)
+            {
+                continue;
+            }
 
-        ReportFragment fragment = renderer->render(model, options);
+            ReportFragment fragment = renderer->render(model, options);
 
-        if (!fragment.empty())
-        {
-            fragments.push_back(std::move(fragment));
+            if (!fragment.empty())
+            {
+                fragments.push_back(std::move(fragment));
+            }
         }
     }
 

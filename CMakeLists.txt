@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(LogScope
-    VERSION 1.4.3
+    VERSION 1.5.0
     DESCRIPTION "Generic, extensible and high-performance log analysis platform"
     LANGUAGES CXX C
 )
@@ -20,6 +20,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 option(LOGSCOPE_BENCHMARKS "Build performance benchmarks" OFF)
 option(LOGSCOPE_FUZZING "Build libFuzzer targets (requires Clang)" OFF)
+option(LOGSCOPE_BUILD_SAMPLE_PLUGINS "Build example dynamic plugins" ON)
 option(LOGSCOPE_DOCS "Build API documentation with Doxygen" OFF)
 
 # ----------------------------------------------------------
@@ -70,6 +71,10 @@ enable_testing()
 add_subdirectory(core)
 add_subdirectory(apps)
 add_subdirectory(tests)
+
+if(LOGSCOPE_BUILD_SAMPLE_PLUGINS)
+    add_subdirectory(examples)
+endif()
 
 # ----------------------------------------------------------
 # Formatting and static analysis

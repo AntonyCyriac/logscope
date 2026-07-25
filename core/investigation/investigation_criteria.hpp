@@ -11,6 +11,7 @@
 #include "field_filter.hpp"
 #include "foundation/result.hpp"
 #include "query_node.hpp"
+#include "runtime/configuration.hpp"
 #include "search_query.hpp"
 #include "time_range_filter.hpp"
 
@@ -32,6 +33,7 @@ struct InvestigationCriteria
 
     TimeRangeFilter timeRange = TimeRangeFilter::any();
     FieldFilter field = FieldFilter::any();
+    std::optional<std::string> searchProviderId;
 
     [[nodiscard]] bool isActive() const noexcept;
 
@@ -45,5 +47,11 @@ struct InvestigationCriteria
      */
     [[nodiscard]] foundation::Result<query::QueryNode> resolvedFilterQuery() const noexcept;
 };
+
+/**
+ * @brief Applies investigation-related configuration keys to criteria.
+ */
+void applyInvestigationConfiguration(InvestigationCriteria& criteria,
+                                     const runtime::Configuration& configuration) noexcept;
 
 } // namespace scope::investigation
