@@ -4,6 +4,7 @@
 
 add_executable(logscope
     log_analyzer.cpp
+    agent_command.cpp
     analyze_command.cpp
     analytics_command.cpp
     analytics_output.cpp

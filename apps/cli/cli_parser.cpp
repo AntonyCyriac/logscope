@@ -502,6 +502,139 @@ std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv
     return options;
 }
 
+std::optional<AgentInvestigateOptions> parseAgentInvestigateArguments(int argc, char* argv[], int startIndex)
+{
+    AgentInvestigateOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.investigate.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--ask")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.askQuery = argv[++index];
+
+            continue;
+        }
+
+        if (argument == "--summarize")
+        {
+            options.summarize = true;
+
+            continue;
+        }
+
+        if (argument == "--hints")
+        {
+            options.hints = true;
+
+            continue;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.investigate.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        if (argument == "--format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto format = parseOutputFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.investigate.format = *format;
+
+            continue;
+        }
+
+        if (argument == "--log-format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto logFormat = analysis::parseLogFormat(argv[++index]);
+
+            if (!logFormat || *logFormat == analysis::LogFormat::Unknown)
+            {
+                return std::nullopt;
+            }
+
+            options.investigate.logFormat = *logFormat;
+
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.investigate.profile))
+        {
+            continue;
+        }
+
+        if (parseStorageOption(argument, index, argc, argv, options.investigate.persistIndex,
+                               options.investigate.reuseIndex, options.investigate.indexPath))
+        {
+            continue;
+        }
+
+        if (parseInvestigationOption(argument, index, argc, argv, options.investigate.criteria))
+        {
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (!options.investigate.logFile.string().empty())
+        {
+            return std::nullopt;
+        }
+
+        options.investigate.logFile = foundation::Path(argument);
+    }
+
+    if (options.investigate.showHelp)
+    {
+        return options;
+    }
+
+    if (options.investigate.logFile.string().empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 std::optional<AnalyticsOptions> parseAnalyticsArguments(int argc, char* argv[], int startIndex)
 {
     AnalyticsOptions options;
@@ -1153,6 +1286,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
             return parsed;
         }
 
+        if (argc >= 3 && std::string_view(argv[2]) == "agent")
+        {
+            parsed.command = CliCommand::AgentHelp;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "agent" && std::string_view(argv[3]) == "investigate")
+        {
+            parsed.command = CliCommand::AgentInvestigate;
+            parsed.agentInvestigate.investigate.showHelp = true;
+
+            return parsed;
+        }
+
         parsed.showGlobalHelp = true;
 
         return parsed;
@@ -1345,6 +1493,40 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::SessionList;
             parsed.sessionList = *options;
+
+            return parsed;
+        }
+
+        return std::nullopt;
+    }
+
+    if (firstArgument == "agent")
+    {
+        if (argc < 3)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view subcommand = argv[2];
+
+        if (subcommand == "--help" || subcommand == "-h")
+        {
+            parsed.command = CliCommand::AgentHelp;
+
+            return parsed;
+        }
+
+        if (subcommand == "investigate")
+        {
+            const auto options = parseAgentInvestigateArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::AgentInvestigate;
+            parsed.agentInvestigate = *options;
 
             return parsed;
         }

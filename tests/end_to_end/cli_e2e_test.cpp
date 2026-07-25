@@ -174,6 +174,7 @@ TEST(CliE2eTest, HelpDisplaysUsage)
     EXPECT_NE(std::string::npos, output.find("config validate"));
     EXPECT_NE(std::string::npos, output.find("extensions list"));
     EXPECT_NE(std::string::npos, output.find("session save"));
+    EXPECT_NE(std::string::npos, output.find("agent investigate"));
 }
 
 TEST(CliE2eTest, AnalyzeDirectoryProducesCombinedReport)
@@ -374,4 +375,65 @@ TEST(CliE2eTest, AnalyzeAnalyticsSections)
 
     EXPECT_NE(std::string::npos, output.find("Analytics"));
     EXPECT_NE(std::string::npos, output.find("Error Clusters"));
+}
+
+TEST(CliE2eTest, AgentHelpShowsInvestigateSubcommand)
+{
+    const std::string output = runLogscope("agent --help");
+
+    EXPECT_NE(std::string::npos, output.find("investigate"));
+}
+
+TEST(CliE2eTest, AgentInvestigateHelpDocumentsAiFlags)
+{
+    const std::string output = runLogscope("agent investigate --help");
+
+    EXPECT_NE(std::string::npos, output.find("--ask"));
+    EXPECT_NE(std::string::npos, output.find("--summarize"));
+    EXPECT_NE(std::string::npos, output.find("--hints"));
+}
+
+TEST(CliE2eTest, AgentInvestigateSummarizeProducesAiSummary)
+{
+    const std::string output =
+        runLogscope("agent investigate --config " +
+                    scope::test_support::quoteArgument(sourcePath("samples/ai-noop.properties")) +
+                    " --summarize " + scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("========== AI SUMMARY =========="));
+    EXPECT_NE(std::string::npos, output.find("Summary\n"));
+}
+
+TEST(CliE2eTest, AgentInvestigateCombinedFlags)
+{
+    const std::string output =
+        runLogscope("agent investigate --config " +
+                    scope::test_support::quoteArgument(sourcePath("samples/ai-noop.properties")) +
+                    " --ask \"errors\" --hints --summarize " +
+                    scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("========== AI SUMMARY =========="));
+    EXPECT_NE(std::string::npos, output.find("========== AI ANOMALY HINTS =========="));
+    EXPECT_NE(std::string::npos, output.find("Anomaly hints"));
+}
+
+TEST(CliE2eTest, AgentInvestigateSkipsAiSectionsWhenDisabled)
+{
+    const std::string output = runLogscope("agent investigate --summarize --hints " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_EQ(std::string::npos, output.find("========== AI SUMMARY =========="));
+    EXPECT_EQ(std::string::npos, output.find("========== AI ANOMALY HINTS =========="));
+}
+
+TEST(CliE2eTest, AgentInvestigateRejectsInvalidAsk)
+{
+    const std::string output = runLogscope("agent investigate --ask \"everything unusual\" " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_EQ(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
+    EXPECT_NE(std::string::npos, output.find("Noop provider"));
 }

@@ -5,6 +5,7 @@
 
 #include "cli_application.hpp"
 
+#include "agent_command.hpp"
 #include "analyze_command.hpp"
 #include "analytics_command.hpp"
 #include "config_validate_command.hpp"
@@ -34,6 +35,7 @@ void CliApplication::printUsage(std::ostream& output)
            << "  session save       Save investigation context to a session file\n"
            << "  session load       Restore a session and reproduce its report\n"
            << "  session list       List saved session files in a directory\n"
+           << "  agent investigate  AI-assisted log investigation\n"
            << "  help [command]     Show help for a command\n"
            << "\n"
            << "Global options:\n"
@@ -76,6 +78,12 @@ int CliApplication::run(const ParsedCli& parsed,
         return runSessionLoadCommand(parsed.sessionLoad, output, errorOutput);
     case CliCommand::SessionList:
         return runSessionListCommand(parsed.sessionList, output, errorOutput);
+    case CliCommand::AgentHelp:
+        printAgentUsage(output);
+
+        return 0;
+    case CliCommand::AgentInvestigate:
+        return runAgentInvestigateCommand(parsed.agentInvestigate, configurationManager, output, errorOutput);
     case CliCommand::Help:
         printUsage(output);
 

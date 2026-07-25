@@ -2,7 +2,7 @@
 
 `scope_ai` implements M13 pluggable AI providers for investigation assistance.
 
-## Shipped (M13.1–M13.4)
+## Shipped (M13.1–M13.5)
 
 | Component | Purpose |
 |-----------|---------|
@@ -15,6 +15,7 @@
 | `ai_analytics_context_builder` | Bounded signals from analytics trends/clusters/correlations |
 | `ai_summary_formatter` | Renders `AiSummary` sections for CLI/agent output |
 | `ai_anomaly_hint_formatter` | Renders `AiAnomalyHint` list for CLI/agent output |
+| `logscope agent investigate` | Primary M13 CLI entry (`--ask`, `--summarize`, `--hints`) |
 | `ai.*` config keys | See [CONFIGURATION_GUIDE](../../docs/handbook/CONFIGURATION_GUIDE.md) |
 
 Architecture: [ADR-007](../../docs/architecture/decisions/ADR-007-AI-Integration.md) · [M13 planning](../../docs/planning/M13-AI-ASSISTANT.md)

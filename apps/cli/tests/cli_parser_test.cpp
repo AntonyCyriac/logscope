@@ -312,3 +312,39 @@ TEST(CliParserTest, RejectsInvalidOption)
 
     EXPECT_FALSE(parseCliArguments(2, argv));
 }
+
+TEST(CliParserTest, ParsesAgentHelp)
+{
+    std::string program = "logscope";
+    std::string command = "agent";
+    std::string helpFlag = "--help";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(helpFlag)};
+
+    const auto parsed = parseCliArguments(3, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::AgentHelp, parsed->command);
+}
+
+TEST(CliParserTest, ParsesAgentInvestigateOptions)
+{
+    std::string program = "logscope";
+    std::string command = "agent";
+    std::string subcommand = "investigate";
+    std::string askFlag = "--ask";
+    std::string askValue = "errors";
+    std::string summarizeFlag = "--summarize";
+    std::string hintsFlag = "--hints";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program),     toArgv(command),      toArgv(subcommand), toArgv(askFlag),
+                    toArgv(askValue),    toArgv(summarizeFlag), toArgv(hintsFlag),  toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(8, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::AgentInvestigate, parsed->command);
+    EXPECT_EQ("errors", parsed->agentInvestigate.askQuery);
+    EXPECT_TRUE(parsed->agentInvestigate.summarize);
+    EXPECT_TRUE(parsed->agentInvestigate.hints);
+    EXPECT_EQ("sample.log", parsed->agentInvestigate.investigate.logFile.string());
+}
