@@ -481,7 +481,7 @@ The architecture should remain extensible so that additional agents can be intro
 
 | Phase | Milestone | Agent relevance |
 |-------|-----------|-----------------|
-| Now | M12 complete (`v1.5.0`) | Plugin SDK enables future AI analyzer providers |
+| Now | M13 complete (`v1.5.1`) | AI Assistant shipped; plugin SDK enables future AI analyzer providers |
 | Next | M13 AI Assistant (`v1.5.1+`) | First product AI: summaries, anomaly hints, NL queries |
 | Later | M14–M16 | GUI, Web, Enterprise agents and orchestration |
 

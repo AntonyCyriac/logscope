@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.9.0 |
+| Version | 1.10.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **462** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_plugin_tests` (M12 plugin loader/providers), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, M11 storage regression guards, and FTS5 pushdown tests.
+**Current baseline:** **513** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_ai_tests` (M13 AI provider/assistant), `scope_plugin_tests` (M12 plugin loader/providers), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, M11 storage regression guards, and FTS5 pushdown tests.
 
 ---
 
@@ -191,3 +191,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.6.0 | 24-07-2026 | Updated baseline to 396 tests at `v1.4.2`; noted M11 bulk index write performance coverage. |
 | 1.7.0 | 24-07-2026 | v1.4.3 scenario test matrix; target ~435 tests at release. |
 | 1.9.0 | 25-07-2026 | v1.5.0 release baseline (462 tests); M12 plugin test coverage. |
+| 1.10.0 | 25-07-2026 | v1.5.1 release baseline (513 tests); M13 AI Assistant test coverage. |

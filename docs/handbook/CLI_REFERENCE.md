@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.9.0 |
+| Version | 1.11.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -284,6 +284,33 @@ Default directory: current working directory.
 
 ---
 
+## agent investigate
+
+AI-assisted investigation using pluggable providers (`noop` by default; `http` for OpenAI-compatible APIs).
+
+```text
+logscope agent investigate [options] <log-source>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--ask <query>` | Translate natural language to a filter DSL expression and investigate |
+| `--summarize` | Append an AI investigation summary (requires `ai.enabled=true`) |
+| `--hints` | Append AI anomaly hints from analytics (requires `ai.enabled=true`) |
+
+Supports the same investigation options as `investigate` (`--filter`, `--search`, `--query`, storage flags, etc.).
+
+```bash
+logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
+logscope agent investigate --config samples/ai-noop.properties --ask "errors" --hints --summarize samples/sample.log
+```
+
+When `ai.enabled=false`, `--summarize` and `--hints` are skipped silently. Invalid `--ask` translation exits non-zero before investigation runs.
+
+See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151) for `ai.*` keys and `LOGSCOPE_AI_API_KEY`.
+
+---
+
 # Exit Codes
 
 | Code | Meaning |
@@ -307,3 +334,4 @@ Default directory: current working directory.
 | 1.8.0 | 24-07-2026 | Moved threshold and investigation filters from `analyze` to `session save`; expanded session save option table. |
 | 1.9.0 | 24-07-2026 | v1.4.3 JSON field filter and FTS pushdown. |
 | 1.10.0 | 25-07-2026 | v1.4.3 release doc sync. |
+| 1.11.0 | 25-07-2026 | v1.5.1 `agent investigate` command and AI flags. |

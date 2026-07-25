@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.3.0 |
+| Version | 3.4.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -347,3 +347,4 @@ These categories should be added only when they provide clear value and support 
 | 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |
 | 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |
 | 3.8.0 | 25-07-2026 | M13 planning docs, ADR-007, and v1.5.1 AI scenarios in reading order. |
+| 3.9.0 | 25-07-2026 | v1.5.1 release notes and M13 doc sync. |

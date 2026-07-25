@@ -63,8 +63,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 | A2.1 | Defaults | Empty / missing `ai.*` | `ai.enabled=false`, `ai.provider=noop` | U | Yes | ✅ |
 | A2.2 | Enable HTTP | `ai.enabled=true`, `ai.provider=http`, endpoint+model set | Http provider selected | U | | ✅ |
 | A2.3 | Missing API key | `ai.provider=http`, no `LOGSCOPE_AI_API_KEY` | Clear error; no silent fallback | U+I | Yes | ✅ |
-| A2.4 | Config validate | `logscope config validate` | Validates `ai.*` keys | U+E | | ⬜ |
-| A2.5 | Context limit | `ai.max_context_lines=50` | At most 50 lines in provider context | U | | ⬜ |
+| A2.4 | Config validate | `logscope config validate` | Validates `ai.*` keys | U+E | | ✅ |
+| A2.5 | Context limit | `ai.max_context_lines=50` | At most 50 lines in provider context | U | | ✅ |
 
 ---
 
@@ -74,8 +74,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 |----|----------|---------|----------|------|-----|--------|
 | A3.1 | Noop heuristic | `--ask "errors"`, noop provider | Valid DSL (e.g. `level == ERROR`); investigate runs | U+I | Yes | ✅ |
 | A3.2 | Invalid DSL rejected | Provider returns malformed DSL | Error; investigate not run with bad filter | U | Yes | ✅ |
-| A3.3 | HTTP translation | Mock server returns `level == ERROR` | Parsed and applied to investigate | I | | ⬜ |
-| A3.4 | Existing DSL unchanged | `investigate --filter 'level == ERROR'` | No AI path; same as pre-M13 | I+E | Yes | ⬜ |
+| A3.3 | HTTP translation | Mock server returns `level == ERROR` | Parsed and applied to investigate | I | | ✅ |
+| A3.4 | Existing DSL unchanged | `investigate --filter 'level == ERROR'` | No AI path; same as pre-M13 | I+E | Yes | ✅ |
 
 ---
 
@@ -128,8 +128,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A8.1 | HTTP down | Provider unreachable | Core investigate output still shown | I | Yes | ⬜ |
-| A8.2 | Summary failure | Mock summarize error | Investigation lines still printed | I | Yes | ⬜ |
+| A8.1 | HTTP down | Provider unreachable | Core investigate output still shown | I | Yes | ✅ |
+| A8.2 | Summary failure | Mock summarize error | Investigation lines still printed | I | Yes | ✅ |
 | A8.3 | AI disabled | `ai.enabled=false` | `agent investigate` runs pipeline; skips or uses noop AI | E | Yes | ✅ |
 | A8.4 | Invalid --ask | Bad NL translation | Non-zero exit; no partial bad filter applied | E | | ✅ |
 

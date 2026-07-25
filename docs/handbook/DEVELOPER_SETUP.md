@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -25,9 +25,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v1.5.0`](../../CHANGELOG.md) — **462** automated tests.
+**Current release:** [`v1.5.1`](../../CHANGELOG.md) — **513** automated tests.
 
-**Next milestone:** M13 – AI Assistant (`v1.5.1+`). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
+**Next milestone:** M14 – Desktop Application (`v2.0.0`). AI Assistant (M13) shipped in `v1.5.1`. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
 ---
 
@@ -356,3 +356,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.3.0 | 24-07-2026 | Added optional Doxygen API documentation build (`LOGSCOPE_DOCS`). |
 | 2.4.0 | 24-07-2026 | Current release baseline (`v1.4.2`, 396 tests). |
 | 2.6.0 | 25-07-2026 | Current release baseline (`v1.5.0`, 462 tests). |
+| 2.7.0 | 25-07-2026 | Current release baseline (`v1.5.1`, 513 tests); M13 AI Assistant. |

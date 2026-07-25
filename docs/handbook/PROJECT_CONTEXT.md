@@ -27,9 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.5.0` (shipped)
+**Current release:** `v1.5.1` (shipped)
 
-**Next milestone:** **M13 – AI Assistant** (`v1.5.1+`). See [Roadmap](../ROADMAP.md).
+**Next milestone:** **M14 – Desktop Application** (`v2.0.0`). See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -53,7 +53,7 @@ The project follows architecture-first development. Every implementation should 
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M13 – AI Assistant | `v1.5.1`+ | Summaries, anomaly hints, NL queries |
+| M13 – AI Assistant | `v1.5.1` | Summaries, anomaly hints, NL queries, `agent investigate` |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -349,3 +349,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 1.8.0 | 24-07-2026 | v1.4.3 M11 remainder in progress. |
 | 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |
 | 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |
+| 2.2.0 | 25-07-2026 | v1.5.1 released; M13 complete; M14 is next. |
