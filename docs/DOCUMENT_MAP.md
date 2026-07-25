@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.2.0 |
+| Version | 3.3.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -133,8 +133,11 @@ docs/
 │   │   ├── FR-003-Generate-Reports.md
 │   │   └── FR-004-Extend-LogScope.md
 │   │
-│   └── non_functional/
-│       └── NFR-001-Quality-Attributes.md
+│   ├── non_functional/
+│   │   └── NFR-001-Quality-Attributes.md
+│   │
+│   └── future/
+│       └── PRD-001-AI-Engineering-Agents.md
 │
 ├── architecture/
 │   ├── ARCHITECTURE_OVERVIEW.md
@@ -332,6 +335,7 @@ These categories should be added only when they provide clear value and support 
 | 3.0.0 | 24-07-2026 | Added PLUGIN_DEVELOPMENT_GUIDE.md (Phase 1 stabilization). |
 | 3.1.0 | 24-07-2026 | Added DEVELOPER_GUIDE.md; regression tests in document map. |
 | 3.2.0 | 24-07-2026 | Updated M11, ADR-005, and reading order for `v1.4.2` bulk index write performance. |
+| 3.3.0 | 25-07-2026 | Added `requirements/future/PRD-001-AI-Engineering-Agents.md` (post-v1.x vision). |
 | 3.3.0 | 24-07-2026 | v1.4.2 doc sync: USER_MANUAL, PERFORMANCE, handbook revision history. |
 | 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |
 | 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |
