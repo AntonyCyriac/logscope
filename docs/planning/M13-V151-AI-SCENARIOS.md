@@ -49,10 +49,10 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A1.1 | Default provider | `ai.enabled=false` (default) | `noop` provider selected | U | Yes | ⬜ |
-| A1.2 | Explicit noop | `ai.provider=noop` | Noop methods callable | U | | ⬜ |
-| A1.3 | Unknown provider | `ai.provider=invalid` | Config validation error | U | | ⬜ |
-| A1.4 | Factory registry | Register `noop` and `http` ids | `createAiProvider` resolves by id | U | | ⬜ |
+| A1.1 | Default provider | `ai.enabled=false` (default) | `noop` provider selected | U | Yes | ✅ |
+| A1.2 | Explicit noop | `ai.provider=noop` | Noop methods callable | U | | ✅ |
+| A1.3 | Unknown provider | `ai.provider=invalid` | Config validation error | U | | ✅ |
+| A1.4 | Factory registry | Register `noop` and `http` ids | `createAiProvider` resolves by id | U | | ✅ |
 
 ---
 
@@ -60,9 +60,9 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A2.1 | Defaults | Empty / missing `ai.*` | `ai.enabled=false`, `ai.provider=noop` | U | Yes | ⬜ |
-| A2.2 | Enable HTTP | `ai.enabled=true`, `ai.provider=http`, endpoint+model set | Http provider selected | U | | ⬜ |
-| A2.3 | Missing API key | `ai.provider=http`, no `LOGSCOPE_AI_API_KEY` | Clear error; no silent fallback | U+I | Yes | ⬜ |
+| A2.1 | Defaults | Empty / missing `ai.*` | `ai.enabled=false`, `ai.provider=noop` | U | Yes | ✅ |
+| A2.2 | Enable HTTP | `ai.enabled=true`, `ai.provider=http`, endpoint+model set | Http provider selected | U | | ✅ |
+| A2.3 | Missing API key | `ai.provider=http`, no `LOGSCOPE_AI_API_KEY` | Clear error; no silent fallback | U+I | Yes | ✅ |
 | A2.4 | Config validate | `logscope config validate` | Validates `ai.*` keys | U+E | | ⬜ |
 | A2.5 | Context limit | `ai.max_context_lines=50` | At most 50 lines in provider context | U | | ⬜ |
 

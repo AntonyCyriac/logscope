@@ -11,6 +11,7 @@
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 #include "plugin_config.hpp"
+#include "ai.hpp"
 
 namespace scope::cli
 {
@@ -93,6 +94,15 @@ int runConfigValidateCommand(const ConfigValidateOptions& options,
     if (!pluginValidation)
     {
         errorOutput << pluginValidation.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const auto aiValidation = scope::ai::validateAiConfiguration(configurationManager.configuration());
+
+    if (!aiValidation)
+    {
+        errorOutput << aiValidation.error().message() << std::endl;
 
         return 1;
     }
