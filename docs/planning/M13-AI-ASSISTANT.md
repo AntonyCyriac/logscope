@@ -38,7 +38,7 @@ See [ADR-007](../architecture/decisions/ADR-007-AI-Integration.md) and [M13 v1.5
 | M13.1 | `scope_ai`, `AiProvider`, `noop` provider, `ai.*` config | ✅ Complete |
 | M13.2 | NL → filter DSL translation + validation | ✅ Complete |
 | M13.3 | Investigation summaries | ✅ Complete |
-| M13.4 | Anomaly hints (analytics context) | ⬜ Planned |
+| M13.4 | Anomaly hints (analytics context) | ✅ Complete |
 | M13.5 | `logscope agent investigate` CLI | ⬜ Planned |
 | M13.6 | `HttpAiProvider` (OpenAI-compatible / Ollama) | ⬜ Planned |
 | M13.7 | Doc sync, `v1.5.1` release | ⬜ Planned |
@@ -56,7 +56,9 @@ See [ADR-007](../architecture/decisions/ADR-007-AI-Integration.md) and [M13 v1.5
 - `AiConfig` — parse `ai.*` configuration keys
 - `nl_query_translator` — NL → DSL with `parseFilterQuery` validation
 - `ai_context_builder` — bounded context from `InvestigationResult` / `InvestigationView`
+- `ai_analytics_context_builder` — bounded context from `AnalyticsResult` trends/clusters/correlations
 - `ai_summary_formatter` — structured summary text for CLI output
+- `ai_anomaly_hint_formatter` — structured anomaly hints for CLI output
 
 ## CLI
 

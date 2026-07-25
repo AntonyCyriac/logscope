@@ -67,6 +67,10 @@ struct AiAnalyticsContext
     std::string spikeVerdict;
     std::size_t clusterCount{0U};
     std::string topClusterMessage;
+    std::uint64_t topClusterCount{0U};
+    std::size_t repeatedErrorPatternCount{0U};
+    std::string topRepeatedErrorKey;
+    std::uint64_t topRepeatedErrorCount{0U};
 };
 
 } // namespace scope::ai

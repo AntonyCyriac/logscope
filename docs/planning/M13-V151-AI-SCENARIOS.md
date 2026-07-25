@@ -94,9 +94,9 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A5.1 | Spike hint | Log with rate spike, `--hints`, noop | Hint references trend/spike | U+I | Yes | ⬜ |
-| A5.2 | Cluster hint | Repeated errors, `--hints` | Hint references top cluster | U | | ⬜ |
-| A5.3 | No analytics signal | Uniform log, `--hints` | Empty or "no anomalies" message | U | | ⬜ |
+| A5.1 | Spike hint | Log with rate spike, `--hints`, noop | Hint references trend/spike | U+I | Yes | ✅ |
+| A5.2 | Cluster hint | Repeated errors, `--hints` | Hint references top cluster | U | | ✅ |
+| A5.3 | No analytics signal | Uniform log, `--hints` | Empty or "no anomalies" message | U | | ✅ |
 | A5.4 | HTTP hints | Mock server | Hints rendered in output | I | | ⬜ |
 
 ---

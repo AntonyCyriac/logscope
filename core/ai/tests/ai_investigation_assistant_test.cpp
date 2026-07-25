@@ -9,6 +9,7 @@
 #include "line_index.hpp"
 
 #include "ai_investigation_assistant.hpp"
+#include "analytics_engine.hpp"
 
 using scope::ai::AiConfig;
 using scope::ai::AiInvestigationAssistant;
@@ -19,6 +20,7 @@ using scope::analysis::IndexedLine;
 using scope::analysis::LineIndex;
 using scope::analysis::LogLevelCounts;
 using scope::analysis::makeLineIndex;
+using scope::analytics::AnalyticsEngine;
 using scope::foundation::Path;
 using scope::investigation::InvestigationCriteria;
 using scope::investigation::InvestigationEngine;
@@ -100,4 +102,53 @@ TEST(AiInvestigationAssistantTest, SummarizesInvestigationWhenEnabled)
     EXPECT_NE(std::string::npos, summary->summary.find("1 matching line"));
     ASSERT_EQ(1U, summary->evidence.size());
     EXPECT_EQ(7U, summary->evidence[0].lineNumber);
+}
+
+TEST(AiInvestigationAssistantTest, RejectsAnomalyHintsWhenDisabled)
+{
+    AiConfig config;
+    config.enabled = false;
+
+    const AiInvestigationAssistant assistant(config);
+    const AnalyticsEngine engine;
+    const AnalysisModel model(Path("sample.log"), 1U);
+    const auto analytics = engine.analyze(model);
+
+    const auto hints = assistant.suggestAnomalyHints(analytics);
+
+    EXPECT_FALSE(hints);
+}
+
+TEST(AiInvestigationAssistantTest, SuggestsAnomalyHintsWhenEnabled)
+{
+    AiConfig config;
+    config.enabled = true;
+
+    LineIndex index = makeLineIndex();
+
+    IndexedLine line;
+    line.lineNumber = 1U;
+    line.level = DetectedLogLevel::Error;
+    line.messageExcerpt = "Connection refused";
+    ASSERT_TRUE(index.tryAddLine(line));
+
+    line.lineNumber = 2U;
+    ASSERT_TRUE(index.tryAddLine(line));
+
+    LogLevelCounts counts;
+    counts.recordError();
+    counts.recordError();
+
+    const AnalysisModel model(Path("sample.log"), 2U, counts, scope::analysis::LogFormat::PlainText, std::nullopt,
+                              std::nullopt, std::move(index));
+
+    const AnalyticsEngine engine;
+    const auto analytics = engine.analyze(model);
+
+    const AiInvestigationAssistant assistant(config);
+    const auto hints = assistant.suggestAnomalyHints(analytics);
+
+    ASSERT_TRUE(hints);
+    ASSERT_FALSE(hints->empty());
+    EXPECT_NE(std::string::npos, hints->front().message.find("Repeated error cluster"));
 }

@@ -4,6 +4,8 @@
 # ==========================================================
 
 add_library(scope_ai
+    ai_analytics_context_builder.cpp
+    ai_anomaly_hint_formatter.cpp
     ai_config.cpp
     ai_context_builder.cpp
     ai_investigation_assistant.cpp
@@ -16,6 +18,7 @@ add_library(scope_ai
 
 target_link_libraries(scope_ai
     PUBLIC
+        scope_analytics
         scope_foundation
         scope_investigation
         scope_query

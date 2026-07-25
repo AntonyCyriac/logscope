@@ -4,6 +4,8 @@
 # ==========================================================
 
 add_executable(scope_ai_tests
+    ai_analytics_context_builder_test.cpp
+    ai_anomaly_hint_formatter_test.cpp
     ai_config_test.cpp
     ai_context_builder_test.cpp
     ai_investigation_assistant_test.cpp

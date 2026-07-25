@@ -154,6 +154,33 @@ foundation::Result<std::vector<AiAnomalyHint>> NoOpAiProvider::suggestAnomalies(
         AiAnomalyHint hint;
         hint.severity = "low";
         hint.message = "Repeated error cluster: " + context.topClusterMessage;
+
+        if (context.topClusterCount > 0U)
+        {
+            hint.message += " (" + std::to_string(context.topClusterCount) + " occurrences)";
+        }
+
+        hints.push_back(std::move(hint));
+    }
+    else if (context.repeatedErrorPatternCount > 0U && !context.topRepeatedErrorKey.empty())
+    {
+        AiAnomalyHint hint;
+        hint.severity = "low";
+        hint.message = "Repeated error pattern: " + context.topRepeatedErrorKey;
+
+        if (context.topRepeatedErrorCount > 0U)
+        {
+            hint.message += " (" + std::to_string(context.topRepeatedErrorCount) + " occurrences)";
+        }
+
+        hints.push_back(std::move(hint));
+    }
+
+    if (hints.empty())
+    {
+        AiAnomalyHint hint;
+        hint.severity = "info";
+        hint.message = "No anomaly signals detected in analytics context.";
         hints.push_back(std::move(hint));
     }
 
