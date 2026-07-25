@@ -122,12 +122,12 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected behavior | Test | Reg | Status |
 |----|----------|---------|-------------------|------|-----|--------|
-| S6.1 | Index population | `--persist-index` | `lines_fts` synced on insert/batch commit | U | | ⬜ |
-| S6.2 | contains pushdown | `contains(message, "timeout")` | FTS `MATCH` when index present | U+I | Yes | ⬜ |
-| S6.3 | M7 search | `search --search "timeout"` on persisted index | FTS path when store attached | I+E | Yes | ⬜ |
-| S6.4 | Memory-only index | No `--persist-index` | Existing in-memory search unchanged | U | | ⬜ |
-| S6.5 | v1 index rebuild | Open v1 DB | FTS populated on rebuild | I | | ⬜ |
-| S6.6 | Benchmark | 100k-line persisted index | `BM_FtsSearch` baseline in CI | B | | ⬜ |
+| S6.1 | Index population | `--persist-index` | `lines_fts` synced on insert/batch commit | U | | ✅ |
+| S6.2 | contains pushdown | `contains(message, "timeout")` | FTS `MATCH` when index present | U+I | Yes | ✅ |
+| S6.3 | M7 search | `search --search "timeout"` on persisted index | FTS path when store attached | I+E | Yes | ✅ |
+| S6.4 | Memory-only index | No `--persist-index` | Existing in-memory search unchanged | U | | ✅ |
+| S6.5 | v1 index rebuild | Open v1 DB | FTS populated on rebuild | I | | ✅ |
+| S6.6 | Benchmark | 100k-line persisted index | `BM_FtsSearch` baseline in CI | B | | ✅ |
 
 **Build:** SQLite compiled with `SQLITE_ENABLE_FTS5`.
 

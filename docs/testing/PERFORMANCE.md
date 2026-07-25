@@ -116,7 +116,7 @@ The `benchmark` job in `.github/workflows/ci.yml` runs benchmarks on Ubuntu and 
 |-----------|-------------|---------|
 | `BM_IndexStoreCompressed/100000` | Append with `storage.compress_content=true`; reports `file_bytes` counter | Local only (no CI gate yet) |
 | `BM_QueryCacheHit` | Second identical filter query on persisted index | TBD |
-| `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | TBD |
+| `BM_FtsSearch` | FTS5 text search on 100k-line persisted index | Informational (not gated) |
 
 See [M11-V143-STORAGE-SCENARIOS.md](../planning/M11-V143-STORAGE-SCENARIOS.md).
 

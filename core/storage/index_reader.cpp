@@ -75,6 +75,20 @@ IndexReader::linesMatchingPushdownFilter(const query::QueryNode& filterNode,
     return foundation::Result<PushdownFetchResult>(std::move(result));
 }
 
+foundation::Result<std::vector<analysis::IndexedLine>>
+IndexReader::linesMatchingFtsSearch(const std::string& term) const
+{
+    if (m_persistentStore == nullptr)
+    {
+        return foundation::Result<std::vector<analysis::IndexedLine>>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "FTS search requires a persistent index store."));
+    }
+
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(m_persistentStore);
+
+    return sqliteStore->fetchLinesMatchingFts(term);
+}
+
 std::uint64_t IndexReader::indexedLineCount() const noexcept
 {
     if (m_persistentStore != nullptr && m_persistentStore->storedLineCount() > 0U)

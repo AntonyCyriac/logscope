@@ -158,7 +158,29 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
     }
 
     const query::QueryEvaluator filterEvaluator(activeFilter);
-    const std::vector<analysis::IndexedLine> lines = candidateLines(model, activeFilter);
+    std::vector<analysis::IndexedLine> lines;
+    bool usedFtsSearch = false;
+
+    if (model.indexStore() != nullptr && activeQuery.kind() == search::SearchQuery::Kind::Term &&
+        activeQuery.mode() == search::SearchMode::Text &&
+        activeQuery.caseSensitivity() == search::CaseSensitivity::Insensitive && !activeFilter.isActive())
+    {
+        const analysis::LineIndex* memoryIndex =
+            model.lineIndex().has_value() ? &*model.lineIndex() : nullptr;
+        const storage::IndexReader reader(memoryIndex, model.indexStore());
+        const auto ftsLines = reader.linesMatchingFtsSearch(activeQuery.term());
+
+        if (ftsLines)
+        {
+            lines = *ftsLines;
+            usedFtsSearch = true;
+        }
+    }
+
+    if (!usedFtsSearch)
+    {
+        lines = candidateLines(model, activeFilter);
+    }
 
     for (const analysis::IndexedLine& line : lines)
     {

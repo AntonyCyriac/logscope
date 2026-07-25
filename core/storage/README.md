@@ -18,7 +18,7 @@
 | `line_json_fields` + DSL pushdown | Shipped (M11.9) |
 | `query_cache` | Shipped |
 | Incremental append | Design |
-| FTS5 full-text search | Design |
+| FTS5 full-text search | Shipped (M11.12) |
 
 Acceptance scenarios: [M11-V143-STORAGE-SCENARIOS.md](../../docs/planning/M11-V143-STORAGE-SCENARIOS.md)
 

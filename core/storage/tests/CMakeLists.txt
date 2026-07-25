@@ -10,6 +10,7 @@ add_executable(scope_storage_tests
     query_planner_test.cpp
     source_snapshot_test.cpp
     sqlite_index_store_compression_test.cpp
+    sqlite_index_store_fts_test.cpp
     sqlite_index_store_incremental_append_test.cpp
     sqlite_index_store_json_fields_test.cpp
     sqlite_index_store_query_cache_test.cpp
