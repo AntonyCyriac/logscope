@@ -272,9 +272,11 @@ static void BM_FtsSearch(benchmark::State& state)
         return;
     }
 
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(*opened);
+
     for (auto _ : state)
     {
-        const auto matches = (*opened)->fetchLinesMatchingFts("code=3");
+        const auto matches = sqliteStore->fetchLinesMatchingFts("code=3");
         benchmark::DoNotOptimize(matches);
     }
 }
