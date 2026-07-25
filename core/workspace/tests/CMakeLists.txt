@@ -5,6 +5,7 @@ add_executable(scope_workspace_tests
 
 target_link_libraries(scope_workspace_tests
     PRIVATE
+        logscope_gtest_support
         scope_workspace
         GTest::gtest_main
 )

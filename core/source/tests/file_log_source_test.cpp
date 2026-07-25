@@ -7,6 +7,7 @@
 
 #include <gtest/gtest.h>
 
+#include "gtest_temp_path.hpp"
 #include "source.hpp"
 
 using scope::foundation::Path;
@@ -21,7 +22,7 @@ class FileLogSourceTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_testFile = Path("file_log_source_test.log");
+        m_testFile = Path(logscope::gtest::uniqueTestPath(".log"));
 
         std::ofstream stream(m_testFile.string());
 

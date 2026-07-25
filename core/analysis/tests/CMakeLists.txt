@@ -14,6 +14,7 @@ add_executable(scope_analysis_tests
 
 target_link_libraries(scope_analysis_tests
     PRIVATE
+        logscope_gtest_support
         scope_analysis
         GTest::gtest_main
 )

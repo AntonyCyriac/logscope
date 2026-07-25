@@ -12,6 +12,7 @@ target_compile_definitions(logscope_e2e_tests
 
 target_link_libraries(logscope_e2e_tests
     PRIVATE
+        logscope_gtest_support
         GTest::gtest_main
 )
 

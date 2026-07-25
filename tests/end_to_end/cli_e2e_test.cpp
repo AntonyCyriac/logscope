@@ -9,6 +9,7 @@
 
 #include <string>
 
+#include "gtest_temp_path.hpp"
 #include "process.hpp"
 
 namespace
@@ -112,7 +113,7 @@ TEST(CliE2eTest, ExtensionsDescribeShowsMetadata)
 
 TEST(CliE2eTest, SessionSaveAndLoadRoundTrip)
 {
-    const std::string sessionFile = "cli_e2e_session.logscope-session";
+    const std::string sessionFile = logscope::gtest::uniqueTestPath(".logscope-session");
 
     std::remove(sessionFile.c_str());
 
@@ -132,7 +133,7 @@ TEST(CliE2eTest, SessionSaveAndLoadRoundTrip)
 
 TEST(CliE2eTest, AnalyzeSubcommandProducesHtmlReportToFile)
 {
-    const std::string outputFile = "cli_e2e_report.html";
+    const std::string outputFile = logscope::gtest::uniqueTestPath(".html");
 
     std::remove(outputFile.c_str());
 
@@ -186,7 +187,7 @@ TEST(CliE2eTest, AnalyzeDirectoryProducesCombinedReport)
 
 TEST(CliE2eTest, AnalyzeStdinProducesReport)
 {
-    const std::string inputFile = "cli_e2e_stdin_input.log";
+    const std::string inputFile = logscope::gtest::uniqueTestPath("_stdin_input.log");
 
     {
         std::ofstream stream(inputFile);
@@ -259,8 +260,8 @@ TEST(CliE2eTest, InvestigateCombinesTextQueryAndFilter)
 
 TEST(CliE2eTest, InvestigatePersistIndexFindsLinesBeyondMemoryCap)
 {
-    const std::string logFile = "e2e_persist_large.log";
-    const std::string indexFile = "e2e_persist_large.db";
+    const std::string logFile = logscope::gtest::uniqueTestPath("_persist_large.log");
+    const std::string indexFile = logscope::gtest::uniqueTestPath("_persist_large.db");
 
     {
         std::ofstream stream(logFile);
@@ -286,8 +287,8 @@ TEST(CliE2eTest, InvestigatePersistIndexFindsLinesBeyondMemoryCap)
 
 TEST(CliE2eTest, QueryPersistedJsonFieldFilter)
 {
-    const std::string logFile = "e2e_json_field_filter.jsonl";
-    const std::string indexFile = "e2e_json_field_filter.db";
+    const std::string logFile = logscope::gtest::uniqueTestPath("_json_field_filter.jsonl");
+    const std::string indexFile = logscope::gtest::uniqueTestPath("_json_field_filter.db");
 
     {
         std::ofstream stream(logFile);
@@ -308,8 +309,8 @@ TEST(CliE2eTest, QueryPersistedJsonFieldFilter)
 
 TEST(CliE2eTest, IncrementalAppendIndexesNewLinesOnReuse)
 {
-    const std::string logFile = "e2e_incremental_append.log";
-    const std::string indexFile = "e2e_incremental_append.db";
+    const std::string logFile = logscope::gtest::uniqueTestPath("_incremental_append.log");
+    const std::string indexFile = logscope::gtest::uniqueTestPath("_incremental_append.db");
 
     {
         std::ofstream stream(logFile);
@@ -340,9 +341,9 @@ TEST(CliE2eTest, IncrementalAppendIndexesNewLinesOnReuse)
 
 TEST(CliE2eTest, SessionLoadReusesPersistedIndex)
 {
-    const std::string logFile = "e2e_session_reuse.log";
-    const std::string sessionFile = "e2e_session_reuse.logscope-session";
-    const std::string indexFile = "e2e_session_reuse.db";
+    const std::string logFile = logscope::gtest::uniqueTestPath("_session_reuse.log");
+    const std::string sessionFile = logscope::gtest::uniqueTestPath("_session_reuse.logscope-session");
+    const std::string indexFile = logscope::gtest::uniqueTestPath("_session_reuse.db");
 
     {
         std::ofstream stream(logFile);

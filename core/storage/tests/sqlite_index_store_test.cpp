@@ -9,6 +9,7 @@
 #include <optional>
 #include <sqlite3.h>
 
+#include "gtest_temp_path.hpp"
 #include "index_fingerprint.hpp"
 #include "schema_version.hpp"
 #include "sqlite_index_store.hpp"
@@ -40,9 +41,9 @@ IndexedLine makeLine(const std::uint64_t lineNumber, const DetectedLogLevel leve
     return line;
 }
 
-Path writeTempSource(const std::string& name, const std::string& content)
+Path writeTempSource(const std::string& suffix, const std::string& content)
 {
-    const Path sourcePath(name);
+    const Path sourcePath(logscope::gtest::uniqueTestPath("_" + suffix + ".log"));
     std::ofstream output(sourcePath.string());
     output << content;
     output.close();
@@ -242,7 +243,7 @@ IndexMetadata makeMetadata(const Path& sourcePath)
 TEST(SqliteIndexStoreTest, AppendsAndFetchesLines)
 {
     const Path databasePath = uniqueDatabasePath("append");
-    const Path sourcePath = writeTempSource("storage_test_source.log", "error line\n");
+    const Path sourcePath = writeTempSource("source", "error line\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -274,7 +275,7 @@ TEST(SqliteIndexStoreTest, AppendsAndFetchesLines)
 TEST(SqliteIndexStoreTest, FetchesFilteredLines)
 {
     const Path databasePath = uniqueDatabasePath("filter");
-    const Path sourcePath = writeTempSource("storage_test_filter_source.log", "error line\ninfo line\n");
+    const Path sourcePath = writeTempSource("filter", "error line\ninfo line\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -303,7 +304,7 @@ TEST(SqliteIndexStoreTest, FetchesFilteredLines)
 TEST(SqliteIndexStoreTest, PersistsMetadata)
 {
     const Path databasePath = uniqueDatabasePath("metadata");
-    const Path sourcePath = writeTempSource("storage_test_metadata_source.log", "sample\n");
+    const Path sourcePath = writeTempSource("metadata", "sample\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -330,7 +331,7 @@ TEST(SqliteIndexStoreTest, PersistsMetadata)
 TEST(SqliteIndexStoreTest, ReturnsLinesInOrder)
 {
     const Path databasePath = uniqueDatabasePath("order");
-    const Path sourcePath = writeTempSource("storage_test_order_source.log", "one\ntwo\nthree\n");
+    const Path sourcePath = writeTempSource("order", "one\ntwo\nthree\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -362,7 +363,7 @@ TEST(SqliteIndexStoreTest, AppendsLargeBatchInOrder)
 {
     constexpr std::size_t lineCount = 12000U;
     const Path databasePath = uniqueDatabasePath("large_batch");
-    const Path sourcePath = writeTempSource("storage_test_large_batch_source.log", "sample\n");
+    const Path sourcePath = writeTempSource("large_batch", "sample\n");
     const auto fingerprint = IndexFingerprint::compute(sourcePath);
 
     ASSERT_TRUE(fingerprint);
@@ -409,7 +410,7 @@ TEST(SqliteIndexStoreTest, RejectsMissingDatabase)
 TEST(SqliteIndexStoreTest, FreshCreateUsesSchemaV2)
 {
     const Path databasePath = uniqueDatabasePath("schema_v2");
-    const Path sourcePath = writeTempSource("storage_test_schema_v2_source.log", "sample\n");
+    const Path sourcePath = writeTempSource("schema_v2", "sample\n");
     const auto metadata = makeMetadata(sourcePath);
 
     const auto created = SqliteIndexStore::create(databasePath, metadata);
@@ -432,7 +433,7 @@ TEST(SqliteIndexStoreTest, FreshCreateUsesSchemaV2)
 TEST(SqliteIndexStoreTest, OpenV1IndexRequiresRebuild)
 {
     const Path databasePath = uniqueDatabasePath("schema_v1");
-    const Path sourcePath = writeTempSource("storage_test_schema_v1_source.log", "sample\n");
+    const Path sourcePath = writeTempSource("schema_v1", "sample\n");
     const auto metadata = makeMetadata(sourcePath);
 
     ASSERT_TRUE(createV1Database(databasePath, metadata));
@@ -466,7 +467,7 @@ TEST(SqliteIndexStoreTest, RejectsCorruptDatabase)
 TEST(SqliteIndexStoreTest, RejectsUnsupportedFutureSchema)
 {
     const Path databasePath = uniqueDatabasePath("schema_future");
-    const Path sourcePath = writeTempSource("storage_test_schema_future_source.log", "sample\n");
+    const Path sourcePath = writeTempSource("schema_future", "sample\n");
     const auto metadata = makeMetadata(sourcePath);
 
     const auto created = SqliteIndexStore::create(databasePath, metadata);
@@ -497,7 +498,7 @@ TEST(SqliteIndexStoreTest, RejectsUnsupportedFutureSchema)
 TEST(SqliteIndexStoreTest, FinalizePersistsSourceSnapshotMeta)
 {
     const Path databasePath = uniqueDatabasePath("source_snapshot");
-    const Path sourcePath = writeTempSource("storage_test_source_snapshot_source.log", "one\ntwo\n");
+    const Path sourcePath = writeTempSource("source_snapshot", "one\ntwo\n");
     const auto metadata = makeMetadata(sourcePath);
 
     const auto created = SqliteIndexStore::create(databasePath, metadata);

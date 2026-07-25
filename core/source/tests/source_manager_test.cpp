@@ -8,6 +8,7 @@
 #include <filesystem>
 #include <gtest/gtest.h>
 
+#include "gtest_temp_path.hpp"
 #include "source.hpp"
 
 using scope::foundation::ErrorCode;
@@ -23,7 +24,7 @@ class SourceManagerTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        m_testFile = Path("source_manager_test.log");
+        m_testFile = Path(logscope::gtest::uniqueTestPath(".log"));
 
         std::ofstream stream(m_testFile.string());
 
@@ -115,7 +116,7 @@ TEST_F(SourceManagerTest, ValidateStdinPath)
 
 TEST_F(SourceManagerTest, ValidateEmptyDirectory)
 {
-    const Path directoryPath("source_manager_empty_dir");
+    const Path directoryPath(logscope::gtest::uniqueTestPath("_empty_dir"));
 
     std::filesystem::create_directory(directoryPath.string());
 
@@ -131,7 +132,7 @@ TEST_F(SourceManagerTest, ValidateEmptyDirectory)
 
 TEST_F(SourceManagerTest, OpenDirectoryReadsAllLogFiles)
 {
-    const Path directoryPath("source_manager_dir");
+    const Path directoryPath(logscope::gtest::uniqueTestPath("_dir"));
 
     std::filesystem::create_directory(directoryPath.string());
 
