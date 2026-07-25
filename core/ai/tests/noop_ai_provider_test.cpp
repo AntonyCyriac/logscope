@@ -76,9 +76,40 @@ TEST(NoOpAiProviderTest, SuggestAnomaliesUsesAnalyticsSignals)
     context.spikeVerdict = "Spike in ERROR rate";
     context.clusterCount = 1U;
     context.topClusterMessage = "connection reset";
+    context.topClusterCount = 3U;
 
     const auto result = provider.suggestAnomalies(context);
 
     ASSERT_TRUE(result);
     ASSERT_EQ(result->size(), 2U);
+    EXPECT_NE(std::string::npos, result->at(1).message.find("connection reset"));
+    EXPECT_NE(std::string::npos, result->at(1).message.find("3 occurrences"));
+}
+
+TEST(NoOpAiProviderTest, SuggestAnomaliesReportsNoSignals)
+{
+    const NoOpAiProvider provider;
+
+    const auto result = provider.suggestAnomalies(AiAnalyticsContext{});
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(1U, result->size());
+    EXPECT_EQ("info", result->front().severity);
+    EXPECT_NE(std::string::npos, result->front().message.find("No anomaly signals"));
+}
+
+TEST(NoOpAiProviderTest, SuggestAnomaliesUsesCorrelationWhenNoCluster)
+{
+    const NoOpAiProvider provider;
+
+    AiAnalyticsContext context;
+    context.repeatedErrorPatternCount = 1U;
+    context.topRepeatedErrorKey = "timeout";
+    context.topRepeatedErrorCount = 4U;
+
+    const auto result = provider.suggestAnomalies(context);
+
+    ASSERT_TRUE(result);
+    ASSERT_EQ(1U, result->size());
+    EXPECT_NE(std::string::npos, result->front().message.find("Repeated error pattern: timeout"));
 }

@@ -12,6 +12,7 @@
 #include "ai_config.hpp"
 #include "ai_provider.hpp"
 #include "ai_result.hpp"
+#include "analytics_result.hpp"
 #include "foundation/result.hpp"
 #include "investigation_result.hpp"
 #include "investigation_view.hpp"
@@ -51,6 +52,12 @@ class AiInvestigationAssistant
     [[nodiscard]] foundation::Result<AiSummary> summarizeInvestigation(
         const investigation::InvestigationView& view,
         const investigation::InvestigationResult& result) const;
+
+    /**
+     * @brief Produces anomaly hints from bounded analytics context.
+     */
+    [[nodiscard]] foundation::Result<std::vector<AiAnomalyHint>> suggestAnomalyHints(
+        const analytics::AnalyticsResult& analytics) const;
 
   private:
     AiConfig m_config;

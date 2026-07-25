@@ -4,6 +4,7 @@
 
 #include "ai_investigation_assistant.hpp"
 
+#include "ai_analytics_context_builder.hpp"
 #include "ai_context_builder.hpp"
 #include "foundation/error.hpp"
 
@@ -55,6 +56,21 @@ foundation::Result<AiSummary> AiInvestigationAssistant::summarizeInvestigation(
     const AiInvestigationContext context = buildInvestigationContext(m_config, view, result);
 
     return m_provider->summarize(context);
+}
+
+foundation::Result<std::vector<AiAnomalyHint>> AiInvestigationAssistant::suggestAnomalyHints(
+    const analytics::AnalyticsResult& analytics) const
+{
+    if (!m_config.enabled)
+    {
+        return foundation::Result<std::vector<AiAnomalyHint>>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "AI assistant is disabled (ai.enabled=false)."));
+    }
+
+    const AiAnalyticsContext context = buildAnalyticsContext(analytics);
+
+    return m_provider->suggestAnomalies(context);
 }
 
 } // namespace scope::ai
