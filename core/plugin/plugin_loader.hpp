@@ -46,4 +46,6 @@ class PluginLoader
 [[nodiscard]] foundation::Result<std::size_t>
 loadPluginsForManager(extension::ExtensionManager& manager, const PluginConfig& config);
 
+void unloadAllPersistentLibraries() noexcept;
+
 } // namespace scope::plugin

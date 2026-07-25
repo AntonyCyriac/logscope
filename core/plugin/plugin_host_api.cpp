@@ -20,6 +20,7 @@
 #include "search_provider.hpp"
 #include "search_provider_registry.hpp"
 #include "storage_backend_registry.hpp"
+#include "plugin_runtime.hpp"
 
 namespace scope::plugin
 {
@@ -73,6 +74,11 @@ class CFormatParserAdapter final : public analysis::FormatParser
 
     ~CFormatParserAdapter() override
     {
+        if (!pluginProvidersMayDestroy())
+        {
+            return;
+        }
+
         if (m_parser.vtable != nullptr && m_parser.vtable->destroy != nullptr)
         {
             m_parser.vtable->destroy(m_parser.instance);
@@ -112,6 +118,11 @@ class CReportContributorAdapter final : public reporting::ReportSectionContribut
 
     ~CReportContributorAdapter() override
     {
+        if (!pluginProvidersMayDestroy())
+        {
+            return;
+        }
+
         if (m_contributor.vtable != nullptr && m_contributor.vtable->destroy != nullptr)
         {
             m_contributor.vtable->destroy(m_contributor.instance);
@@ -181,6 +192,11 @@ class CSearchProviderAdapter final : public search::SearchProvider
 
     ~CSearchProviderAdapter() override
     {
+        if (!pluginProvidersMayDestroy())
+        {
+            return;
+        }
+
         if (m_provider.vtable != nullptr && m_provider.vtable->destroy != nullptr)
         {
             m_provider.vtable->destroy(m_provider.instance);
@@ -217,6 +233,11 @@ class CStorageStoreAdapter final : public storage::IndexStore
 
     ~CStorageStoreAdapter() override
     {
+        if (!pluginProvidersMayDestroy())
+        {
+            return;
+        }
+
         if (m_store.vtable != nullptr && m_store.vtable->destroy != nullptr)
         {
             m_store.vtable->destroy(m_store.instance);

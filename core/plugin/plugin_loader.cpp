@@ -6,6 +6,7 @@
 
 #include "foundation/filesystem.hpp"
 #include "log_macros.hpp"
+#include "plugin_runtime.hpp"
 
 namespace scope::plugin
 {
@@ -142,6 +143,8 @@ foundation::Result<bool> PluginLoader::loadLibraryFile(const foundation::Path& l
 
     persistentLoadedLibraries().push_back(std::move(loaded));
 
+    ensurePluginRuntimeShutdownRegistered();
+
     SCOPE_LOG_INFO("plugin", "Loaded plugin library: " + libraryPath.string());
 
     return foundation::Result<bool>(true);
@@ -158,6 +161,11 @@ foundation::Result<std::size_t> loadPluginsForManager(extension::ExtensionManage
     PluginLoader loader(manager);
 
     return loader.loadFromPaths(mergePluginPaths(config));
+}
+
+void unloadAllPersistentLibraries() noexcept
+{
+    persistentLoadedLibraries().clear();
 }
 
 } // namespace scope::plugin

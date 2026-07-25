@@ -15,4 +15,19 @@ namespace scope::plugin
 [[nodiscard]] extension::ExtensionManager
 createConfiguredExtensionManager(const runtime::Configuration& configuration);
 
+/**
+ * @brief Releases plugin providers and unloads libraries before process exit.
+ */
+void shutdownPluginRuntime() noexcept;
+
+/**
+ * @brief Returns false after shutdown begins so adapters skip cross-DLL destroy.
+ */
+[[nodiscard]] bool pluginProvidersMayDestroy() noexcept;
+
+/**
+ * @brief Registers an atexit handler to run @ref shutdownPluginRuntime once.
+ */
+void ensurePluginRuntimeShutdownRegistered() noexcept;
+
 } // namespace scope::plugin

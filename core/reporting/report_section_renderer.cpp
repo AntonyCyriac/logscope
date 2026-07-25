@@ -52,6 +52,7 @@ ReportSectionRegistry::ReportSectionRegistry()
     registerBuiltInSectionRenderers(*this);
     registerAnalyticsSectionRenderers(*this);
     registerReportingContributors(*this);
+    m_builtInRendererCount = m_renderers.size();
 }
 
 ReportSectionRegistry& ReportSectionRegistry::instance()
@@ -69,6 +70,14 @@ void ReportSectionRegistry::registerRenderer(std::unique_ptr<ReportSectionRender
 void ReportSectionRegistry::registerContributor(std::unique_ptr<ReportSectionContributor> contributor)
 {
     registerRenderer(std::make_unique<ContributorRenderer>(std::move(contributor)));
+}
+
+void ReportSectionRegistry::clearPluginContributors()
+{
+    if (m_renderers.size() > m_builtInRendererCount)
+    {
+        m_renderers.resize(m_builtInRendererCount);
+    }
 }
 
 const ReportSectionRenderer* ReportSectionRegistry::findRenderer(const ReportSection section) const

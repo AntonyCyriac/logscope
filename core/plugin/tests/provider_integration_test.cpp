@@ -58,6 +58,7 @@ void loadFullTestPlugin()
 {
     ParserRegistry::instance().clear();
     SearchProviderRegistry::instance().clear();
+    ReportSectionRegistry::instance().clearPluginContributors();
 
     ExtensionManager manager = ExtensionManager::createWithBuiltIns();
 

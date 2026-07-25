@@ -43,6 +43,8 @@ class ReportSectionRegistry
 
     void registerContributor(std::unique_ptr<ReportSectionContributor> contributor);
 
+    void clearPluginContributors();
+
     [[nodiscard]] std::vector<ReportFragment>
     renderFragments(const analysis::AnalysisModel& model, const ReportOptions& options) const;
 
@@ -52,6 +54,7 @@ class ReportSectionRegistry
     [[nodiscard]] const ReportSectionRenderer* findRenderer(ReportSection section) const;
 
     std::vector<std::unique_ptr<ReportSectionRenderer>> m_renderers;
+    std::size_t m_builtInRendererCount{0U};
 };
 
 /**
