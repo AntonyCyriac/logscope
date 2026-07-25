@@ -32,6 +32,7 @@ target_link_libraries(logscope
         scope_configuration
         scope_extension
         scope_plugin
+        scope_ai
         scope_foundation
         scope_investigation
         scope_query

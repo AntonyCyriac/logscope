@@ -238,6 +238,13 @@ report.include_charts=true
 # Dynamic plugins (v1.5.0+)
 # plugins.enabled=true
 # plugins.paths=/opt/logscope/plugins
+
+# AI assistant (v1.5.1+)
+# ai.enabled=false
+# ai.provider=noop
+# ai.endpoint=
+# ai.model=
+# ai.max_context_lines=200
 # analysis.plugin_format=pipe-delimited
 # investigation.search_provider=sample.search
 # storage.backend=sqlite
@@ -259,7 +266,21 @@ Environment: `LOGSCOPE_PLUGIN_PATH` augments `plugins.paths`.
 
 ---
 
-# 9. Related documents
+# 9. AI configuration (v1.5.1+)
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `ai.enabled` | `false` | When `false`, the noop provider is used and no outbound AI calls occur. |
+| `ai.provider` | `noop` | `noop` or `http` (OpenAI-compatible API). |
+| `ai.endpoint` | (unset) | Base URL for HTTP provider (required when `ai.provider=http`). |
+| `ai.model` | (unset) | Model name for HTTP provider (required when `ai.provider=http`). |
+| `ai.max_context_lines` | `200` | Maximum log lines included in AI context. |
+
+Environment: `LOGSCOPE_AI_API_KEY` — bearer token for HTTP provider (never store in properties files).
+
+---
+
+# 10. Related documents
 
 | Document | Purpose |
 |----------|---------|

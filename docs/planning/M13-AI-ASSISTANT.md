@@ -35,7 +35,7 @@ See [ADR-007](../architecture/decisions/ADR-007-AI-Integration.md) and [M13 v1.5
 | Phase | Focus | Status |
 |-------|-------|--------|
 | M13.0 | ADR-007, planning doc, scenarios | ✅ Complete |
-| M13.1 | `scope_ai`, `AiProvider`, `noop` provider, `ai.*` config | ⬜ Planned |
+| M13.1 | `scope_ai`, `AiProvider`, `noop` provider, `ai.*` config | ✅ Complete |
 | M13.2 | NL → filter DSL translation + validation | ⬜ Planned |
 | M13.3 | Investigation summaries | ⬜ Planned |
 | M13.4 | Anomaly hints (analytics context) | ⬜ Planned |

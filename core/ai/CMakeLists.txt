@@ -1,0 +1,26 @@
+# ==========================================================
+# LogScope
+# Core AI Assistant
+# ==========================================================
+
+add_library(scope_ai
+    ai_config.cpp
+    ai_investigation_assistant.cpp
+    ai_provider.cpp
+    http_ai_provider.cpp
+    noop_ai_provider.cpp
+)
+
+target_link_libraries(scope_ai
+    PUBLIC
+        scope_foundation
+        scope_query
+        scope_runtime
+)
+
+target_include_directories(scope_ai
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_subdirectory(tests)
