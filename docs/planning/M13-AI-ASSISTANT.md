@@ -39,7 +39,7 @@ See [ADR-007](../architecture/decisions/ADR-007-AI-Integration.md) and [M13 v1.5
 | M13.2 | NL → filter DSL translation + validation | ✅ Complete |
 | M13.3 | Investigation summaries | ✅ Complete |
 | M13.4 | Anomaly hints (analytics context) | ✅ Complete |
-| M13.5 | `logscope agent investigate` CLI | ⬜ Planned |
+| M13.5 | `logscope agent investigate` CLI | ✅ Complete |
 | M13.6 | `HttpAiProvider` (OpenAI-compatible / Ollama) | ⬜ Planned |
 | M13.7 | Doc sync, `v1.5.1` release | ⬜ Planned |
 

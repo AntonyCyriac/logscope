@@ -105,11 +105,11 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A6.1 | Agent help | `logscope agent --help` | Shows `investigate` subcommand | E | | ⬜ |
-| A6.2 | Investigate help | `logscope agent investigate --help` | Documents `--ask`, `--summarize`, `--hints` | E | | ⬜ |
-| A6.3 | End-to-end | `agent investigate sample.log --summarize` | Exit 0; summary section present | E | Yes | ⬜ |
-| A6.4 | Combined flags | `--ask "errors" --hints --summarize` | NL investigate + hints + summary | E | Yes | ⬜ |
-| A6.5 | Existing commands | `logscope investigate` unchanged | No `agent` prefix required; same behaviour | E | Yes | ⬜ |
+| A6.1 | Agent help | `logscope agent --help` | Shows `investigate` subcommand | E | | ✅ |
+| A6.2 | Investigate help | `logscope agent investigate --help` | Documents `--ask`, `--summarize`, `--hints` | E | | ✅ |
+| A6.3 | End-to-end | `agent investigate sample.log --summarize` | Exit 0; summary section present | E | Yes | ✅ |
+| A6.4 | Combined flags | `--ask "errors" --hints --summarize` | NL investigate + hints + summary | E | Yes | ✅ |
+| A6.5 | Existing commands | `logscope investigate` unchanged | No `agent` prefix required; same behaviour | E | Yes | ✅ |
 
 ---
 
@@ -130,8 +130,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 |----|----------|---------|----------|------|-----|--------|
 | A8.1 | HTTP down | Provider unreachable | Core investigate output still shown | I | Yes | ⬜ |
 | A8.2 | Summary failure | Mock summarize error | Investigation lines still printed | I | Yes | ⬜ |
-| A8.3 | AI disabled | `ai.enabled=false` | `agent investigate` runs pipeline; skips or uses noop AI | E | Yes | ⬜ |
-| A8.4 | Invalid --ask | Bad NL translation | Non-zero exit; no partial bad filter applied | E | | ⬜ |
+| A8.3 | AI disabled | `ai.enabled=false` | `agent investigate` runs pipeline; skips or uses noop AI | E | Yes | ✅ |
+| A8.4 | Invalid --ask | Bad NL translation | Non-zero exit; no partial bad filter applied | E | | ✅ |
 
 ---
 

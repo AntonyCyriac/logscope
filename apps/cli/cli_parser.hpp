@@ -38,7 +38,9 @@ enum class CliCommand
     ExtensionsDescribe,
     SessionSave,
     SessionLoad,
-    SessionList
+    SessionList,
+    AgentHelp,
+    AgentInvestigate
 };
 
 /**
@@ -74,6 +76,17 @@ struct InvestigateOptions
     bool reuseIndex = false;
     std::optional<foundation::Path> indexPath;
     bool showHelp = false;
+};
+
+/**
+ * @brief Options for the agent investigate command.
+ */
+struct AgentInvestigateOptions
+{
+    InvestigateOptions investigate;
+    std::string askQuery;
+    bool summarize = false;
+    bool hints = false;
 };
 
 /**
@@ -164,6 +177,7 @@ struct ParsedCli
     SessionSaveOptions sessionSave;
     SessionLoadOptions sessionLoad;
     SessionListOptions sessionList;
+    AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
 };
 
