@@ -90,7 +90,7 @@ TEST_F(PipelineIntegrationTest, RunsSourceToReportPipeline)
     EXPECT_EQ(4U, modelResult->levelCounts().errorLines());
     EXPECT_TRUE(investigationEngine.matches(*modelResult, LineCountFilter::nonEmpty()));
     EXPECT_TRUE(investigationEngine.matches(*modelResult, LogLevelFilter::any().withMinimumErrors(1U)));
-    EXPECT_TRUE(investigationEngine.searchSource(*modelResult, "pipeline_integration"));
+    EXPECT_TRUE(investigationEngine.searchSource(*modelResult, "logscope_test"));
 
     const auto report = ReportGenerator{}.generate(*modelResult);
 
@@ -243,7 +243,7 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
     const AnalysisModel model(m_testFile, 8U, levelCounts);
 
     const InvestigationSession session = InvestigationSession::fromAnalysis(
-        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "pipeline",
+        model, LineCountFilter::nonEmpty(), LogLevelFilter::any().withMinimumErrors(1U), "logscope_test",
         InvestigationCriteria{}, SearchHistory{}, ReportOptions{}, Path());
 
     SessionStore store;
@@ -255,7 +255,7 @@ TEST_F(PipelineIntegrationTest, SessionRoundTripPreservesInvestigationState)
     ASSERT_TRUE(loaded.hasValue());
     EXPECT_EQ(8U, loaded->analysisModel().totalLines());
     EXPECT_EQ(1U, loaded->levelFilter().minimumErrors());
-    EXPECT_EQ("pipeline", loaded->searchQuery());
+    EXPECT_EQ("logscope_test", loaded->searchQuery());
 
     InvestigationEngine investigationEngine;
 
