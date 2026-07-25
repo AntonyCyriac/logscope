@@ -35,7 +35,7 @@ Detailed agent instructions, long-horizon product vision, and theme research are
 | **Operational (today)** | Constitution-style prompts for AI IDEs assisting development | Private strategy repo `.ai/` |
 | **Product (future)** | Runtime agents invoked by users (`logscope agent …`, investigation AI) | PRD-001; delivery via M13+ |
 
-Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) (M13 AI Assistant at `v1.5.1+`).
+Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) (M14 Desktop Application at `v2.0.0`).
 
 ---
 
@@ -54,7 +54,7 @@ When a future requirement becomes committed work:
 
 | Document | Use when |
 |----------|----------|
-| [ROADMAP.md](../../ROADMAP.md) | Near-term milestones (M13) |
+| [ROADMAP.md](../../ROADMAP.md) | Near-term milestones (M14) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../../planning/POST_V1_STRATEGIC_ROADMAP.md) | Phased post-v1 strategy |
 | [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) | Public agent session bootstrap |
 | [PRD-001-AI-Engineering-Agents.md](PRD-001-AI-Engineering-Agents.md) | Full AI agent platform vision |

@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | User Manual |
 | Category | Handbook |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -25,7 +25,7 @@ Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../plannin
 
 ## 2.1 Install
 
-**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.4.3` or later) and add `logscope` to your `PATH`.
+**Pre-built binaries** — download the archive for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.5.1` or later) and add `logscope` to your `PATH`.
 
 **Build from source** — see [Developer Setup](DEVELOPER_SETUP.md) or the [README](../../README.md) quick start.
 
@@ -78,6 +78,7 @@ Each subcommand accepts `-h` or `--help` for usage text. Full flag reference: [C
 |------|---------|--------------|
 | **Analysis** | `analyze` | Aggregated report: level breakdown, errors, charts, analytics sections |
 | **Investigation** | `investigate`, `search`, `query` | Matching log lines with filters and search |
+| **AI-assisted** | `agent investigate` | NL queries, summaries, and anomaly hints (`v1.5.1`+) |
 | **Analytics** | `analytics` | Frequency, clustering, timeline, and correlation summaries |
 
 Start with `analyze` for an overview. Use `investigate` or `search` when you need to find specific lines.
@@ -239,6 +240,21 @@ logscope search --search "ERROR" --case-sensitive samples/sample.log
 logscope investigate --format json --filter 'level == ERROR' samples/sample.log
 logscope search --format json --query "error AND timeout" samples/sample.log
 ```
+
+## 5.10 AI-assisted investigation (`v1.5.1`+)
+
+Use `agent investigate` when you want natural-language filters, AI summaries, or anomaly hints. By default AI is **off** (`ai.enabled=false`); enable it in a properties file or use `samples/ai-noop.properties` for offline testing.
+
+```bash
+# Offline noop provider — summary only
+logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
+
+# Natural language → filter DSL, plus hints and summary
+logscope agent investigate --config samples/ai-noop.properties \
+  --ask "errors" --hints --summarize samples/sample.log
+```
+
+For HTTP providers (OpenAI-compatible or Ollama), set `ai.provider=http`, `ai.endpoint`, `ai.model`, and export `LOGSCOPE_AI_API_KEY`. See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151).
 
 ---
 
@@ -518,3 +534,4 @@ Use in shell scripts: `logscope analyze ... || exit 1`
 | 1.2.0 | 24-07-2026 | Complete CLI workflow coverage: CSV/Markdown, session thresholds, extensions, investigate flags. |
 | 1.2.1 | 24-07-2026 | Align session save flags with CLI reference (`--search` path vs `--content-search`). |
 | 1.3.0 | 24-07-2026 | Draft v1.4.3 sections: incremental append, JSON fields, query cache. |
+| 1.4.0 | 25-07-2026 | v1.5.1 AI-assisted investigation (`agent investigate`). |

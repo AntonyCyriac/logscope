@@ -12,6 +12,43 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [1.5.1] - 2026-07-25
+
+M13 AI Assistant — pluggable AI providers, natural-language investigation queries, summaries, anomaly hints, and `logscope agent investigate`. **513** automated tests.
+
+### Added
+
+- `scope_ai` module: `AiProvider`, `NoOpAiProvider`, `HttpAiProvider`, `AiInvestigationAssistant`.
+- NL → filter DSL translation with `parseFilterQuery` validation (`NlQueryTranslator`).
+- Investigation summaries and anomaly hints with bounded context builders and CLI formatters.
+- `logscope agent investigate` with `--ask`, `--summarize`, and `--hints`.
+- OpenAI-compatible HTTP client (`HttpAiClient`, cpp-httplib) for local (Ollama) and cloud endpoints.
+- Config keys: `ai.enabled`, `ai.provider`, `ai.endpoint`, `ai.model`, `ai.max_context_lines`.
+- `samples/ai-noop.properties` for offline AI e2e tests.
+- `scope_ai_tests` (42 cases) including HTTP mock-server integration tests.
+
+### Changed
+
+- `config validate` validates `ai.*` keys when present.
+- Global CLI help lists `agent investigate`.
+
+### Documentation
+
+- ADR-007 AI Integration (Accepted); M13 planning and acceptance scenarios.
+- CLI Reference, User Manual, and module READMEs updated for M13.
+
+### Upgrade notes
+
+- Default config unchanged: `ai.enabled=false` (noop provider; no network).
+- Enable HTTP provider with `ai.enabled=true`, `ai.provider=http`, endpoint/model, and `LOGSCOPE_AI_API_KEY`.
+
+### Known limitations
+
+- Full PRD-001 agent roster (`agent design`, `implement`, etc.) remains future work.
+- HTTP provider sends bounded log excerpts only; no autonomous remediation.
+
+---
+
 ## [1.5.0] - 2026-07-25
 
 M12 Dynamic Plugins — runtime `.so`/`.dll` loading, C ABI provider registration, Plugin SDK, and sample plugins. **462** automated tests.
@@ -45,7 +82,7 @@ M12 Dynamic Plugins — runtime `.so`/`.dll` loading, C ABI provider registratio
 ### Known limitations
 
 - No marketplace, signing, or sandboxing (documented threat model in ADR-006).
-- M13 AI Assistant not included (planned `v1.5.1+`).
+- M13 AI Assistant shipped in `v1.5.1`.
 
 ---
 

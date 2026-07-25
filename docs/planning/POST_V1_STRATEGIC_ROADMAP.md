@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.6.0 |
+| Version | 1.7.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** **M13 – AI Assistant** at **`v1.5.1+`**. M12 Dynamic Plugins shipped at **`v1.5.0`**. See [Roadmap](../ROADMAP.md) and [M12-DYNAMIC-PLUGINS.md](M12-DYNAMIC-PLUGINS.md).
+**Immediate next milestone:** **M14 – Desktop Application** at **`v2.0.0`**. M13 AI Assistant shipped at **`v1.5.1`**. M12 Dynamic Plugins shipped at **`v1.5.0`**. See [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -363,6 +363,8 @@ v1.4.1  — M11: Storage Layer (core)
 v1.4.2  — M11: bulk index write performance
 v1.4.3  — M11: compression, cache, JSON fields, incremental append, FTS5 (released)
 v1.5.0  — M12: Dynamic Plugins (released)
+v1.5.1  — M13: AI Assistant (released)
+v2.0.0  — M14 GUI + M15 Web
 v1.5.1+ — M13: AI Assistant
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.x    — M16 Enterprise, M17 Cloud, ecosystem
@@ -462,3 +464,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.3.0 | 24-07-2026 | Version roadmap split M10/M11/M12; v1.4.2 bulk perf shipped. |
 | 1.4.0 | 24-07-2026 | v1.4.3 M11 remainder shipped; M12 at v1.5.0. |
 | 1.6.0 | 25-07-2026 | v1.5.0 released; M12 complete; immediate next milestone is M13. |
+| 1.7.0 | 25-07-2026 | v1.5.1 released; M13 complete; immediate next milestone is M14. |

@@ -5,7 +5,7 @@
 | Document | M13 – AI Assistant |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | In progress |
+| Status | Complete |
 | Created | 25-07-2026 |
 | Last Updated | 25-07-2026 |
 
@@ -41,7 +41,7 @@ See [ADR-007](../architecture/decisions/ADR-007-AI-Integration.md) and [M13 v1.5
 | M13.4 | Anomaly hints (analytics context) | ✅ Complete |
 | M13.5 | `logscope agent investigate` CLI | ✅ Complete |
 | M13.6 | `HttpAiProvider` (OpenAI-compatible / Ollama) | ✅ Complete |
-| M13.7 | Doc sync, `v1.5.1` release | ⬜ Planned |
+| M13.7 | Doc sync, `v1.5.1` release | ✅ Complete |
 
 ---
 

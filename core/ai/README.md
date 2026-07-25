@@ -2,7 +2,7 @@
 
 `scope_ai` implements M13 pluggable AI providers for investigation assistance.
 
-## Shipped (M13.1–M13.6)
+## Shipped (M13 — `v1.5.1`)
 
 | Component | Purpose |
 |-----------|---------|

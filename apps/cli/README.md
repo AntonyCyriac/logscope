@@ -17,6 +17,7 @@ It wires together configuration, source acquisition, analysis, investigation, an
 | `session save` | Analyze a log source and save investigation context |
 | `session load` | Restore a session and reproduce its report |
 | `session list` | List saved `.logscope-session` files |
+| `agent investigate` | AI-assisted investigation (`--ask`, `--summarize`, `--hints`) |
 | `help` | Show command help |
 
 Legacy invocation is supported:
@@ -42,6 +43,7 @@ logscope analyze -
 logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log
 logscope config validate --config samples/logscope.properties --require log.level
+logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
 ```
 
 ## Output Formats
@@ -64,6 +66,7 @@ Use `--output <file>` to write any format to a file instead of stdout.
 | `CliApplication` | Top-level command dispatcher |
 | `CliParser` | Argument parsing |
 | `AnalyzeCommand` | Analyze workflow |
+| `AgentCommand` | AI-assisted investigation (`agent investigate`) |
 | `ConfigValidateCommand` | Configuration validation |
 | `LogAnalyzer` | End-to-end analysis pipeline |
 | `ReportWriter` | File or stdout report output |
