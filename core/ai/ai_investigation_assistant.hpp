@@ -11,7 +11,10 @@
 
 #include "ai_config.hpp"
 #include "ai_provider.hpp"
+#include "ai_result.hpp"
 #include "foundation/result.hpp"
+#include "investigation_result.hpp"
+#include "investigation_view.hpp"
 #include "nl_query_translator.hpp"
 #include "query_node.hpp"
 
@@ -41,6 +44,13 @@ class AiInvestigationAssistant
      */
     [[nodiscard]] foundation::Result<query::QueryNode> translateNaturalLanguageFilter(
         std::string_view naturalLanguageQuery) const;
+
+    /**
+     * @brief Produces an investigation summary from bounded context.
+     */
+    [[nodiscard]] foundation::Result<AiSummary> summarizeInvestigation(
+        const investigation::InvestigationView& view,
+        const investigation::InvestigationResult& result) const;
 
   private:
     AiConfig m_config;

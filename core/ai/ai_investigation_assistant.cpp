@@ -4,6 +4,9 @@
 
 #include "ai_investigation_assistant.hpp"
 
+#include "ai_context_builder.hpp"
+#include "foundation/error.hpp"
+
 namespace scope::ai
 {
 
@@ -36,6 +39,22 @@ foundation::Result<query::QueryNode> AiInvestigationAssistant::translateNaturalL
     const NlQueryTranslator translator(*m_provider);
 
     return translator.translateToFilterQuery(naturalLanguageQuery);
+}
+
+foundation::Result<AiSummary> AiInvestigationAssistant::summarizeInvestigation(
+    const investigation::InvestigationView& view,
+    const investigation::InvestigationResult& result) const
+{
+    if (!m_config.enabled)
+    {
+        return foundation::Result<AiSummary>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "AI assistant is disabled (ai.enabled=false)."));
+    }
+
+    const AiInvestigationContext context = buildInvestigationContext(m_config, view, result);
+
+    return m_provider->summarize(context);
 }
 
 } // namespace scope::ai

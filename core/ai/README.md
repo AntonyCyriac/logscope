@@ -2,7 +2,7 @@
 
 `scope_ai` implements M13 pluggable AI providers for investigation assistance.
 
-## Shipped (M13.1)
+## Shipped (M13.1–M13.3)
 
 | Component | Purpose |
 |-----------|---------|
@@ -10,7 +10,9 @@
 | `NoOpAiProvider` | Deterministic offline provider (default; CI) |
 | `HttpAiProvider` | Stub for M13.6 HTTP/OpenAI-compatible backend |
 | `NlQueryTranslator` | NL → DSL with `parseFilterQuery` validation |
-| `AiInvestigationAssistant` | Config + provider holder; `translateNaturalLanguageQuery` |
+| `AiInvestigationAssistant` | Config + provider holder; NL translation and `summarizeInvestigation` |
+| `ai_context_builder` | Bounded evidence samples from investigation output |
+| `ai_summary_formatter` | Renders `AiSummary` sections for CLI/agent output |
 | `ai.*` config keys | See [CONFIGURATION_GUIDE](../../docs/handbook/CONFIGURATION_GUIDE.md) |
 
 Architecture: [ADR-007](../../docs/architecture/decisions/ADR-007-AI-Integration.md) · [M13 planning](../../docs/planning/M13-AI-ASSISTANT.md)

@@ -50,6 +50,12 @@ struct AiInvestigationContext
     std::string sourceSummary;
     std::vector<AiEvidence> sampleLines;
     std::uint64_t matchCount{0U};
+    std::string searchQuerySummary;
+    std::uint64_t indexedLineCount{0U};
+    std::uint64_t truncatedLineCount{0U};
+    std::size_t repeatedErrorPatternCount{0U};
+    std::string topRepeatedErrorKey;
+    std::uint64_t topRepeatedErrorCount{0U};
 };
 
 /**
