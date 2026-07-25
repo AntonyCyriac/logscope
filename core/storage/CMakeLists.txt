@@ -28,11 +28,12 @@ FetchContent_MakeAvailable(zlib)
 if(NOT TARGET sqlite3)
     add_library(sqlite3 STATIC ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c)
     target_include_directories(sqlite3 PUBLIC ${sqlite_amalgamation_SOURCE_DIR})
-    target_compile_definitions(sqlite3 PUBLIC SQLITE_THREADSAFE=1)
+    target_compile_definitions(sqlite3 PUBLIC SQLITE_THREADSAFE=1 SQLITE_ENABLE_FTS5)
 endif()
 
 add_library(scope_storage
     content_codec.cpp
+    fts_index.cpp
     index_fingerprint.cpp
     index_reader.cpp
     index_reuse.cpp

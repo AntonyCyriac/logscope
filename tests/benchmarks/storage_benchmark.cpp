@@ -259,7 +259,28 @@ static void BM_QueryEvaluatorScan(benchmark::State& state)
     }
 }
 
+static void BM_FtsSearch(benchmark::State& state)
+{
+    constexpr std::size_t lineCount = 100000U;
+    const Path databasePath = createBenchmarkIndex(lineCount);
+    const auto opened = SqliteIndexStore::open(databasePath);
+
+    if (!opened)
+    {
+        state.SkipWithError("Failed to open benchmark index");
+
+        return;
+    }
+
+    for (auto _ : state)
+    {
+        const auto matches = (*opened)->fetchLinesMatchingFts("code=3");
+        benchmark::DoNotOptimize(matches);
+    }
+}
+
 BENCHMARK(BM_IndexStoreAppend)->Arg(1000)->Arg(100000);
 BENCHMARK(BM_IndexStoreCompressed)->Arg(100000);
 BENCHMARK(BM_QueryPushdown);
 BENCHMARK(BM_QueryEvaluatorScan);
+BENCHMARK(BM_FtsSearch);

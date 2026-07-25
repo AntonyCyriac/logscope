@@ -29,7 +29,8 @@ TEST(QueryPlannerTest, PlansContainsFunction)
     const auto plan = planQueryPushdown(*parsed);
 
     ASSERT_TRUE(plan.has_value());
-    EXPECT_NE(std::string::npos, plan->sqlWhere.find("LIKE"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("lines_fts"));
+    EXPECT_NE(std::string::npos, plan->sqlWhere.find("MATCH"));
 }
 
 TEST(QueryPlannerTest, PlansBooleanComposition)

@@ -66,6 +66,9 @@ class SqliteIndexStore final : public IndexStore
 
     [[nodiscard]] const IndexMetadata& metadata() const noexcept override;
 
+    [[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>>
+    fetchLinesMatchingFts(const std::string& term) const;
+
     [[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>> fetchAllLines() const override;
 
     [[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>>

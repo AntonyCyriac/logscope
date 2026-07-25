@@ -2,6 +2,7 @@
  * @file query_planner.cpp
  */
 
+#include "fts_index.hpp"
 #include "query_planner.hpp"
 
 #include <sstream>
@@ -258,9 +259,8 @@ namespace
         }
 
         const std::string column = field == "message" ? "message" : "content";
-        const std::string escaped = escapeSqlLiteral(node.argument());
 
-        return std::optional<std::string>("LOWER(" + column + ") LIKE '%" + foundation::toLower(escaped) + "%'");
+        return std::optional<std::string>(buildFtsContainsSql(column, node.argument()));
     }
 
     if (node.functionKind() == query::FunctionKind::HasKey)

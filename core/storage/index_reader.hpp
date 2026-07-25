@@ -38,6 +38,9 @@ class IndexReader
     [[nodiscard]] foundation::Result<PushdownFetchResult>
     linesMatchingPushdownFilter(const query::QueryNode& filterNode, const std::string& sqlWhereClause) const;
 
+    [[nodiscard]] foundation::Result<std::vector<analysis::IndexedLine>>
+    linesMatchingFtsSearch(const std::string& term) const;
+
     [[nodiscard]] std::uint64_t indexedLineCount() const noexcept;
 
     [[nodiscard]] std::uint64_t truncatedLineCount() const noexcept;

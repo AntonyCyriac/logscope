@@ -19,6 +19,7 @@
 #include "source_snapshot.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
+#include "fts_index.hpp"
 #include "query_cache_codec.hpp"
 #include "query_cache_key.hpp"
 #include "schema_version.hpp"
@@ -259,7 +260,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
         return versionResult;
     }
 
-    return foundation::Result<bool>(true);
+    return initializeFts5Schema(database);
 }
 
 [[nodiscard]] foundation::Result<int> readStoredSchemaVersion(sqlite3* database)
@@ -704,6 +705,7 @@ struct SqliteIndexStore::Impl
     std::uint64_t storedLines{0U};
     sqlite3_stmt* insertStatement{nullptr};
     sqlite3_stmt* jsonFieldInsertStatement{nullptr};
+    sqlite3_stmt* ftsInsertStatement{nullptr};
     bool inWriteBatch{false};
     std::size_t linesInWriteBatch{0U};
     bool compressContent{false};
@@ -846,6 +848,15 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
             foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
     }
 
+    const sqlite3_int64 lineId = sqlite3_last_insert_rowid(m_impl->database);
+    const auto ftsResult = insertFtsLine(m_impl->database, m_impl->ftsInsertStatement, lineId,
+                                           line.messageExcerpt, fullContent);
+
+    if (!ftsResult)
+    {
+        return ftsResult;
+    }
+
     return insertJsonFields(m_impl->database, m_impl->jsonFieldInsertStatement,
                             sqlite3_last_insert_rowid(m_impl->database), line.jsonFieldValues);
 }
@@ -875,6 +886,8 @@ SqliteIndexStore::~SqliteIndexStore()
         sqlite3_finalize(m_impl->jsonFieldInsertStatement);
         m_impl->jsonFieldInsertStatement = nullptr;
     }
+
+    finalizeFtsInsertStatement(m_impl->ftsInsertStatement);
 
     if (m_impl->database != nullptr)
     {
@@ -1065,6 +1078,15 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
         sqlite3_finalize(countStatement);
     }
 
+    const auto ftsResult = ensureFts5Index(database);
+
+    if (!ftsResult)
+    {
+        sqlite3_close(database);
+
+        return foundation::Result<IndexStorePtr>(ftsResult.error());
+    }
+
     return foundation::Result<IndexStorePtr>(IndexStorePtr(new SqliteIndexStore(std::move(impl))));
 }
 
@@ -1193,6 +1215,12 @@ const foundation::Path& SqliteIndexStore::path() const noexcept
 const IndexMetadata& SqliteIndexStore::metadata() const noexcept
 {
     return m_impl->metadata;
+}
+
+foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLinesMatchingFts(
+    const std::string& term) const
+{
+    return fetchLinesWhere(buildFtsSearchSql(term));
 }
 
 foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchAllLines() const
