@@ -433,7 +433,7 @@ v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6–M12. M13–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M13. M14–M17 plans will be added as preceding milestones near completion.
 
 ---
 
