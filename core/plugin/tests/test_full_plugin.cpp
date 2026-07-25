@@ -5,6 +5,7 @@
 
 #include <logscope/plugin/plugin.h>
 
+#include <cstddef>
 #include <cstring>
 
 namespace
@@ -111,9 +112,17 @@ struct ReportContributorState
 {
 };
 
+struct ReportContributorBundle
+{
+    LogScopeReportContributor contributor;
+    ReportContributorState state;
+};
+
 void destroyReportContributor(void* instance)
 {
-    delete static_cast<ReportContributorState*>(instance);
+    auto* bundle = reinterpret_cast<ReportContributorBundle*>(reinterpret_cast<char*>(instance) -
+                                                              offsetof(ReportContributorBundle, state));
+    delete bundle;
 }
 
 int renderReportContributor(void* instance, uint64_t /*totalLines*/, LogScopeReportFragment* out)
@@ -138,11 +147,11 @@ const LogScopeReportContributorVTable kReportContributorVTable{destroyReportCont
 
 LogScopeReportContributor* createReportContributor()
 {
-    auto* contributor = new LogScopeReportContributor();
-    contributor->instance = new ReportContributorState();
-    contributor->vtable = &kReportContributorVTable;
+    auto* bundle = new ReportContributorBundle();
+    bundle->contributor.instance = &bundle->state;
+    bundle->contributor.vtable = &kReportContributorVTable;
 
-    return contributor;
+    return &bundle->contributor;
 }
 
 struct SearchProviderState

@@ -5,6 +5,7 @@
 #include "plugin_host_api.hpp"
 
 #include <memory>
+#include <optional>
 #include <string>
 #include <utility>
 #include <vector>
@@ -111,8 +112,8 @@ class CFormatParserAdapter final : public analysis::FormatParser
 class CReportContributorAdapter final : public reporting::ReportSectionContributor
 {
   public:
-    explicit CReportContributorAdapter(std::string id, LogScopeReportContributor contributor)
-        : m_id(std::move(id)), m_contributor(contributor)
+    CReportContributorAdapter(std::string id, LogScopeCreateReportContributorFn createFn)
+        : m_id(std::move(id)), m_createFn(createFn)
     {
     }
 
@@ -123,9 +124,14 @@ class CReportContributorAdapter final : public reporting::ReportSectionContribut
             return;
         }
 
-        if (m_contributor.vtable != nullptr && m_contributor.vtable->destroy != nullptr)
+        if (!m_contributor.has_value())
         {
-            m_contributor.vtable->destroy(m_contributor.instance);
+            return;
+        }
+
+        if (m_contributor->vtable != nullptr && m_contributor->vtable->destroy != nullptr)
+        {
+            m_contributor->vtable->destroy(m_contributor->instance);
         }
     }
 
@@ -146,13 +152,16 @@ class CReportContributorAdapter final : public reporting::ReportSectionContribut
     {
         reporting::ReportFragment fragment;
 
-        if (m_contributor.vtable == nullptr || m_contributor.vtable->render == nullptr)
+        ensureContributor();
+
+        if (!m_contributor.has_value() || m_contributor->vtable == nullptr ||
+            m_contributor->vtable->render == nullptr)
         {
             return fragment;
         }
 
         LogScopeReportFragment rendered{};
-        (void)m_contributor.vtable->render(m_contributor.instance, model.totalLines(), &rendered);
+        (void)m_contributor->vtable->render(m_contributor->instance, model.totalLines(), &rendered);
 
         if (rendered.text_body != nullptr)
         {
@@ -178,8 +187,28 @@ class CReportContributorAdapter final : public reporting::ReportSectionContribut
     }
 
   private:
+    void ensureContributor() const
+    {
+        if (m_contributor.has_value() || m_createFn == nullptr)
+        {
+            return;
+        }
+
+        LogScopeReportContributor* contributor = m_createFn();
+
+        if (contributor != nullptr && contributor->vtable != nullptr)
+        {
+            m_contributor = *contributor;
+        }
+        else
+        {
+            m_contributor = LogScopeReportContributor{};
+        }
+    }
+
     std::string m_id;
-    LogScopeReportContributor m_contributor;
+    LogScopeCreateReportContributorFn m_createFn{nullptr};
+    mutable std::optional<LogScopeReportContributor> m_contributor;
 };
 
 class CSearchProviderAdapter final : public search::SearchProvider
@@ -388,15 +417,8 @@ int PluginHostApi::registerReportContributorThunk(void* context, const char* con
         return 1;
     }
 
-    LogScopeReportContributor* contributor = createFn();
-
-    if (contributor == nullptr || contributor->vtable == nullptr)
-    {
-        return 1;
-    }
-
     reporting::ReportSectionRegistry::instance().registerContributor(
-        std::make_unique<CReportContributorAdapter>(contributorId, *contributor));
+        std::make_unique<CReportContributorAdapter>(contributorId, createFn));
 
     SCOPE_LOG_DEBUG("plugin", std::string("Registered report contributor: ") + contributorId);
 
