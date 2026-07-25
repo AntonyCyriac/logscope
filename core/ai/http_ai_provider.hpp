@@ -1,6 +1,6 @@
 /**
  * @file http_ai_provider.hpp
- * @brief HTTP / OpenAI-compatible AI provider (M13.6 stub in M13.1).
+ * @brief HTTP / OpenAI-compatible AI provider (M13).
  */
 
 #pragma once
@@ -12,7 +12,7 @@ namespace scope::ai
 {
 
 /**
- * @brief HTTP-backed provider; full implementation in M13.6.
+ * @brief HTTP-backed OpenAI-compatible provider.
  */
 class HttpAiProvider final : public AiProvider
 {

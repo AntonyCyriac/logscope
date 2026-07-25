@@ -85,7 +85,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 |----|----------|---------|----------|------|-----|--------|
 | A4.1 | Noop summary | `--summarize`, noop provider | Structured output with summary + evidence sections | U+I | Yes | ✅ |
 | A4.2 | Empty investigation | No matching lines | Summary states no matches | U | | ✅ |
-| A4.3 | HTTP summary | Mock server returns summary JSON/text | Rendered in agent output | I | | ⬜ |
+| A4.3 | HTTP summary | Mock server returns summary JSON/text | Rendered in agent output | I | | ✅ |
 | A4.4 | Evidence cites lines | Summary with matches | Evidence references line numbers | U | | ✅ |
 
 ---
@@ -97,7 +97,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 | A5.1 | Spike hint | Log with rate spike, `--hints`, noop | Hint references trend/spike | U+I | Yes | ✅ |
 | A5.2 | Cluster hint | Repeated errors, `--hints` | Hint references top cluster | U | | ✅ |
 | A5.3 | No analytics signal | Uniform log, `--hints` | Empty or "no anomalies" message | U | | ✅ |
-| A5.4 | HTTP hints | Mock server | Hints rendered in output | I | | ⬜ |
+| A5.4 | HTTP hints | Mock server | Hints rendered in output | I | | ✅ |
 
 ---
 
@@ -117,10 +117,10 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| A7.1 | OpenAI-compatible | Mock `/v1/chat/completions` | Request/response parsed | I | | ⬜ |
-| A7.2 | Local endpoint | `ai.endpoint=http://127.0.0.1:<port>/v1` | Works with mock (Ollama-shaped) | I | | ⬜ |
-| A7.3 | CI offline | Default CI config | No HTTP calls in matrix | CI | Yes | ⬜ |
-| A7.4 | Timeout | Mock slow response | Error surfaced; no hang | I | | ⬜ |
+| A7.1 | OpenAI-compatible | Mock `/v1/chat/completions` | Request/response parsed | I | | ✅ |
+| A7.2 | Local endpoint | `ai.endpoint=http://127.0.0.1:<port>/v1` | Works with mock (Ollama-shaped) | I | | ✅ |
+| A7.3 | CI offline | Default CI config | No HTTP calls in matrix | CI | Yes | ✅ |
+| A7.4 | Timeout | Mock slow response | Error surfaced; no hang | I | | ✅ |
 
 ---
 
