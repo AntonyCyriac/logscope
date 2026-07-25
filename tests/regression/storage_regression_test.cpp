@@ -26,7 +26,12 @@ class StorageRegressionTest : public ::testing::Test
     void TearDown() override
     {
         std::error_code error;
-        std::filesystem::remove_all(m_directoryPath.string(), error);
+
+        if (!m_directoryPath.isEmpty())
+        {
+            std::filesystem::remove_all(m_directoryPath.string(), error);
+            m_directoryPath = Path{};
+        }
 
         if (!m_logFilePath.isEmpty())
         {
@@ -35,7 +40,7 @@ class StorageRegressionTest : public ::testing::Test
         }
     }
 
-    Path m_directoryPath{"regression_log_directory"};
+    Path m_directoryPath;
     Path m_logFilePath;
 };
 
@@ -70,6 +75,9 @@ TEST_F(StorageRegressionTest, AnalyzeStdinWithReuseIndexDoesNotFail)
 // M11 v1.4.1: fingerprint on non-regular paths (directories) must not break analysis.
 TEST_F(StorageRegressionTest, AnalyzeDirectoryWithPersistIndexDoesNotFail)
 {
+    m_directoryPath = Path(std::string("regression_log_directory_") +
+                           ::testing::UnitTest::GetInstance()->current_test_info()->name());
+
     std::filesystem::create_directory(m_directoryPath.string());
 
     const Path logFile = m_directoryPath.append("app.log");
@@ -98,7 +106,8 @@ TEST_F(StorageRegressionTest, AnalyzeDirectoryWithPersistIndexDoesNotFail)
 // M11 v1.4.1: analyze on a regular file with reuse-index enabled must remain stable.
 TEST_F(StorageRegressionTest, AnalyzeFileWithReuseIndexSucceeds)
 {
-    m_logFilePath = Path("regression_reuse_index.log");
+    m_logFilePath = Path(std::string("regression_reuse_index_") +
+                         ::testing::UnitTest::GetInstance()->current_test_info()->name() + ".log");
 
     {
         std::ofstream output(m_logFilePath.string());
