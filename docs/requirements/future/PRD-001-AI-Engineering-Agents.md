@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | PRD-001 – AI Engineering Agents |
 | Category | Requirements (Future) |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Future Vision (Post v1.x) |
 | Priority | High |
 | Owner | LogScope Platform |
@@ -20,6 +20,23 @@ Introduce a collection of specialized AI agents that assist engineers throughout
 These agents are **assistants**, not replacements. Their purpose is to automate repetitive engineering tasks, improve software quality, reduce investigation time, and provide expert-level recommendations.
 
 The long-term goal is for LogScope to evolve into an **AI-Assisted Engineering Platform** rather than only a log analysis tool.
+
+This PRD describes the **product vision** for runtime and CLI-integrated agents. It does not list current milestone deliverables. See [README.md](README.md) for how this relates to AI-assisted development today.
+
+---
+
+# Operational vs Product Agents
+
+Two distinct layers must not be conflated:
+
+| Layer | Scope | Status |
+|-------|--------|--------|
+| **Operational** | AI IDE instructions for contributors building LogScope (design, implement, test, release, investigate CI) | In use today via public [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) and a private strategy `.ai/` context layer |
+| **Product** | User-facing agents analyzing logs, cores, traces, and engineering workflows via LogScope itself | Future — PRD-001; first bounded delivery **M13 – AI Assistant** |
+
+Operational agents do not require new C++ modules. Product agents require ADR-gated integration (see [POST_V1_STRATEGIC_ROADMAP.md](../../planning/POST_V1_STRATEGIC_ROADMAP.md) Phase 5).
+
+**M12 – Dynamic Plugins** (`v1.5.0`) is a prerequisite for extensible analyzer and provider registration; it is not the AI agent runtime. **M13** delivers the first shipped product AI capabilities (summaries, anomaly hints, NL queries).
 
 ---
 
@@ -83,15 +100,17 @@ All agents shall:
       ┌───────────┬────────┼────────┬───────────┐
       │           │        │        │           │
   Design     Implementation Testing Release Investigation
+      │           │        │        │           │
+ Documentation Performance Security Refactoring
       │
- Documentation
-      │
- Performance
-      │
- Security
+ DevOps (future)
 ```
 
 The orchestrator coordinates specialized agents and aggregates their recommendations.
+
+**Operational today (IDE):** Design, Implementation, Testing, Release, Investigation, Documentation, Performance, Security, and Refactoring are specified as contributor-facing agent roles in the private strategy `.ai/` layer.
+
+**Product future (runtime):** Investigation Agent is the primary user-facing flagship; engineering lifecycle agents may later surface via CLI (`logscope agent …`) after M13+ and ADR approval.
 
 ---
 
@@ -313,6 +332,14 @@ Recommend:
 
 # DevOps Agent
 
+## Purpose
+
+Automates infrastructure and delivery pipeline tasks (distinct from Release Agent validation).
+
+## Status
+
+Future product agent. **Release Agent** covers pre-release quality gates today; CI/CD maintenance remains human-driven with GitHub Actions in the public repository.
+
 ## Responsibilities
 
 - Docker
@@ -359,29 +386,37 @@ logscope agent performance
 
 # Cursor Integration
 
-A primary goal is seamless integration with AI-powered IDEs such as Cursor.
+Cursor is the primary AI IDE for LogScope development today.
 
-Example workflow:
+**Operational workflow (contributors, now):**
 
 ```text
 Developer
     ↓
-Cursor
+Cursor (+ PROJECT_CONTEXT.md / private .ai/ constitution)
     ↓
-Design Agent
-    ↓
-Implementation Agent
-    ↓
-Test Agent
+Design Agent → Implementation Agent → Test Agent
     ↓
 Developer Review
     ↓
-Commit
+Commit / PR
     ↓
-Release Agent
+Release Agent (checklist on release branches)
 ```
 
-The agents should provide contextual guidance while respecting the project's architecture, coding standards, and engineering guidelines.
+**Product workflow (users, future):**
+
+```text
+Engineer
+    ↓
+logscope investigate / logscope agent investigate
+    ↓
+Investigation Agent (and later other product agents)
+    ↓
+Timeline, root cause, report
+```
+
+All agents must respect project architecture, coding standards, and engineering guidelines. Human approval is required before merge and release.
 
 ---
 
@@ -442,11 +477,26 @@ The architecture should remain extensible so that additional agents can be intro
 
 ---
 
+# Delivery Phases
+
+| Phase | Milestone | Agent relevance |
+|-------|-----------|-----------------|
+| Now | M11 complete (`v1.4.3`) | Operational IDE agents only (no product runtime) |
+| Next | M12 Dynamic Plugins (`v1.5.0`) | Plugin SDK enables future AI analyzer providers |
+| Then | M13 AI Assistant (`v1.5.0`) | First product AI: summaries, anomaly hints, NL queries |
+| Later | M14–M16 | GUI, Web, Enterprise agents and orchestration |
+
+An **ADR for AI integration** is required before M13 implementation starts.
+
+---
+
 # Related Documents
 
 | Document | Use when |
 |----------|----------|
+| [README.md](README.md) | Future requirements folder scope and graduation |
 | [POST_V1_STRATEGIC_ROADMAP.md](../../planning/POST_V1_STRATEGIC_ROADMAP.md) | Post-v1.x strategic direction |
 | [PRODUCT_OVERVIEW.md](../../vision/PRODUCT_OVERVIEW.md) | Current product scope |
-| [ROADMAP.md](../../ROADMAP.md) | Near-term milestone planning |
+| [ROADMAP.md](../../ROADMAP.md) | Near-term milestone planning (M12, M13) |
+| [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) | Public AI session bootstrap |
 | [ENGINEERING_PRINCIPLES.md](../../standards/ENGINEERING_PRINCIPLES.md) | Agent design constraints |

@@ -137,6 +137,7 @@ docs/
 │   │   └── NFR-001-Quality-Attributes.md
 │   │
 │   └── future/
+│       ├── README.md
 │       └── PRD-001-AI-Engineering-Agents.md
 │
 ├── architecture/
@@ -339,3 +340,4 @@ These categories should be added only when they provide clear value and support 
 | 3.3.0 | 24-07-2026 | v1.4.2 doc sync: USER_MANUAL, PERFORMANCE, handbook revision history. |
 | 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |
 | 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |
+| 3.6.0 | 25-07-2026 | Added `requirements/future/README.md`; PRD-001 v1.1.0 (operational vs product agents, M12/M13 phasing). |
