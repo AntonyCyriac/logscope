@@ -42,4 +42,4 @@ for (const auto& info : manager.listExtensions()) {
 
 ## Handbook
 
-- [Plugin Development Guide](../../docs/handbook/PLUGIN_DEVELOPMENT_GUIDE.md) — built-in extensions, report contributor hook, M12 roadmap
+- [Plugin Development Guide](../../docs/handbook/PLUGIN_DEVELOPMENT_GUIDE.md) — built-in extensions, dynamic plugins (M12 / `v1.5.0`), report contributor hook

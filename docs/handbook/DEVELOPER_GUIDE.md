@@ -93,7 +93,7 @@ Require an Architecture Decision Record before coding when the strategic roadmap
 
 - SQLite storage (ADR-005 — shipped)
 - Query DSL grammar (ADR-004 — shipped)
-- Dynamic plugins (M12 — planned)
+- Dynamic plugins (ADR-006 — shipped, `v1.5.0`)
 - Qt GUI, AI integration (future)
 
 ADR templates live in `docs/architecture/decisions/`.
@@ -267,4 +267,4 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 developer guide. |
 | 1.1.0 | 24-07-2026 | v1.4.2 storage benchmark guidance; CI vs release bulk matrix sizes. |
-| 1.2.0 | 24-07-2026 | v1.4.3 implementation order and scenario matrix link. |
+| 1.3.0 | 25-07-2026 | v1.5.0 M12 dynamic plugins; ADR-006 shipped. |

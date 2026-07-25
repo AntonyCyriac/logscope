@@ -136,9 +136,12 @@ Shipped in **`v1.4.2`:**
 
 - Schema v2 migration, zlib compression, `line_json_fields`, `query_cache`, incremental append, FTS5
 
-Deferred to **M12 (`v1.5.0`):**
+Deferred to **M12 (`v1.5.0`)** — **shipped:**
 
-- Storage provider plugins
+- Storage provider plugins (see [ADR-006](ADR-006-Plugin-Loading.md))
+
+Still out of scope:
+
 - Replacing source log files
 
 ---

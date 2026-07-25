@@ -74,7 +74,7 @@ Every component SHALL:
 
 ## Component structure diagram
 
-Logical components (C01–C10) and supporting domain libraries through **v1.4.2**. Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
+Logical components (C01–C10) and supporting domain libraries through **v1.5.0** (includes `scope_plugin` / M12). Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
 
 ```mermaid
 flowchart TB
@@ -385,4 +385,4 @@ Major architectural changes should be documented through Architecture Decision R
 |----------|------------|-----------------------------|
 | 1.0.0 | 15-07-2026 | Initial component catalog. |
 | 1.1.0 | 24-07-2026 | M8 reporting: section registry, contributed sections, HTML/PDF formats (`v1.3.0`). |
-| 1.2.0 | 24-07-2026 | Added Mermaid component structure diagram (`v1.4.2`). |
+| 1.3.0 | 25-07-2026 | Diagram scope through v1.5.0 (M12 plugin module). |

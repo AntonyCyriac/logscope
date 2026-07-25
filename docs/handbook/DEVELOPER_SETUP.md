@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 25-07-2026 |
 
 ---
 
@@ -25,9 +25,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v1.4.2`](../../CHANGELOG.md) — **396** automated tests.
+**Current release:** [`v1.5.0`](../../CHANGELOG.md) — **462** automated tests.
 
-**In progress:** [`v1.4.3`](../../CHANGELOG.md) M11 storage remainder — see [M11 v1.4.3 Scenarios](../planning/M11-V143-STORAGE-SCENARIOS.md) and [Testing Guide](../testing/TESTING.md).
+**Next milestone:** M13 – AI Assistant (`v1.5.1+`). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
 ---
 
@@ -355,4 +355,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.2.0 | 18-07-2026 | Linked M5 testing guide from verification checklist. |
 | 2.3.0 | 24-07-2026 | Added optional Doxygen API documentation build (`LOGSCOPE_DOCS`). |
 | 2.4.0 | 24-07-2026 | Current release baseline (`v1.4.2`, 396 tests). |
-| 2.5.0 | 24-07-2026 | Note v1.4.3 zlib dependency and FTS5 compile flag (when implemented). |
+| 2.6.0 | 25-07-2026 | Current release baseline (`v1.5.0`, 462 tests). |

@@ -73,7 +73,7 @@ logscope extensions describe reporting.multi-format --config samples/logscope.pr
 
 Use dot-separated names: `<category>.<feature>`.
 
-| Prefix | Intended capability | M12 direction |
+| Prefix | Intended capability | Plugin hook (v1.5.0+) |
 |--------|---------------------|---------------|
 | `analysis.*` | Analysis pipeline additions | Parser plugins |
 | `source.*` | Log source providers | Custom source readers |
@@ -239,20 +239,20 @@ extensions.reporting.multi-format.enabled=false
 
 ---
 
-# 10. Limitations (v1.4.x)
+# 10. Limitations (v1.5.0)
 
-| Limitation | Workaround / future |
-|------------|---------------------|
-| No dynamic `.so`/`.dll` loading | Contribute built-ins in-tree; M12 adds shared libraries |
-| No extension SDK or C ABI | C++ static registration only |
-| No formal extension type enum | Use ID prefix convention |
-| Single hook type (`ReportSectionContributor`) | Parser/search/storage hooks planned M12 |
+| Limitation | Notes |
+|------------|-------|
+| No plugin signing or sandbox | Plugins are trusted local code (see ADR-006 threat model) |
+| No marketplace or install UX | Contribute built-ins in-tree or ship `.so`/`.dll` manually |
 | `ExtensionManager` not a runtime service bus | Init hooks register into core singletons |
-| Third-party out-of-tree plugins | Supported via M12 C ABI (`include/logscope/plugin/plugin.h`) |
+| No formal extension type enum | Use ID prefix convention |
+
+Pre-v1.5.0 limitations (static-only extensions, single report hook) were resolved in M12 — see §11.
 
 ---
 
-# 11. Out-of-tree dynamic plugins (M12)
+# 11. Out-of-tree dynamic plugins (v1.5.0)
 
 Shipped in **v1.5.0**. Plugins are shared libraries exporting:
 

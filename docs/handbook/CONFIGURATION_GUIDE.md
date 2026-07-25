@@ -183,7 +183,7 @@ CLI flags `--persist-index`, `--reuse-index`, and `--index-path` override storag
 
 **Compression toggle:** enabling compression on an existing plain index requires a full rebuild (see USER_MANUAL §8).
 
-### Planned (remaining v1.4.3)
+### Shipped (v1.4.3)
 
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|

@@ -111,9 +111,9 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | Incremental append | ✅ |
 | FTS5 | ✅ |
 
-## Deferred to M12 (`v1.5.0`)
+## Shipped in M12 (`v1.5.0`)
 
-- Storage provider plugins (`.so`/`.dll` backends)
+- Storage provider plugins (`.so`/`.dll` backends) — see [M12-DYNAMIC-PLUGINS.md](M12-DYNAMIC-PLUGINS.md)
 
 ---
 
@@ -124,4 +124,4 @@ See [ADR-005](../architecture/decisions/ADR-005-Storage-Architecture.md) and [M1
 | 1.0.0 | 24-07-2026 | Initial M11 planning document. |
 | 1.1.0 | 24-07-2026 | v1.4.1 shipped; v1.4.2 bulk write perf. |
 | 1.2.0 | 24-07-2026 | v1.4.3 phases M11.7–M11.12; scenario matrix link. |
-| 1.3.0 | 25-07-2026 | v1.4.3 shipped; M11 complete. |
+| 1.4.0 | 25-07-2026 | M12 storage provider plugins shipped at v1.5.0. |

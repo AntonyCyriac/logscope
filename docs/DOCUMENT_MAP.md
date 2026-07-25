@@ -179,7 +179,9 @@ Developers new to LogScope should read the documentation in the following order.
 | 6 | M9-ANALYTICS-ENGINE.md | Understand the completed M9 analytics engine (`v1.3.1`). |
 | 7 | M10-QUERY-LANGUAGE.md | Understand the completed M10 query language (`v1.4.0`). |
 | 8 | M11-STORAGE-LAYER.md | Understand M11 storage (`v1.4.1` core, `v1.4.2` bulk perf, `v1.4.3` remainder). |
-| 8a | M11-V143-STORAGE-SCENARIOS.md | v1.4.3 acceptance scenarios and test matrix (implement against this). |
+| 8a | M11-V143-STORAGE-SCENARIOS.md | v1.4.3 acceptance scenarios and test matrix. |
+| 8b | M12-DYNAMIC-PLUGINS.md | Understand M12 dynamic plugins (`v1.5.0`). |
+| 8c | M12-V150-PLUGIN-SCENARIOS.md | v1.5.0 plugin acceptance scenarios and test matrix. |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -340,4 +342,4 @@ These categories should be added only when they provide clear value and support 
 | 3.3.0 | 24-07-2026 | v1.4.2 doc sync: USER_MANUAL, PERFORMANCE, handbook revision history. |
 | 3.4.0 | 24-07-2026 | USER_MANUAL expanded for full CLI workflow coverage. |
 | 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |
-| 3.6.0 | 25-07-2026 | Added `requirements/future/README.md`; PRD-001 v1.1.0 (operational vs product agents, M12/M13 phasing). |
+| 3.7.0 | 25-07-2026 | M12 planning docs and v1.5.0 plugin scenarios in reading order. |

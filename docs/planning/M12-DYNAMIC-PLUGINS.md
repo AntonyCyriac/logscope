@@ -34,7 +34,7 @@ See [ADR-006](../architecture/decisions/ADR-006-Plugin-Loading.md) and [M12 v1.5
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| M12.0 | ADR-006, planning doc, scenarios | 🟡 In progress |
+| M12.0 | ADR-006, planning doc, scenarios | ✅ Complete |
 | M12.1 | `SharedLibrary`, `PluginLoader`, config | ✅ Complete |
 | M12.2 | Dynamic `ExtensionManager` integration | ✅ Complete |
 | M12.3 | Report provider plugins + sample | ✅ Complete |

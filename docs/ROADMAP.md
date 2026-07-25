@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.7.0 |
+| Version | 3.11.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 25-07-2026 |
@@ -39,7 +39,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M10 – Query Language** | ✅ Complete | Field-aware filter DSL over indexed lines. Released: `v1.4.0`. |
 | **M11 – Storage Layer** | ✅ Complete | SQLite hybrid index (`v1.4.1`); bulk perf (`v1.4.2`); compression, cache, FTS5 (`v1.4.3`). |
 | **M12 – Dynamic Plugins** | ✅ Complete | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`). |
-| **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.0`. |
+| **M13 – AI Assistant** | ⏳ Planned | Summaries, anomaly hints, NL queries. Target: `v1.5.1`+. |
 | **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
 | **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |
 | **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
@@ -62,6 +62,7 @@ M8  ██████████ 100%  (v1.3.0 released)
 M9  ██████████ 100%  (v1.3.1 released)
 M10 ██████████ 100%  (v1.4.0 released)
 M11 ██████████ 100%  (v1.4.3 released)
+M12 ██████████ 100%  (v1.5.0 released)
 ```
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
@@ -409,7 +410,7 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M10 – Query Language | Field-aware filter DSL | `v1.4.0` |
 | M11 – Storage Layer | SQLite hybrid index, session reuse, bulk perf, schema v2, compression, cache, FTS5 | `v1.4.1` / `v1.4.2` / `v1.4.3` |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, marketplace prep | `v1.5.0` |
-| M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.0` |
+| M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.1`+ |
 | M14 – Desktop Application | Qt GUI | `v2.0.0` |
 | M15 – Web Platform | Dashboard, REST API, shared investigations | `v2.0.0` |
 | M16 – Enterprise | RBAC, agents, streaming, multi-node | `v2.x` |
@@ -426,12 +427,13 @@ v1.4.0  — M10 Query Language (released)
 v1.4.1  — M11 Storage Layer (released)
 v1.4.2  — M11 bulk index write performance (released)
 v1.4.3  — M11 storage remainder (released)
-v1.5.0  — M12 Dynamic Plugins; M13 AI
+v1.5.0  — M12 Dynamic Plugins (released)
+v1.5.1+ — M13 AI Assistant
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6–M11. M12–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M12. M13–M17 plans will be added as preceding milestones near completion.
 
 ---
 
@@ -470,4 +472,4 @@ The roadmap is considered successful when:
 | 3.7.0 | 24-07-2026 | M10 complete; v1.4.0 released with query language DSL. |
 | 3.8.0 | 24-07-2026 | M11 complete; v1.4.1 storage layer and v1.4.2 bulk index write performance released. |
 | 3.9.0 | 24-07-2026 | v1.4.3 M11 remainder in progress; scenario matrix and design docs. |
-| 3.10.0 | 25-07-2026 | M11 complete; v1.4.3 released (schema v2, compression, cache, append, FTS5). |
+| 3.11.0 | 25-07-2026 | M12 complete; v1.5.0 released (dynamic plugins, Plugin SDK). |

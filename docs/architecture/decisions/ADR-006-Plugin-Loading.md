@@ -7,7 +7,7 @@
 
 ## Context
 
-LogScope v1.4.3 ships a **static** extension system (`ExtensionManager`, built-in registration, `ReportSectionContributor` hook). M6–M11 deferred dynamic `.so`/`.dll` loading to M12. FR-004 requires extension failures to not compromise unrelated capabilities.
+LogScope through **v1.4.3** shipped a **static** extension system (`ExtensionManager`, built-in registration, `ReportSectionContributor` hook). **M12 (`v1.5.0`)** added dynamic `.so`/`.dll` loading for parser, report, search, and storage providers. FR-004 requires extension failures to not compromise unrelated capabilities.
 
 M12 must add runtime plugin loading for parser, report, search, and storage providers without redesigning the core pipeline.
 
