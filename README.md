@@ -71,7 +71,7 @@ GoogleTest and SQLite (amalgamation) are fetched automatically by CMake.
 apps/       CLI application
 core/       Libraries (foundation, source, analysis, investigation, reporting, …)
 docs/       Product, architecture, handbook, planning
-samples/    Example logs and configuration
+samples/    Example logs and configuration (see [samples/README.md](samples/README.md))
 scripts/    Bulk-log fixtures and CLI matrix runners
 tests/      Unit, integration, e2e, regression, benchmarks
 ```

@@ -20,4 +20,27 @@
 | `logscope agent investigate` | Primary M13 CLI entry (`--ask`, `--summarize`, `--hints`) |
 | `ai.*` config keys | See [CONFIGURATION_GUIDE](../../docs/handbook/CONFIGURATION_GUIDE.md) |
 
+## Sample configs
+
+| File | Provider | Network |
+|------|----------|---------|
+| `samples/ai-noop.properties` | `noop` | None (CI default) |
+| `samples/ai-ollama.properties` | `http` → local Ollama | `localhost:11434` |
+| `samples/ai-openai.properties.example` | `http` → OpenAI API | Cloud (set `LOGSCOPE_AI_API_KEY`) |
+
+```bash
+# Offline
+logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
+
+# Ollama
+export LOGSCOPE_AI_API_KEY=ollama
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+
+# OpenAI (after copying the example file)
+export LOGSCOPE_AI_API_KEY="sk-..."
+logscope agent investigate --config my-openai.properties --summarize samples/sample.log
+```
+
+More examples: [samples/README.md](../../samples/README.md)
+
 Architecture: [ADR-007](../../docs/architecture/decisions/ADR-007-AI-Integration.md) · [M13 planning](../../docs/planning/M13-AI-ASSISTANT.md)

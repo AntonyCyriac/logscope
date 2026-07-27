@@ -197,6 +197,24 @@ Run LogScope:
 
 Adjust the executable path if the build configuration changes.
 
+### Try AI locally
+
+Sample configs live under `samples/`. See [samples/README.md](../../samples/README.md).
+
+```bash
+# Offline — no network (CI-safe)
+./build/apps/cli/logscope.exe agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
+
+# Ollama — requires Ollama running; any non-empty LOGSCOPE_AI_API_KEY
+export LOGSCOPE_AI_API_KEY=ollama
+./build/apps/cli/logscope.exe agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+```
+
+```powershell
+$env:LOGSCOPE_AI_API_KEY = "ollama"
+.\build\apps\cli\logscope.exe agent investigate --config samples\ai-ollama.properties --summarize samples\sample.log
+```
+
 ---
 
 # 11. Debug

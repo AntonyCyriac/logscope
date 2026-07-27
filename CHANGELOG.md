@@ -10,6 +10,16 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Added
+
+- `samples/ai-ollama.properties` for local Ollama HTTP provider.
+- `samples/ai-openai.properties.example` template for OpenAI-compatible cloud APIs.
+- `samples/README.md` with AI and analysis examples.
+
+### Documentation
+
+- AI sample configs and examples in Configuration Guide, User Manual, CLI Reference, Developer Setup, and `core/ai/README.md`.
+
 ---
 
 ## [1.5.1] - 2026-07-25

@@ -1,0 +1,12 @@
+# OpenAI-compatible cloud API — copy to a local file and customize.
+# NEVER commit API keys. Set LOGSCOPE_AI_API_KEY in your environment.
+#
+#   cp samples/ai-openai.properties.example my-openai.properties
+#   export LOGSCOPE_AI_API_KEY="sk-..."   # Linux/macOS
+#   $env:LOGSCOPE_AI_API_KEY = "sk-..."   # Windows PowerShell
+#
+ai.enabled=true
+ai.provider=http
+ai.endpoint=https://api.openai.com/v1
+ai.model=gpt-4o-mini
+ai.max_context_lines=200

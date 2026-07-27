@@ -284,6 +284,37 @@ Sample configs:
 |------|----------|
 | `samples/ai-noop.properties` | Offline noop provider (CI, no network) |
 | `samples/ai-ollama.properties` | Local [Ollama](https://ollama.com) at `http://localhost:11434/v1`; set `LOGSCOPE_AI_API_KEY` to any non-empty value |
+| `samples/ai-openai.properties.example` | OpenAI-compatible cloud API template — copy locally; set `LOGSCOPE_AI_API_KEY` in the environment |
+
+See [samples/README.md](../../samples/README.md) for full examples.
+
+### Example — local Ollama
+
+```properties
+ai.enabled=true
+ai.provider=http
+ai.endpoint=http://localhost:11434/v1
+ai.model=llama3.2
+```
+
+```bash
+export LOGSCOPE_AI_API_KEY=ollama
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+```
+
+### Example — OpenAI
+
+```properties
+ai.enabled=true
+ai.provider=http
+ai.endpoint=https://api.openai.com/v1
+ai.model=gpt-4o-mini
+```
+
+```bash
+export LOGSCOPE_AI_API_KEY="sk-..."
+logscope agent investigate --config my-openai.properties --summarize samples/sample.log
+```
 
 ---
 

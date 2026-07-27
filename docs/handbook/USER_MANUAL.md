@@ -243,24 +243,54 @@ logscope search --format json --query "error AND timeout" samples/sample.log
 
 ## 5.10 AI-assisted investigation (`v1.5.1`+)
 
-Use `agent investigate` when you want natural-language filters, AI summaries, or anomaly hints. By default AI is **off** (`ai.enabled=false`); enable it in a properties file or use `samples/ai-noop.properties` for offline testing.
+Use `agent investigate` when you want natural-language filters, AI summaries, or anomaly hints. By default AI is **off** (`ai.enabled=false`); enable it in a properties file or use the samples under `samples/`.
+
+| Sample config | Use case |
+|---------------|----------|
+| `samples/ai-noop.properties` | Offline testing (no network) |
+| `samples/ai-ollama.properties` | Local Ollama |
+| `samples/ai-openai.properties.example` | OpenAI-compatible cloud API (copy locally) |
+
+Full examples: [samples/README.md](../../samples/README.md).
 
 ```bash
 # Offline noop provider — summary only
 logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
 
-# Natural language → filter DSL, plus hints and summary
+# Natural language → filter DSL, plus hints and summary (noop heuristics)
 logscope agent investigate --config samples/ai-noop.properties \
   --ask "errors" --hints --summarize samples/sample.log
 ```
 
-For HTTP providers (OpenAI-compatible or Ollama), set `ai.provider=http`, `ai.endpoint`, `ai.model`, and export `LOGSCOPE_AI_API_KEY`. See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151).
+For HTTP providers (OpenAI-compatible or Ollama), set `ai.provider=http`, `ai.endpoint`, `ai.model`, and `LOGSCOPE_AI_API_KEY` in the environment (never in properties files). See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151).
+
+**Local Ollama** — requires Ollama running and a pulled model (`llama3.2` in the sample config):
 
 ```bash
-# Local Ollama — summaries and hints (requires Ollama running + model pulled)
-export LOGSCOPE_AI_API_KEY=ollama   # any non-empty value; Ollama ignores it
+# Linux / macOS
+export LOGSCOPE_AI_API_KEY=ollama
 logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
 logscope agent investigate --config samples/ai-ollama.properties --hints samples/sample.log
+```
+
+```powershell
+# Windows PowerShell
+$env:LOGSCOPE_AI_API_KEY = "ollama"
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+```
+
+Prefer `--filter "level == ERROR"` over `--ask` with smaller local models; `--summarize` and `--hints` are the most reliable Ollama features.
+
+**OpenAI** — copy `samples/ai-openai.properties.example`, set your key:
+
+```bash
+export LOGSCOPE_AI_API_KEY="sk-..."
+logscope agent investigate --config my-openai.properties --summarize samples/sample.log
+```
+
+```powershell
+$env:LOGSCOPE_AI_API_KEY = "sk-..."
+logscope agent investigate --config my-openai.properties --summarize samples/sample.log
 ```
 
 ---

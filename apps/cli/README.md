@@ -47,6 +47,8 @@ logscope agent investigate --config samples/ai-noop.properties --summarize sampl
 logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
 ```
 
+AI sample configs and examples: [samples/README.md](../../samples/README.md).
+
 ## Output Formats
 
 | Format | Description |

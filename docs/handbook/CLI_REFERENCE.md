@@ -301,13 +301,23 @@ logscope agent investigate [options] <log-source>
 Supports the same investigation options as `investigate` (`--filter`, `--search`, `--query`, storage flags, etc.).
 
 ```bash
+# Offline noop provider (deterministic; no network)
 logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
 logscope agent investigate --config samples/ai-noop.properties --ask "errors" --hints --summarize samples/sample.log
+
+# Local Ollama (requires Ollama running; set LOGSCOPE_AI_API_KEY to any non-empty value)
+export LOGSCOPE_AI_API_KEY=ollama
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+logscope agent investigate --config samples/ai-ollama.properties --filter "level == ERROR" --hints samples/sample.log
+
+# OpenAI-compatible cloud API (copy samples/ai-openai.properties.example; set real API key in env)
+export LOGSCOPE_AI_API_KEY="sk-..."
+logscope agent investigate --config my-openai.properties --summarize samples/sample.log
 ```
 
 When `ai.enabled=false`, `--summarize` and `--hints` are skipped silently. Invalid `--ask` translation exits non-zero before investigation runs.
 
-See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151) for `ai.*` keys and `LOGSCOPE_AI_API_KEY`.
+See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151) for `ai.*` keys and `LOGSCOPE_AI_API_KEY`. Full sample walkthrough: [samples/README.md](../../samples/README.md).
 
 ---
 

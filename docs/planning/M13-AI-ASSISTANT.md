@@ -78,6 +78,16 @@ ai.max_context_lines=200
 
 Environment: `LOGSCOPE_AI_API_KEY` (HTTP provider only).
 
+## Samples
+
+| File | Purpose |
+|------|---------|
+| `samples/ai-noop.properties` | Offline noop provider (CI, e2e) |
+| `samples/ai-ollama.properties` | Local Ollama HTTP provider |
+| `samples/ai-openai.properties.example` | OpenAI-compatible cloud template |
+
+See [samples/README.md](../../samples/README.md) for usage examples.
+
 ## Tests
 
 - Unit: provider selection, noop outputs, NL validation, config parsing
