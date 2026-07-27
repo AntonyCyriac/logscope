@@ -44,6 +44,7 @@ logscope analyze --format json samples/sample.log
 logscope --config samples/logscope.properties samples/sample.log
 logscope config validate --config samples/logscope.properties --require log.level
 logscope agent investigate --config samples/ai-noop.properties --summarize samples/sample.log
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
 ```
 
 ## Output Formats

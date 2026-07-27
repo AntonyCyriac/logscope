@@ -278,6 +278,13 @@ Environment: `LOGSCOPE_PLUGIN_PATH` augments `plugins.paths`.
 
 Environment: `LOGSCOPE_AI_API_KEY` — bearer token for HTTP provider (never store in properties files).
 
+Sample configs:
+
+| File | Use case |
+|------|----------|
+| `samples/ai-noop.properties` | Offline noop provider (CI, no network) |
+| `samples/ai-ollama.properties` | Local [Ollama](https://ollama.com) at `http://localhost:11434/v1`; set `LOGSCOPE_AI_API_KEY` to any non-empty value |
+
 ---
 
 # 10. Related documents

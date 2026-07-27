@@ -256,6 +256,13 @@ logscope agent investigate --config samples/ai-noop.properties \
 
 For HTTP providers (OpenAI-compatible or Ollama), set `ai.provider=http`, `ai.endpoint`, `ai.model`, and export `LOGSCOPE_AI_API_KEY`. See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151).
 
+```bash
+# Local Ollama — summaries and hints (requires Ollama running + model pulled)
+export LOGSCOPE_AI_API_KEY=ollama   # any non-empty value; Ollama ignores it
+logscope agent investigate --config samples/ai-ollama.properties --summarize samples/sample.log
+logscope agent investigate --config samples/ai-ollama.properties --hints samples/sample.log
+```
+
 ---
 
 # 6. Workflow: analytics
