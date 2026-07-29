@@ -74,7 +74,7 @@ Every component SHALL:
 
 ## Component structure diagram
 
-Logical components (C01–C10) and supporting domain libraries through **v1.5.0** (includes `scope_plugin` / M12). Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
+Logical components (C01–C10) and supporting domain libraries through **v1.5.1** (M11 storage, M12 `scope_plugin`, M13 `scope_ai`). Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
 
 ```mermaid
 flowchart TB
@@ -97,6 +97,8 @@ flowchart TB
     ANLY[Analytics]
     STO[Storage Index]
     SESS[Workspace Session]
+    AI[scope_ai M13]
+    PLG[scope_plugin M12]
   end
 
   subgraph infrastructure [Infrastructure]
@@ -112,6 +114,7 @@ flowchart TB
   CLI --> RPT
   CLI --> EXT
   CLI --> SESS
+  CLI -.-> AI
 
   SRC --> ANA
   ANA --> INV
@@ -123,6 +126,9 @@ flowchart TB
   ANA -.-> STO
   INV -.-> STO
   RPT -.-> ANLY
+  EXT -.-> PLG
+  AI -.-> INV
+  AI -.-> ANLY
 
   CFG --> CORE
   SRC --> CORE
@@ -131,6 +137,8 @@ flowchart TB
   RPT --> CORE
   EXT --> CORE
   SESS --> CORE
+  AI --> CORE
+  PLG --> CORE
   DIAG --> CORE
   SRC --> PLAT
   STO --> PLAT
