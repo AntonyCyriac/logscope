@@ -20,6 +20,7 @@
 #include "foundation/path.hpp"
 #include "report_options.hpp"
 #include "report_writer.hpp"
+#include "theme_manager.hpp"
 #include "time_range_filter.hpp"
 
 namespace scope::desktop
@@ -31,7 +32,7 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
     resize(1200, 800);
 
     ThemeManager::apply(ThemeMode::System);
-    m_service.loadConfiguration(scope::foundation::Path{});
+    [[maybe_unused]] const auto configResult = m_service.loadConfiguration(scope::foundation::Path{});
 
     createMenus();
     createLayout();
