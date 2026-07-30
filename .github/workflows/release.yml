@@ -32,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Configure CMake (Windows)
         if: matrix.os == 'windows-latest'
@@ -86,7 +86,7 @@ jobs:
             --jsonl-log /tmp/bulk.jsonl
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.archive_file }}
@@ -122,7 +122,7 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
 
       - name: Install Qt6 (apt)
         if: matrix.qt_method == 'apt'
@@ -181,7 +181,7 @@ jobs:
           Compress-Archive -Path dist\* -DestinationPath ${{ matrix.archive_file }} -Force
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.archive_file }}
@@ -193,12 +193,12 @@ jobs:
 
     steps:
       - name: Download Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v7
         with:
           path: release-assets
           merge-multiple: true
 
       - name: Create GitHub Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: release-assets/*
