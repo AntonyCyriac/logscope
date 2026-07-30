@@ -39,7 +39,7 @@ Phase 1 does **not** require new product features. M14 starts only after `v1.5.2
 | Phase | Focus | Status |
 |-------|-------|--------|
 | P1.0 | Planning doc, scenarios | ✅ Complete |
-| P1.1 | Tutorials, architecture diagrams, API docs policy | ⬜ Planned |
+| P1.1 | Tutorials, architecture diagrams, API docs policy | ✅ Complete |
 | P1.2 | Regression expansion, flaky storage test fix | ⬜ Planned |
 | P1.3 | CLI matrix + e2e expansion, benchmark baselines | ⬜ Planned |
 | P1.4 | Query/filter fuzz target + CI | ⬜ Planned |

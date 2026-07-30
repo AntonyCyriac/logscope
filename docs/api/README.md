@@ -25,6 +25,8 @@ Output: `build/docs/api/html/index.html`
 
 The [CI workflow](../../.github/workflows/ci.yml) `docs` job builds the site on Ubuntu and uploads `api-docs` as a workflow artifact on every push and pull request to `master`.
 
+**Phase 1 policy (v1.5.2):** the `api-docs` CI artifact is the supported distribution channel. Public GitHub Pages is optional follow-up; consumers download the artifact or run `cmake --build build --target docs` locally.
+
 ## Scope
 
 Doxygen scans `core/` and `apps/` headers (`.hpp`, `.h`, `.inl`), excluding test and fuzz directories. Only documented public APIs appear when `EXTRACT_ALL = NO`.

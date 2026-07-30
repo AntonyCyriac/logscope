@@ -29,6 +29,8 @@ Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../plannin
 
 **Build from source** — see [Developer Setup](DEVELOPER_SETUP.md) or the [README](../../README.md) quick start.
 
+Step-by-step tutorials: [docs/tutorials](../../tutorials/README.md).
+
 ## 2.2 First run
 
 Analyze the included sample log:
