@@ -11,6 +11,14 @@ cmake --build build --target logscope-desktop
 
 Requires Qt6 Widgets (`qt6-base-dev` on Ubuntu, `qt@6` via Homebrew on macOS).
 
+On macOS the build produces `logscope-desktop.app`; run the bundle or the executable inside it:
+
+```bash
+open build/apps/desktop/logscope-desktop.app
+# or
+build/apps/desktop/logscope-desktop.app/Contents/MacOS/logscope-desktop --config samples/ai-ollama.properties
+```
+
 ## Run
 
 ```bash

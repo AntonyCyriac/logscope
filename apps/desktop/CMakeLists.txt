@@ -26,6 +26,14 @@ target_link_libraries(logscope-desktop
 )
 
 if(APPLE)
+    set_target_properties(logscope-desktop PROPERTIES
+        MACOSX_BUNDLE TRUE
+        MACOSX_BUNDLE_BUNDLE_NAME "LogScope"
+        MACOSX_BUNDLE_GUI_IDENTIFIER "org.logscope.desktop"
+        MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
+        MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
+    )
+
     # AGL.framework was removed from recent macOS SDKs; some Qt builds still reference it.
     find_library(LOGSCOPE_AGL_FRAMEWORK AGL)
     if(NOT LOGSCOPE_AGL_FRAMEWORK)
