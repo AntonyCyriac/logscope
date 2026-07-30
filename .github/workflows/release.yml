@@ -140,7 +140,7 @@ jobs:
         if: matrix.qt_method == 'install-qt-action'
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.*'
+          version: '6.8.4'
           host: ${{ matrix.qt_host }}
           target: desktop
           arch: ${{ matrix.qt_arch }}
@@ -148,9 +148,7 @@ jobs:
 
       - name: Configure CMake (macOS)
         if: matrix.os == 'macos-latest'
-        run: |
-          cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON \
-            -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6)"
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
 
       - name: Configure CMake (Linux)
         if: matrix.os == 'ubuntu-latest'
