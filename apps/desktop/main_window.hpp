@@ -31,11 +31,12 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
   public:
-    explicit MainWindow(QWidget* parent = nullptr);
+    explicit MainWindow(const scope::foundation::Path& configFile = {}, QWidget* parent = nullptr);
 
   private:
     void createMenus();
     void createLayout();
+    void loadConfigurationFile();
     void openFile();
     void runAnalyze();
     void runInvestigate();

@@ -26,13 +26,13 @@
 namespace scope::desktop
 {
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent)
+MainWindow::MainWindow(const scope::foundation::Path& configFile, QWidget* parent) : QMainWindow(parent)
 {
     setWindowTitle(QStringLiteral("LogScope Desktop"));
     resize(1200, 800);
 
     ThemeManager::apply(ThemeMode::System);
-    [[maybe_unused]] const auto configResult = m_service.loadConfiguration(scope::foundation::Path{});
+    [[maybe_unused]] const auto configResult = m_service.loadConfiguration(configFile);
 
     createMenus();
     createLayout();
@@ -60,6 +60,7 @@ void MainWindow::createMenus()
 {
     auto* fileMenu = menuBar()->addMenu(QStringLiteral("File"));
     fileMenu->addAction(QStringLiteral("Open…"), this, &MainWindow::openFile);
+    fileMenu->addAction(QStringLiteral("Load Configuration…"), this, &MainWindow::loadConfigurationFile);
     fileMenu->addAction(QStringLiteral("Export Report…"), this, &MainWindow::exportReport);
     fileMenu->addSeparator();
     fileMenu->addAction(QStringLiteral("Quit"), this, &QWidget::close);
@@ -163,6 +164,31 @@ void MainWindow::createLayout()
 
     refreshSessions();
     refreshExtensions();
+}
+
+void MainWindow::loadConfigurationFile()
+{
+    const QString path =
+        QFileDialog::getOpenFileName(this, QStringLiteral("Load configuration"), QString{},
+                                     QStringLiteral("Properties (*.properties)"));
+
+    if (path.isEmpty())
+    {
+        return;
+    }
+
+    const auto result = m_service.loadConfiguration(scope::foundation::Path(path.toStdString()));
+
+    if (!result || !*result)
+    {
+        QMessageBox::warning(this, QStringLiteral("Configuration"),
+                             QStringLiteral("Could not load configuration file."));
+
+        return;
+    }
+
+    refreshExtensions();
+    updateStatus(QStringLiteral("Loaded configuration: %1").arg(path));
 }
 
 void MainWindow::openFile()

@@ -23,14 +23,15 @@ target_link_libraries(logscope-desktop
     PRIVATE
         Qt6::Widgets
         scope_application
-        scope_ai
-        scope_analysis
-        scope_analytics
-        scope_foundation
-        scope_investigation
-        scope_reporting
-        scope_search
 )
+
+if(APPLE)
+    # AGL.framework was removed from recent macOS SDKs; some Qt builds still reference it.
+    find_library(LOGSCOPE_AGL_FRAMEWORK AGL)
+    if(NOT LOGSCOPE_AGL_FRAMEWORK)
+        target_link_options(logscope-desktop PRIVATE "-Wl,-weak_framework,AGL")
+    endif()
+endif()
 
 target_include_directories(logscope-desktop
     PRIVATE
