@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.12.0 |
+| Version | 3.13.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -40,7 +40,8 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M11 – Storage Layer** | ✅ Complete | SQLite hybrid index (`v1.4.1`); bulk perf (`v1.4.2`); compression, cache, FTS5 (`v1.4.3`). |
 | **M12 – Dynamic Plugins** | ✅ Complete | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`). |
 | **M13 – AI Assistant** | ✅ Complete | NL queries, summaries, anomaly hints, `agent investigate` (`v1.5.1`). |
-| **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. |
+| **Phase 1 – Stabilize v1.x** | ✅ Complete | Docs, regression, observability, fuzz, license CI (`v1.5.2`). |
+| **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. **Next milestone.** |
 | **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |
 | **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
 | **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
@@ -64,7 +65,10 @@ M10 ██████████ 100%  (v1.4.0 released)
 M11 ██████████ 100%  (v1.4.3 released)
 M12 ██████████ 100%  (v1.5.0 released)
 M13 ██████████ 100%  (v1.5.1 released)
+P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
+
+**Current release:** [`v1.5.2`](CHANGELOG.md) — Phase 1 stabilization. **Next:** M14 – Desktop Application (`v2.0.0`).
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
@@ -430,6 +434,7 @@ v1.4.2  — M11 bulk index write performance (released)
 v1.4.3  — M11 storage remainder (released)
 v1.5.0  — M12 Dynamic Plugins (released)
 v1.5.1  — M13 AI Assistant (released)
+v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
@@ -475,3 +480,4 @@ The roadmap is considered successful when:
 | 3.9.0 | 24-07-2026 | v1.4.3 M11 remainder in progress; scenario matrix and design docs. |
 | 3.11.0 | 25-07-2026 | M12 complete; v1.5.0 released (dynamic plugins, Plugin SDK). |
 | 3.12.0 | 25-07-2026 | M13 complete; v1.5.1 released (AI Assistant, agent investigate). |
+| 3.13.0 | 30-07-2026 | Phase 1 complete; v1.5.2 released (stabilize v1.x); M14 next. |

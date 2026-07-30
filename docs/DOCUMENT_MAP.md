@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.4.0 |
+| Version | 3.10.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -85,10 +85,17 @@ docs/
 │   ├── M8-ADVANCED-REPORTING.md
 │   ├── M9-ANALYTICS-ENGINE.md
 │   ├── M10-QUERY-LANGUAGE.md
-│   └── M11-STORAGE-LAYER.md
+│   ├── M11-STORAGE-LAYER.md
+│   ├── PHASE-1-STABILIZATION.md
+│   └── PHASE-1-V152-SCENARIOS.md
 │
 │   (Long-horizon strategy beyond published Mn plans is maintained privately
 │    outside this repository; public Mn docs are added when implementation starts.)
+│
+├── tutorials/
+│   ├── 01-analyze-logs.md
+│   ├── 02-investigate-logs.md
+│   └── 03-plugins-and-ai.md
 │
 ├── testing/
 │   ├── TESTING.md
@@ -101,7 +108,9 @@ docs/
 │
 ├── release/
 │   ├── RELEASE.md
-│   └── V1_VALIDATION.md
+│   ├── V1_VALIDATION.md
+│   ├── v1.5.1-RELEASE-NOTES.md
+│   └── v1.5.2-RELEASE-NOTES.md
 │
 ├── handbook/
 │   ├── PROJECT_CONTEXT.md
@@ -113,6 +122,7 @@ docs/
 │   ├── PULL_REQUEST_GUIDE.md
 │   ├── PLUGIN_DEVELOPMENT_GUIDE.md
 │   ├── SECURITY_REVIEW.md
+│   ├── THIRD_PARTY_LICENSES.md
 │   └── USER_MANUAL.md
 │
 ├── standards/
@@ -186,6 +196,8 @@ Developers new to LogScope should read the documentation in the following order.
 | 8c | M12-V150-PLUGIN-SCENARIOS.md | v1.5.0 plugin acceptance scenarios and test matrix. |
 | 8d | M13-AI-ASSISTANT.md | Understand M13 AI Assistant (`v1.5.1`). |
 | 8e | M13-V151-AI-SCENARIOS.md | v1.5.1 AI acceptance scenarios and test matrix. |
+| 8f | PHASE-1-STABILIZATION.md | Phase 1 stabilize v1.x plan (`v1.5.2`). |
+| 8g | PHASE-1-V152-SCENARIOS.md | v1.5.2 stabilization acceptance scenarios. |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -348,3 +360,4 @@ These categories should be added only when they provide clear value and support 
 | 3.5.0 | 24-07-2026 | Added M11-V143-STORAGE-SCENARIOS.md for v1.4.3 design. |
 | 3.8.0 | 25-07-2026 | M13 planning docs, ADR-007, and v1.5.1 AI scenarios in reading order. |
 | 3.9.0 | 25-07-2026 | v1.5.1 release notes and M13 doc sync. |
+| 3.10.0 | 30-07-2026 | v1.5.2 release notes; Phase 1 planning, tutorials, THIRD_PARTY_LICENSES in map. |

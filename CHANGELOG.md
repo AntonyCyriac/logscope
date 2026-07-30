@@ -10,15 +10,41 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [1.5.2] - 2026-07-30
+
+Phase 1 stabilization — tutorials, regression hardening, `--stats` observability, fuzz expansion, and third-party license CI. **520** automated tests.
+
 ### Added
 
-- `samples/ai-ollama.properties` for local Ollama HTTP provider.
-- `samples/ai-openai.properties.example` template for OpenAI-compatible cloud APIs.
-- `samples/README.md` with AI and analysis examples.
+- `docs/tutorials/` and handbook links for analyze, investigate, plugins/AI workflows.
+- CLI `--stats` with `AnalysisStats`, `PluginLoadStats`, and process memory RSS snapshot.
+- Regression tests: AI summarize isolation, plugin path isolation, storage incremental-append flake fix.
+- CLI matrix: `agent investigate` (noop), bad plugin path scenario; session e2e report reproduction.
+- `query_filter_fuzz` libFuzzer target; CI fuzz smoke coverage.
+- `third_party/manifest.json`, `THIRD_PARTY_LICENSES.md`, and CI `license-scan` job.
+- `samples/plugin-bad-path.properties` for plugin isolation matrix testing.
+
+### Changed
+
+- Component catalog diagram includes M11–M13 modules (`scope_ai`, storage, plugins).
+- API docs policy: CI `api-docs` artifact (GitHub Pages optional).
 
 ### Documentation
 
-- AI sample configs and examples in Configuration Guide, User Manual, CLI Reference, Developer Setup, and `core/ai/README.md`.
+- Phase 1 planning closure: `PHASE-1-STABILIZATION.md`, `PHASE-1-V152-SCENARIOS.md`.
+- Roadmap and strategic roadmap updated: Phase 1 complete; M14 next.
+
+### Upgrade notes
+
+- No breaking changes for default CLI or configuration behaviour.
+- `--stats` is opt-in on `analyze`, `investigate`, and `agent investigate`.
+
+### Known limitations
+
+- API documentation published as CI artifact only (no GitHub Pages yet).
+- Performance SIMD / zero-copy work deferred to later milestones.
 
 ---
 

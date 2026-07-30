@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.1.0 |
+| Version | 2.3.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.5.1` (shipped)
+**Current release:** `v1.5.2` (shipped) — Phase 1 stabilization complete.
 
 **Next milestone:** **M14 – Desktop Application** (`v2.0.0`). See [Roadmap](../ROADMAP.md).
 
@@ -48,12 +48,14 @@ The project follows architecture-first development. Every implementation should 
 | M10 – Query Language | Field-aware filter DSL, `--filter`, `logscope query` (`v1.4.0`) |
 | M11 – Storage Layer | SQLite hybrid index, `--persist-index`, session reuse (`v1.4.1`); bulk write perf (`v1.4.2`); schema v2, compression, cache, append, FTS5 (`v1.4.3`) |
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, parser/report/search/storage providers, Plugin SDK (`v1.5.0`) |
+| M13 – AI Assistant | Summaries, anomaly hints, NL queries, `agent investigate` (`v1.5.1`) |
+| Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M13 – AI Assistant | `v1.5.1` | Summaries, anomaly hints, NL queries, `agent investigate` |
+| M14 – Desktop Application | `v2.0.0` | Qt desktop UI consuming core APIs |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -350,3 +352,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |
 | 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |
 | 2.2.0 | 25-07-2026 | v1.5.1 released; M13 complete; M14 is next. |
+| 2.3.0 | 30-07-2026 | v1.5.2 released; Phase 1 complete; M14 is next. |

@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v1.5.1`](CHANGELOG.md) — M13 AI Assistant shipped. M0–M13 complete. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v1.5.2`](CHANGELOG.md) — Phase 1 stabilization complete. M0–M13 feature milestones shipped; **M14 – Desktop Application** is next. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 
@@ -31,7 +31,7 @@ Full documentation index: [Document Map](docs/DOCUMENT_MAP.md).
 
 ## Quick start
 
-**Install** — download a pre-built binary for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.5.1`+), or build from source below.
+**Install** — download a pre-built binary for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v1.5.2`+), or build from source below.
 
 ```bash
 git clone https://github.com/AntonyCyriac/logscope.git

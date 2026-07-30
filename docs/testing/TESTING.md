@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.10.0 |
+| Version | 1.11.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **513** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_ai_tests` (M13 AI provider/assistant), `scope_plugin_tests` (M12 plugin loader/providers), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios, M11 storage regression guards, and FTS5 pushdown tests.
+**Current baseline:** **520** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, and CI `license-scan`.
 
 ---
 
@@ -76,6 +76,10 @@ Integration tests run with the repository root as the working directory.
 
 Guards for fixed bugs that must not return (Phase 1 `tests/regression/`):
 
+- AI summarize isolation (`ai_regression_test.cpp`)
+- Plugin bad-path isolation (`plugin_regression_test.cpp`)
+- Storage incremental-append flake fix (Windows CI)
+
 ```bash
 cmake --build build --target logscope_regression_tests
 ctest --test-dir build --output-on-failure -R regression
@@ -131,8 +135,9 @@ Requires Clang:
 
 ```bash
 cmake -S . -B build -DLOGSCOPE_FUZZING=ON -DCMAKE_CXX_COMPILER=clang++
-cmake --build build --target session_serializer_fuzz configuration_fuzz
+cmake --build build --target session_serializer_fuzz configuration_fuzz query_filter_fuzz
 ./build/tests/fuzz/session_serializer_fuzz -runs=10000
+./build/tests/fuzz/query_filter_fuzz -runs=10000
 ```
 
 ---
@@ -192,3 +197,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.7.0 | 24-07-2026 | v1.4.3 scenario test matrix; target ~435 tests at release. |
 | 1.9.0 | 25-07-2026 | v1.5.0 release baseline (462 tests); M12 plugin test coverage. |
 | 1.10.0 | 25-07-2026 | v1.5.1 release baseline (513 tests); M13 AI Assistant test coverage. |
+| 1.11.0 | 30-07-2026 | v1.5.2 release baseline (520 tests); regression expansion, fuzz, license-scan CI. |

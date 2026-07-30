@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** **M14 – Desktop Application** at **`v2.0.0`**. M13 AI Assistant shipped at **`v1.5.1`**. M12 Dynamic Plugins shipped at **`v1.5.0`**. See [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** **M14 – Desktop Application** at **`v2.0.0`**. Phase 1 stabilization shipped at **`v1.5.2`**. M13 AI Assistant shipped at **`v1.5.1`**. M12 Dynamic Plugins shipped at **`v1.5.0`**. See [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -75,6 +75,8 @@ Long-horizon product themes beyond the published public milestones are maintaine
 # 5. Strategic Phases
 
 ## Phase 1 — Stabilize v1.x
+
+**Status:** ✅ Complete at **`v1.5.2`** (30-07-2026). See [PHASE-1-STABILIZATION.md](PHASE-1-STABILIZATION.md).
 
 **Goal:** Make LogScope rock solid before adding major new capabilities.
 
@@ -364,8 +366,7 @@ v1.4.2  — M11: bulk index write performance
 v1.4.3  — M11: compression, cache, JSON fields, incremental append, FTS5 (released)
 v1.5.0  — M12: Dynamic Plugins (released)
 v1.5.1  — M13: AI Assistant (released)
-v2.0.0  — M14 GUI + M15 Web
-v1.5.1+ — M13: AI Assistant
+v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.x    — M16 Enterprise, M17 Cloud, ecosystem
 ```
@@ -390,22 +391,25 @@ The following are **already delivered** at v1.0.0 and should not be re-planned:
 | Packaging | CMake install, CPack, GitHub Release binaries |
 | Security review | [`SECURITY_REVIEW.md`](../handbook/SECURITY_REVIEW.md) |
 
-### Phase 1 gaps (v1.0.x track)
+### Phase 1 gaps (v1.0.x track) — closed at `v1.5.2`
 
-| Gap | Proposed delivery |
-|-----|-------------------|
-| Generated Doxygen site + CI publish | [`docs/api/README.md`](../api/README.md) — CMake `docs` target, CI `api-docs` artifact; GitHub Pages optional |
-| User manual | [`USER_MANUAL.md`](../handbook/USER_MANUAL.md) — Phase 1 (`v1.0.x`) |
-| Plugin dev guide | [`PLUGIN_DEVELOPMENT_GUIDE.md`](../handbook/PLUGIN_DEVELOPMENT_GUIDE.md) — Phase 1 (`v1.0.x`) |
-| Tutorials | `v1.0.x` |
-| Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) — Phase 1 (`v1.0.x`) |
-| Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) — Phase 1 (`v1.0.x`) |
-| Architecture diagrams | `v1.0.x` |
-| Stress tests with large log fixtures | CI CLI matrix at 10k lines; release matrix at 100k lines per OS (`scripts/`); `BM_*` benchmarks use larger fixtures |
-| Regression tests | [`tests/regression/`](../../tests/regression/README.md) — M11 storage edge cases (Phase 1, started) |
-| Memory leak / ASan CI hardening | CI `ASAN_OPTIONS` / `UBSAN_OPTIONS`; LeakSanitizer via ASan on Linux (Phase 1, partial) |
-| Internal metrics / parser stats | `v1.0.x` or early M6 |
-| SIMD / thread pool / zero-copy | M6 perf pass + M7 search indexing |
+Delivered or explicitly deferred in Phase 1 (`v1.5.2`). Remaining items are accepted partial scope or deferred to feature milestones.
+
+| Gap | Delivery at `v1.5.2` |
+|-----|----------------------|
+| Generated Doxygen site + CI publish | CI `api-docs` artifact; GitHub Pages optional ([`docs/api/README.md`](../api/README.md)) |
+| User manual | [`USER_MANUAL.md`](../handbook/USER_MANUAL.md) + tutorials |
+| Plugin dev guide | [`PLUGIN_DEVELOPMENT_GUIDE.md`](../handbook/PLUGIN_DEVELOPMENT_GUIDE.md) |
+| Tutorials | [`docs/tutorials/`](../../tutorials/) |
+| Configuration guide | [`CONFIGURATION_GUIDE.md`](../handbook/CONFIGURATION_GUIDE.md) |
+| Developer guide | [`DEVELOPER_GUIDE.md`](../handbook/DEVELOPER_GUIDE.md) |
+| Architecture diagrams | [`COMPONENT_CATALOG.md`](../architecture/COMPONENT_CATALOG.md) |
+| Stress tests with large log fixtures | CLI matrix 10k; release matrix 100k per OS |
+| Regression tests | [`tests/regression/`](../../tests/regression/) — AI, plugin, storage |
+| Memory leak / ASan CI hardening | Sanitizer job with `ASAN_OPTIONS` leak detection |
+| Internal metrics / parser stats | CLI `--stats` (P1.5) |
+| Dependency/license scanning | [`THIRD_PARTY_LICENSES.md`](../handbook/THIRD_PARTY_LICENSES.md) + CI `license-scan` |
+| SIMD / thread pool / zero-copy | Deferred to M6+ performance milestones |
 
 ---
 
@@ -421,7 +425,7 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | API compatibility checks | Planned |
 | Automated release notes | Partial (CHANGELOG + release workflow) |
 | Security scanning | Planned |
-| Dependency/license scanning | Planned |
+| Dependency/license scanning | Done (`v1.5.2` — manifest + CI) |
 | Cross-platform CI | Done |
 | Packaging (MSI, DEB, RPM, Homebrew) | CPack + GitHub Releases done; distro packages planned |
 
@@ -465,3 +469,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.4.0 | 24-07-2026 | v1.4.3 M11 remainder shipped; M12 at v1.5.0. |
 | 1.6.0 | 25-07-2026 | v1.5.0 released; M12 complete; immediate next milestone is M13. |
 | 1.7.0 | 25-07-2026 | v1.5.1 released; M13 complete; immediate next milestone is M14. |
+| 1.8.0 | 30-07-2026 | v1.5.2 released; Phase 1 complete; M14 is next. |
