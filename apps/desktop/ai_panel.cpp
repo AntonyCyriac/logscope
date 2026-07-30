@@ -59,7 +59,7 @@ void AiPanel::submitAsk(const QString& query)
 
 void AiPanel::runAsk()
 {
-    if (m_service == nullptr)
+    if (m_service == nullptr || m_askEdit == nullptr || m_outputEdit == nullptr)
     {
         return;
     }
@@ -92,7 +92,7 @@ void AiPanel::runAsk()
 
 void AiPanel::runSummarize()
 {
-    if (m_service == nullptr)
+    if (m_service == nullptr || m_outputEdit == nullptr)
     {
         return;
     }
@@ -121,7 +121,7 @@ void AiPanel::runSummarize()
 
 void AiPanel::runHints()
 {
-    if (m_service == nullptr)
+    if (m_service == nullptr || m_outputEdit == nullptr)
     {
         return;
     }
