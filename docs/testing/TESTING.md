@@ -62,7 +62,7 @@ Application service tests (M14):
 
 ```bash
 cmake --build build --target scope_application_tests
-ctest --test-dir build --output-on-failure -R scope_application_tests
+ctest --test-dir build --output-on-failure -L scope_application_tests
 ```
 
 Desktop build smoke (Ubuntu CI; requires Qt6):

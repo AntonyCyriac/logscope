@@ -293,4 +293,4 @@ jobs:
         run: cmake --build build --config Release --target logscope-desktop scope_application_tests --parallel
 
       - name: Run Application Service Tests
-        run: ctest --test-dir build --output-on-failure --build-config Release -R scope_application_tests
+        run: ctest --test-dir build --output-on-failure --build-config Release -L scope_application_tests

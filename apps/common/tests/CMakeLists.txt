@@ -16,4 +16,5 @@ target_link_libraries(scope_application_tests
 include(GoogleTest)
 gtest_discover_tests(scope_application_tests
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    PROPERTIES LABELS "scope_application_tests"
 )
