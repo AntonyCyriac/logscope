@@ -96,8 +96,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| E1.1 | License doc | THIRD_PARTY_LICENSES.md | Lists FetchContent deps | Doc | | ⬜ |
-| E1.2 | License CI | CI license job | Passes on master | CI | Yes | ⬜ |
+| E1.1 | License doc | THIRD_PARTY_LICENSES.md | Lists FetchContent deps | Doc | | ✅ |
+| E1.2 | License CI | CI license job | Passes on master | CI | Yes | ✅ |
 | E2.1 | ASan Linux | sanitizer job | Green with leak detection | CI | Yes | ⬜ |
 
 ---

@@ -1,0 +1,48 @@
+{
+  "version": 1,
+  "description": "FetchContent dependencies vendored at configure time. Used by scripts/check_third_party_licenses.py.",
+  "dependencies": [
+    {
+      "name": "SQLite amalgamation",
+      "fetch_prefix": "sqlite_amalgamation",
+      "spdx": "blessing",
+      "usage": "runtime",
+      "homepage": "https://www.sqlite.org/",
+      "license_files": ["sqlite3.h"],
+      "license_snippet": "disclaims copyright"
+    },
+    {
+      "name": "zlib",
+      "fetch_prefix": "zlib",
+      "spdx": "Zlib",
+      "usage": "runtime",
+      "homepage": "https://github.com/madler/zlib",
+      "license_files": ["LICENSE"]
+    },
+    {
+      "name": "cpp-httplib",
+      "fetch_prefix": "httplib",
+      "spdx": "MIT",
+      "usage": "runtime",
+      "homepage": "https://github.com/yhirose/cpp-httplib",
+      "license_files": ["LICENSE"]
+    },
+    {
+      "name": "GoogleTest",
+      "fetch_prefix": "googletest",
+      "spdx": "BSD-3-Clause",
+      "usage": "test",
+      "homepage": "https://github.com/google/googletest",
+      "license_files": ["LICENSE"]
+    },
+    {
+      "name": "Google Benchmark",
+      "fetch_prefix": "googlebenchmark",
+      "spdx": "Apache-2.0",
+      "usage": "benchmark",
+      "optional": true,
+      "homepage": "https://github.com/google/benchmark",
+      "license_files": ["LICENSE"]
+    }
+  ]
+}

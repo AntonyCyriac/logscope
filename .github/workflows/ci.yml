@@ -215,6 +215,27 @@ jobs:
           ./build/tests/fuzz/plugin_loader_path_fuzz -runs=1000
           ./build/tests/fuzz/query_filter_fuzz -runs=1000
 
+  license-scan:
+    name: Third-Party License Scan (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Configure CMake
+        run: |
+          cmake -S . -B build \
+                -DCMAKE_BUILD_TYPE=Release \
+                -DLOGSCOPE_BENCHMARKS=ON
+
+      - name: Verify Third-Party Licenses
+        run: |
+          python3 scripts/check_third_party_licenses.py \
+            --deps-dir build/_deps \
+            --require-optional
+
   sample-plugins:
     name: Sample Plugins (${{ matrix.os }})
 

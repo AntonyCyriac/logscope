@@ -182,6 +182,14 @@ cmake --build build --target docs
 
 Open `build/docs/api/html/index.html`. See [API Documentation](../api/README.md) for CI integration and input scope.
 
+### Third-party licenses
+
+Vendored FetchContent dependencies and SPDX identifiers are documented in [Third-Party Licenses](THIRD_PARTY_LICENSES.md). Run the license scan after configure:
+
+```bash
+python3 scripts/check_third_party_licenses.py --deps-dir build/_deps --require-optional
+```
+
 ---
 
 # 10. Run
