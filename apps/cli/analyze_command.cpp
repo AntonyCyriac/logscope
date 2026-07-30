@@ -10,7 +10,9 @@
 #include "cli_config.hpp"
 #include "cli_extension_runtime.hpp"
 #include "log_macros.hpp"
+#include "plugin_runtime.hpp"
 #include "report_config.hpp"
+#include "stats_output.hpp"
 
 namespace scope::cli
 {
@@ -32,6 +34,7 @@ void printAnalyzeUsage(std::ostream& output)
            << "  --persist-index       Persist indexed lines to SQLite\n"
            << "  --reuse-index         Reuse an existing index when the source fingerprint matches\n"
            << "  --index-path <file>   Explicit SQLite index file path\n"
+           << "  --stats               Print parse timing and resource usage stats\n"
            << "  --help, -h            Show this help message\n"
            << "\n"
            << "Log source may be a file path, a directory of .log files, or \"-\" for stdin.\n";
@@ -54,8 +57,9 @@ int runAnalyzeCommand(const AnalyzeOptions& options,
         return 1;
     }
 
+    scope::plugin::PluginLoadStats pluginStats;
     const scope::extension::ExtensionManager extensionManager =
-        createConfiguredExtensionManager(configurationManager.configuration());
+        scope::plugin::createConfiguredExtensionManager(configurationManager.configuration(), &pluginStats);
 
     SCOPE_LOG_INFO("cli", "Analyzing " + options.logFile.string());
 
@@ -63,10 +67,22 @@ int runAnalyzeCommand(const AnalyzeOptions& options,
 
     const reporting::ReportOptions reportOptions = buildReportOptions(options, configurationManager);
     const scope::analysis::AnalysisConfig analysisConfig = buildAnalysisConfig(options, configurationManager);
+    scope::analysis::AnalysisStats analysisStats;
 
-    if (!analyzer.analyze(options.logFile, reportOptions, analysisConfig, options.outputFile, output, errorOutput))
+    if (!analyzer.analyze(options.logFile,
+                          reportOptions,
+                          analysisConfig,
+                          options.outputFile,
+                          output,
+                          errorOutput,
+                          options.showStats ? &analysisStats : nullptr))
     {
         return 1;
+    }
+
+    if (options.showStats)
+    {
+        printRunStats(analysisStats, pluginStats, errorOutput);
     }
 
     return 0;

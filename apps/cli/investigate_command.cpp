@@ -12,7 +12,9 @@
 #include "investigation.hpp"
 #include "investigation_output.hpp"
 #include "log_macros.hpp"
+#include "plugin_runtime.hpp"
 #include "source.hpp"
+#include "stats_output.hpp"
 
 namespace scope::cli
 {
@@ -36,6 +38,7 @@ void printInvestigateUsage(std::ostream& output)
            << "  --persist-index         Persist indexed lines to SQLite\n"
            << "  --reuse-index           Reuse an existing index when the source fingerprint matches\n"
            << "  --index-path <file>     Explicit SQLite index file path\n"
+           << "  --stats                 Print parse timing and resource usage stats\n"
            << "\n"
            << "Log source may be a file path, a directory of .log files, or \"-\" for stdin.\n";
 }
@@ -57,8 +60,9 @@ int runInvestigateCommand(const InvestigateOptions& options,
         return 1;
     }
 
+    scope::plugin::PluginLoadStats pluginStats;
     const scope::extension::ExtensionManager extensionManager =
-        createConfiguredExtensionManager(configurationManager.configuration());
+        scope::plugin::createConfiguredExtensionManager(configurationManager.configuration(), &pluginStats);
 
     SCOPE_LOG_INFO("cli", "Investigating " + options.logFile.string());
 
@@ -74,7 +78,11 @@ int runInvestigateCommand(const InvestigateOptions& options,
     }
 
     const scope::analysis::AnalysisConfig analysisConfig = buildAnalysisConfig(options, configurationManager);
-    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig);
+    scope::analysis::AnalysisStats analysisStats;
+    const auto modelResult =
+        scope::analysis::AnalysisEngine{}.analyze(*datasetResult,
+                                                  analysisConfig,
+                                                  options.showStats ? &analysisStats : nullptr);
 
     if (!modelResult)
     {
@@ -124,6 +132,11 @@ int runInvestigateCommand(const InvestigateOptions& options,
     }
 
     output << formatInvestigationOutput(result, options.format) << std::endl;
+
+    if (options.showStats)
+    {
+        printRunStats(analysisStats, pluginStats, errorOutput);
+    }
 
     return 0;
 }

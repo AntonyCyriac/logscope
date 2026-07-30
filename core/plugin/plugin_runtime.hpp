@@ -7,13 +7,15 @@
 
 #include "extension_manager.hpp"
 #include "plugin_config.hpp"
+#include "plugin_load_stats.hpp"
 #include "runtime/configuration.hpp"
 
 namespace scope::plugin
 {
 
 [[nodiscard]] extension::ExtensionManager
-createConfiguredExtensionManager(const runtime::Configuration& configuration);
+createConfiguredExtensionManager(const runtime::Configuration& configuration,
+                                 PluginLoadStats* statsOut = nullptr);
 
 /**
  * @brief Destroys plugin-backed providers while their libraries are still loaded.

@@ -17,7 +17,9 @@
 #include "investigation.hpp"
 #include "investigation_output.hpp"
 #include "log_macros.hpp"
+#include "plugin_runtime.hpp"
 #include "source.hpp"
+#include "stats_output.hpp"
 
 namespace scope::cli
 {
@@ -42,6 +44,7 @@ void printAgentInvestigateUsage(std::ostream& output)
            << "  --ask <query>          Translate natural language to a filter and investigate\n"
            << "  --summarize            Include an AI investigation summary (requires ai.enabled=true)\n"
            << "  --hints                Include AI anomaly hints from analytics (requires ai.enabled=true)\n"
+           << "  --stats                Print parse timing and resource usage stats\n"
            << "\n"
            << "Investigation options:\n"
            << "  --search <query>        Search indexed log line content\n"
@@ -82,8 +85,10 @@ int runAgentInvestigateCommand(const AgentInvestigateOptions& options,
         scope::ai::resolveAiConfig(configurationManager.configuration());
     const scope::ai::AiInvestigationAssistant assistant(aiConfig);
 
+    scope::plugin::PluginLoadStats pluginStats;
+
     const scope::extension::ExtensionManager extensionManager =
-        createConfiguredExtensionManager(configurationManager.configuration());
+        scope::plugin::createConfiguredExtensionManager(configurationManager.configuration(), &pluginStats);
 
     SCOPE_LOG_INFO("cli", "Agent investigating " + options.investigate.logFile.string());
 
@@ -100,7 +105,11 @@ int runAgentInvestigateCommand(const AgentInvestigateOptions& options,
 
     const scope::analysis::AnalysisConfig analysisConfig =
         buildAnalysisConfig(options.investigate, configurationManager);
-    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(*datasetResult, analysisConfig);
+    scope::analysis::AnalysisStats analysisStats;
+    const auto modelResult = scope::analysis::AnalysisEngine{}.analyze(
+        *datasetResult,
+        analysisConfig,
+        options.investigate.showStats ? &analysisStats : nullptr);
 
     if (!modelResult)
     {
@@ -216,6 +225,11 @@ int runAgentInvestigateCommand(const AgentInvestigateOptions& options,
                 errorOutput << "AI hints skipped: " << hints.error().message() << '\n';
             }
         }
+    }
+
+    if (options.investigate.showStats)
+    {
+        printRunStats(analysisStats, pluginStats, errorOutput);
     }
 
     (void)extensionManager;

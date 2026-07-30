@@ -15,7 +15,7 @@ namespace scope::cli
 [[nodiscard]] inline extension::ExtensionManager
 createConfiguredExtensionManager(const runtime::Configuration& configuration)
 {
-    return plugin::createConfiguredExtensionManager(configuration);
+    return plugin::createConfiguredExtensionManager(configuration, nullptr);
 }
 
 } // namespace scope::cli

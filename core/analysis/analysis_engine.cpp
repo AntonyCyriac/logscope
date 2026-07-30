@@ -10,6 +10,7 @@
 #include <vector>
 
 #include "analysis_config.hpp"
+#include "analysis_stats.hpp"
 #include "field_summary.hpp"
 #include "format_detector.hpp"
 #include "foundation/error.hpp"
@@ -18,6 +19,7 @@
 #include "index_reuse.hpp"
 #include "index_store_factory.hpp"
 #include "foundation/filesystem.hpp"
+#include "foundation/stopwatch.hpp"
 #include "json_lines_parser.hpp"
 #include "json_lines_summary.hpp"
 #include "line_index.hpp"
@@ -298,8 +300,24 @@ void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const 
     return foundation::Result<LogFormat>(formatHint);
 }
 
-foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset, const AnalysisConfig& config)
+foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
+                                                   const AnalysisConfig& config,
+                                                   AnalysisStats* statsOut)
 {
+    foundation::Stopwatch stopwatch;
+
+    const auto recordStats = [&](const std::uint64_t lineCount, const std::uint64_t byteCount,
+                                 const bool indexReused)
+    {
+        if (statsOut != nullptr)
+        {
+            statsOut->parseDuration = stopwatch.elapsed();
+            statsOut->lineCount = lineCount;
+            statsOut->byteCount = byteCount;
+            statsOut->indexReused = indexReused;
+        }
+    };
+
     if (!dataset.isValid())
     {
         return foundation::Result<AnalysisModel>(
@@ -307,6 +325,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     }
 
     const bool isStdinSource = dataset.path().string() == "-";
+    std::uint64_t byteCount = 0U;
+    bool accumulateReadBytes = isStdinSource;
     std::optional<storage::IndexFingerprint> sourceFingerprint;
     std::optional<storage::IndexReusePrepareResult> appendReuse;
     const FormatParser* pluginParser = nullptr;
@@ -331,6 +351,13 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
             sourceFingerprint = *fingerprintResult;
 
+            const auto fileSizeResult = foundation::FileSystem::fileSize(dataset.path());
+
+            if (fileSizeResult)
+            {
+                byteCount = *fileSizeResult;
+            }
+
             if (config.storage.reuseIndex)
             {
                 const auto prepared =
@@ -341,6 +368,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                     if (prepared->mode == storage::IndexReuseMode::Unchanged && prepared->store != nullptr)
                     {
                         const storage::IndexMetadata& metadata = prepared->store->metadata();
+
+                        recordStats(metadata.totalLines, byteCount, true);
 
                         return foundation::Result<AnalysisModel>(AnalysisModel(
                             dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
@@ -353,6 +382,10 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                     }
                 }
             }
+        }
+        else
+        {
+            accumulateReadBytes = true;
         }
     }
 
@@ -386,6 +419,11 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 return foundation::Result<AnalysisModel>(foundation::Error(
                     foundation::ErrorCode::InvalidArgument,
                     "Source log ended before indexed line count while appending."));
+            }
+
+            if (accumulateReadBytes)
+            {
+                byteCount += line.size() + 1U;
             }
         }
     }
@@ -462,6 +500,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         for (const std::string& sampleLine : sampleLines)
         {
             ++totalLines;
+
+            if (accumulateReadBytes)
+            {
+                byteCount += sampleLine.size() + 1U;
+            }
+
             analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
                         indexWriter, config.jsonFieldMapping, pluginParser);
         }
@@ -483,6 +527,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             }
 
             ++totalLines;
+
+            if (accumulateReadBytes)
+            {
+                byteCount += line.size() + 1U;
+            }
+
             analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
                         config.jsonFieldMapping, pluginParser);
         }
@@ -495,6 +545,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         }
 
         SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
+
+        recordStats(totalLines, byteCount, false);
 
         return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
                                                                totalLines,
@@ -536,6 +588,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         }
 
         ++totalLines;
+
+        if (accumulateReadBytes)
+        {
+            byteCount += line.size() + 1U;
+        }
+
         analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
                     config.jsonFieldMapping, pluginParser);
     }
@@ -548,6 +606,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines after append");
+
+    recordStats(totalLines, byteCount, false);
 
     return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
                                                            totalLines,
@@ -562,18 +622,20 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 } // namespace
 
 foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset,
-                                                          const AnalysisConfig& config) const
+                                                          const AnalysisConfig& config,
+                                                          AnalysisStats* statsOut) const
 {
-    return analyzeDataset(dataset, config);
+    return analyzeDataset(dataset, config, statsOut);
 }
 
 foundation::Result<AnalysisModel> AnalysisEngine::analyze(source::SourceDataset& dataset,
-                                                          const LogFormat formatHint) const
+                                                          const LogFormat formatHint,
+                                                          AnalysisStats* statsOut) const
 {
     AnalysisConfig config = AnalysisConfig::defaults();
     config.formatHint = formatHint;
 
-    return analyzeDataset(dataset, config);
+    return analyzeDataset(dataset, config, statsOut);
 }
 
 } // namespace scope::analysis

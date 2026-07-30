@@ -5,6 +5,7 @@
 #include "plugin_loader.hpp"
 
 #include "foundation/filesystem.hpp"
+#include "foundation/stopwatch.hpp"
 #include "log_macros.hpp"
 #include "plugin_runtime.hpp"
 
@@ -62,9 +63,13 @@ PluginLoader::PluginLoader(extension::ExtensionManager& extensionManager)
 {
 }
 
-foundation::Result<std::size_t> PluginLoader::loadFromPaths(const std::vector<foundation::Path>& searchPaths)
+foundation::Result<std::size_t> PluginLoader::loadFromPaths(const std::vector<foundation::Path>& searchPaths,
+                                                            PluginLoadStats* statsOut)
 {
+    foundation::Stopwatch stopwatch;
     std::size_t loadedCount = 0U;
+    std::size_t failedCount = 0U;
+    std::size_t skippedPathCount = 0U;
 
     for (const foundation::Path& searchPath : searchPaths)
     {
@@ -72,6 +77,7 @@ foundation::Result<std::size_t> PluginLoader::loadFromPaths(const std::vector<fo
 
         if (!existsResult || !*existsResult)
         {
+            ++skippedPathCount;
             SCOPE_LOG_ERROR("plugin", "Plugin search path does not exist: " + searchPath.string());
 
             continue;
@@ -98,7 +104,20 @@ foundation::Result<std::size_t> PluginLoader::loadFromPaths(const std::vector<fo
             {
                 ++loadedCount;
             }
+            else
+            {
+                ++failedCount;
+            }
         }
+    }
+
+    if (statsOut != nullptr)
+    {
+        statsOut->attempted = true;
+        statsOut->loaded = loadedCount;
+        statsOut->failed = failedCount;
+        statsOut->skippedPaths = skippedPathCount;
+        statsOut->loadDuration = stopwatch.elapsed();
     }
 
     return foundation::Result<std::size_t>(loadedCount);
@@ -167,16 +186,22 @@ foundation::Result<bool> PluginLoader::loadLibraryFile(const foundation::Path& l
 }
 
 foundation::Result<std::size_t> loadPluginsForManager(extension::ExtensionManager& manager,
-                                                        const PluginConfig& config)
+                                                        const PluginConfig& config,
+                                                        PluginLoadStats* statsOut)
 {
     if (!config.enabled)
     {
+        if (statsOut != nullptr)
+        {
+            *statsOut = PluginLoadStats{};
+        }
+
         return foundation::Result<std::size_t>(0U);
     }
 
     PluginLoader loader(manager);
 
-    return loader.loadFromPaths(mergePluginPaths(config));
+    return loader.loadFromPaths(mergePluginPaths(config), statsOut);
 }
 
 void unloadAllPersistentLibraries() noexcept

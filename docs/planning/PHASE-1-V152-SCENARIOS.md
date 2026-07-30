@@ -86,9 +86,9 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| O1.1 | Analyze stats | `analyze --stats sample.log` | Duration, line count in output | U+E | Yes | ⬜ |
-| O2.1 | Plugin stats | `analyze --stats` with plugins enabled | Load counts/time when applicable | U+I | | ⬜ |
-| O3.1 | Memory snapshot | `--stats` on supported OS | RSS field present | U | | ⬜ |
+| O1.1 | Analyze stats | `analyze --stats sample.log` | Duration, line count in output | U+E | Yes | ✅ |
+| O2.1 | Plugin stats | `analyze --stats` with plugins enabled | Load counts/time when applicable | U+I | | ✅ |
+| O3.1 | Memory snapshot | `--stats` on supported OS | RSS field present | U | | ✅ |
 
 ---
 

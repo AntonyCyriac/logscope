@@ -7,6 +7,7 @@
 
 #include "analysis_model.hpp"
 #include "analysis_config.hpp"
+#include "analysis_stats.hpp"
 #include "foundation/result.hpp"
 #include "source_dataset.hpp"
 
@@ -27,13 +28,16 @@ class AnalysisEngine
      * @return Analysis model or error.
      */
     [[nodiscard]] foundation::Result<AnalysisModel> analyze(
-        source::SourceDataset& dataset, const AnalysisConfig& config = AnalysisConfig::defaults()) const;
+        source::SourceDataset& dataset,
+        const AnalysisConfig& config = AnalysisConfig::defaults(),
+        AnalysisStats* statsOut = nullptr) const;
 
     /**
      * @brief Analyzes a source dataset with a format hint only.
      */
     [[nodiscard]] foundation::Result<AnalysisModel> analyze(source::SourceDataset& dataset,
-                                                            LogFormat formatHint) const;
+                                                            LogFormat formatHint,
+                                                            AnalysisStats* statsOut = nullptr) const;
 };
 
 } // namespace scope::analysis

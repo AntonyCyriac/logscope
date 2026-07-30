@@ -7,6 +7,7 @@ add_executable(scope_foundation_tests
     filesystem_test.cpp
     hash_test.cpp
     path_test.cpp
+    process_memory_test.cpp
     random_test.cpp
     result_test.cpp
     status_test.cpp
