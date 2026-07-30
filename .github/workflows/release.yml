@@ -94,6 +94,10 @@ jobs:
   build-desktop:
     name: Build Desktop (${{ matrix.artifact_name }})
 
+    env:
+      # GitHub macOS runners may have untrusted third-party taps; qt@6 is from homebrew-core.
+      HOMEBREW_NO_REQUIRE_TAP_TRUST: '1'
+
     strategy:
       fail-fast: false
       matrix:
