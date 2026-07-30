@@ -116,9 +116,11 @@ jobs:
             qt_arch: win64_msvc2022_64
           - os: macos-latest
             artifact_name: logscope-desktop-macos-amd64
-            binary_path: build/apps/desktop/logscope-desktop
+            binary_path: build/apps/desktop/logscope-desktop.app/Contents/MacOS/logscope-desktop
             archive_file: logscope-desktop-macos-amd64.tar.gz
-            qt_method: brew
+            qt_method: install-qt-action
+            qt_host: mac
+            qt_arch: clang_64
 
     runs-on: ${{ matrix.os }}
 
@@ -132,7 +134,7 @@ jobs:
 
       - name: Install Qt6 (brew)
         if: matrix.qt_method == 'brew'
-        run: brew install qt@6
+        run: brew install qt
 
       - name: Install Qt6 (install-qt-action)
         if: matrix.qt_method == 'install-qt-action'
