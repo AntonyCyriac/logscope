@@ -6,6 +6,8 @@
 
 #include <QColor>
 #include <QCoreApplication>
+#include <QPalette>
+#include <QStyle>
 #include <QStyleFactory>
 
 namespace scope::desktop

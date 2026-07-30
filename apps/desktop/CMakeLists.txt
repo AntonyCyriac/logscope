@@ -35,6 +35,7 @@ target_link_libraries(logscope-desktop
 target_include_directories(logscope-desktop
     PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}/../cli
 )
 
 if(WIN32)
