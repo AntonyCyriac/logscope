@@ -84,8 +84,8 @@ See [ADR-008](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) and 
 
 ## CI
 
-- Optional desktop build job on Ubuntu with `LOGSCOPE_DESKTOP=ON`
-- Headless smoke: `QT_QPA_PLATFORM=offscreen`
+- Desktop build job on Ubuntu with `LOGSCOPE_DESKTOP=ON`
+- Release workflow: `logscope-desktop` artifacts for Linux, Windows, and macOS
 
 ---
 

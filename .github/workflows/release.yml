@@ -91,40 +91,104 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.archive_file }}
 
-  build-desktop-linux:
-    name: Build Desktop (Linux)
+  build-desktop:
+    name: Build Desktop (${{ matrix.artifact_name }})
 
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: logscope-desktop-linux-amd64
+            binary_path: build/apps/desktop/logscope-desktop
+            archive_file: logscope-desktop-linux-amd64.tar.gz
+            qt_method: apt
+          - os: windows-latest
+            artifact_name: logscope-desktop-windows-amd64
+            binary_path: build/apps/desktop/Release/logscope-desktop.exe
+            archive_file: logscope-desktop-windows-amd64.zip
+            qt_method: install-qt-action
+            qt_host: windows
+            qt_arch: win64_msvc2022_64
+          - os: macos-latest
+            artifact_name: logscope-desktop-macos-amd64
+            binary_path: build/apps/desktop/logscope-desktop
+            archive_file: logscope-desktop-macos-amd64.tar.gz
+            qt_method: install-qt-action
+            qt_host: mac
+            qt_arch: clang_arm64
+
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v5
 
-      - name: Install Qt6
+      - name: Install Qt6 (apt)
+        if: matrix.qt_method == 'apt'
         run: sudo apt-get update && sudo apt-get install -y qt6-base-dev
 
-      - name: Configure CMake
+      - name: Install Qt6 (install-qt-action)
+        if: matrix.qt_method == 'install-qt-action'
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.8.*'
+          host: ${{ matrix.qt_host }}
+          target: desktop
+          arch: ${{ matrix.qt_arch }}
+          cache: true
+
+      - name: Configure CMake (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          CMAKE_TLS_VERIFY: '0'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+
+      - name: Configure CMake (Unix)
+        if: matrix.os != 'windows-latest'
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
 
       - name: Build Desktop
         run: cmake --build build --config Release --target logscope-desktop --parallel
 
-      - name: Package Desktop Binary
+      - name: Package Desktop Binary (Linux)
+        if: matrix.os == 'ubuntu-latest'
         run: |
           mkdir -p dist
           cp build/apps/desktop/logscope-desktop dist/
           cp -r samples dist/
-          tar -czf logscope-desktop-linux-amd64.tar.gz -C dist .
+          tar -czf ${{ matrix.archive_file }} -C dist .
+
+      - name: Package Desktop Binary (macOS)
+        if: matrix.os == 'macos-latest'
+        run: |
+          mkdir -p dist
+          cp build/apps/desktop/logscope-desktop dist/
+          cp -r samples dist/
+          macdeployqt dist/logscope-desktop -always-overwrite
+          tar -czf ${{ matrix.archive_file }} -C dist .
+
+      - name: Package Desktop Binary (Windows)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: |
+          $binary = "${{ matrix.binary_path }}"
+          $dir = Split-Path $binary -Parent
+          windeployqt --release --no-translations "$binary"
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item -Path "$dir\*" -Destination dist -Recurse -Force
+          Copy-Item -Path samples -Destination dist\samples -Recurse -Force
+          Compress-Archive -Path dist\* -DestinationPath ${{ matrix.archive_file }} -Force
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v6
         with:
-          name: logscope-desktop-linux-amd64
-          path: logscope-desktop-linux-amd64.tar.gz
+          name: ${{ matrix.artifact_name }}
+          path: ${{ matrix.archive_file }}
 
   release:
     name: Publish GitHub Release
-    needs: [build, build-desktop-linux]
+    needs: [build, build-desktop]
     runs-on: ubuntu-latest
 
     steps:
