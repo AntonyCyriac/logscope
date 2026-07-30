@@ -134,4 +134,4 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 |----|----------|----------|--------|
 | REL.1 | Scenario rows above | Pass on CI smoke | 🟡 |
 | REL.2 | `v2.0.0` tag + GitHub Release | Published | ⬜ |
-| REL.3 | Desktop binary in release workflow | Linux/Win/macOS artifacts | ⬜ |
+| REL.3 | Desktop binary in release workflow | Linux/Win/macOS artifacts | ✅ |
