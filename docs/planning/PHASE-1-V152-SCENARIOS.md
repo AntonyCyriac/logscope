@@ -78,7 +78,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| F1.1 | Query parser fuzz | CI fuzz job | New target runs 1000+ iterations without crash | CI | Yes | ⬜ |
+| F1.1 | Query parser fuzz | CI fuzz job | New target runs 1000+ iterations without crash | CI | Yes | ✅ |
 
 ---
 
