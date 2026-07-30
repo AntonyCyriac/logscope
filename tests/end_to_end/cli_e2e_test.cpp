@@ -3,6 +3,7 @@
  * @brief End-to-end tests for the LogScope CLI executable.
  */
 
+#include <filesystem>
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -199,8 +200,33 @@ TEST(CliE2eTest, HelpDisplaysUsage)
 
 TEST(CliE2eTest, AnalyzeDirectoryProducesCombinedReport)
 {
+    const std::string directoryPath = logscope::gtest::uniqueTestPath("_log_directory");
+    const std::filesystem::path directory(directoryPath);
+
+    std::filesystem::remove_all(directory);
+
+    ASSERT_TRUE(std::filesystem::create_directory(directory));
+
+    {
+        std::ofstream firstLog(directory / "first.log");
+        firstLog << "2026-07-11 10:00:01 INFO first file line\n";
+        firstLog << "2026-07-11 10:00:02 ERROR first file error\n";
+        firstLog << "2026-07-11 10:00:03 INFO first file done\n";
+    }
+
+    {
+        std::ofstream secondLog(directory / "second.log");
+        secondLog << "2026-07-11 10:00:01 INFO second file start\n";
+        secondLog << "2026-07-11 10:00:02 ERROR second error one\n";
+        secondLog << "2026-07-11 10:00:03 ERROR second error two\n";
+        secondLog << "2026-07-11 10:00:04 WARNING second warning\n";
+        secondLog << "2026-07-11 10:00:05 ERROR second error three\n";
+    }
+
     const std::string output =
-        runLogscope("analyze " + scope::test_support::quoteArgument(sourcePath("samples")));
+        runLogscope("analyze " + scope::test_support::quoteArgument(directoryPath));
+
+    std::filesystem::remove_all(directory);
 
     EXPECT_NE(std::string::npos, output.find("Total log lines : 8"));
     EXPECT_NE(std::string::npos, output.find("Error lines     : 4"));
