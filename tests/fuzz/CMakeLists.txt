@@ -34,3 +34,10 @@ target_include_directories(plugin_loader_path_fuzz PRIVATE
     ${CMAKE_SOURCE_DIR}/core/plugin
     ${CMAKE_SOURCE_DIR}/core/extension
 )
+
+add_logscope_fuzz_target(query_filter_fuzz query_filter_fuzz.cpp)
+target_link_libraries(query_filter_fuzz PRIVATE scope_query scope_search scope_foundation)
+target_include_directories(query_filter_fuzz PRIVATE
+    ${CMAKE_SOURCE_DIR}/core/query
+    ${CMAKE_SOURCE_DIR}/core/search
+)

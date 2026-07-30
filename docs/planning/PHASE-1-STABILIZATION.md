@@ -42,7 +42,7 @@ Phase 1 does **not** require new product features. M14 starts only after `v1.5.2
 | P1.1 | Tutorials, architecture diagrams, API docs policy | ✅ Complete |
 | P1.2 | Regression expansion, flaky storage test fix | ✅ Complete |
 | P1.3 | CLI matrix + e2e expansion, benchmark baselines | ✅ Complete |
-| P1.4 | Query/filter fuzz target + CI | ⬜ Planned |
+| P1.4 | Query/filter fuzz target + CI | ✅ Complete |
 | P1.5 | Medium observability (`--stats`, plugin metrics, memory) | ⬜ Planned |
 | P1.6 | License scan CI, third-party licenses doc | ⬜ Planned |
 | P1.7 | Doc sync, `v1.5.2` release, roadmap closure | ⬜ Planned |
