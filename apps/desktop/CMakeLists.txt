@@ -6,18 +6,16 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt6 REQUIRED COMPONENTS Widgets)
-
-# AGL.framework was removed from macOS 14+ / Tahoe SDKs; some Qt builds still inject it
-# via WrapOpenGL::WrapOpenGL (QTBUG-137687). Filter it before linking the desktop target.
-if(APPLE AND TARGET WrapOpenGL::WrapOpenGL)
-    get_target_property(_logscope_qt_opengl_libs WrapOpenGL::WrapOpenGL INTERFACE_LINK_LIBRARIES)
-    if(_logscope_qt_opengl_libs)
-        list(FILTER _logscope_qt_opengl_libs EXCLUDE REGEX "AGL")
-        set_target_properties(WrapOpenGL::WrapOpenGL PROPERTIES
-            INTERFACE_LINK_LIBRARIES "${_logscope_qt_opengl_libs}")
+if(APPLE)
+    # Stub target: Qt may list "AGL" as a link-library name on older 6.8.x builds.
+    if(NOT TARGET AGL)
+        add_library(AGL INTERFACE IMPORTED GLOBAL)
     endif()
+    # Prefer LogScope FindWrapOpenGL.cmake (no AGL) over Qt's copy.
+    list(PREPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake/qt-macos")
 endif()
+
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
 
 add_executable(logscope-desktop
     main.cpp
@@ -44,9 +42,6 @@ if(APPLE)
         MACOSX_BUNDLE_BUNDLE_VERSION "${PROJECT_VERSION}"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "${PROJECT_VERSION}"
     )
-
-    # Fallback when Qt or the SDK still references AGL after the filter above.
-    target_link_options(logscope-desktop PRIVATE "-Wl,-weak_framework,AGL")
 endif()
 
 target_include_directories(logscope-desktop
