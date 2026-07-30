@@ -4,6 +4,7 @@
 
 #include "configuration_editor_dialog.hpp"
 
+#include <QDialogButtonBox>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QHeaderView>

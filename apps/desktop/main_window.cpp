@@ -509,7 +509,7 @@ bool MainWindow::loadSessionFromPath(const QString& path)
 
     if (m_logModel->rowCount() == 0 && !m_currentPath.isEmpty())
     {
-        openLogFile(m_currentPath);
+        (void)openLogFile(m_currentPath);
     }
 
     updateStatus(QStringLiteral("Session loaded"));
@@ -751,7 +751,11 @@ void MainWindow::loadSession()
 
     if (m_logModel->rowCount() == 0 && !m_currentPath.isEmpty())
     {
-        openLogFile(m_currentPath);
+        if (!openLogFile(m_currentPath))
+        {
+            QMessageBox::warning(this, QStringLiteral("Open failed"),
+                                 QStringLiteral("Session loaded, but the source log could not be reopened."));
+        }
     }
 
     updateStatus(QStringLiteral("Session loaded"));
