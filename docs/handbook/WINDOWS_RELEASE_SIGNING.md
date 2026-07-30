@@ -111,6 +111,7 @@ OV certificates may still show SmartScreen until the certificate builds reputati
 
 | Document | Topic |
 |----------|-------|
+| [MACOS_RELEASE_NOTARIZATION.md](MACOS_RELEASE_NOTARIZATION.md) | macOS Gatekeeper / notarization |
 | [RELEASE.md](../release/RELEASE.md) | Full release checklist |
 | [ADR-006](../architecture/decisions/ADR-006-Plugin-Loading.md) | Plugin signing is future work (separate from release binary signing) |
 

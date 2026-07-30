@@ -57,6 +57,31 @@ jobs:
           cp "${{ matrix.binary_path }}" dist/
           cp -r samples dist/
 
+      - name: Import macOS signing certificate
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          chmod +x scripts/macos_*.sh
+          ./scripts/macos_import_certificate.sh
+
+      - name: Sign and notarize macOS CLI binary
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ./scripts/macos_sign_release.sh --binary dist/logscope
+          ./scripts/macos_notarize_release.sh dist/logscope
+
       - name: Sign Windows release binaries
         if: runner.os == 'Windows'
         shell: pwsh
@@ -182,14 +207,50 @@ jobs:
           cp -r samples dist/
           tar -czf ${{ matrix.archive_file }} -C dist .
 
+      - name: Import macOS signing certificate (desktop)
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          chmod +x scripts/macos_*.sh
+          ./scripts/macos_import_certificate.sh
+
       - name: Package Desktop Binary (macOS)
         if: matrix.os == 'macos-latest'
+        env:
+          MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          CODESIGNIDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
         run: |
           mkdir -p dist
           cp -R build/apps/desktop/logscope-desktop.app dist/
           cp -r samples dist/
-          macdeployqt dist/logscope-desktop.app -always-overwrite
-          tar -czf ${{ matrix.archive_file }} -C dist .
+          DEPLOY_EXTRA=""
+          if [[ -n "${CODESIGNIDENTITY:-}" ]]; then
+            DEPLOY_EXTRA="-sign-for-notarization"
+          fi
+          macdeployqt dist/logscope-desktop.app -always-overwrite $DEPLOY_EXTRA
+
+      - name: Sign and notarize macOS desktop app
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ./scripts/macos_sign_release.sh --app dist/logscope-desktop.app \
+            --entitlements apps/desktop/macos/entitlements.plist
+          ./scripts/macos_notarize_release.sh dist/logscope-desktop.app
+
+      - name: Archive macOS desktop release
+        if: matrix.os == 'macos-latest'
+        run: tar -czf ${{ matrix.archive_file }} -C dist .
 
       - name: Package Desktop Binary (Windows)
         if: matrix.os == 'windows-latest'

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.13.0 |
+| Version | 3.14.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -125,7 +125,8 @@ docs/
 │   ├── SECURITY_REVIEW.md
 │   ├── THIRD_PARTY_LICENSES.md
 │   ├── USER_MANUAL.md
-│   └── WINDOWS_RELEASE_SIGNING.md
+│   ├── WINDOWS_RELEASE_SIGNING.md
+│   └── MACOS_RELEASE_NOTARIZATION.md
 │
 ├── standards/
 │   ├── API_DESIGN_GUIDELINES.md
@@ -368,3 +369,4 @@ These categories should be added only when they provide clear value and support 
 | 3.11.0 | 30-07-2026 | M14 desktop planning, ADR-008, v2.0.0 release notes. |
 | 3.12.0 | 30-07-2026 | v2.0.1 release notes; handbook build-flavor sync (`DEVELOPER_SETUP`). |
 | 3.13.0 | 30-07-2026 | `WINDOWS_RELEASE_SIGNING.md` handbook guide. |
+| 3.14.0 | 30-07-2026 | `MACOS_RELEASE_NOTARIZATION.md` handbook guide. |
