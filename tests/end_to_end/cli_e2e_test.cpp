@@ -131,6 +131,26 @@ TEST(CliE2eTest, SessionSaveAndLoadRoundTrip)
     std::remove(sessionFile.c_str());
 }
 
+TEST(CliE2eTest, SessionLoadReproducesSavedReportSections)
+{
+    const std::string sessionFile = logscope::gtest::uniqueTestPath(".logscope-session");
+
+    std::remove(sessionFile.c_str());
+
+    const std::string saveOutput = runLogscope("session save " + sessionFile + " --min-errors 1 " +
+                                               scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, saveOutput.find("Session saved to " + sessionFile));
+
+    const std::string loadOutput = runLogscope("session load " + sessionFile);
+
+    EXPECT_NE(std::string::npos, loadOutput.find("========== LOGSCOPE REPORT =========="));
+    EXPECT_NE(std::string::npos, loadOutput.find("--- Executive Summary ---"));
+    EXPECT_NE(std::string::npos, loadOutput.find("Health verdict"));
+
+    std::remove(sessionFile.c_str());
+}
+
 TEST(CliE2eTest, AnalyzeSubcommandProducesHtmlReportToFile)
 {
     const std::string outputFile = logscope::gtest::uniqueTestPath(".html");

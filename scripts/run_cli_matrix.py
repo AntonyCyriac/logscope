@@ -26,7 +26,14 @@ def run_command(logscope: Path, args: tuple[str, ...]) -> subprocess.CompletedPr
     return subprocess.run(command, check=False, capture_output=True, text=True)
 
 
-def default_scenarios(plain_log: Path, jsonl_log: Path, config_file: Path, work_dir: Path) -> list[Scenario]:
+def default_scenarios(
+    plain_log: Path,
+    jsonl_log: Path,
+    config_file: Path,
+    work_dir: Path,
+    ai_config: Path,
+    plugin_bad_config: Path,
+) -> list[Scenario]:
     html_output = work_dir / "report.html"
     pdf_output = work_dir / "report.pdf"
     session_file = work_dir / "matrix.session"
@@ -128,6 +135,23 @@ def default_scenarios(plain_log: Path, jsonl_log: Path, config_file: Path, work_
             ("analyze", "--persist-index", str(plain_log)),
             expect_stdout="Total log lines",
         ),
+        Scenario(
+            "agent-investigate-noop",
+            (
+                "agent",
+                "investigate",
+                "--config",
+                str(ai_config),
+                "--summarize",
+                str(plain_log),
+            ),
+            expect_stdout="========== AI SUMMARY ==========",
+        ),
+        Scenario(
+            "analyze-bad-plugin-path",
+            ("analyze", "--config", str(plugin_bad_config), str(plain_log)),
+            expect_stdout="Total log lines",
+        ),
     ]
 
 
@@ -159,13 +183,19 @@ def main() -> int:
     parser.add_argument("--plain-log", type=Path, required=True)
     parser.add_argument("--jsonl-log", type=Path, required=True)
     parser.add_argument("--config", type=Path, default=Path("samples/logscope.properties"))
+    parser.add_argument("--ai-config", type=Path, default=Path("samples/ai-noop.properties"))
+    parser.add_argument(
+        "--plugin-bad-config",
+        type=Path,
+        default=Path("samples/plugin-bad-path.properties"),
+    )
     parser.add_argument("--work-dir", type=Path)
     args = parser.parse_args()
 
     if not args.logscope.exists():
         raise SystemExit(f"logscope binary not found: {args.logscope}")
 
-    for fixture in (args.plain_log, args.jsonl_log, args.config):
+    for fixture in (args.plain_log, args.jsonl_log, args.config, args.ai_config, args.plugin_bad_config):
         if not fixture.exists():
             raise SystemExit(f"fixture not found: {fixture}")
 
@@ -173,7 +203,14 @@ def main() -> int:
         work_dir = args.work_dir or Path(temp_directory)
         work_dir.mkdir(parents=True, exist_ok=True)
 
-        scenarios = default_scenarios(args.plain_log, args.jsonl_log, args.config, work_dir)
+        scenarios = default_scenarios(
+            args.plain_log,
+            args.jsonl_log,
+            args.config,
+            work_dir,
+            args.ai_config,
+            args.plugin_bad_config,
+        )
         failures: list[str] = []
 
         print(f"Running {len(scenarios)} CLI scenarios against {args.plain_log.name}")
