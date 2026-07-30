@@ -114,6 +114,7 @@ jobs:
             qt_method: install-qt-action
             qt_host: windows
             qt_arch: win64_msvc2022_64
+            qt_version: '6.8.*'
           - os: macos-latest
             artifact_name: logscope-desktop-macos-amd64
             binary_path: build/apps/desktop/logscope-desktop.app/Contents/MacOS/logscope-desktop
@@ -121,6 +122,8 @@ jobs:
             qt_method: install-qt-action
             qt_host: mac
             qt_arch: clang_64
+            # 6.8.4 is not published for mac via aqt; AGL stripped in apps/desktop/CMakeLists.txt
+            qt_version: '6.8.*'
 
     runs-on: ${{ matrix.os }}
 
@@ -140,7 +143,7 @@ jobs:
         if: matrix.qt_method == 'install-qt-action'
         uses: jurplel/install-qt-action@v4
         with:
-          version: '6.8.4'
+          version: ${{ matrix.qt_version }}
           host: ${{ matrix.qt_host }}
           target: desktop
           arch: ${{ matrix.qt_arch }}
