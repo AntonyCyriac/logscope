@@ -47,11 +47,11 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| D1.1 | Tutorials exist | `docs/tutorials/` | At least 3 tutorial files; linked from README | Doc | | ⬜ |
-| D1.2 | Tutorial index | README / User Manual | Links to tutorials | Doc | | ⬜ |
-| D2.1 | Component diagram | Open COMPONENT_CATALOG | Includes `scope_ai`, storage, plugin paths | Doc | | ⬜ |
+| D1.1 | Tutorials exist | `docs/tutorials/` | At least 3 tutorial files; linked from README | Doc | | ✅ |
+| D1.2 | Tutorial index | README / User Manual | Links to tutorials | Doc | | ✅ |
+| D2.1 | Component diagram | Open COMPONENT_CATALOG | Includes `scope_ai`, storage, plugin paths | Doc | | ✅ |
 | D3.1 | API docs CI | Push to master | `api-docs` artifact uploaded | CI | Yes | ⬜ |
-| D3.2 | API docs policy | docs/api/README | Pages or artifact-only documented | Doc | | ⬜ |
+| D3.2 | API docs policy | docs/api/README | Pages or artifact-only documented | Doc | | ✅ |
 
 ---
 
@@ -59,9 +59,9 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| R1.1 | AI isolation | HTTP/AI summarize fails | Investigation output still printed | U+R | Yes | ⬜ |
-| R1.2 | Plugin isolation | Invalid plugin in path | Analyze succeeds; plugin skipped | U+R | Yes | ⬜ |
-| R2.1 | Incremental append | `UpdatesFingerprintOnFinalize` on Windows CI | Passes reliably | U | Yes | ⬜ |
+| R1.1 | AI isolation | HTTP/AI summarize fails | Investigation output still printed | U+R | Yes | ✅ |
+| R1.2 | Plugin isolation | Invalid plugin in path | Analyze succeeds; plugin skipped | U+R | Yes | ✅ |
+| R2.1 | Incremental append | `UpdatesFingerprintOnFinalize` on Windows CI | Passes reliably | U | Yes | ✅ |
 
 ---
 
@@ -69,8 +69,8 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Reg | Status |
 |----|----------|---------|----------|------|-----|--------|
-| S1.1 | Agent in matrix | CLI matrix job | `agent investigate` with noop config exit 0 | CI | Yes | ⬜ |
-| S1.2 | Session e2e | `session save` + `load` | Exit 0; report reproduced | E | | ⬜ |
+| S1.1 | Agent in matrix | CLI matrix job | `agent investigate` with noop config exit 0 | CI | Yes | ✅ |
+| S1.2 | Session e2e | `session save` + `load` | Exit 0; report reproduced | E | | ✅ |
 
 ---
 
