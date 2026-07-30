@@ -12,6 +12,28 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.5] - 2026-07-30
+
+Hotfix for **v2.0.4 CI / build breaks** — Linux desktop compile failure and directory-analyze e2e regression after `large-app.log`.
+
+### Fixed
+
+- Desktop Linux build: `#include <QDialogButtonBox>` in configuration editor.
+- Desktop: handle `[[nodiscard]]` on `openLogFile()` when reloading session source.
+- `CliE2eTest.AnalyzeDirectoryProducesCombinedReport` — isolated temp directory instead of `samples/` (which includes `large-app.log`).
+
+### Changed
+
+- Release workflow: artifact archives include version tag in filename (`logscope-vX.Y.Z-…`).
+- [RELEASE.md](docs/release/RELEASE.md): versioning policy (patch for bugfix, minor for milestone).
+
+### Upgrade notes
+
+- Replace `v2.0.4` desktop Linux build or wait for this release artifacts.
+- CLI unchanged.
+
+---
+
 ## [2.0.4] - 2026-07-30
 
 M14.12 desktop CLI parity **Phase C** — configuration editor, open format/profile, session save dialog, clipboard/stdin open.

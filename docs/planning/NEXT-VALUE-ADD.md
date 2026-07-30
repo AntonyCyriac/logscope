@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.1.0 |
+| Version | 1.2.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -15,30 +15,29 @@
 
 Prioritized **documented** work not yet shipped, derived from the full planning corpus audit (roadmap, M14 gaps, Phase 1, M11 scenarios, strategy themes). Use this to sequence releases before and during [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.0.3`. **In tree (pre-release):** M14.12 Phase C → **`v2.0.4` track**.
+**Current public release:** `v2.0.5`. **Next ship:** [M15 – Web Platform](M15-WEB-PLATFORM.md) (`v2.1.0` track).
 
 ---
 
 # 2. Recommended sequence
 
 ```text
-v2.0.4  → M14.12 Phase C + desktop tests + large sample + doc sync
-v2.0.x  → Hotfixes, signing, handbook sweep
+v2.0.5  → shipped (v2.0.4 CI/build hotfix, versioned artifacts)
 v2.1.0  → M15 REST API + browser MVP
 v2.2.0+ → Shared investigations, thin auth (or M16)
 ```
 
 ---
 
-# 3. Immediate — `v2.0.4` (high value, low effort)
+# 3. Immediate — shipped `v2.0.5` (completed)
 
-| Item | Source | Notes |
-|------|--------|-------|
-| Ship M14.12 Phase C | [M14-DESKTOP-CLI-PARITY-GAPS.md](M14-DESKTOP-CLI-PARITY-GAPS.md) | Config editor, format/profile, session save, clipboard/stdin |
-| `logscope_desktop_tests` (14 cases) | Desktop CI | Regression guard after v2.0.3 |
-| `samples/large-app.log` | [samples/README.md](../../samples/README.md) | Persist-index / performance fixture |
-| Desktop user docs | [USER_MANUAL.md](../handbook/USER_MANUAL.md) gap | CLI-only today; tutorial `04-desktop` proposed |
-| Doc version sync | README, PRODUCT.md, handbook | Credibility |
+| Item | Status |
+|------|--------|
+| M14.12 Phase C | ✅ `v2.0.4` |
+| `logscope_desktop_tests` (14 cases) | ✅ |
+| `samples/large-app.log` | ✅ |
+| v2.0.5 CI/build hotfix | ✅ Linux desktop build + e2e isolation |
+| Versioned release artifacts | ✅ since `v2.0.5` |
 
 ---
 
@@ -50,7 +49,7 @@ v2.2.0+ → Shared investigations, thin auth (or M16)
 | [M15-WEB-PLATFORM.md](M15-WEB-PLATFORM.md) | ROADMAP | M15.0 gate satisfied; M15.1 implementation next |
 | REST over `ApplicationService` | ADR-008 | M15.1 — core deliverable |
 | Browser MVP | Strategic roadmap Phase 7 | M15.2 |
-| Strategy `sync/v2.0.4` | RELEASE.md §8 | After public tag |
+| Strategy `sync/v2.0.5` | RELEASE.md §8 | After public tag |
 
 ---
 

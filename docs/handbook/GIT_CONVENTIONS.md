@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Git Conventions |
 | Category | Handbook |
-| Version | 1.1.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -73,6 +73,10 @@ release/v1.0.0
 
 Public releases use annotated semantic tags: `vX.Y.Z` (for example `v1.2.0`, `v1.3.0`).
 
+**Bump rules:** bug fix / hotfix on the current line → increment **PATCH** (`v2.0.4` → `v2.0.5`); new milestone feature → increment **MINOR** (`v2.0.5` → `v2.1.0`); breaking change → increment **MAJOR**. See [Release process — Versioning policy](../release/RELEASE.md#versioning-policy).
+
+Each tag keeps its own GitHub Release artifacts (versioned filenames since `v2.0.5`). Older releases are not removed when a new tag ships.
+
 These tags are the **sync points** for related private strategy materials maintained outside this repository. Private strategy uses matching tags of the form `sync/vX.Y.Z` after each public release so long-horizon plans stay aligned with shipped code. This repository does not publish or link those private tags.
 
 Tag a public release only from `master` after the release PR is merged.
@@ -108,3 +112,4 @@ See [Release process §8](../release/RELEASE.md#release-regression-issues-requir
 | 1.0.0 | 18-07-2026 | Extracted from Foundation Guidelines. |
 | 1.1.0 | 24-07-2026 | Release tags as sync points with private strategy (`sync/vX.Y.Z`). |
 | 1.2.0 | 30-07-2026 | Require GitHub issues for release regressions; link to RELEASE.md checklist. |
+| 1.3.0 | 30-07-2026 | Versioning bump rules; versioned artifact retention per release tag. |

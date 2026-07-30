@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.4.3 |
+| Version | 1.5.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -24,6 +24,45 @@ This document describes how maintainers cut LogScope releases, from version bump
 | `v0.x.0` | Milestone completion (M3, M4, M5 interim) |
 | `v1.0.0` | First stable production release after M5 validation |
 | `v1.0.0-rc.N` | Release candidate before v1.0.0 |
+
+---
+
+# Versioning policy
+
+LogScope uses **semantic versioning** `vMAJOR.MINOR.PATCH` (public tag prefix `v`).
+
+| Change | Version bump | Example |
+|--------|----------------|---------|
+| **Bug fix / hotfix** on the current shipped line | Increment **PATCH** only | `v2.0.4` → `v2.0.5` |
+| **Feature milestone** on the current major line | Increment **MINOR**, reset PATCH to `0` | `v2.0.5` → `v2.1.0` (e.g. M15 Web Platform) |
+| **Breaking** architecture or API change | Increment **MAJOR** | `v2.x` → `v3.0.0` |
+
+Rules:
+
+- Stay on `v2.0.X` for desktop/CLI **fixes** that do not introduce a new milestone (build break, regression, test fixture).
+- Do **not** skip patch numbers on the same line (`v2.0.4` hotfix ships as `v2.0.5`, not `v2.0.4.1`).
+- Bump `VERSION` in root [`CMakeLists.txt`](../../CMakeLists.txt) in the release commit before tagging.
+
+See also [Git Conventions §4](../handbook/GIT_CONVENTIONS.md#4-release-tags).
+
+---
+
+# Release artifacts and retention
+
+Each public tag produces a **separate GitHub Release** with its own binaries. **Older releases and their artifacts remain published** — users download the version they need from [Releases](https://github.com/AntonyCyriac/logscope/releases).
+
+**Filename convention** (since `v2.0.5`): include the release tag in archive names so artifacts are unambiguous when multiple versions are listed:
+
+| Artifact | Pattern |
+|----------|---------|
+| CLI Linux | `logscope-vX.Y.Z-linux-amd64.tar.gz` |
+| CLI Windows | `logscope-vX.Y.Z-windows-amd64.zip` |
+| CLI macOS | `logscope-vX.Y.Z-macos-amd64.tar.gz` |
+| Desktop Linux | `logscope-desktop-vX.Y.Z-linux-amd64.tar.gz` |
+| Desktop Windows | `logscope-desktop-vX.Y.Z-windows-amd64.zip` |
+| Desktop macOS | `logscope-desktop-vX.Y.Z-macos-amd64.tar.gz` |
+
+Pre-`v2.0.5` releases used unversioned names (`logscope-linux-amd64.tar.gz`, etc.).
 
 ---
 
@@ -158,3 +197,4 @@ logscope analyze samples/sample.log
 | 1.4.2 | 30-07-2026 | Optional Windows Authenticode signing via GitHub secrets. |
 | 1.4.3 | 30-07-2026 | Optional macOS signing and notarization via GitHub secrets. |
 | 1.4.4 | 30-07-2026 | Require GitHub issues for release regressions (see #86 / v2.0.3 example). |
+| 1.5.0 | 30-07-2026 | Versioning policy (patch vs minor); versioned release artifact filenames; artifact retention. |

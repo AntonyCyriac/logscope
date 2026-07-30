@@ -219,3 +219,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.13.0 | 30-07-2026 | Current release baseline `v2.0.1`; all-platform desktop release workflow. |
 | 1.14.0 | 30-07-2026 | Current release baseline `v2.0.2`; M14.12 desktop CLI parity polish. |
 | 1.15.0 | 30-07-2026 | Current release baseline `v2.0.3`; `logscope_desktop_tests` (529 tests). |
+| 1.16.0 | 30-07-2026 | Current release baseline `v2.0.5`; directory e2e isolation, versioned release artifacts. |

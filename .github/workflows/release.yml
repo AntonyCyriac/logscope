@@ -8,6 +8,9 @@ on:
 permissions:
   contents: write
 
+env:
+  RELEASE_TAG: ${{ github.ref_name }}
+
 jobs:
   build:
     name: Build (${{ matrix.artifact_name }})
@@ -18,15 +21,18 @@ jobs:
           - os: ubuntu-latest
             artifact_name: logscope-linux-amd64
             binary_path: build/apps/cli/logscope
-            archive_file: logscope-linux-amd64.tar.gz
+            platform: linux-amd64
+            archive_ext: tar.gz
           - os: windows-latest
             artifact_name: logscope-windows-amd64
             binary_path: build/apps/cli/Release/logscope.exe
-            archive_file: logscope-windows-amd64.zip
+            platform: windows-amd64
+            archive_ext: zip
           - os: macos-latest
             artifact_name: logscope-macos-amd64
             binary_path: build/apps/cli/logscope
-            archive_file: logscope-macos-amd64.tar.gz
+            platform: macos-amd64
+            archive_ext: tar.gz
 
     runs-on: ${{ matrix.os }}
 
@@ -92,12 +98,12 @@ jobs:
 
       - name: Create Archive (Unix)
         if: runner.os != 'Windows'
-        run: tar -czf ${{ matrix.archive_file }} -C dist .
+        run: tar -czf "logscope-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -C dist .
 
       - name: Create Archive (Windows)
         if: runner.os == 'Windows'
         shell: pwsh
-        run: Compress-Archive -Path dist/* -DestinationPath ${{ matrix.archive_file }}
+        run: Compress-Archive -Path dist/* -DestinationPath "logscope-${env:RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}"
 
       - name: CLI Matrix Smoke Test
         shell: bash
@@ -113,7 +119,7 @@ jobs:
             LOGSCOPE=./build/apps/cli/logscope
           fi
 
-          python3 scripts/run_cli_matrix.py \
+            python3 scripts/run_cli_matrix.py \
             --logscope "${LOGSCOPE}" \
             --plain-log /tmp/bulk.log \
             --jsonl-log /tmp/bulk.jsonl
@@ -122,7 +128,7 @@ jobs:
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.archive_file }}
+          path: logscope-${{ github.ref_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
 
   build-desktop:
     name: Build Desktop (${{ matrix.artifact_name }})
@@ -138,12 +144,14 @@ jobs:
           - os: ubuntu-latest
             artifact_name: logscope-desktop-linux-amd64
             binary_path: build/apps/desktop/logscope-desktop
-            archive_file: logscope-desktop-linux-amd64.tar.gz
+            platform: linux-amd64
+            archive_ext: tar.gz
             qt_method: apt
           - os: windows-latest
             artifact_name: logscope-desktop-windows-amd64
             binary_path: build/apps/desktop/Release/logscope-desktop.exe
-            archive_file: logscope-desktop-windows-amd64.zip
+            platform: windows-amd64
+            archive_ext: zip
             qt_method: install-qt-action
             qt_host: windows
             qt_arch: win64_msvc2022_64
@@ -151,7 +159,8 @@ jobs:
           - os: macos-latest
             artifact_name: logscope-desktop-macos-amd64
             binary_path: build/apps/desktop/logscope-desktop.app/Contents/MacOS/logscope-desktop
-            archive_file: logscope-desktop-macos-amd64.tar.gz
+            platform: macos-amd64
+            archive_ext: tar.gz
             qt_method: install-qt-action
             qt_host: mac
             qt_arch: clang_64
@@ -205,7 +214,7 @@ jobs:
           mkdir -p dist
           cp build/apps/desktop/logscope-desktop dist/
           cp -r samples dist/
-          tar -czf ${{ matrix.archive_file }} -C dist .
+          tar -czf "logscope-desktop-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -C dist .
 
       - name: Import macOS signing certificate (desktop)
         if: matrix.os == 'macos-latest'
@@ -250,7 +259,7 @@ jobs:
 
       - name: Archive macOS desktop release
         if: matrix.os == 'macos-latest'
-        run: tar -czf ${{ matrix.archive_file }} -C dist .
+        run: tar -czf "logscope-desktop-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -C dist .
 
       - name: Package Desktop Binary (Windows)
         if: matrix.os == 'windows-latest'
@@ -274,13 +283,13 @@ jobs:
       - name: Package Desktop Binary (Windows archive)
         if: matrix.os == 'windows-latest'
         shell: pwsh
-        run: Compress-Archive -Path dist\* -DestinationPath ${{ matrix.archive_file }} -Force
+        run: Compress-Archive -Path dist\* -DestinationPath "logscope-desktop-${env:RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -Force
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
         with:
           name: ${{ matrix.artifact_name }}
-          path: ${{ matrix.archive_file }}
+          path: logscope-desktop-${{ github.ref_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
 
   release:
     name: Publish GitHub Release
