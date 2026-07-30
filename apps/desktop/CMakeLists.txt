@@ -51,4 +51,7 @@ if(WIN32)
     set_target_properties(logscope-desktop PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
-install(TARGETS logscope-desktop RUNTIME DESTINATION bin)
+install(TARGETS logscope-desktop
+    BUNDLE DESTINATION .
+    RUNTIME DESTINATION bin
+)
