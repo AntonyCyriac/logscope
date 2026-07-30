@@ -192,6 +192,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
       - name: Download Artifacts
         uses: actions/download-artifact@v7
         with:
@@ -201,4 +204,5 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v3
         with:
+          body_path: docs/release/${{ github.ref_name }}-RELEASE-NOTES.md
           files: release-assets/*

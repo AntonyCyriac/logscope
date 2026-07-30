@@ -80,12 +80,11 @@ For tags matching `v*`, the [release workflow](../../.github/workflows/release.y
 
 **Bulk-log matrix size:** CI (`cli-matrix` on Ubuntu) uses **10k-line** fixtures (`BULK_LOG_LINES: 10000`) for fast PR feedback. Release workflows (all OSes) use **100k-line** fixtures (`BULK_LOG_LINES: 100000`), including `--persist-index` scenarios, after **`v1.4.2`** batched SQLite writes.
 
-The workflow creates the GitHub Release draft with attached binaries. Maintainer steps:
+The workflow creates the GitHub Release with binaries attached. Release notes are loaded automatically from `docs/release/vX.Y.Z-RELEASE-NOTES.md` matching the tag (for example `v2.0.1` → `docs/release/v2.0.1-RELEASE-NOTES.md`).
 
-1. Open **Releases** for the new tag (workflow may auto-publish)
-2. Paste or verify changelog summary in the release notes body
-3. Verify attached artifacts: `logscope-linux-amd64`, `logscope-macos-amd64`, `logscope-windows-amd64`
-4. Publish if still a draft
+Maintainer steps after the workflow completes:
+
+1. Open **Releases** for the new tag and verify the notes body and attached artifacts.
 
 ## 7. Source packages (optional)
 
