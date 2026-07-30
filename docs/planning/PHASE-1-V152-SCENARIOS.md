@@ -107,6 +107,6 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 | ID | Scenario | Expected | Status |
 |----|----------|----------|--------|
 | REL.1 | All scenario rows above | ✅ complete | ✅ |
-| REL.2 | `v1.5.2` tag + GitHub Release | Published | ⬜ |
+| REL.2 | `v1.5.2` tag + GitHub Release | Published | ✅ |
 | REL.3 | POST_V1 Phase 1 gaps | Closed or accepted partial | ✅ |
 | REL.4 | ROADMAP | M14 next; Phase 1 complete | ✅ |
