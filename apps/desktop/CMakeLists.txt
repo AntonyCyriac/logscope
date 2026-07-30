@@ -26,6 +26,9 @@ add_executable(logscope-desktop
     analytics_panel.cpp
     ai_panel.cpp
     export_report_dialog.cpp
+    configuration_editor_dialog.cpp
+    open_log_dialog.cpp
+    save_session_dialog.cpp
     run_stats_dialog.cpp
     ../cli/report_writer.cpp
     ../cli/stats_output.cpp

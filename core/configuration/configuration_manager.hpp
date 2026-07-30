@@ -40,6 +40,14 @@ class ConfigurationManager
     [[nodiscard]] static foundation::Result<ConfigurationManager> loadFromFile(const foundation::Path& path);
 
     /**
+     * @brief Writes the current configuration to a properties file.
+     *
+     * @param path Destination file path.
+     * @return Success or I/O error.
+     */
+    [[nodiscard]] foundation::Result<bool> saveToFile(const foundation::Path& path) const;
+
+    /**
      * @brief Applies SCOPE_-prefixed environment variables as overrides.
      */
     void applyEnvironment();

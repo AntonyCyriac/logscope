@@ -27,9 +27,10 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.3` (shipped) — M14 Desktop + v2.0.3 regression hotfix (log table, AI Ask).
+**Current release:** `v2.0.4` (shipped) � M14.12 Phase C desktop CLI parity.
 
-**Next milestone:** **M15 – Web Platform** (`v2.0.0` track). See [Roadmap](../ROADMAP.md).
+
+**Strategic next milestone:** **M15 – Web Platform** — see [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md) (`v2.1.0` track). See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 

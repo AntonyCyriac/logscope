@@ -68,7 +68,9 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.0.3`](CHANGELOG.md) — M14 Desktop + v2.0.3 regression hotfix (table + AI Ask). **Next:** M15 – Web Platform (`v2.0.0` track).
+**Current release:** [`v2.0.3`](CHANGELOG.md) — M14 Desktop + v2.0.3 regression hotfix. **Next ship:** [`v2.0.4`](planning/NEXT-VALUE-ADD.md) (M14.12 Phase C, in tree). **Strategic next:** [M15 – Web Platform](planning/M15-WEB-PLATFORM.md) (`v2.1.0` track).
+
+See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
@@ -439,7 +441,7 @@ v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6–M14. M15–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M15. M16–M17 plans will be added as preceding milestones near completion.
 
 ---
 

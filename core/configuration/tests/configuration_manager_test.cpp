@@ -131,6 +131,31 @@ TEST_F(ConfigurationManagerTest, ValidateMissingKeys)
     EXPECT_EQ(ErrorCode::InvalidArgument, validResult.error().code());
 }
 
+TEST_F(ConfigurationManagerTest, SaveToFileRoundTrip)
+{
+    auto loadResult = ConfigurationManager::loadFromFile(m_configFile);
+
+    ASSERT_TRUE(loadResult.hasValue());
+
+    const Path outputFile(std::string("configuration_manager_") +
+                          ::testing::UnitTest::GetInstance()->current_test_info()->name() + "_saved.properties");
+
+    const auto saveResult = loadResult->saveToFile(outputFile);
+
+    ASSERT_TRUE(saveResult.hasValue());
+    EXPECT_TRUE(*saveResult);
+
+    const auto reloadResult = ConfigurationManager::loadFromFile(outputFile);
+
+    ASSERT_TRUE(reloadResult.hasValue());
+
+    EXPECT_EQ("debug", *reloadResult->configuration().get("log.level"));
+    EXPECT_EQ("false", *reloadResult->configuration().get("log.timestamps"));
+    EXPECT_EQ("logscope", *reloadResult->configuration().get("app.name"));
+
+    std::remove(outputFile.string().c_str());
+}
+
 TEST_F(ConfigurationManagerTest, ApplyEnvironmentOverride)
 {
 #if defined(_WIN32)

@@ -19,10 +19,14 @@
 #include "analytics_panel.hpp"
 #include "ai_panel.hpp"
 #include "analysis_stats.hpp"
+#include "configuration_editor_dialog.hpp"
 #include "desktop_analysis_config.hpp"
 #include "export_report_dialog.hpp"
+#include "log_format.hpp"
 #include "log_table_model.hpp"
+#include "open_log_dialog.hpp"
 #include "run_stats_dialog.hpp"
+#include "save_session_dialog.hpp"
 #include "tail_worker.hpp"
 
 namespace scope::desktop
@@ -39,7 +43,9 @@ class MainWindow : public QMainWindow
     explicit MainWindow(const scope::foundation::Path& configFile = {}, QWidget* parent = nullptr);
 
     /// Opens and analyzes a log file (used by desktop integration tests).
-    [[nodiscard]] bool openLogFile(const QString& path);
+    [[nodiscard]] bool openLogFile(const QString& path,
+                                   scope::analysis::LogFormat formatHint = scope::analysis::LogFormat::Auto,
+                                   const std::string& profile = {});
 
     [[nodiscard]] int logRowCount() const;
     [[nodiscard]] QString statusMessage() const;
@@ -51,11 +57,25 @@ class MainWindow : public QMainWindow
     void setPersistIndexEnabled(const bool enabled);
     void setReuseIndexEnabled(const bool enabled);
 
+    /// Investigation bar helpers for desktop integration tests.
+    void setInvestigationLevel(const QString& level);
+    [[nodiscard]] bool investigateCurrentFilters();
+
+    /// Opens clipboard text via temp file (Phase C clipboard open).
+    [[nodiscard]] bool openFromClipboardText(const QString& text);
+
+    /// Saves/loads session without QFileDialog (Phase C session dialog).
+    [[nodiscard]] bool saveSessionToPath(const QString& path);
+    [[nodiscard]] bool loadSessionFromPath(const QString& path);
+
   private:
     void createMenus();
     void createLayout();
     void loadConfigurationFile();
+    void showConfigurationEditor();
     void openFile();
+    void openFromClipboard();
+    void openStdin();
     void runAnalyze();
     void runInvestigate();
     void runAnalytics();
@@ -72,6 +92,8 @@ class MainWindow : public QMainWindow
     void updateStatus(const QString& message);
     void populateTableFromModel();
     void populateTableFromInvestigation(const scope::investigation::InvestigationResult& result);
+    [[nodiscard]] scope::investigation::InvestigationCriteria buildInvestigationCriteriaFromUi(
+        QString* errorMessage) const;
 
     scope::application::ApplicationService m_service;
     LogTableModel* m_logModel{nullptr};
@@ -94,6 +116,8 @@ class MainWindow : public QMainWindow
     AiPanel* m_aiPanel{nullptr};
     TailWorker* m_tailWorker{nullptr};
     QString m_currentPath;
+    scope::analysis::LogFormat m_formatHint{scope::analysis::LogFormat::Auto};
+    std::string m_profile;
     bool m_hasRunStats{false};
     scope::analysis::AnalysisStats m_lastAnalysisStats{};
 };

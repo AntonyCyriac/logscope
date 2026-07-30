@@ -14,11 +14,28 @@ namespace scope::desktop
 
 [[nodiscard]] inline scope::analysis::AnalysisConfig buildAnalysisConfigForDesktop(
     const scope::configuration::ConfigurationManager& configurationManager, const bool persistIndex,
-    const bool reuseIndex)
+    const bool reuseIndex, const scope::analysis::LogFormat formatHint = scope::analysis::LogFormat::Auto,
+    const std::string& profile = {})
 {
     scope::analysis::AnalysisConfig overrides = scope::analysis::AnalysisConfig::defaults();
     overrides.storage.persistIndex = persistIndex;
     overrides.storage.reuseIndex = reuseIndex;
+
+    if (!profile.empty())
+    {
+        if (const std::optional<scope::analysis::FormatProfile> resolved =
+                scope::analysis::resolveFormatProfile(profile))
+        {
+            overrides = resolved->defaults;
+            overrides.storage.persistIndex = persistIndex;
+            overrides.storage.reuseIndex = reuseIndex;
+        }
+    }
+
+    if (formatHint != scope::analysis::LogFormat::Auto)
+    {
+        overrides.formatHint = formatHint;
+    }
 
     if (persistIndex && overrides.storage.mode == scope::storage::StorageMode::Memory)
     {

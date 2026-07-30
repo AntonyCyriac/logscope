@@ -4,14 +4,18 @@
 
 #include "main_window.hpp"
 
+#include <QGuiApplication>
 #include <QLabel>
 #include <QHeaderView>
+#include <QClipboard>
+#include <QFile>
 #include <QFileDialog>
 #include <QHBoxLayout>
 #include <QListWidgetItem>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QStandardPaths>
 #include <QVBoxLayout>
 #include <sstream>
 
@@ -83,7 +87,10 @@ void MainWindow::createMenus()
 {
     auto* fileMenu = menuBar()->addMenu(QStringLiteral("File"));
     fileMenu->addAction(QStringLiteral("Open…"), this, &MainWindow::openFile);
+    fileMenu->addAction(QStringLiteral("Open from Clipboard"), this, &MainWindow::openFromClipboard);
+    fileMenu->addAction(QStringLiteral("Open Stdin"), this, &MainWindow::openStdin);
     fileMenu->addAction(QStringLiteral("Load Configuration…"), this, &MainWindow::loadConfigurationFile);
+    fileMenu->addAction(QStringLiteral("Configuration…"), this, &MainWindow::showConfigurationEditor);
     fileMenu->addAction(QStringLiteral("Export Report…"), this, &MainWindow::exportReport);
     fileMenu->addSeparator();
     fileMenu->addAction(QStringLiteral("Quit"), this, &QWidget::close);
@@ -245,24 +252,89 @@ void MainWindow::loadConfigurationFile()
     QMessageBox::information(this, QStringLiteral("Configuration"), QStringLiteral("Configuration is valid."));
 }
 
+void MainWindow::showConfigurationEditor()
+{
+    ConfigurationEditorDialog dialog(m_service.configurationManager(),
+                                     QString::fromStdString(m_service.configFilePath().string()), this);
+    dialog.exec();
+
+    if (!dialog.configurationChanged())
+    {
+        return;
+    }
+
+    const scope::foundation::Path configPath =
+        scope::foundation::Path(dialog.configFilePath().toStdString());
+
+    if (!configPath.string().empty())
+    {
+        const auto reloadResult = m_service.loadConfiguration(configPath);
+
+        if (!reloadResult || !*reloadResult)
+        {
+            QMessageBox::warning(this, QStringLiteral("Configuration"),
+                                 QStringLiteral("Saved but could not reload configuration."));
+
+            return;
+        }
+    }
+
+    refreshExtensions();
+    updateStatus(QStringLiteral("Configuration updated"));
+}
+
 void MainWindow::openFile()
 {
-    const QString path =
-        QFileDialog::getOpenFileName(this, QStringLiteral("Open log file"), QString{}, QStringLiteral("Logs (*.log *.jsonl *.*)"));
+    OpenLogDialog dialog(this);
+
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    const QString path = dialog.logPath();
 
     if (path.isEmpty())
     {
         return;
     }
 
-    if (!openLogFile(path))
+    if (!openLogFile(path, dialog.logFormat(), dialog.profile()))
     {
         QMessageBox::warning(this, QStringLiteral("Open failed"),
                              QStringLiteral("Could not open the selected log file."));
     }
 }
 
-bool MainWindow::openLogFile(const QString& path)
+void MainWindow::openFromClipboard()
+{
+    const QString text = QGuiApplication::clipboard()->text();
+
+    if (text.trimmed().isEmpty())
+    {
+        QMessageBox::information(this, QStringLiteral("Clipboard"), QStringLiteral("Clipboard is empty."));
+
+        return;
+    }
+
+    if (!openFromClipboardText(text))
+    {
+        QMessageBox::warning(this, QStringLiteral("Open failed"),
+                             QStringLiteral("Could not analyze clipboard contents."));
+    }
+}
+
+void MainWindow::openStdin()
+{
+    if (!openLogFile(QStringLiteral("-")))
+    {
+        QMessageBox::warning(this, QStringLiteral("Stdin"),
+                             QStringLiteral("Could not read log data from stdin. Pipe input to logscope-desktop or use Open from Clipboard."));
+    }
+}
+
+bool MainWindow::openLogFile(const QString& path, const scope::analysis::LogFormat formatHint,
+                             const std::string& profile)
 {
     if (path.isEmpty())
     {
@@ -270,6 +342,8 @@ bool MainWindow::openLogFile(const QString& path)
     }
 
     m_currentPath = path;
+    m_formatHint = formatHint;
+    m_profile = profile;
     scope::source::OpenOptions options;
     options.follow = m_tailCheck->isChecked();
 
@@ -331,6 +405,118 @@ void MainWindow::setReuseIndexEnabled(const bool enabled)
     }
 }
 
+void MainWindow::setInvestigationLevel(const QString& level)
+{
+    if (m_levelEdit != nullptr)
+    {
+        m_levelEdit->setText(level);
+    }
+}
+
+bool MainWindow::investigateCurrentFilters()
+{
+    if (!m_service.hasModel())
+    {
+        return false;
+    }
+
+    QString errorMessage;
+    const scope::investigation::InvestigationCriteria criteria = buildInvestigationCriteriaFromUi(&errorMessage);
+
+    if (!errorMessage.isEmpty())
+    {
+        return false;
+    }
+
+    const auto result = m_service.investigate(criteria);
+
+    if (!result)
+    {
+        return false;
+    }
+
+    populateTableFromInvestigation(*result);
+    updateStatus(QStringLiteral("Investigation: %1 matches").arg(static_cast<qulonglong>(result->matchingLines.size())));
+
+    return true;
+}
+
+bool MainWindow::openFromClipboardText(const QString& text)
+{
+    if (text.trimmed().isEmpty())
+    {
+        return false;
+    }
+
+    const QString tempDir = QStandardPaths::writableLocation(QStandardPaths::TempLocation);
+    const QString tempPath = tempDir + QStringLiteral("/logscope-clipboard.log");
+
+    QFile file(tempPath);
+
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text))
+    {
+        return false;
+    }
+
+    file.write(text.toUtf8());
+    file.close();
+
+    return openLogFile(tempPath);
+}
+
+bool MainWindow::saveSessionToPath(const QString& path)
+{
+    if (!m_service.hasModel() || path.isEmpty())
+    {
+        return false;
+    }
+
+    SaveSessionDialog dialog(defaultReportOptions(m_service.configurationManager()), nullptr);
+
+    QString criteriaError;
+    const scope::investigation::InvestigationCriteria criteria = buildInvestigationCriteriaFromUi(&criteriaError);
+
+    if (!criteriaError.isEmpty())
+    {
+        return false;
+    }
+
+    const scope::application::SessionSaveRequest request =
+        dialog.sessionSaveRequest(scope::foundation::Path(path.toStdString()), m_service.configFilePath(), criteria);
+
+    const auto saveResult = m_service.saveSession(request);
+
+    return saveResult && *saveResult;
+}
+
+bool MainWindow::loadSessionFromPath(const QString& path)
+{
+    if (path.isEmpty())
+    {
+        return false;
+    }
+
+    const auto sessionResult = m_service.loadSession(scope::foundation::Path(path.toStdString()));
+
+    if (!sessionResult)
+    {
+        return false;
+    }
+
+    m_service.adoptModel(sessionResult->analysisModel(), sessionResult->sourcePath());
+    m_currentPath = QString::fromStdString(sessionResult->sourcePath().string());
+    populateTableFromModel();
+
+    if (m_logModel->rowCount() == 0 && !m_currentPath.isEmpty())
+    {
+        openLogFile(m_currentPath);
+    }
+
+    updateStatus(QStringLiteral("Session loaded"));
+
+    return true;
+}
+
 void MainWindow::runAnalyze()
 {
     if (m_currentPath.isEmpty())
@@ -343,7 +529,7 @@ void MainWindow::runAnalyze()
     scope::analysis::AnalysisStats stats;
     const scope::analysis::AnalysisConfig analysisConfig =
         buildAnalysisConfigForDesktop(m_service.configurationManager(), m_persistIndexCheck->isChecked(),
-                                      m_reuseIndexCheck->isChecked());
+                                      m_reuseIndexCheck->isChecked(), m_formatHint, m_profile);
     const auto modelResult = m_service.analyze(analysisConfig, &stats);
 
     if (!modelResult)
@@ -388,87 +574,30 @@ void MainWindow::populateTableFromInvestigation(const scope::investigation::Inve
 
 void MainWindow::runInvestigate()
 {
-    if (!m_service.hasModel())
+    if (!investigateCurrentFilters())
     {
-        QMessageBox::information(this, QStringLiteral("Investigate"), QStringLiteral("Analyze first."));
-
-        return;
-    }
-
-    scope::investigation::InvestigationCriteria criteria;
-    criteria.contentSearch = m_searchEdit->text().toStdString();
-    criteria.booleanQuery = m_queryEdit->text().toStdString();
-    criteria.filterExpression = m_filterEdit->text().toStdString();
-
-    if (!m_levelEdit->text().isEmpty())
-    {
-        const std::string level = m_levelEdit->text().toStdString();
-
-        if (level == "error")
+        if (!m_service.hasModel())
         {
-            criteria.field = scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Error);
+            QMessageBox::information(this, QStringLiteral("Investigate"), QStringLiteral("Analyze first."));
         }
-        else if (level == "warning" || level == "warn")
+        else
         {
-            criteria.field = scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Warn);
-        }
-        else if (level == "info")
-        {
-            criteria.field = scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Info);
+            QString errorMessage;
+            const scope::investigation::InvestigationCriteria criteria = buildInvestigationCriteriaFromUi(&errorMessage);
+
+            if (!errorMessage.isEmpty())
+            {
+                QMessageBox::warning(this, QStringLiteral("Investigate"), errorMessage);
+            }
+            else
+            {
+                QMessageBox::warning(this, QStringLiteral("Investigate failed"),
+                                     QStringLiteral("Investigation failed."));
+            }
+
+            Q_UNUSED(criteria);
         }
     }
-
-    if (!m_timeFromEdit->text().isEmpty())
-    {
-        const auto earliest = scope::foundation::Timestamp::parse(m_timeFromEdit->text().toStdString());
-
-        if (!earliest)
-        {
-            QMessageBox::warning(this, QStringLiteral("Investigate"),
-                                 QStringLiteral("Invalid time-from timestamp (use ISO-like format)."));
-
-            return;
-        }
-
-        criteria.timeRange = criteria.timeRange.withEarliest(*earliest);
-    }
-
-    if (!m_timeToEdit->text().isEmpty())
-    {
-        const auto latest = scope::foundation::Timestamp::parse(m_timeToEdit->text().toStdString());
-
-        if (!latest)
-        {
-            QMessageBox::warning(this, QStringLiteral("Investigate"),
-                                 QStringLiteral("Invalid time-to timestamp (use ISO-like format)."));
-
-            return;
-        }
-
-        criteria.timeRange = criteria.timeRange.withLatest(*latest);
-    }
-
-    if (m_regexCheck->isChecked())
-    {
-        criteria.searchMode = scope::search::SearchMode::Regex;
-    }
-
-    if (m_caseCheck->isChecked())
-    {
-        criteria.caseSensitivity = scope::search::CaseSensitivity::Sensitive;
-    }
-
-    const auto result = m_service.investigate(criteria);
-
-    if (!result)
-    {
-        QMessageBox::warning(this, QStringLiteral("Investigate failed"), QString::fromStdString(result.error().message()));
-
-        return;
-    }
-
-    populateTableFromInvestigation(*result);
-    updateStatus(QStringLiteral("Investigation: %1 matches").arg(static_cast<qulonglong>(result->matchingLines.size())));
 }
 
 void MainWindow::runAnalytics()
@@ -556,17 +685,33 @@ void MainWindow::saveSession()
     }
 
     const QString path =
-        QFileDialog::getSaveFileName(this, QStringLiteral("Save session"), QString{}, QStringLiteral("Session (*.logscope-session)"));
+        QFileDialog::getSaveFileName(this, QStringLiteral("Save session"), QString{},
+                                     QStringLiteral("Session (*.logscope-session)"));
 
     if (path.isEmpty())
     {
         return;
     }
 
-    scope::application::SessionSaveRequest request;
-    request.sessionFile = scope::foundation::Path(path.toStdString());
-    request.configFile = m_service.configFilePath();
-    request.reportOptions = defaultReportOptions(m_service.configurationManager());
+    SaveSessionDialog dialog(defaultReportOptions(m_service.configurationManager()), this);
+
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    QString criteriaError;
+    const scope::investigation::InvestigationCriteria criteria = buildInvestigationCriteriaFromUi(&criteriaError);
+
+    if (!criteriaError.isEmpty())
+    {
+        QMessageBox::warning(this, QStringLiteral("Session"), criteriaError);
+
+        return;
+    }
+
+    const scope::application::SessionSaveRequest request =
+        dialog.sessionSaveRequest(scope::foundation::Path(path.toStdString()), m_service.configFilePath(), criteria);
 
     const auto saveResult = m_service.saveSession(request);
 
@@ -603,6 +748,12 @@ void MainWindow::loadSession()
     m_service.adoptModel(sessionResult->analysisModel(), sessionResult->sourcePath());
     m_currentPath = QString::fromStdString(sessionResult->sourcePath().string());
     populateTableFromModel();
+
+    if (m_logModel->rowCount() == 0 && !m_currentPath.isEmpty())
+    {
+        openLogFile(m_currentPath);
+    }
+
     updateStatus(QStringLiteral("Session loaded"));
 }
 
@@ -724,6 +875,86 @@ void MainWindow::applyDarkTheme()
 void MainWindow::updateStatus(const QString& message)
 {
     statusBar()->showMessage(message);
+}
+
+scope::investigation::InvestigationCriteria MainWindow::buildInvestigationCriteriaFromUi(QString* errorMessage) const
+{
+    scope::investigation::InvestigationCriteria criteria;
+    criteria.contentSearch = m_searchEdit->text().toStdString();
+    criteria.booleanQuery = m_queryEdit->text().toStdString();
+    criteria.filterExpression = m_filterEdit->text().toStdString();
+
+    if (!m_levelEdit->text().isEmpty())
+    {
+        const std::string level = m_levelEdit->text().toStdString();
+
+        if (level == "error")
+        {
+            criteria.field =
+                scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Error);
+        }
+        else if (level == "warning" || level == "warn")
+        {
+            criteria.field =
+                scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Warn);
+        }
+        else if (level == "info")
+        {
+            criteria.field =
+                scope::investigation::FieldFilter::any().withLevel(scope::analysis::DetectedLogLevel::Info);
+        }
+    }
+
+    if (!m_timeFromEdit->text().isEmpty())
+    {
+        const auto earliest = scope::foundation::Timestamp::parse(m_timeFromEdit->text().toStdString());
+
+        if (!earliest)
+        {
+            if (errorMessage != nullptr)
+            {
+                *errorMessage = QStringLiteral("Invalid time-from timestamp (use ISO-like format).");
+            }
+
+            return criteria;
+        }
+
+        criteria.timeRange = criteria.timeRange.withEarliest(*earliest);
+    }
+
+    if (!m_timeToEdit->text().isEmpty())
+    {
+        const auto latest = scope::foundation::Timestamp::parse(m_timeToEdit->text().toStdString());
+
+        if (!latest)
+        {
+            if (errorMessage != nullptr)
+            {
+                *errorMessage = QStringLiteral("Invalid time-to timestamp (use ISO-like format).");
+            }
+
+            return criteria;
+        }
+
+        criteria.timeRange = criteria.timeRange.withLatest(*latest);
+    }
+
+    if (m_regexCheck->isChecked())
+    {
+        criteria.searchMode = scope::search::SearchMode::Regex;
+    }
+
+    if (m_caseCheck->isChecked())
+    {
+        criteria.caseSensitivity = scope::search::CaseSensitivity::Sensitive;
+    }
+
+    if (errorMessage != nullptr)
+    {
+        errorMessage->clear();
+    }
+
+    return criteria;
 }
 
 } // namespace scope::desktop

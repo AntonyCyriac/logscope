@@ -12,6 +12,27 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.4] - 2026-07-30
+
+M14.12 desktop CLI parity **Phase C** — configuration editor, open format/profile, session save dialog, clipboard/stdin open.
+
+### Added
+
+- Desktop: Configuration editor, Open dialog (format/profile), Save Session dialog, Open from Clipboard / Stdin.
+- `ConfigurationManager::saveToFile()`.
+- `samples/large-app.log` (~1 MB fixture).
+- `logscope_desktop_tests` expanded to 14 headless GUI scenarios.
+
+### Fixed
+
+- Desktop session load re-opens source when table index is empty after adopt.
+
+### Upgrade notes
+
+- Desktop-only; CLI unchanged.
+
+---
+
 ## [2.0.3] - 2026-07-30
 
 Hotfix for **v2.0.2 desktop regression** — empty log table after Open/Analyze and AI Ask `Matches: 0`.

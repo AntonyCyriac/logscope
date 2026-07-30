@@ -5,6 +5,7 @@ Example logs and configuration files for trying LogScope without writing your ow
 | File | Purpose |
 |------|---------|
 | `sample.log` | Plain-text log with errors, warnings, and info lines |
+| `large-app.log` | ~1 MB plain-text log (~14k lines) for persist-index, tail, and desktop stress |
 | `sample.jsonl` | JSON Lines sample |
 | `logscope.properties` | General configuration example |
 | `ai-noop.properties` | Offline AI provider (CI, no network) |
@@ -19,6 +20,17 @@ Example logs and configuration files for trying LogScope without writing your ow
 logscope analyze samples/sample.log
 logscope investigate --filter "level == ERROR" samples/sample.log
 ```
+
+### Large log (~1 MB)
+
+Use `large-app.log` to exercise persistent indexes, reuse, and desktop performance:
+
+```bash
+logscope analyze --stats --persist-index samples/large-app.log
+logscope analyze --reuse-index --filter "level == ERROR" samples/large-app.log
+```
+
+Desktop: **Open…** → `samples/large-app.log`, enable **Persist index**, then **Analyze**.
 
 ---
 

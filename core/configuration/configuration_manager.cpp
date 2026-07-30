@@ -5,6 +5,7 @@
 
 #include "configuration_manager.hpp"
 
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -139,6 +140,40 @@ foundation::Result<ConfigurationManager> ConfigurationManager::loadFromFile(cons
     }
 
     return foundation::Result<ConfigurationManager>(std::move(manager));
+}
+
+foundation::Result<bool> ConfigurationManager::saveToFile(const foundation::Path& path) const
+{
+    std::ofstream stream(path.string());
+
+    if (!stream)
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, "Unable to write configuration file."));
+    }
+
+    std::vector<std::string> keys = m_configuration.keys();
+    std::sort(keys.begin(), keys.end());
+
+    for (const std::string& key : keys)
+    {
+        const auto value = m_configuration.get(key);
+
+        if (!value)
+        {
+            continue;
+        }
+
+        stream << key << '=' << *value << '\n';
+    }
+
+    if (!stream.good())
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::IOError, "Failed while writing configuration file."));
+    }
+
+    return foundation::Result<bool>(true);
 }
 
 void ConfigurationManager::applyEnvironment()
