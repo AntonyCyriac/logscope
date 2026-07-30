@@ -1,10 +1,16 @@
 add_executable(logscope_regression_tests
+    ai_regression_test.cpp
+    plugin_regression_test.cpp
     storage_regression_test.cpp
 )
 
 target_link_libraries(logscope_regression_tests
     PRIVATE
+        scope_ai
         scope_analysis
+        scope_extension
+        scope_investigation
+        scope_plugin
         scope_source
         GTest::gtest_main
 )

@@ -145,6 +145,7 @@ TEST(SqliteIndexStoreIncrementalAppendTest, UpdatesFingerprintOnFinalize)
     {
         std::ofstream append(sourcePath.string(), std::ios::app);
         append << "beta\n";
+        append.flush();
     }
 
     const auto grownFingerprint = IndexFingerprint::compute(sourcePath);
