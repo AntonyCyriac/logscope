@@ -15,7 +15,7 @@
 
 M14 shipped **workflow parity** (open → analyze → investigate → analytics → export → sessions → extensions → AI → tail) via shared `ApplicationService`. This document tracks **remaining CLI surface** not yet exposed in `logscope-desktop`, prioritized for a **desktop polish** track before or alongside M15 Web.
 
-**Baseline:** `v2.0.1` desktop release.
+**Baseline:** `v2.0.2` desktop release.
 
 ---
 

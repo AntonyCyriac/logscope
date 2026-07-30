@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v2.0.1`](CHANGELOG.md) — M14 Desktop Application. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v2.0.2`](CHANGELOG.md) — M14 Desktop Application + CLI parity polish. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 
@@ -31,7 +31,7 @@ Full documentation index: [Document Map](docs/DOCUMENT_MAP.md).
 
 ## Quick start
 
-**Install** — download pre-built binaries for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v2.0.1`+ includes `logscope-desktop` on Linux, Windows, and macOS), or build from source below.
+**Install** — download pre-built binaries for your OS from [GitHub Releases](https://github.com/AntonyCyriac/logscope/releases) (`v2.0.1`+ includes `logscope-desktop` on Linux, Windows, and macOS; `v2.0.2` adds export section picker, index toggles, and stats dialog), or build from source below.
 
 ```bash
 git clone https://github.com/AntonyCyriac/logscope.git

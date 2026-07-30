@@ -12,6 +12,31 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.2] - 2026-07-30
+
+M14.12 desktop CLI parity polish — Phase A + B (investigation filters, export sections, index toggles, stats dialog).
+
+### Added
+
+- Desktop **Export Report** dialog with format and section checkboxes (GAP.2); defaults from `report.sections` config.
+- Desktop toolbar **Persist index** / **Reuse index** on Analyze (GAP.3).
+- Desktop **View → Run Statistics…** — full `--stats` parity via `RunStatsDialog` (GAP.7).
+- Desktop investigate **From/To** time range wiring (GAP.1).
+- `ApplicationService::validateConfiguration()` on File → Load Configuration… (GAP.5).
+- Extension **describe** detail panel when selecting an extension (GAP.6).
+
+### Changed
+
+- Removed redundant export format combo from main toolbar.
+- Session save uses default report sections from configuration.
+- Planning docs: M14.12 Phase A + B complete.
+
+### Upgrade notes
+
+- No CLI or API changes; desktop UX improvements only. Rebuild or download new desktop binaries.
+
+---
+
 ## [2.0.1] - 2026-07-30
 
 Desktop release packaging for Windows and macOS, plus GitHub Actions Node.js 24 runtime updates.

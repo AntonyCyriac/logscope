@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.1` (shipped) — M14 Desktop Application complete (CLI + Linux/Windows/macOS desktop binaries).
+**Current release:** `v2.0.2` (shipped) — M14 Desktop + M14.12 CLI parity polish (export sections, index toggles, stats dialog).
 
 **Next milestone:** **M15 – Web Platform** (`v2.0.0` track). See [Roadmap](../ROADMAP.md).
 
@@ -354,4 +354,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |
 | 2.2.0 | 25-07-2026 | v1.5.1 released; M13 complete; M14 is next. |
 | 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
-| 2.5.0 | 30-07-2026 | Current release `v2.0.1` (all-platform desktop packaging). |
+| 2.5.0 | 30-07-2026 | Current release `v2.0.2` (M14.12 desktop CLI parity polish). |

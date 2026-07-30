@@ -25,7 +25,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.0.1`](../../CHANGELOG.md) — **524** automated tests. M14 Desktop Application (CLI + all-platform desktop binaries).
+**Current release:** [`v2.0.2`](../../CHANGELOG.md) — **524** automated tests. M14 Desktop + M14.12 CLI parity polish.
 
 **Next milestone:** M15 – Web Platform (`v2.0.0` track). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
@@ -438,3 +438,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.8.0 | 30-07-2026 | Current release baseline (`v1.5.2`, 520 tests); Phase 1 stabilization. |
 | 2.9.0 | 30-07-2026 | Current release baseline (`v2.0.0`, 524 tests); M14 desktop build (`LOGSCOPE_DESKTOP`). |
 | 2.10.0 | 30-07-2026 | Current release baseline (`v2.0.1`); per-platform desktop build table and CMake options. |
+| 2.11.0 | 30-07-2026 | Current release baseline (`v2.0.2`); M14.12 desktop CLI parity polish. |
