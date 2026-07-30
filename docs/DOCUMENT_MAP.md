@@ -110,7 +110,8 @@ docs/
 │   ├── RELEASE.md
 │   ├── V1_VALIDATION.md
 │   ├── v1.5.2-RELEASE-NOTES.md
-│   └── v2.0.0-RELEASE-NOTES.md
+│   ├── v2.0.0-RELEASE-NOTES.md
+│   └── v2.0.1-RELEASE-NOTES.md
 │
 ├── handbook/
 │   ├── PROJECT_CONTEXT.md

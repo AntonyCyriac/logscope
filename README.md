@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v2.0.0`](CHANGELOG.md) — M14 Desktop Application. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v2.0.1`](CHANGELOG.md) — M14 Desktop Application. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 

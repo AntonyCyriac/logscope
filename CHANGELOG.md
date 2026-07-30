@@ -12,7 +12,23 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
-## [2.0.0] - 2026-07-30
+## [2.0.1] - 2026-07-30
+
+Desktop release packaging for Windows and macOS, plus GitHub Actions Node.js 24 runtime updates.
+
+### Added
+
+- Release workflow: `logscope-desktop-windows-amd64.zip` and `logscope-desktop-macos-amd64.tar.gz` (`windeployqt` / `macdeployqt`).
+
+### Changed
+
+- GitHub Actions: `checkout@v7`, `upload-artifact@v7`, `download-artifact@v7`, `action-gh-release@v3` (Node.js 24).
+
+### Upgrade notes
+
+- No CLI or API changes from `v2.0.0`; download desktop archives for your OS from GitHub Releases.
+
+---
 
 M14 Desktop Application — Qt Widgets GUI, shared `ApplicationService`, live tail, CLI parity for investigation workflows.
 
