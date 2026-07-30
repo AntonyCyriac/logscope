@@ -49,6 +49,7 @@ See [ADR-008](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) and 
 | M14.9 | Live tail | ✅ Complete |
 | M14.10 | Themes, shortcuts, status stats | ✅ Complete |
 | M14.11 | CI smoke, doc sync, `v2.0.0` / `v2.0.1` release | ✅ Complete |
+| M14.12 | Desktop CLI parity polish (Phase A shipped; Phase B in [M14-DESKTOP-CLI-PARITY-GAPS.md](M14-DESKTOP-CLI-PARITY-GAPS.md)) | 🟡 Phase B planned (`v2.0.2+`) |
 
 ---
 
@@ -77,6 +78,8 @@ See [ADR-008](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) and 
 - AI panel: ask, summarize, hints
 - Tail toggle + worker thread
 - Dark/light themes, status bar with `--stats` parity
+
+**Follow-on:** [M14-DESKTOP-CLI-PARITY-GAPS.md](M14-DESKTOP-CLI-PARITY-GAPS.md) — prioritized CLI surface not yet in the GUI (config editor, sections, persist-index, time-range wiring).
 
 ## CLI
 

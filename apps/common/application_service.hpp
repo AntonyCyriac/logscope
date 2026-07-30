@@ -70,6 +70,12 @@ class ApplicationService
   public:
     [[nodiscard]] foundation::Result<bool> loadConfiguration(const foundation::Path& configFile);
 
+    /**
+     * @brief Validates configuration (same checks as CLI config validate).
+     */
+    [[nodiscard]] foundation::Result<bool> validateConfiguration(
+        const std::vector<std::string>& requiredKeys = {}) const;
+
     [[nodiscard]] configuration::ConfigurationManager& configurationManager() noexcept;
 
     [[nodiscard]] const configuration::ConfigurationManager& configurationManager() const noexcept;

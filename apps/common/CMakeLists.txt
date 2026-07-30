@@ -16,10 +16,12 @@ target_link_libraries(scope_application
         scope_foundation
         scope_investigation
         scope_plugin
+        scope_query
         scope_reporting
         scope_runtime
         scope_search
         scope_source
+        scope_storage
         scope_workspace
 )
 

@@ -8,6 +8,8 @@
 #include <gtest/gtest.h>
 
 #include "foundation/path.hpp"
+#include "investigation_criteria.hpp"
+#include "time_range_filter.hpp"
 
 using scope::application::ApplicationService;
 using scope::foundation::Path;
@@ -51,4 +53,39 @@ TEST(ApplicationServiceTest, InvestigateMatchesErrors)
 
     ASSERT_TRUE(result);
     EXPECT_FALSE(result->matchingLines.empty());
+}
+
+TEST(ApplicationServiceTest, InvestigateTimeRangeFiltersLines)
+{
+    ApplicationService service;
+    ASSERT_TRUE(service.loadConfiguration(Path{}));
+
+    ASSERT_TRUE(service.openSource(Path("samples/sample.log")));
+    ASSERT_TRUE(service.analyze(scope::analysis::AnalysisConfig::defaults()));
+
+    const auto earliest = scope::foundation::Timestamp::parse("2026-07-11T10:00:06");
+    const auto latest = scope::foundation::Timestamp::parse("2026-07-11T10:00:15");
+    ASSERT_TRUE(earliest);
+    ASSERT_TRUE(latest);
+
+    scope::investigation::InvestigationCriteria criteria;
+    criteria.timeRange =
+        scope::investigation::TimeRangeFilter::any().withEarliest(*earliest).withLatest(*latest);
+
+    const auto result = service.investigate(criteria);
+
+    ASSERT_TRUE(result);
+    EXPECT_FALSE(result->matchingLines.empty());
+    EXPECT_LE(result->matchingLines.size(), 4U);
+}
+
+TEST(ApplicationServiceTest, ValidateSampleConfiguration)
+{
+    ApplicationService service;
+    ASSERT_TRUE(service.loadConfiguration(Path("samples/logscope.properties")));
+
+    const auto validateResult = service.validateConfiguration();
+
+    ASSERT_TRUE(validateResult);
+    EXPECT_TRUE(*validateResult);
 }

@@ -6,16 +6,21 @@
 #include "application_service.hpp"
 
 #include "ai_config.hpp"
+#include "analysis_config.hpp"
 #include "foundation/filesystem.hpp"
 #include "foundation/error.hpp"
 #include "analytics_engine.hpp"
 #include "analysis_engine.hpp"
 #include "investigation_engine.hpp"
+#include "plugin_config.hpp"
 #include "plugin_runtime.hpp"
+#include "query.hpp"
 #include "reporting.hpp"
 #include "runtime.hpp"
+#include "search_config.hpp"
 #include "session_store.hpp"
 #include "source.hpp"
+#include "storage.hpp"
 #include "tailing_file_log_source.hpp"
 
 namespace scope::application
@@ -52,6 +57,65 @@ foundation::Result<bool> ApplicationService::loadConfiguration(const foundation:
     {
         return foundation::Result<bool>(
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Failed to apply configuration."));
+    }
+
+    return foundation::Result<bool>(true);
+}
+
+foundation::Result<bool> ApplicationService::validateConfiguration(
+    const std::vector<std::string>& requiredKeys) const
+{
+    const auto validationResult = m_configurationManager.validate(requiredKeys);
+
+    if (!validationResult)
+    {
+        return foundation::Result<bool>(validationResult.error());
+    }
+
+    const auto analysisValidation =
+        scope::analysis::validateAnalysisConfiguration(m_configurationManager.configuration());
+
+    if (!analysisValidation)
+    {
+        return foundation::Result<bool>(analysisValidation.error());
+    }
+
+    const auto searchValidation =
+        scope::search::validateSearchConfiguration(m_configurationManager.configuration());
+
+    if (!searchValidation)
+    {
+        return foundation::Result<bool>(searchValidation.error());
+    }
+
+    const auto queryValidation = scope::query::validateQueryConfiguration(m_configurationManager.configuration());
+
+    if (!queryValidation)
+    {
+        return foundation::Result<bool>(queryValidation.error());
+    }
+
+    const auto storageValidation =
+        scope::storage::validateStorageConfiguration(m_configurationManager.configuration());
+
+    if (!storageValidation)
+    {
+        return foundation::Result<bool>(storageValidation.error());
+    }
+
+    const auto pluginValidation =
+        scope::plugin::validatePluginConfiguration(m_configurationManager.configuration());
+
+    if (!pluginValidation)
+    {
+        return foundation::Result<bool>(pluginValidation.error());
+    }
+
+    const auto aiValidation = scope::ai::validateAiConfiguration(m_configurationManager.configuration());
+
+    if (!aiValidation)
+    {
+        return foundation::Result<bool>(aiValidation.error());
     }
 
     return foundation::Result<bool>(true);

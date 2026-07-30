@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QTableView>
+#include <QTextEdit>
 
 #include "application_service.hpp"
 #include "analytics_panel.hpp"
@@ -46,6 +47,7 @@ class MainWindow : public QMainWindow
     void loadSession();
     void refreshSessions();
     void refreshExtensions();
+    void showSelectedExtension();
     void toggleTail(bool enabled);
     void applyLightTheme();
     void applyDarkTheme();
@@ -58,6 +60,7 @@ class MainWindow : public QMainWindow
     QTableView* m_logView{nullptr};
     QListWidget* m_sessionList{nullptr};
     QListWidget* m_extensionList{nullptr};
+    QTextEdit* m_extensionDetails{nullptr};
     QLineEdit* m_searchEdit{nullptr};
     QLineEdit* m_queryEdit{nullptr};
     QLineEdit* m_filterEdit{nullptr};

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.14.0 |
+| Version | 3.15.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -201,6 +201,7 @@ Developers new to LogScope should read the documentation in the following order.
 | 8e | M13-V151-AI-SCENARIOS.md | v1.5.1 AI acceptance scenarios and test matrix. |
 | 8f | M14-DESKTOP-APPLICATION.md | M14 desktop application plan (`v2.0.0`). |
 | 8g | M14-V200-DESKTOP-SCENARIOS.md | v2.0.0 desktop acceptance scenarios. |
+| 8h | M14-DESKTOP-CLI-PARITY-GAPS.md | Desktop vs CLI gap list and polish phases. |
 | 8h | PHASE-1-STABILIZATION.md | Phase 1 stabilize v1.x plan (`v1.5.2`). |
 | 8i | PHASE-1-V152-SCENARIOS.md | v1.5.2 stabilization acceptance scenarios. |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
@@ -370,3 +371,4 @@ These categories should be added only when they provide clear value and support 
 | 3.12.0 | 30-07-2026 | v2.0.1 release notes; handbook build-flavor sync (`DEVELOPER_SETUP`). |
 | 3.13.0 | 30-07-2026 | `WINDOWS_RELEASE_SIGNING.md` handbook guide. |
 | 3.14.0 | 30-07-2026 | `MACOS_RELEASE_NOTARIZATION.md` handbook guide. |
+| 3.15.0 | 30-07-2026 | `M14-DESKTOP-CLI-PARITY-GAPS.md` desktop polish planning. |

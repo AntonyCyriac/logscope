@@ -82,4 +82,4 @@ Without a config file, AI is disabled (`ai.enabled=false` by default).
 - AI assistant panel (ask, summarize, hints)
 - Live tail toggle, dark/light themes
 
-See [M14-DESKTOP-APPLICATION.md](../../docs/planning/M14-DESKTOP-APPLICATION.md) and [samples/README.md](../../samples/README.md).
+See [M14-DESKTOP-APPLICATION.md](../../docs/planning/M14-DESKTOP-APPLICATION.md), [M14-DESKTOP-CLI-PARITY-GAPS.md](../../docs/planning/M14-DESKTOP-CLI-PARITY-GAPS.md), and [samples/README.md](../../samples/README.md).

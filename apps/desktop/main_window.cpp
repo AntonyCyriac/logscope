@@ -8,6 +8,7 @@
 #include <QHeaderView>
 #include <QFileDialog>
 #include <QHBoxLayout>
+#include <QListWidgetItem>
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSplitter>
@@ -18,6 +19,7 @@
 #include "analytics_config.hpp"
 #include "field_filter.hpp"
 #include "foundation/path.hpp"
+#include "foundation/timestamp.hpp"
 #include "report_options.hpp"
 #include "report_writer.hpp"
 #include "theme_manager.hpp"
@@ -25,6 +27,26 @@
 
 namespace scope::desktop
 {
+
+namespace
+{
+
+QString extensionStatusLabel(const scope::extension::ExtensionStatus status)
+{
+    switch (status)
+    {
+    case scope::extension::ExtensionStatus::Ready:
+        return QStringLiteral("ready");
+    case scope::extension::ExtensionStatus::Disabled:
+        return QStringLiteral("disabled");
+    case scope::extension::ExtensionStatus::InitializationFailed:
+        return QStringLiteral("failed");
+    }
+
+    return QStringLiteral("unknown");
+}
+
+} // namespace
 
 MainWindow::MainWindow(const scope::foundation::Path& configFile, QWidget* parent) : QMainWindow(parent)
 {
@@ -84,10 +106,15 @@ void MainWindow::createLayout()
 
     m_sessionList = new QListWidget(navigator);
     m_extensionList = new QListWidget(navigator);
+    m_extensionDetails = new QTextEdit(navigator);
+    m_extensionDetails->setReadOnly(true);
+    m_extensionDetails->setPlaceholderText(QStringLiteral("Select an extension"));
+    m_extensionDetails->setMaximumHeight(120);
     navLayout->addWidget(new QLabel(QStringLiteral("Sessions"), navigator));
     navLayout->addWidget(m_sessionList);
     navLayout->addWidget(new QLabel(QStringLiteral("Extensions"), navigator));
     navLayout->addWidget(m_extensionList);
+    navLayout->addWidget(m_extensionDetails);
 
     auto* workArea = new QWidget(splitter);
     auto* workLayout = new QVBoxLayout(workArea);
@@ -161,6 +188,17 @@ void MainWindow::createLayout()
     connect(investigateButton, &QPushButton::clicked, this, &MainWindow::runInvestigate);
     connect(analyticsButton, &QPushButton::clicked, this, &MainWindow::runAnalytics);
     connect(m_tailCheck, &QCheckBox::toggled, this, &MainWindow::toggleTail);
+    connect(m_extensionList, &QListWidget::currentItemChanged, this,
+            [this](QListWidgetItem* current, QListWidgetItem* /*previous*/) {
+                if (current == nullptr)
+                {
+                    m_extensionDetails->clear();
+
+                    return;
+                }
+
+                showSelectedExtension();
+            });
 
     refreshSessions();
     refreshExtensions();
@@ -187,8 +225,22 @@ void MainWindow::loadConfigurationFile()
         return;
     }
 
+    const auto validateResult = m_service.validateConfiguration();
+
+    if (!validateResult || !*validateResult)
+    {
+        const QString detail =
+            !validateResult ? QString::fromStdString(validateResult.error().message())
+                            : QStringLiteral("Configuration validation failed.");
+
+        QMessageBox::warning(this, QStringLiteral("Configuration"), detail);
+
+        return;
+    }
+
     refreshExtensions();
     updateStatus(QStringLiteral("Loaded configuration: %1").arg(path));
+    QMessageBox::information(this, QStringLiteral("Configuration"), QStringLiteral("Configuration is valid."));
 }
 
 void MainWindow::openFile()
@@ -303,11 +355,34 @@ void MainWindow::runInvestigate()
         }
     }
 
-    if (!m_timeFromEdit->text().isEmpty() || !m_timeToEdit->text().isEmpty())
+    if (!m_timeFromEdit->text().isEmpty())
     {
-        // Time range strings are applied via filter DSL or future timestamp parsing.
-        (void)m_timeFromEdit;
-        (void)m_timeToEdit;
+        const auto earliest = scope::foundation::Timestamp::parse(m_timeFromEdit->text().toStdString());
+
+        if (!earliest)
+        {
+            QMessageBox::warning(this, QStringLiteral("Investigate"),
+                                 QStringLiteral("Invalid time-from timestamp (use ISO-like format)."));
+
+            return;
+        }
+
+        criteria.timeRange = criteria.timeRange.withEarliest(*earliest);
+    }
+
+    if (!m_timeToEdit->text().isEmpty())
+    {
+        const auto latest = scope::foundation::Timestamp::parse(m_timeToEdit->text().toStdString());
+
+        if (!latest)
+        {
+            QMessageBox::warning(this, QStringLiteral("Investigate"),
+                                 QStringLiteral("Invalid time-to timestamp (use ISO-like format)."));
+
+            return;
+        }
+
+        criteria.timeRange = criteria.timeRange.withLatest(*latest);
     }
 
     if (m_regexCheck->isChecked())
@@ -492,11 +567,57 @@ void MainWindow::refreshSessions()
 void MainWindow::refreshExtensions()
 {
     m_extensionList->clear();
+    m_extensionDetails->clear();
 
     for (const scope::extension::ExtensionInfo& info : m_service.listExtensions())
     {
         m_extensionList->addItem(QString::fromStdString(info.id));
     }
+
+    if (m_extensionList->count() > 0)
+    {
+        m_extensionList->setCurrentRow(0);
+    }
+}
+
+void MainWindow::showSelectedExtension()
+{
+    QListWidgetItem* item = m_extensionList->currentItem();
+
+    if (item == nullptr)
+    {
+        m_extensionDetails->clear();
+
+        return;
+    }
+
+    const auto infoResult = m_service.describeExtension(item->text().toStdString());
+
+    if (!infoResult)
+    {
+        m_extensionDetails->setPlainText(QString::fromStdString(infoResult.error().message()));
+
+        return;
+    }
+
+    const scope::extension::ExtensionInfo& info = *infoResult;
+    QString details = QStringLiteral("ID: %1\nVersion: %2\nEnabled: %3\nStatus: %4\n")
+                          .arg(QString::fromStdString(info.id), QString::fromStdString(info.version),
+                               info.enabled ? QStringLiteral("yes") : QStringLiteral("no"),
+                               extensionStatusLabel(info.status));
+
+    if (info.dynamic)
+    {
+        details += QStringLiteral("Source: dynamic\nAPI version: %1\n").arg(info.apiVersion);
+
+        if (!info.libraryPath.empty())
+        {
+            details += QStringLiteral("Library: %1\n").arg(QString::fromStdString(info.libraryPath));
+        }
+    }
+
+    details += QStringLiteral("Description: %1").arg(QString::fromStdString(info.description));
+    m_extensionDetails->setPlainText(details);
 }
 
 void MainWindow::toggleTail(const bool enabled)
