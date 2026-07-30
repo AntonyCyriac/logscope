@@ -12,6 +12,7 @@
 #include "foundation/result.hpp"
 #include "plugin_config.hpp"
 #include "plugin_host_api.hpp"
+#include "plugin_load_stats.hpp"
 #include "shared_library.hpp"
 
 namespace scope::plugin
@@ -32,7 +33,8 @@ class PluginLoader
   public:
     explicit PluginLoader(extension::ExtensionManager& extensionManager);
 
-    [[nodiscard]] foundation::Result<std::size_t> loadFromPaths(const std::vector<foundation::Path>& searchPaths);
+    [[nodiscard]] foundation::Result<std::size_t> loadFromPaths(const std::vector<foundation::Path>& searchPaths,
+                                                                PluginLoadStats* statsOut = nullptr);
 
     [[nodiscard]] const std::vector<LoadedPluginLibrary>& loadedLibraries() const noexcept;
 
@@ -44,7 +46,8 @@ class PluginLoader
 };
 
 [[nodiscard]] foundation::Result<std::size_t>
-loadPluginsForManager(extension::ExtensionManager& manager, const PluginConfig& config);
+loadPluginsForManager(extension::ExtensionManager& manager, const PluginConfig& config,
+                      PluginLoadStats* statsOut = nullptr);
 
 void unloadAllPersistentLibraries() noexcept;
 

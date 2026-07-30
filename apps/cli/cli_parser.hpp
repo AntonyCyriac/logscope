@@ -58,6 +58,7 @@ struct AnalyzeOptions
     bool persistIndex = false;
     bool reuseIndex = false;
     std::optional<foundation::Path> indexPath;
+    bool showStats = false;
     bool showHelp = false;
 };
 
@@ -75,6 +76,7 @@ struct InvestigateOptions
     bool persistIndex = false;
     bool reuseIndex = false;
     std::optional<foundation::Path> indexPath;
+    bool showStats = false;
     bool showHelp = false;
 };
 

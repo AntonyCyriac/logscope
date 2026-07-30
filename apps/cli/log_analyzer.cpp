@@ -20,7 +20,8 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
                           const scope::analysis::AnalysisConfig& analysisConfig,
                           const std::optional<foundation::Path>& outputFile,
                           std::ostream& output,
-                          std::ostream& errorOutput)
+                          std::ostream& errorOutput,
+                          scope::analysis::AnalysisStats* statsOut)
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
@@ -39,7 +40,7 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
 
     scope::analysis::AnalysisEngine analysisEngine;
 
-    auto modelResult = analysisEngine.analyze(*datasetResult, analysisConfig);
+    auto modelResult = analysisEngine.analyze(*datasetResult, analysisConfig, statsOut);
 
     if (!modelResult)
     {

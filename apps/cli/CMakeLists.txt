@@ -20,6 +20,7 @@ add_executable(logscope
     extensions_command.cpp
     main.cpp
     session_command.cpp
+    stats_output.cpp
     output_format.cpp
     report_config.cpp
     report_output.cpp
@@ -52,5 +53,9 @@ target_include_directories(logscope
 install(TARGETS logscope
     RUNTIME DESTINATION bin
 )
+
+if(WIN32)
+    target_link_libraries(logscope PRIVATE psapi)
+endif()
 
 add_subdirectory(tests)

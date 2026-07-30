@@ -12,6 +12,7 @@ add_library(scope_foundation
     filesystem.cpp
     hash.cpp
     path.cpp
+    process_memory.cpp
     random.cpp
     stopwatch.cpp
     string.cpp

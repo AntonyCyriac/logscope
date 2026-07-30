@@ -24,13 +24,14 @@ std::atomic<bool> g_pluginProvidersMayDestroy{true};
 
 } // namespace
 
-extension::ExtensionManager createConfiguredExtensionManager(const runtime::Configuration& configuration)
+extension::ExtensionManager createConfiguredExtensionManager(const runtime::Configuration& configuration,
+                                                             PluginLoadStats* statsOut)
 {
     extension::ExtensionManager manager = extension::ExtensionManager::createWithBuiltIns();
 
     const PluginConfig pluginConfig = resolvePluginConfig(configuration);
 
-    (void)loadPluginsForManager(manager, pluginConfig);
+    (void)loadPluginsForManager(manager, pluginConfig, statsOut);
 
     manager.applyConfiguration(configuration);
     manager.initializeEnabled();

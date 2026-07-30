@@ -74,6 +74,27 @@ TEST_F(AnalysisEngineTest, AnalyzesSourceDataset)
     EXPECT_EQ(3U, modelResult->totalLines());
 }
 
+TEST_F(AnalysisEngineTest, CollectsAnalysisStats)
+{
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(m_testFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    AnalysisEngine engine;
+    scope::analysis::AnalysisStats stats;
+
+    const auto modelResult =
+        engine.analyze(*datasetResult, scope::analysis::AnalysisConfig::defaults(), &stats);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(3U, stats.lineCount);
+    EXPECT_GT(stats.byteCount, 0U);
+    EXPECT_FALSE(stats.indexReused);
+    EXPECT_GT(stats.parseDuration.totalNanoseconds(), 0);
+}
+
 TEST_F(AnalysisEngineTest, AnalyzesEmptyFile)
 {
     const Path emptyFile(logscope::gtest::uniqueTestPath("_empty.log"));

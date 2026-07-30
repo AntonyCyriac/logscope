@@ -8,6 +8,7 @@
 #include "analysis_config.hpp"
 #include "analysis_engine.hpp"
 #include "analysis_model.hpp"
+#include "analysis_stats.hpp"
 #include "field_summary.hpp"
 #include "format_detector.hpp"
 #include "json_lines_parser.hpp"

@@ -339,6 +339,13 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             continue;
         }
 
+        if (argument == "--stats")
+        {
+            options.showStats = true;
+
+            continue;
+        }
+
         if (argument == "--sections")
         {
             if (index + 1 >= argc)
@@ -471,6 +478,13 @@ std::optional<InvestigateOptions> parseInvestigateArguments(int argc, char* argv
             continue;
         }
 
+        if (argument == "--stats")
+        {
+            options.showStats = true;
+
+            continue;
+        }
+
         if (parseInvestigationOption(argument, index, argc, argv, options.criteria))
         {
             continue;
@@ -539,6 +553,13 @@ std::optional<AgentInvestigateOptions> parseAgentInvestigateArguments(int argc, 
         if (argument == "--hints")
         {
             options.hints = true;
+
+            continue;
+        }
+
+        if (argument == "--stats")
+        {
+            options.investigate.showStats = true;
 
             continue;
         }

@@ -29,7 +29,8 @@ class LogAnalyzer
                  const scope::analysis::AnalysisConfig& analysisConfig,
                  const std::optional<foundation::Path>& outputFile,
                  std::ostream& output,
-                 std::ostream& errorOutput);
+                 std::ostream& errorOutput,
+                 scope::analysis::AnalysisStats* statsOut = nullptr);
 };
 
 } // namespace scope::cli

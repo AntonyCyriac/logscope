@@ -94,3 +94,22 @@ TEST(PluginLoaderTest, RejectsFutureApiVersion)
 
     ASSERT_TRUE(loaded.hasValue());
 }
+
+TEST(PluginLoaderTest, RecordsSkippedPathsInStats)
+{
+    ExtensionManager manager = ExtensionManager::createWithBuiltIns();
+
+    PluginConfig config;
+    config.enabled = true;
+    config.paths = {Path("/path/does/not/exist/for_plugin_stats_test")};
+
+    scope::plugin::PluginLoadStats stats;
+    const auto loaded = loadPluginsForManager(manager, config, &stats);
+
+    ASSERT_TRUE(loaded.hasValue());
+    EXPECT_EQ(0U, *loaded);
+    EXPECT_TRUE(stats.attempted);
+    EXPECT_EQ(1U, stats.skippedPaths);
+    EXPECT_EQ(0U, stats.loaded);
+    EXPECT_EQ(0U, stats.failed);
+}

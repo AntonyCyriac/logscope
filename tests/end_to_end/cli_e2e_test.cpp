@@ -439,6 +439,17 @@ TEST(CliE2eTest, AgentInvestigateCombinedFlags)
     EXPECT_NE(std::string::npos, output.find("Anomaly hints"));
 }
 
+TEST(CliE2eTest, AnalyzeWithStatsShowsDurationAndLines)
+{
+    const std::string output = runLogscope("analyze --stats " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("========== RUN STATS =========="));
+    EXPECT_NE(std::string::npos, output.find("Parse duration"));
+    EXPECT_NE(std::string::npos, output.find("Line count"));
+    EXPECT_NE(std::string::npos, output.find("Memory RSS"));
+}
+
 TEST(CliE2eTest, AgentInvestigateSkipsAiSectionsWhenDisabled)
 {
     const std::string output = runLogscope("agent investigate --summarize --hints " +
