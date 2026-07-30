@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.0.5`](CHANGELOG.md) — M14 Desktop + v2.0.5 CI/build hotfix. **Next ship:** [M15 – Web Platform](planning/M15-WEB-PLATFORM.md) (`v2.1.0` track).
+**Current release:** [`v2.0.6`](CHANGELOG.md) — M14 Desktop + v2.0.6 CI hotfix. **Next ship:** [M15 – Web Platform](planning/M15-WEB-PLATFORM.md) (`v2.1.0` track).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 

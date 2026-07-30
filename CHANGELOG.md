@@ -12,6 +12,21 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.6] - 2026-07-30
+
+Hotfix for **v2.0.5 CI** — clang-tidy static analysis on desktop `AiPanel`.
+
+### Fixed
+
+- `AiPanel::runAsk()` — null-guard widget pointers before `m_askEdit->text()` (`clang-analyzer-core.CallAndMessage`).
+- `runSummarize()` / `runHints()` — guard `m_outputEdit` consistently.
+
+### Upgrade notes
+
+- No functional change expected; restores green CI tidy gate.
+
+---
+
 ## [2.0.5] - 2026-07-30
 
 Hotfix for **v2.0.4 CI / build breaks** — Linux desktop compile failure and directory-analyze e2e regression after `large-app.log`.

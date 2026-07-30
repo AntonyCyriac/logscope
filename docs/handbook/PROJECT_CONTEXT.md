@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.5` (shipped) — v2.0.4 CI/build hotfix; versioned release artifacts.
+**Current release:** `v2.0.6` (shipped) — clang-tidy CI hotfix on `AiPanel`.
 
 
 **Strategic next milestone:** **M15 – Web Platform** — see [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md) (`v2.1.0` track). **M15.0 gate:** [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) accepted. See [Roadmap](../ROADMAP.md).
@@ -357,3 +357,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
 | 2.5.0 | 30-07-2026 | Current release `v2.0.3` (desktop regression hotfix). |
 | 2.6.0 | 30-07-2026 | Current release `v2.0.5` (CI/build hotfix, versioned artifacts). |
+| 2.7.0 | 30-07-2026 | Current release `v2.0.6` (clang-tidy CI hotfix). |

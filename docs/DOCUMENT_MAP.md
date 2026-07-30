@@ -118,7 +118,8 @@ docs/
 â”‚   â”œâ”€â”€ v2.0.2-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.3-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.4-RELEASE-NOTES.md
-â”‚   â””â”€â”€ v2.0.5-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.5-RELEASE-NOTES.md
+â”‚   â””â”€â”€ v2.0.6-RELEASE-NOTES.md
 â”‚
 â”œâ”€â”€ handbook/
 â”‚   â”œâ”€â”€ PROJECT_CONTEXT.md
@@ -385,3 +386,4 @@ These categories should be added only when they provide clear value and support 
 | 3.15.0 | 30-07-2026 | `M14-DESKTOP-CLI-PARITY-GAPS.md` desktop polish planning. |
 | 3.16.0 | 30-07-2026 | M15 planning, ADR-009, v2.0.4 release notes in structure tree. |
 | 3.17.0 | 30-07-2026 | v2.0.5 release notes; versioning policy in RELEASE.md. |
+| 3.18.0 | 30-07-2026 | v2.0.6 release notes. |
