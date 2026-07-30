@@ -92,6 +92,7 @@ void MainWindow::createMenus()
     sessionMenu->addAction(QStringLiteral("Load…"), this, &MainWindow::loadSession);
 
     auto* viewMenu = menuBar()->addMenu(QStringLiteral("View"));
+    viewMenu->addAction(QStringLiteral("Run Statistics…"), this, &MainWindow::showRunStats);
     viewMenu->addAction(QStringLiteral("Light Theme"), this, &MainWindow::applyLightTheme);
     viewMenu->addAction(QStringLiteral("Dark Theme"), this, &MainWindow::applyDarkTheme);
 }
@@ -122,12 +123,16 @@ void MainWindow::createLayout()
     auto* toolbar = new QHBoxLayout();
     auto* openButton = new QPushButton(QStringLiteral("Open"), workArea);
     m_tailCheck = new QCheckBox(QStringLiteral("Tail"), workArea);
+    m_persistIndexCheck = new QCheckBox(QStringLiteral("Persist index"), workArea);
+    m_reuseIndexCheck = new QCheckBox(QStringLiteral("Reuse index"), workArea);
     auto* analyzeButton = new QPushButton(QStringLiteral("Analyze"), workArea);
     auto* investigateButton = new QPushButton(QStringLiteral("Investigate"), workArea);
     auto* analyticsButton = new QPushButton(QStringLiteral("Analytics"), workArea);
 
     toolbar->addWidget(openButton);
     toolbar->addWidget(m_tailCheck);
+    toolbar->addWidget(m_persistIndexCheck);
+    toolbar->addWidget(m_reuseIndexCheck);
     toolbar->addWidget(analyzeButton);
     toolbar->addWidget(investigateButton);
     toolbar->addWidget(analyticsButton);
@@ -177,11 +182,6 @@ void MainWindow::createLayout()
     splitter->addWidget(navigator);
     splitter->addWidget(workArea);
     splitter->setStretchFactor(1, 1);
-
-    m_formatCombo = new QComboBox(workArea);
-    m_formatCombo->addItems({QStringLiteral("text"), QStringLiteral("html"), QStringLiteral("pdf"),
-                             QStringLiteral("json"), QStringLiteral("markdown"), QStringLiteral("csv")});
-    toolbar->addWidget(m_formatCombo);
 
     connect(openButton, &QPushButton::clicked, this, &MainWindow::openFile);
     connect(analyzeButton, &QPushButton::clicked, this, &MainWindow::runAnalyze);
@@ -280,10 +280,10 @@ void MainWindow::runAnalyze()
     }
 
     scope::analysis::AnalysisStats stats;
-    const auto modelResult =
-        m_service.analyze(scope::analysis::resolveAnalysisConfig(m_service.configurationManager().configuration(),
-                                                               scope::analysis::AnalysisConfig::defaults()),
-                          &stats);
+    const scope::analysis::AnalysisConfig analysisConfig =
+        buildAnalysisConfigForDesktop(m_service.configurationManager(), m_persistIndexCheck->isChecked(),
+                                      m_reuseIndexCheck->isChecked());
+    const auto modelResult = m_service.analyze(analysisConfig, &stats);
 
     if (!modelResult)
     {
@@ -291,6 +291,9 @@ void MainWindow::runAnalyze()
 
         return;
     }
+
+    m_lastAnalysisStats = stats;
+    m_hasRunStats = true;
 
     populateTableFromModel();
 
@@ -439,36 +442,19 @@ void MainWindow::exportReport()
         return;
     }
 
-    const QString format = m_formatCombo->currentText();
+    ExportReportDialog dialog(defaultReportOptions(m_service.configurationManager()), this);
+
+    if (dialog.exec() != QDialog::Accepted)
+    {
+        return;
+    }
+
+    const scope::reporting::ReportOptions options = dialog.reportOptions();
     const QString path = QFileDialog::getSaveFileName(this, QStringLiteral("Export report"));
 
     if (path.isEmpty())
     {
         return;
-    }
-
-    scope::reporting::ReportOptions options;
-    options.format = scope::reporting::ReportFormat::Text;
-
-    if (format == "html")
-    {
-        options.format = scope::reporting::ReportFormat::Html;
-    }
-    else if (format == "pdf")
-    {
-        options.format = scope::reporting::ReportFormat::Pdf;
-    }
-    else if (format == "json")
-    {
-        options.format = scope::reporting::ReportFormat::Json;
-    }
-    else if (format == "markdown")
-    {
-        options.format = scope::reporting::ReportFormat::Markdown;
-    }
-    else if (format == "csv")
-    {
-        options.format = scope::reporting::ReportFormat::Csv;
     }
 
     const scope::reporting::Report report = m_service.generateReport(options);
@@ -485,6 +471,19 @@ void MainWindow::exportReport()
     {
         updateStatus(QStringLiteral("Exported to %1").arg(path));
     }
+}
+
+void MainWindow::showRunStats()
+{
+    if (!m_hasRunStats)
+    {
+        QMessageBox::information(this, QStringLiteral("Statistics"), QStringLiteral("Run Analyze first."));
+
+        return;
+    }
+
+    RunStatsDialog dialog(m_lastAnalysisStats, m_service.lastPluginStats(), this);
+    dialog.exec();
 }
 
 void MainWindow::saveSession()
@@ -507,7 +506,7 @@ void MainWindow::saveSession()
     scope::application::SessionSaveRequest request;
     request.sessionFile = scope::foundation::Path(path.toStdString());
     request.configFile = m_service.configFilePath();
-    request.reportOptions = scope::reporting::ReportOptions{};
+    request.reportOptions = defaultReportOptions(m_service.configurationManager());
 
     const auto saveResult = m_service.saveSession(request);
 

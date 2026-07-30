@@ -25,7 +25,10 @@ add_executable(logscope-desktop
     tail_worker.cpp
     analytics_panel.cpp
     ai_panel.cpp
+    export_report_dialog.cpp
+    run_stats_dialog.cpp
     ../cli/report_writer.cpp
+    ../cli/stats_output.cpp
 )
 
 target_link_libraries(logscope-desktop

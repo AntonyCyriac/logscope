@@ -76,9 +76,11 @@ Without a config file, AI is disabled (`ai.enabled=false` by default).
 
 ## Features
 
-- Open log file, analyze, investigate (search/query/DSL filters)
-- Analytics tabs, report export (HTML/PDF/JSON/…)
-- Session save/load/list, extensions list
+- Open log file, analyze, investigate (search/query/DSL filters, time range From/To)
+- Toolbar: **Persist index**, **Reuse index** (CLI `--persist-index` / `--reuse-index`)
+- Analytics tabs, report export with format + section picker (HTML/PDF/JSON/…)
+- **View → Run Statistics…** — full `--stats` output after Analyze
+- Session save/load/list, extensions list + describe panel
 - AI assistant panel (ask, summarize, hints)
 - Live tail toggle, dark/light themes
 

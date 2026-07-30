@@ -18,7 +18,11 @@
 #include "application_service.hpp"
 #include "analytics_panel.hpp"
 #include "ai_panel.hpp"
+#include "analysis_stats.hpp"
+#include "desktop_analysis_config.hpp"
+#include "export_report_dialog.hpp"
 #include "log_table_model.hpp"
+#include "run_stats_dialog.hpp"
 #include "tail_worker.hpp"
 
 namespace scope::desktop
@@ -43,6 +47,7 @@ class MainWindow : public QMainWindow
     void runInvestigate();
     void runAnalytics();
     void exportReport();
+    void showRunStats();
     void saveSession();
     void loadSession();
     void refreshSessions();
@@ -70,11 +75,14 @@ class MainWindow : public QMainWindow
     QCheckBox* m_regexCheck{nullptr};
     QCheckBox* m_caseCheck{nullptr};
     QCheckBox* m_tailCheck{nullptr};
-    QComboBox* m_formatCombo{nullptr};
+    QCheckBox* m_persistIndexCheck{nullptr};
+    QCheckBox* m_reuseIndexCheck{nullptr};
     AnalyticsPanel* m_analyticsPanel{nullptr};
     AiPanel* m_aiPanel{nullptr};
     TailWorker* m_tailWorker{nullptr};
     QString m_currentPath;
+    bool m_hasRunStats{false};
+    scope::analysis::AnalysisStats m_lastAnalysisStats{};
 };
 
 } // namespace scope::desktop

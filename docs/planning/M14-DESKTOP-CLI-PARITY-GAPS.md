@@ -40,12 +40,12 @@ M14 shipped **workflow parity** (open → analyze → investigate → analytics 
 | ID | Priority | Gap | CLI today | Desktop today | Proposed UI | Effort | Status |
 |----|----------|-----|-----------|---------------|-------------|--------|--------|
 | GAP.1 | **P0** | Time range filters | `--time-from` / `--time-to` on investigate, search, session | From/To wired to `InvestigationCriteria.timeRange` | Parse with `Timestamp::parse`; apply in `runInvestigate()` | S | ✅ |
-| GAP.2 | **P1** | Report section picker | `analyze --sections`, session `--sections` | Export uses default sections only | Checklist in Export dialog (executive, summary, levels, errors, analytics, …) | M | ⬜ |
-| GAP.3 | **P1** | Persist / reuse index | `--persist-index`, `--reuse-index` | Not exposed | Analyze toolbar checkboxes or Advanced → Storage; pass through `AnalysisConfig` / `OpenOptions` | M | ⬜ |
+| GAP.2 | **P1** | Report section picker | `analyze --sections`, session `--sections` | Export dialog: format + section checkboxes | Checklist in Export dialog (executive, summary, levels, errors, analytics, …) | M | ✅ |
+| GAP.3 | **P1** | Persist / reuse index | `--persist-index`, `--reuse-index` | Toolbar **Persist index** / **Reuse index** on Analyze | Analyze toolbar checkboxes; `buildAnalysisConfigForDesktop()` | M | ✅ |
 | GAP.4 | **P1** | Configuration editor | Edit `.properties` keys | Load file only (`--config`, File → Load Configuration…) | Settings dialog: view/edit keys, save as, validate on save | L | ⬜ |
 | GAP.5 | **P1** | `config validate` | `logscope config validate` | Validate on Load Configuration via `ApplicationService::validateConfiguration()` | Settings → Validate, or validate after Load Configuration | S | ✅ |
 | GAP.6 | **P2** | Extension describe | `extensions describe <id>` | List + detail panel (`describeExtension`) | Double-click extension → detail panel (metadata from `describeExtension`) | S | ✅ |
-| GAP.7 | **P2** | Full `--stats` parity | `--stats` on analyze, investigate, agent | Parse ms in status bar only | Status bar expansion or Stats dialog (`AnalysisStats`, memory, plugin load) | M | ⬜ |
+| GAP.7 | **P2** | Full `--stats` parity | `--stats` on analyze, investigate, agent | **View → Run Statistics…** (`RunStatsDialog`, CLI `printRunStats`) | Status bar expansion or Stats dialog (`AnalysisStats`, memory, plugin load) | M | ✅ |
 | GAP.8 | **P2** | Log format / profile | `--log-format`, `--profile` | Config + auto-detect only | Open dialog: format auto/plain/jsonl, profile dropdown | S | ⬜ |
 | GAP.9 | **P2** | Session save filters | `session save` with `--min-errors`, `--filter`, `--sections`, … | Basic save (model + default report options) | Save Session dialog mirroring session CLI flags | M | ⬜ |
 | GAP.10 | **P2** | Stdin analyze | `analyze -` | File picker only | Optional “Open from clipboard / pipe” or document as CLI-only | S | ⬜ |
@@ -65,7 +65,7 @@ M14 shipped **workflow parity** (open → analyze → investigate → analytics 
 
 **Target:** patch release `v2.0.2`; no API breaks.
 
-## Phase B — `v2.0.3` or M14.12 (P1 depth)
+## Phase B — `v2.0.2` desktop polish (P1 depth) ✅ Shipped in tree
 
 | Item | Rationale |
 |------|-----------|
@@ -144,7 +144,17 @@ Read/write via `ConfigurationManager`; avoid duplicating parser — reuse `confi
 
 ---
 
-# 9. Related documents
+# 9. Acceptance (Phase B)
+
+| Scenario | Expected |
+|----------|----------|
+| Export sections | Export dialog sections match CLI `--sections`; defaults from `report.sections` config |
+| Persist / reuse | Toolbar toggles pass `--persist-index` / `--reuse-index` equivalent through analyze |
+| Run stats | View → Run Statistics shows same block as CLI `--stats` after Analyze |
+
+---
+
+# 10. Related documents
 
 | Document | Role |
 |----------|------|
@@ -155,8 +165,9 @@ Read/write via `ConfigurationManager`; avoid duplicating parser — reuse `confi
 
 ---
 
-# 10. Revision History
+# 11. Revision History
 
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 30-07-2026 | Initial prioritized gap list after v2.0.1 desktop release. |
+| 1.1.0 | 30-07-2026 | Phase B complete: GAP.2, GAP.3, GAP.7. |
