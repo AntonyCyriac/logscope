@@ -5,7 +5,7 @@
 | Document | Phase 1 — Stabilize v1.x |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | In progress |
+| Status | Complete |
 | Created | 30-07-2026 |
 | Last Updated | 30-07-2026 |
 
@@ -45,7 +45,7 @@ Phase 1 does **not** require new product features. M14 starts only after `v1.5.2
 | P1.4 | Query/filter fuzz target + CI | ✅ Complete |
 | P1.5 | Medium observability (`--stats`, plugin metrics, memory) | ✅ Complete |
 | P1.6 | License scan CI, third-party licenses doc | ✅ Complete |
-| P1.7 | Doc sync, `v1.5.2` release, roadmap closure | ⬜ Planned |
+| P1.7 | Doc sync, `v1.5.2` release, roadmap closure | ✅ Complete |
 
 ---
 

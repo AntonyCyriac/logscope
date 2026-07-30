@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | Phase 1 v1.5.2 Stabilization Scenarios |
 | Category | Project Planning |
-| Version | 1.0.0 |
-| Status | In progress |
+| Version | 1.1.0 |
+| Status | Complete |
 | Created | 30-07-2026 |
 | Last Updated | 30-07-2026 |
 
@@ -50,7 +50,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 | D1.1 | Tutorials exist | `docs/tutorials/` | At least 3 tutorial files; linked from README | Doc | | ✅ |
 | D1.2 | Tutorial index | README / User Manual | Links to tutorials | Doc | | ✅ |
 | D2.1 | Component diagram | Open COMPONENT_CATALOG | Includes `scope_ai`, storage, plugin paths | Doc | | ✅ |
-| D3.1 | API docs CI | Push to master | `api-docs` artifact uploaded | CI | Yes | ⬜ |
+| D3.1 | API docs CI | Push to master | `api-docs` artifact uploaded | CI | Yes | ✅ |
 | D3.2 | API docs policy | docs/api/README | Pages or artifact-only documented | Doc | | ✅ |
 
 ---
@@ -98,7 +98,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 |----|----------|---------|----------|------|-----|--------|
 | E1.1 | License doc | THIRD_PARTY_LICENSES.md | Lists FetchContent deps | Doc | | ✅ |
 | E1.2 | License CI | CI license job | Passes on master | CI | Yes | ✅ |
-| E2.1 | ASan Linux | sanitizer job | Green with leak detection | CI | Yes | ⬜ |
+| E2.1 | ASan Linux | sanitizer job | Green with leak detection | CI | Yes | ✅ |
 
 ---
 
@@ -106,7 +106,7 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Expected | Status |
 |----|----------|----------|--------|
-| REL.1 | All scenario rows above | ✅ complete | ⬜ |
+| REL.1 | All scenario rows above | ✅ complete | ✅ |
 | REL.2 | `v1.5.2` tag + GitHub Release | Published | ⬜ |
-| REL.3 | POST_V1 Phase 1 gaps | Closed or accepted partial | ⬜ |
-| REL.4 | ROADMAP | M14 next; Phase 1 complete | ⬜ |
+| REL.3 | POST_V1 Phase 1 gaps | Closed or accepted partial | ✅ |
+| REL.4 | ROADMAP | M14 next; Phase 1 complete | ✅ |

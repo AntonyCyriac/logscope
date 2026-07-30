@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.7.0 |
+| Version | 2.8.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -25,9 +25,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v1.5.1`](../../CHANGELOG.md) — **513** automated tests.
+**Current release:** [`v1.5.2`](../../CHANGELOG.md) — **520** automated tests. Phase 1 stabilization complete.
 
-**Next milestone:** M14 – Desktop Application (`v2.0.0`). AI Assistant (M13) shipped in `v1.5.1`. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
+**Next milestone:** M14 – Desktop Application (`v2.0.0`). M13 AI Assistant shipped in `v1.5.1`. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
 ---
 
@@ -383,3 +383,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.4.0 | 24-07-2026 | Current release baseline (`v1.4.2`, 396 tests). |
 | 2.6.0 | 25-07-2026 | Current release baseline (`v1.5.0`, 462 tests). |
 | 2.7.0 | 25-07-2026 | Current release baseline (`v1.5.1`, 513 tests); M13 AI Assistant. |
+| 2.8.0 | 30-07-2026 | Current release baseline (`v1.5.2`, 520 tests); Phase 1 stabilization. |
