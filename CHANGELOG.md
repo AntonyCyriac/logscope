@@ -23,6 +23,7 @@ Desktop release packaging for Windows and macOS, plus GitHub Actions Node.js 24 
 ### Changed
 
 - GitHub Actions: `checkout@v7`, `upload-artifact@v7`, `download-artifact@v7`, `action-gh-release@v3` (Node.js 24).
+- Handbook and planning docs synced to `v2.0.1` (per-platform desktop builds, CMake options, M14 completion).
 
 ### Upgrade notes
 
