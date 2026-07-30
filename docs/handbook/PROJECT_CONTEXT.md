@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.3.0 |
+| Version | 2.4.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -27,9 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v1.5.2` (shipped) — Phase 1 stabilization complete.
+**Current release:** `v2.0.0` (shipped) — M14 Desktop Application complete.
 
-**Next milestone:** **M14 – Desktop Application** (`v2.0.0`). See [Roadmap](../ROADMAP.md).
+**Next milestone:** **M15 – Web Platform** (`v2.0.0` track). See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -50,12 +50,13 @@ The project follows architecture-first development. Every implementation should 
 | M12 – Dynamic Plugins | `.so`/`.dll` loading, parser/report/search/storage providers, Plugin SDK (`v1.5.0`) |
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries, `agent investigate` (`v1.5.1`) |
 | Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
+| M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M14 – Desktop Application | `v2.0.0` | Qt desktop UI consuming core APIs |
+| M15 – Web Platform | `v2.0.0` | Browser UI, REST API integration |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -352,4 +353,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 1.9.0 | 25-07-2026 | v1.4.3 released; M12 is next. |
 | 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |
 | 2.2.0 | 25-07-2026 | v1.5.1 released; M13 complete; M14 is next. |
-| 2.3.0 | 30-07-2026 | v1.5.2 released; Phase 1 complete; M14 is next. |
+| 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |

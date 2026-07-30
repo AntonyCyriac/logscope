@@ -109,8 +109,8 @@ docs/
 ├── release/
 │   ├── RELEASE.md
 │   ├── V1_VALIDATION.md
-│   ├── v1.5.1-RELEASE-NOTES.md
-│   └── v1.5.2-RELEASE-NOTES.md
+│   ├── v1.5.2-RELEASE-NOTES.md
+│   └── v2.0.0-RELEASE-NOTES.md
 │
 ├── handbook/
 │   ├── PROJECT_CONTEXT.md
@@ -196,8 +196,10 @@ Developers new to LogScope should read the documentation in the following order.
 | 8c | M12-V150-PLUGIN-SCENARIOS.md | v1.5.0 plugin acceptance scenarios and test matrix. |
 | 8d | M13-AI-ASSISTANT.md | Understand M13 AI Assistant (`v1.5.1`). |
 | 8e | M13-V151-AI-SCENARIOS.md | v1.5.1 AI acceptance scenarios and test matrix. |
-| 8f | PHASE-1-STABILIZATION.md | Phase 1 stabilize v1.x plan (`v1.5.2`). |
-| 8g | PHASE-1-V152-SCENARIOS.md | v1.5.2 stabilization acceptance scenarios. |
+| 8f | M14-DESKTOP-APPLICATION.md | M14 desktop application plan (`v2.0.0`). |
+| 8g | M14-V200-DESKTOP-SCENARIOS.md | v2.0.0 desktop acceptance scenarios. |
+| 8h | PHASE-1-STABILIZATION.md | Phase 1 stabilize v1.x plan (`v1.5.2`). |
+| 8i | PHASE-1-V152-SCENARIOS.md | v1.5.2 stabilization acceptance scenarios. |
 | 8 | M5-PRODUCTION-READINESS.md | Understand the completed M5 production readiness plan. |
 | 9 | M4-FEATURE-EXPANSION.md | Understand the completed M4 feature expansion plan. |
 | 10 | PROJECT_CHARTER.md | Understand why LogScope exists. |
@@ -361,3 +363,4 @@ These categories should be added only when they provide clear value and support 
 | 3.8.0 | 25-07-2026 | M13 planning docs, ADR-007, and v1.5.1 AI scenarios in reading order. |
 | 3.9.0 | 25-07-2026 | v1.5.1 release notes and M13 doc sync. |
 | 3.10.0 | 30-07-2026 | v1.5.2 release notes; Phase 1 planning, tutorials, THIRD_PARTY_LICENSES in map. |
+| 3.11.0 | 30-07-2026 | M14 desktop planning, ADR-008, v2.0.0 release notes. |

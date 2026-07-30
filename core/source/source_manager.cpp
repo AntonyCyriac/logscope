@@ -9,6 +9,7 @@
 
 #include "composite_log_source.hpp"
 #include "file_log_source.hpp"
+#include "tailing_file_log_source.hpp"
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
@@ -135,6 +136,11 @@ foundation::Result<bool> SourceManager::validate(const foundation::Path& path) c
 
 foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& path) const
 {
+    return open(path, OpenOptions{});
+}
+
+foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& path, const OpenOptions options) const
+{
     SCOPE_LOG_INFO("source", "Opening source: " + path.string());
 
     const auto validationResult = validate(path);
@@ -165,6 +171,18 @@ foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& pa
 
     if (*isFileResult)
     {
+        if (options.follow)
+        {
+            auto sourceResult = TailingFileLogSource::open(path, true);
+
+            if (!sourceResult)
+            {
+                return foundation::Result<SourceDataset>(sourceResult.error());
+            }
+
+            return foundation::Result<SourceDataset>(SourceDataset(std::move(*sourceResult)));
+        }
+
         auto sourceResult = FileLogSource::open(path);
 
         if (!sourceResult)

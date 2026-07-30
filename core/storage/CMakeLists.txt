@@ -23,7 +23,13 @@ FetchContent_Declare(
 set(ZLIB_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(ZLIB_INSTALL OFF CACHE BOOL "" FORCE)
 
-FetchContent_MakeAvailable(zlib)
+if(MINGW)
+    find_package(ZLIB REQUIRED)
+    set(LOGSCOPE_ZLIB_LIB ZLIB::ZLIB)
+else()
+    FetchContent_MakeAvailable(zlib)
+    set(LOGSCOPE_ZLIB_LIB zlibstatic)
+endif()
 
 if(NOT TARGET sqlite3)
     add_library(sqlite3 STATIC ${sqlite_amalgamation_SOURCE_DIR}/sqlite3.c)
@@ -57,7 +63,7 @@ target_link_libraries(scope_storage
         sqlite3
     PRIVATE
         scope_analysis
-        zlibstatic
+        ${LOGSCOPE_ZLIB_LIB}
 )
 
 target_include_directories(scope_storage

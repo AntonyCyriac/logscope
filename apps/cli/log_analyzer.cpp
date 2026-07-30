@@ -5,12 +5,10 @@
 
 #include "log_analyzer.hpp"
 
-#include "analysis.hpp"
-#include "investigation.hpp"
+#include "application_service.hpp"
 #include "log_macros.hpp"
 #include "report_output.hpp"
 #include "report_writer.hpp"
-#include "source.hpp"
 
 namespace scope::cli
 {
@@ -25,37 +23,27 @@ bool LogAnalyzer::analyze(const foundation::Path& filePath,
 {
     SCOPE_LOG_INFO("cli", "Starting analysis for " + filePath.string());
 
-    scope::source::SourceManager sourceManager;
+    scope::application::ApplicationService service;
 
-    auto datasetResult = sourceManager.open(filePath);
+    const auto openResult = service.openSource(filePath);
 
-    if (!datasetResult)
+    if (!openResult)
     {
-        const std::string message = datasetResult.error().message();
-        SCOPE_LOG_ERROR("cli", message);
-        errorOutput << message << '\n';
+        errorOutput << openResult.error().message() << '\n';
 
         return false;
     }
 
-    scope::analysis::AnalysisEngine analysisEngine;
-
-    auto modelResult = analysisEngine.analyze(*datasetResult, analysisConfig, statsOut);
+    const auto modelResult = service.analyze(analysisConfig, statsOut);
 
     if (!modelResult)
     {
-        const std::string message = modelResult.error().message();
-        SCOPE_LOG_ERROR("cli", message);
-        errorOutput << message << '\n';
+        errorOutput << modelResult.error().message() << '\n';
 
         return false;
     }
 
-    scope::investigation::InvestigationEngine investigationEngine;
-
-    const scope::investigation::InvestigationView view = investigationEngine.inspect(*modelResult);
-
-    SCOPE_LOG_INFO("cli", "Investigation summary: " + view.summary());
+    SCOPE_LOG_INFO("cli", "Analysis complete for " + filePath.string());
 
     const reporting::Report report = generateAnalysisReport(*modelResult, reportOptions);
     const auto writeResult = writeReport(report, outputFile, output, errorOutput);

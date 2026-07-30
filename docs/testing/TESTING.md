@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.11.0 |
+| Version | 1.12.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **520** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, and CI `license-scan`.
+**Current baseline:** **524** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_application_tests` (M14), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 
@@ -23,7 +23,7 @@ This document describes LogScope test layers, how to run them, and how they map 
 
 | Layer | Target | Location |
 |-------|--------|----------|
-| Unit | Individual modules | `core/*/tests/`, `apps/cli/tests/` |
+| Unit | Individual modules | `core/*/tests/`, `apps/cli/tests/`, `apps/common/tests/` |
 | Integration | Core pipeline | `tests/integration/` |
 | End-to-end | CLI executable | `tests/end_to_end/` |
 | Regression | Fixed-bug guards | `tests/regression/` |
@@ -56,6 +56,20 @@ CLI parser tests:
 ```bash
 cmake --build build --target logscope_cli_tests
 ./build/apps/cli/tests/logscope_cli_tests
+```
+
+Application service tests (M14):
+
+```bash
+cmake --build build --target scope_application_tests
+ctest --test-dir build --output-on-failure -L scope_application_tests
+```
+
+Desktop build smoke (Ubuntu CI; requires Qt6):
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+cmake --build build --target logscope-desktop scope_application_tests
 ```
 
 ---
@@ -198,3 +212,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.9.0 | 25-07-2026 | v1.5.0 release baseline (462 tests); M12 plugin test coverage. |
 | 1.10.0 | 25-07-2026 | v1.5.1 release baseline (513 tests); M13 AI Assistant test coverage. |
 | 1.11.0 | 30-07-2026 | v1.5.2 release baseline (520 tests); regression expansion, fuzz, license-scan CI. |
+| 1.12.0 | 30-07-2026 | v2.0.0 release baseline (524 tests); M14 application layer and tailing source tests; desktop CI smoke. |

@@ -6,6 +6,7 @@
 add_library(scope_source
     composite_log_source.cpp
     file_log_source.cpp
+    tailing_file_log_source.cpp
     source_dataset.cpp
     source_manager.cpp
     stdin_log_source.cpp

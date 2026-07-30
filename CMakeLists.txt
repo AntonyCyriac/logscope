@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 
 project(LogScope
-    VERSION 1.5.2
+    VERSION 2.0.0
     DESCRIPTION "Generic, extensible and high-performance log analysis platform"
     LANGUAGES CXX C
 )
@@ -18,6 +18,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # Options
 # ----------------------------------------------------------
 
+option(LOGSCOPE_DESKTOP "Build Qt desktop application" OFF)
 option(LOGSCOPE_BENCHMARKS "Build performance benchmarks" OFF)
 option(LOGSCOPE_FUZZING "Build libFuzzer targets (requires Clang)" OFF)
 option(LOGSCOPE_BUILD_SAMPLE_PLUGINS "Build example dynamic plugins" ON)

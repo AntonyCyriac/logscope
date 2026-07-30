@@ -41,3 +41,7 @@ benchmark_synthetic.log
 benchmark_results.json
 fuzz_configuration.properties
 *.logscope-session
+logscope_tail_test.log
+logscope_test_*.log
+tmp_bulk.log
+tmp_bulk.jsonl
