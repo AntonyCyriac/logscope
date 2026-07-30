@@ -107,8 +107,21 @@ Complete after the public tag and GitHub Release are live:
 | Step | Action |
 |------|--------|
 | Release notes | Ensure the GitHub Release body summarizes the `[X.Y.Z]` section from [`CHANGELOG.md`](../../CHANGELOG.md) |
+| **Release regressions** | **Open a GitHub issue** for user-visible bugs found in a shipped tag (empty UI, wrong results, crash) before or alongside the hotfix PR — label `bug`, note affected tag, link fix commit/tag, close when released |
 | Private strategy sync | On the private strategy repository: update long-horizon docs for the shipped milestone, then tag `sync/vX.Y.Z` on that commit (annotated message: `sync/vX.Y.Z — public vX.Y.Z <milestone summary>`) and push the tag |
 | Bulk matrix (when ready) | CI at `10000` lines; release runners at `100000` lines |
+
+### Release regression issues (required)
+
+When a **shipped release** (`vX.Y.Z`) has a user-visible defect (GUI shows wrong/empty data, CLI/GUI parity break, crash, bad export):
+
+1. **File a GitHub issue** immediately — do not fix silently without tracking.
+2. Title: short symptom + `(vX.Y.Z regression)` when the bug shipped in that tag.
+3. Body: symptoms, repro steps, expected vs actual, root cause (when known), fix version/commit.
+4. Label: `bug` (add `desktop` label if the repo uses component labels).
+5. On hotfix release: comment with fix tag/commit, close the issue, link issue URL in `CHANGELOG` or release notes if helpful.
+
+Example: [#86](https://github.com/AntonyCyriac/logscope/issues/86) — desktop empty table / Ask `Matches: 0` (v2.0.2), fixed in v2.0.3.
 
 Example private strategy sync (run in the strategy repository checkout, not in this repo):
 
@@ -144,3 +157,4 @@ logscope analyze samples/sample.log
 | 1.4.0 | 24-07-2026 | Header bump; 100k release matrix shipped in v1.4.2. |
 | 1.4.2 | 30-07-2026 | Optional Windows Authenticode signing via GitHub secrets. |
 | 1.4.3 | 30-07-2026 | Optional macOS signing and notarization via GitHub secrets. |
+| 1.4.4 | 30-07-2026 | Require GitHub issues for release regressions (see #86 / v2.0.3 example). |

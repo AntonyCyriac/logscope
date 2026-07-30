@@ -79,7 +79,21 @@ Tag a public release only from `master` after the release PR is merged.
 
 ---
 
-# 5. Related Documents
+# 5. GitHub issues for release regressions
+
+User-visible bugs found **after a public tag** (`vX.Y.Z`) must be tracked on GitHub before or alongside the fix — not only in chat or CHANGELOG.
+
+| When | Action |
+|------|--------|
+| Shipped release broken (GUI empty, wrong counts, crash) | Open issue: symptom + `(vX.Y.Z regression)`, repro, label `bug` |
+| Hotfix merged | Comment with fix commit/tag; close issue |
+| Release notes | Optional link to issue number |
+
+See [Release process §8](../release/RELEASE.md#release-regression-issues-required) for the full checklist.
+
+---
+
+# 6. Related Documents
 
 - [Pull Request Guide](PULL_REQUEST_GUIDE.md)
 - [Developer Setup](DEVELOPER_SETUP.md)
@@ -87,9 +101,10 @@ Tag a public release only from `master` after the release PR is merged.
 
 ---
 
-# 6. Revision History
+# 7. Revision History
 
 | Version | Date | Description |
 |----------|------------|-----------------------------|
 | 1.0.0 | 18-07-2026 | Extracted from Foundation Guidelines. |
 | 1.1.0 | 24-07-2026 | Release tags as sync points with private strategy (`sync/vX.Y.Z`). |
+| 1.2.0 | 30-07-2026 | Require GitHub issues for release regressions; link to RELEASE.md checklist. |
