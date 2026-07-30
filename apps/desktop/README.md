@@ -4,12 +4,26 @@ Qt6 Widgets investigation workbench — `logscope-desktop`.
 
 ## Build
 
+**CMake:** `-DLOGSCOPE_DESKTOP=ON` (default OFF). Full option table: [Developer Setup](../../docs/handbook/DEVELOPER_SETUP.md#cmake-options-build-flavors).
+
 ```bash
+# Linux / MinGW
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
 cmake --build build --target logscope-desktop
 ```
 
-Requires Qt6 Widgets (`qt6-base-dev` on Ubuntu, `qt@6` via Homebrew on macOS).
+```powershell
+# Windows MSVC (TLS workaround for SQLite FetchContent if needed)
+$env:CMAKE_TLS_VERIFY = "0"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+cmake --build build --config Release --target logscope-desktop
+```
+
+Requires Qt6 Widgets (`qt6-base-dev` on Ubuntu, `pacman -S mingw-w64-ucrt-x86_64-qt6-base` on MSYS2, Qt MSVC kit or Homebrew `qt@6` on macOS).
+
+On macOS configure with `-DCMAKE_PREFIX_PATH="$(brew --prefix qt@6)"` if Qt is not on the default path.
+
+On macOS the build produces `logscope-desktop.app`; on Windows MSVC: `build\apps\desktop\Release\logscope-desktop.exe`.
 
 On macOS the build produces `logscope-desktop.app`; run the bundle or the executable inside it:
 

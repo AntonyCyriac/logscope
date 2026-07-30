@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.8.0 |
+| Version | 1.9.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** **M15 – Web Platform** at **`v2.0.0`**. M14 Desktop Application shipped at **`v2.0.0`**. Phase 1 stabilization shipped at **`v1.5.2`**. See [Roadmap](../ROADMAP.md).
+**Immediate next milestone:** **M15 – Web Platform** at **`v2.0.0`**. M14 Desktop Application shipped at **`v2.0.0`** (features) and **`v2.0.1`** (all-platform desktop release artifacts). Phase 1 stabilization shipped at **`v1.5.2`**. See [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -469,3 +469,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.4.0 | 24-07-2026 | v1.4.3 M11 remainder shipped; M12 at v1.5.0. |
 | 1.6.0 | 25-07-2026 | v1.5.0 released; M12 complete; immediate next milestone is M13. |
 | 1.8.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
+| 1.9.0 | 30-07-2026 | `v2.0.1` all-platform desktop release; doc sync. |

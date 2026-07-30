@@ -213,3 +213,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.10.0 | 25-07-2026 | v1.5.1 release baseline (513 tests); M13 AI Assistant test coverage. |
 | 1.11.0 | 30-07-2026 | v1.5.2 release baseline (520 tests); regression expansion, fuzz, license-scan CI. |
 | 1.12.0 | 30-07-2026 | v2.0.0 release baseline (524 tests); M14 application layer and tailing source tests; desktop CI smoke. |
+| 1.13.0 | 30-07-2026 | Current release baseline `v2.0.1`; all-platform desktop release workflow. |

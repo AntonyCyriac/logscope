@@ -48,7 +48,7 @@ See [ADR-008](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) and 
 | M14.8 | AI assistant panel | ✅ Complete |
 | M14.9 | Live tail | ✅ Complete |
 | M14.10 | Themes, shortcuts, status stats | ✅ Complete |
-| M14.11 | CI smoke, doc sync, `v2.0.0` release | 🟡 Doc sync done; release pending |
+| M14.11 | CI smoke, doc sync, `v2.0.0` / `v2.0.1` release | ✅ Complete |
 
 ---
 

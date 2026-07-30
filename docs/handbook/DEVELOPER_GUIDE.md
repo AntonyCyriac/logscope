@@ -62,7 +62,7 @@ tests/
   fuzz/             Optional libFuzzer targets (Clang)
 ```
 
-**Rule:** CLI-first until v2.0 — business logic lives in `core/`; `apps/cli` is a thin command layer.
+**Rule:** Core-first presentation — business logic lives in `core/`; `apps/cli` and `apps/desktop` are thin layers over `ApplicationService` (see ADR-008). Optional desktop: `-DLOGSCOPE_DESKTOP=ON` ([Developer Setup](DEVELOPER_SETUP.md)).
 
 ---
 
@@ -134,7 +134,7 @@ For discoverable capabilities and report hooks, see [Plugin Development Guide](P
 - C++17 minimum (`CMAKE_CXX_STANDARD 17`)
 - One static library per module: `add_library(scope_<name> ...)`
 - Tests: `scope_<name>_tests` with `gtest_discover_tests`
-- Optional: `LOGSCOPE_BENCHMARKS`, `LOGSCOPE_FUZZING`, `LOGSCOPE_DOCS`, `LOGSCOPE_SANITIZE`
+- Optional: `LOGSCOPE_DESKTOP`, `LOGSCOPE_BENCHMARKS`, `LOGSCOPE_FUZZING`, `LOGSCOPE_DOCS`, `LOGSCOPE_SANITIZE`, `LOGSCOPE_BUILD_SAMPLE_PLUGINS` — see [Developer Setup](DEVELOPER_SETUP.md) for per-platform desktop builds
 
 ---
 

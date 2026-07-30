@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.4.0 |
+| Version | 2.5.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -27,7 +27,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.0` (shipped) — M14 Desktop Application complete.
+**Current release:** `v2.0.1` (shipped) — M14 Desktop Application complete (CLI + Linux/Windows/macOS desktop binaries).
 
 **Next milestone:** **M15 – Web Platform** (`v2.0.0` track). See [Roadmap](../ROADMAP.md).
 
@@ -354,3 +354,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.1.0 | 25-07-2026 | v1.5.0 released; M12 complete; M13 is next. |
 | 2.2.0 | 25-07-2026 | v1.5.1 released; M13 complete; M14 is next. |
 | 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
+| 2.5.0 | 30-07-2026 | Current release `v2.0.1` (all-platform desktop packaging). |

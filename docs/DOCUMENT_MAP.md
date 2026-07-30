@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.10.0 |
+| Version | 3.12.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -365,3 +365,4 @@ These categories should be added only when they provide clear value and support 
 | 3.9.0 | 25-07-2026 | v1.5.1 release notes and M13 doc sync. |
 | 3.10.0 | 30-07-2026 | v1.5.2 release notes; Phase 1 planning, tutorials, THIRD_PARTY_LICENSES in map. |
 | 3.11.0 | 30-07-2026 | M14 desktop planning, ADR-008, v2.0.0 release notes. |
+| 3.12.0 | 30-07-2026 | v2.0.1 release notes; handbook build-flavor sync (`DEVELOPER_SETUP`). |

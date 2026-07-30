@@ -4,7 +4,7 @@
 |-------|-------|
 | Category | Requirements (Future) |
 | Status | Vision / not committed for near-term implementation |
-| Last Updated | 25-07-2026 |
+| Last Updated | 30-07-2026 |
 
 ---
 
@@ -35,7 +35,7 @@ Detailed agent instructions, long-horizon product vision, and theme research are
 | **Operational (today)** | Constitution-style prompts for AI IDEs assisting development | Private strategy repo `.ai/` |
 | **Product (future)** | Runtime agents invoked by users (`logscope agent …`, investigation AI) | PRD-001; delivery via M13+ |
 
-Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) (M14 Desktop Application at `v2.0.0`).
+Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) (M15 Web Platform; M14 shipped at `v2.0.0` / `v2.0.1`).
 
 ---
 

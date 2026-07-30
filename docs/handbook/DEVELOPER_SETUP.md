@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.9.0 |
+| Version | 2.10.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -25,7 +25,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.0.0`](../../CHANGELOG.md) — **524** automated tests. M14 Desktop Application complete.
+**Current release:** [`v2.0.1`](../../CHANGELOG.md) — **524** automated tests. M14 Desktop Application (CLI + all-platform desktop binaries).
 
 **Next milestone:** M15 – Web Platform (`v2.0.0` track). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
@@ -171,15 +171,55 @@ MSVC Release binary path: `build\apps\cli\Release\logscope.exe`. For `--persist-
 
 ### Desktop application (optional, M14)
 
-Requires Qt6 Widgets. On Ubuntu: `qt6-base-dev`. On MSYS2 UCRT64: `pacman -S mingw-w64-ucrt-x86_64-qt6-base`.
+Requires Qt6 Widgets (`Qt6::Widgets`). Enable with `-DLOGSCOPE_DESKTOP=ON` (default **OFF** so CI and minimal builds skip Qt).
+
+| Platform | Qt install | Configure | Binary path |
+|----------|------------|-----------|-------------|
+| **Linux** | `qt6-base-dev` | `cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON` | `build/apps/desktop/logscope-desktop` |
+| **Windows (MSVC)** | Qt 6 MSVC kit or [install-qt-action](https://github.com/jurplel/install-qt-action) locally | Same + `CMAKE_TLS_VERIFY=0` if SQLite FetchContent fails TLS | `build\apps\desktop\Release\logscope-desktop.exe` |
+| **Windows (MinGW)** | `pacman -S mingw-w64-ucrt-x86_64-qt6-base` | Same as Linux | `build/apps/desktop/logscope-desktop.exe` |
+| **macOS** | `brew install qt@6` | `cmake … -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6)"` | `build/apps/desktop/logscope-desktop.app` (run binary inside `Contents/MacOS/`) |
 
 ```bash
+# Linux / MinGW (from repo root)
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
 cmake --build build --target logscope-desktop
-./build/apps/desktop/logscope-desktop
+./build/apps/desktop/logscope-desktop --config samples/logscope.properties
 ```
 
-See [apps/desktop/README.md](../../apps/desktop/README.md) and [M14 planning](../planning/M14-DESKTOP-APPLICATION.md).
+```bash
+# macOS
+brew install qt@6
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON \
+  -DCMAKE_PREFIX_PATH="$(brew --prefix qt@6)"
+cmake --build build --target logscope-desktop
+open build/apps/desktop/logscope-desktop.app
+```
+
+```powershell
+# Windows MSVC (configure TLS workaround if needed)
+$env:CMAKE_TLS_VERIFY = "0"
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+cmake --build build --config Release --target logscope-desktop
+.\build\apps\desktop\Release\logscope-desktop.exe --config samples\logscope.properties
+```
+
+Release archives bundle Qt on Windows (`windeployqt`) and macOS (`macdeployqt` on `.app`). Linux tarball ships the binary; install system Qt6 Widgets or build locally.
+
+See [apps/desktop/README.md](../../apps/desktop/README.md) (Ollama/`--config`) and [M14 planning](../planning/M14-DESKTOP-APPLICATION.md).
+
+### CMake options (build flavors)
+
+| Option | Default | Purpose |
+|--------|---------|---------|
+| `LOGSCOPE_DESKTOP` | OFF | Build `logscope-desktop` (Qt6 Widgets) |
+| `LOGSCOPE_BENCHMARKS` | OFF | Performance benchmark target |
+| `LOGSCOPE_FUZZING` | OFF | libFuzzer targets (Clang only) |
+| `LOGSCOPE_BUILD_SAMPLE_PLUGINS` | ON | Example dynamic plugins |
+| `LOGSCOPE_DOCS` | OFF | Doxygen API docs (`cmake --build build --target docs`) |
+| `LOGSCOPE_SANITIZE` | OFF | ASan/UBSan (`-DLOGSCOPE_SANITIZE=ON`, Debug) |
+
+Common configure flags: `-DCMAKE_BUILD_TYPE=Release|Debug`, `-DCMAKE_EXPORT_COMPILE_COMMANDS=ON` (clang-tidy), `-DCMAKE_PREFIX_PATH=…` (Qt on macOS/custom installs). Windows MinGW uses system `ZLIB` for `scope_storage`; other platforms use vendored zlib via FetchContent.
 
 ---
 
@@ -397,3 +437,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.7.0 | 25-07-2026 | Current release baseline (`v1.5.1`, 513 tests); M13 AI Assistant. |
 | 2.8.0 | 30-07-2026 | Current release baseline (`v1.5.2`, 520 tests); Phase 1 stabilization. |
 | 2.9.0 | 30-07-2026 | Current release baseline (`v2.0.0`, 524 tests); M14 desktop build (`LOGSCOPE_DESKTOP`). |
+| 2.10.0 | 30-07-2026 | Current release baseline (`v2.0.1`); per-platform desktop build table and CMake options. |

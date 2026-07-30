@@ -41,7 +41,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M12 – Dynamic Plugins** | ✅ Complete | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`). |
 | **M13 – AI Assistant** | ✅ Complete | NL queries, summaries, anomaly hints, `agent investigate` (`v1.5.1`). |
 | **Phase 1 – Stabilize v1.x** | ✅ Complete | Docs, regression, observability, fuzz, license CI (`v1.5.2`). |
-| **M14 – Desktop Application** | ✅ Complete | Qt GUI, `logscope-desktop`, live tail (`v2.0.0`). |
+| **M14 – Desktop Application** | ✅ Complete | Qt GUI, `logscope-desktop`, live tail (`v2.0.0`; all-platform binaries `v2.0.1`). |
 | **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |
 | **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
 | **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
