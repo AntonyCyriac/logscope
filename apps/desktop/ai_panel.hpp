@@ -10,6 +10,7 @@
 #include <QWidget>
 
 #include "application_service.hpp"
+#include "investigation_result.hpp"
 
 namespace scope::desktop
 {
@@ -23,6 +24,14 @@ class AiPanel : public QWidget
 
   public:
     explicit AiPanel(scope::application::ApplicationService* service, QWidget* parent = nullptr);
+
+    [[nodiscard]] QString outputText() const;
+
+    /// Sets Ask text and runs Ask (used by desktop integration tests).
+    void submitAsk(const QString& query);
+
+  signals:
+    void investigationReady(const scope::investigation::InvestigationResult& result);
 
   private:
     void runAsk();

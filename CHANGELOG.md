@@ -12,6 +12,28 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.3] - 2026-07-30
+
+Hotfix for **v2.0.2 desktop regression** — empty log table after Open/Analyze and AI Ask `Matches: 0`.
+
+### Fixed
+
+- Log table empty after Open/Analyze when lines were in persistent storage — `fetchIndexedLines()` in `populateTableFromModel()`.
+- AI Ask showed `Matches: 0` because `agentInvestigate()` re-analyzed and dropped the in-memory index; reuses existing model when present.
+- AI Ask updates the center log table; empty Ask shows a hint instead of silent zero matches.
+
+### Added
+
+- `logscope_desktop_tests` — headless Qt Test (`QT_QPA_PLATFORM=offscreen`): open → 8 rows, Ask `errors` → 4 rows.
+- `scope_application_tests` — noop `agentInvestigate` ask and model-reuse cases.
+- CI desktop job runs `logscope_desktop_tests`.
+
+### Upgrade notes
+
+- Desktop-only hotfix; no CLI or API changes. Re-download or rebuild `logscope-desktop`.
+
+---
+
 ## [2.0.2] - 2026-07-30
 
 M14.12 desktop CLI parity polish — Phase A + B (investigation filters, export sections, index toggles, stats dialog).

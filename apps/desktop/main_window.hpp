@@ -38,6 +38,19 @@ class MainWindow : public QMainWindow
   public:
     explicit MainWindow(const scope::foundation::Path& configFile = {}, QWidget* parent = nullptr);
 
+    /// Opens and analyzes a log file (used by desktop integration tests).
+    [[nodiscard]] bool openLogFile(const QString& path);
+
+    [[nodiscard]] int logRowCount() const;
+    [[nodiscard]] QString statusMessage() const;
+    [[nodiscard]] QString aiOutputText() const;
+
+    /// Sets Ask query and runs AI investigate (used by desktop integration tests).
+    [[nodiscard]] bool runAiAsk(const QString& query);
+
+    void setPersistIndexEnabled(const bool enabled);
+    void setReuseIndexEnabled(const bool enabled);
+
   private:
     void createMenus();
     void createLayout();

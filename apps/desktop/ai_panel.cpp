@@ -42,6 +42,21 @@ AiPanel::AiPanel(scope::application::ApplicationService* service, QWidget* paren
     connect(m_hintsButton, &QPushButton::clicked, this, &AiPanel::runHints);
 }
 
+QString AiPanel::outputText() const
+{
+    return m_outputEdit != nullptr ? m_outputEdit->toPlainText() : QString{};
+}
+
+void AiPanel::submitAsk(const QString& query)
+{
+    if (m_askEdit != nullptr)
+    {
+        m_askEdit->setText(query);
+    }
+
+    runAsk();
+}
+
 void AiPanel::runAsk()
 {
     if (m_service == nullptr)
@@ -49,8 +64,18 @@ void AiPanel::runAsk()
         return;
     }
 
+    const QString askText = m_askEdit->text().trimmed();
+
+    if (askText.isEmpty())
+    {
+        m_outputEdit->setPlainText(
+            QStringLiteral("Type a question first (noop examples: errors, warnings, info)."));
+
+        return;
+    }
+
     scope::investigation::InvestigationCriteria criteria;
-    const auto result = m_service->agentInvestigate(criteria, m_askEdit->text().toStdString(), false, false);
+    const auto result = m_service->agentInvestigate(criteria, askText.toStdString(), false, false);
 
     if (!result)
     {
@@ -58,6 +83,8 @@ void AiPanel::runAsk()
 
         return;
     }
+
+    emit investigationReady(result->investigation);
 
     m_outputEdit->setPlainText(
         QStringLiteral("Matches: %1").arg(static_cast<qulonglong>(result->investigation.matchingLines.size())));
@@ -86,7 +113,9 @@ void AiPanel::runSummarize()
     }
     else
     {
-        m_outputEdit->setPlainText(QStringLiteral("No summary (ai.enabled=false or error)."));
+        m_outputEdit->setPlainText(
+            QStringLiteral("No summary (ai.enabled=false or error). Summarize does not use the Ask box; "
+                           "it summarizes the whole log with no filter (0 filter matches is normal)."));
     }
 }
 

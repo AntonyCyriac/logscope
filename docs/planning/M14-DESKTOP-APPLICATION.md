@@ -49,7 +49,7 @@ See [ADR-008](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) and 
 | M14.9 | Live tail | ✅ Complete |
 | M14.10 | Themes, shortcuts, status stats | ✅ Complete |
 | M14.11 | CI smoke, doc sync, `v2.0.0` / `v2.0.1` release | ✅ Complete |
-| M14.12 | Desktop CLI parity polish (Phase A + B shipped; Phase C in [M14-DESKTOP-CLI-PARITY-GAPS.md](M14-DESKTOP-CLI-PARITY-GAPS.md)) | 🟡 Phase C planned (`v2.0.2+`) |
+| M14.12 | Desktop CLI parity polish (Phase A + B shipped; Phase C in [M14-DESKTOP-CLI-PARITY-GAPS.md](M14-DESKTOP-CLI-PARITY-GAPS.md)) | 🟡 Phase C planned (`v2.0.3+`) |
 
 ---
 

@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.0.2`](CHANGELOG.md) — M14 Desktop + M14.12 CLI parity polish (export sections, index toggles, stats dialog). **Next:** M15 – Web Platform (`v2.0.0` track).
+**Current release:** [`v2.0.3`](CHANGELOG.md) — M14 Desktop + v2.0.3 regression hotfix (table + AI Ask). **Next:** M15 – Web Platform (`v2.0.0` track).
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 

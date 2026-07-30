@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **524** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_application_tests` (M14), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
+**Current baseline:** **529** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_application_tests` (M14), `logscope_desktop_tests` (M14 GUI headless), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 
@@ -69,8 +69,11 @@ Desktop build smoke (Ubuntu CI; requires Qt6):
 
 ```bash
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
-cmake --build build --target logscope-desktop scope_application_tests
+cmake --build build --target logscope-desktop scope_application_tests logscope_desktop_tests
+ctest --test-dir build --output-on-failure -L logscope_desktop_tests
 ```
+
+Headless desktop GUI tests use `QT_QPA_PLATFORM=offscreen` (set automatically by CTest). Covers open/analyze table population and noop AI Ask (`errors` → 4 matches) — guards v2.0.2 desktop table/Ask regression (fixed in `v2.0.3`).
 
 ---
 
@@ -215,3 +218,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.12.0 | 30-07-2026 | v2.0.0 release baseline (524 tests); M14 application layer and tailing source tests; desktop CI smoke. |
 | 1.13.0 | 30-07-2026 | Current release baseline `v2.0.1`; all-platform desktop release workflow. |
 | 1.14.0 | 30-07-2026 | Current release baseline `v2.0.2`; M14.12 desktop CLI parity polish. |
+| 1.15.0 | 30-07-2026 | Current release baseline `v2.0.3`; `logscope_desktop_tests` (529 tests). |

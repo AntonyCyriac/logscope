@@ -20,6 +20,7 @@
 #include "field_filter.hpp"
 #include "foundation/path.hpp"
 #include "foundation/timestamp.hpp"
+#include "indexed_line_access.hpp"
 #include "report_options.hpp"
 #include "report_writer.hpp"
 #include "theme_manager.hpp"
@@ -187,6 +188,7 @@ void MainWindow::createLayout()
     connect(analyzeButton, &QPushButton::clicked, this, &MainWindow::runAnalyze);
     connect(investigateButton, &QPushButton::clicked, this, &MainWindow::runInvestigate);
     connect(analyticsButton, &QPushButton::clicked, this, &MainWindow::runAnalytics);
+    connect(m_aiPanel, &AiPanel::investigationReady, this, &MainWindow::populateTableFromInvestigation);
     connect(m_tailCheck, &QCheckBox::toggled, this, &MainWindow::toggleTail);
     connect(m_extensionList, &QListWidget::currentItemChanged, this,
             [this](QListWidgetItem* current, QListWidgetItem* /*previous*/) {
@@ -253,6 +255,20 @@ void MainWindow::openFile()
         return;
     }
 
+    if (!openLogFile(path))
+    {
+        QMessageBox::warning(this, QStringLiteral("Open failed"),
+                             QStringLiteral("Could not open the selected log file."));
+    }
+}
+
+bool MainWindow::openLogFile(const QString& path)
+{
+    if (path.isEmpty())
+    {
+        return false;
+    }
+
     m_currentPath = path;
     scope::source::OpenOptions options;
     options.follow = m_tailCheck->isChecked();
@@ -261,13 +277,58 @@ void MainWindow::openFile()
 
     if (!openResult)
     {
-        QMessageBox::warning(this, QStringLiteral("Open failed"), QString::fromStdString(openResult.error().message()));
+        updateStatus(QString::fromStdString(openResult.error().message()));
 
-        return;
+        return false;
     }
 
     updateStatus(QStringLiteral("Opened %1").arg(path));
     runAnalyze();
+
+    return m_service.hasModel();
+}
+
+int MainWindow::logRowCount() const
+{
+    return m_logModel != nullptr ? m_logModel->rowCount() : 0;
+}
+
+QString MainWindow::statusMessage() const
+{
+    return statusBar()->currentMessage();
+}
+
+QString MainWindow::aiOutputText() const
+{
+    return m_aiPanel != nullptr ? m_aiPanel->outputText() : QString{};
+}
+
+bool MainWindow::runAiAsk(const QString& query)
+{
+    if (m_aiPanel == nullptr)
+    {
+        return false;
+    }
+
+    m_aiPanel->submitAsk(query);
+
+    return !m_aiPanel->outputText().startsWith(QStringLiteral("Type a question"));
+}
+
+void MainWindow::setPersistIndexEnabled(const bool enabled)
+{
+    if (m_persistIndexCheck != nullptr)
+    {
+        m_persistIndexCheck->setChecked(enabled);
+    }
+}
+
+void MainWindow::setReuseIndexEnabled(const bool enabled)
+{
+    if (m_reuseIndexCheck != nullptr)
+    {
+        m_reuseIndexCheck->setChecked(enabled);
+    }
 }
 
 void MainWindow::runAnalyze()
@@ -310,14 +371,13 @@ void MainWindow::populateTableFromModel()
     }
 
     const auto& model = m_service.model();
+    const std::vector<scope::analysis::IndexedLine> lines = scope::analysis::fetchIndexedLines(model);
+    m_logModel->setLines(lines);
 
-    if (model.lineIndex().has_value())
+    if (lines.empty() && model.totalLines() > 0U)
     {
-        m_logModel->setLines(model.lineIndex()->lines());
-    }
-    else
-    {
-        m_logModel->setLines({});
+        updateStatus(QStringLiteral("Analyzed %1 lines but the table index is empty. Uncheck Persist/Reuse index, then Analyze again.")
+                             .arg(static_cast<qulonglong>(model.totalLines())));
     }
 }
 

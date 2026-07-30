@@ -89,3 +89,35 @@ TEST(ApplicationServiceTest, ValidateSampleConfiguration)
     ASSERT_TRUE(validateResult);
     EXPECT_TRUE(*validateResult);
 }
+
+TEST(ApplicationServiceTest, AgentInvestigateNoopAskErrors)
+{
+    ApplicationService service;
+    ASSERT_TRUE(service.loadConfiguration(Path("samples/ai-noop.properties")));
+
+    ASSERT_TRUE(service.openSource(Path("samples/sample.log")));
+    ASSERT_TRUE(service.analyze(scope::analysis::AnalysisConfig::defaults()));
+
+    scope::investigation::InvestigationCriteria criteria;
+    const auto result = service.agentInvestigate(criteria, "errors", false, false);
+
+    ASSERT_TRUE(result);
+    EXPECT_EQ(result->investigation.matchingLines.size(), 4U);
+}
+
+TEST(ApplicationServiceTest, AgentInvestigateReusesExistingModel)
+{
+    ApplicationService service;
+    ASSERT_TRUE(service.loadConfiguration(Path("samples/ai-noop.properties")));
+    ASSERT_TRUE(service.openSource(Path("samples/sample.log")));
+    ASSERT_TRUE(service.analyze(scope::analysis::AnalysisConfig::defaults()));
+
+    scope::investigation::InvestigationCriteria criteria;
+    const auto firstAsk = service.agentInvestigate(criteria, "errors", false, false);
+    const auto secondAsk = service.agentInvestigate(criteria, "warnings", false, false);
+
+    ASSERT_TRUE(firstAsk);
+    ASSERT_TRUE(secondAsk);
+    EXPECT_EQ(firstAsk->investigation.matchingLines.size(), 4U);
+    EXPECT_FALSE(secondAsk->investigation.matchingLines.empty());
+}

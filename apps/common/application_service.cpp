@@ -5,6 +5,8 @@
 
 #include "application_service.hpp"
 
+#include "indexed_line_access.hpp"
+
 #include "ai_config.hpp"
 #include "analysis_config.hpp"
 #include "foundation/filesystem.hpp"
@@ -226,12 +228,8 @@ ApplicationService::investigate(const investigation::InvestigationCriteria& crit
     {
         investigation::InvestigationResult result;
         result.correlations = engine.findCorrelations(*m_model);
-
-        if (m_model->lineIndex().has_value())
-        {
-            result.indexedLineCount = m_model->lineIndex()->indexedLineCount();
-            result.truncatedLineCount = m_model->lineIndex()->truncatedLineCount();
-        }
+        result.indexedLineCount = analysis::indexedLineCountForModel(*m_model);
+        result.truncatedLineCount = analysis::truncatedLineCountForModel(*m_model);
 
         return foundation::Result<investigation::InvestigationResult>(std::move(result));
     }
@@ -363,13 +361,16 @@ foundation::Result<AgentInvestigateResult> ApplicationService::agentInvestigate(
     const ai::AiConfig aiConfig = ai::resolveAiConfig(m_configurationManager.configuration());
     const ai::AiInvestigationAssistant assistant(aiConfig);
 
-    const auto analysisConfig = analysis::resolveAnalysisConfig(m_configurationManager.configuration(),
-                                                              analysis::AnalysisConfig::defaults());
-    const auto modelResult = analyze(analysisConfig, statsOut);
-
-    if (!modelResult)
+    if (!hasModel())
     {
-        return foundation::Result<AgentInvestigateResult>(modelResult.error());
+        const auto analysisConfig = analysis::resolveAnalysisConfig(m_configurationManager.configuration(),
+                                                                  analysis::AnalysisConfig::defaults());
+        const auto modelResult = analyze(analysisConfig, statsOut);
+
+        if (!modelResult)
+        {
+            return foundation::Result<AgentInvestigateResult>(modelResult.error());
+        }
     }
 
     investigation::InvestigationCriteria resolvedCriteria = criteria;

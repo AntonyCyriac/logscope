@@ -61,3 +61,5 @@ install(TARGETS logscope-desktop
     BUNDLE DESTINATION .
     RUNTIME DESTINATION bin
 )
+
+add_subdirectory(tests)

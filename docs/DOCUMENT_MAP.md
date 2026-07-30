@@ -112,7 +112,8 @@ docs/
 │   ├── v1.5.2-RELEASE-NOTES.md
 │   ├── v2.0.0-RELEASE-NOTES.md
 │   ├── v2.0.1-RELEASE-NOTES.md
-│   └── v2.0.2-RELEASE-NOTES.md
+│   ├── v2.0.2-RELEASE-NOTES.md
+│   └── v2.0.3-RELEASE-NOTES.md
 │
 ├── handbook/
 │   ├── PROJECT_CONTEXT.md
@@ -371,6 +372,7 @@ These categories should be added only when they provide clear value and support 
 | 3.11.0 | 30-07-2026 | M14 desktop planning, ADR-008, v2.0.0 release notes. |
 | 3.12.0 | 30-07-2026 | v2.0.1 release notes; handbook build-flavor sync (`DEVELOPER_SETUP`). |
 | 3.13.0 | 30-07-2026 | v2.0.2 release notes; M14.12 desktop CLI parity polish. |
+| 3.14.0 | 30-07-2026 | v2.0.3 release notes; desktop regression hotfix + GUI tests. |
 | 3.13.0 | 30-07-2026 | `WINDOWS_RELEASE_SIGNING.md` handbook guide. |
 | 3.14.0 | 30-07-2026 | `MACOS_RELEASE_NOTARIZATION.md` handbook guide. |
 | 3.15.0 | 30-07-2026 | `M14-DESKTOP-CLI-PARITY-GAPS.md` desktop polish planning. |

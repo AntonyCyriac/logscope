@@ -290,7 +290,10 @@ jobs:
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
 
       - name: Build Desktop and Application Tests
-        run: cmake --build build --config Release --target logscope-desktop scope_application_tests --parallel
+        run: cmake --build build --config Release --target logscope-desktop scope_application_tests logscope_desktop_tests --parallel
 
       - name: Run Application Service Tests
         run: ctest --test-dir build --output-on-failure --build-config Release -L scope_application_tests
+
+      - name: Run Desktop GUI Tests
+        run: ctest --test-dir build --output-on-failure --build-config Release -L logscope_desktop_tests
