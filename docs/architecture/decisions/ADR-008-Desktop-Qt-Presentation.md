@@ -77,7 +77,7 @@ CLI commands refactor to call `ApplicationService` internally where practical; o
 ### Positive
 
 - Single pipeline for CLI and desktop (parity, less drift).
-- Clear graduation path for M15 Web (reuse `ApplicationService` behind HTTP later).
+- Clear graduation path for M15 Web (reuse `ApplicationService` behind HTTP later); formalized in [ADR-009](ADR-009-Web-Platform-REST.md) (accepted; web presentation **C12**).
 - Qt Widgets matches C++ codebase and ships faster than QML.
 
 ### Negative
@@ -91,4 +91,5 @@ CLI commands refactor to call `ApplicationService` internally where practical; o
 
 - [M14-DESKTOP-APPLICATION.md](../../planning/M14-DESKTOP-APPLICATION.md)
 - [M14-V200-DESKTOP-SCENARIOS.md](../../planning/M14-V200-DESKTOP-SCENARIOS.md)
+- [ADR-009 Web Platform REST](ADR-009-Web-Platform-REST.md)
 - [POST_V1_STRATEGIC_ROADMAP.md](../../planning/POST_V1_STRATEGIC_ROADMAP.md) § Phase 6

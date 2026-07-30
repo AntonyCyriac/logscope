@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -46,8 +46,8 @@ v2.2.0+ → Shared investigations, thin auth (or M16)
 
 | Item | Source | Notes |
 |------|--------|-------|
-| **ADR-009** Web/REST | Graduation gate | HTTP server, API contract, auth boundary |
-| [M15-WEB-PLATFORM.md](M15-WEB-PLATFORM.md) | ROADMAP | Scope, slices, non-goals |
+| ~~**ADR-009** Web/REST~~ | Graduation gate | ✅ Accepted — [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) |
+| [M15-WEB-PLATFORM.md](M15-WEB-PLATFORM.md) | ROADMAP | M15.0 gate satisfied; M15.1 implementation next |
 | REST over `ApplicationService` | ADR-008 | M15.1 — core deliverable |
 | Browser MVP | Strategic roadmap Phase 7 | M15.2 |
 | Strategy `sync/v2.0.4` | RELEASE.md §8 | After public tag |
@@ -85,3 +85,4 @@ v2.2.0+ → Shared investigations, thin auth (or M16)
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 30-07-2026 | Initial backlog from planning corpus audit. |
+| 1.1.0 | 30-07-2026 | ADR-009 accepted; M15.0 planning gate complete. |

@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | M15 – Web Platform |
 | Category | Project Planning |
-| Version | 0.1.0 |
-| Status | Draft — graduation in progress |
+| Version | 0.2.0 |
+| Status | Draft — M15.0 planning gate satisfied |
 | Created | 30-07-2026 |
 | Last Updated | 30-07-2026 |
 
@@ -28,7 +28,7 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | M14 + `ApplicationService` | Shared orchestration for CLI and desktop |
 | ADR-008 | Desktop proved GUI consumes application layer; web is next presentation |
 | `v2.0.4` (M14.12 Phase C) | Desktop CLI parity closed before new surface |
-| **ADR-009** (planned) | HTTP server, API shape, auth boundary — **gate before implementation** |
+| **[ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md)** | HTTP server, API shape, auth boundary, test strategy — **M15.0 gate satisfied** |
 
 ---
 
@@ -59,7 +59,7 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 
 | Phase | Focus | Target |
 |-------|-------|--------|
-| M15.0 | ADR-009 + scenario matrix + API sketch | Planning |
+| M15.0 | ADR-009 + scenario matrix + API sketch | ✅ Planning complete |
 | M15.1 | REST service over `ApplicationService` | `v2.1.0` alpha |
 | M15.2 | Browser MVP (investigate workflow) | `v2.1.0` |
 | M15.3 | Shared investigations / saved workspaces API | `v2.1.x` |
@@ -84,6 +84,8 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | Document | Role |
 |----------|------|
 | [ADR-008 Desktop Qt](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) | ApplicationService graduation path |
+| [ADR-009 Web REST](../architecture/decisions/ADR-009-Web-Platform-REST.md) | HTTP server, API contract, auth, test strategy |
+| [M15-V210-WEB-SCENARIOS.md](M15-V210-WEB-SCENARIOS.md) | v2.1.0 acceptance scenario matrix |
 | [NEXT-VALUE-ADD.md](NEXT-VALUE-ADD.md) | Prioritized backlog before/during M15 |
 | [ROADMAP.md](../ROADMAP.md) | Milestone status |
 
@@ -94,3 +96,4 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | Version | Date | Description |
 |---------|------|-------------|
 | 0.1.0 | 30-07-2026 | Initial draft; graduation stub before ADR-009. |
+| 0.2.0 | 30-07-2026 | ADR-009 accepted; M15.0 gate satisfied; scenario matrix linked. |

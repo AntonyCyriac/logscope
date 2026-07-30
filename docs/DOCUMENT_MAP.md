@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.15.0 |
+| Version | 3.16.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -31,23 +31,23 @@ Together, the documents provide complete traceability from project vision throug
 
 ```text
 Engineering Standards
-        │
-        ▼
+        â”‚
+        â–¼
 Product Vision
-        │
-        ▼
+        â”‚
+        â–¼
 Requirements
-        │
-        ▼
+        â”‚
+        â–¼
 Architecture
-        │
-        ▼
+        â”‚
+        â–¼
 Implementation
-        │
-        ▼
+        â”‚
+        â–¼
 Testing
-        │
-        ▼
+        â”‚
+        â–¼
 Release
 ```
 
@@ -61,10 +61,10 @@ Repository-level documents:
 README.md
 CHANGELOG.md
 scripts/                 # Bulk log generation and CLI matrix runners
-│   ├── README.md
-│   ├── generate_bulk_log.py
-│   ├── run_cli_matrix.py
-│   └── check_benchmark_regression.py
+â”‚   â”œâ”€â”€ README.md
+â”‚   â”œâ”€â”€ generate_bulk_log.py
+â”‚   â”œâ”€â”€ run_cli_matrix.py
+â”‚   â””â”€â”€ check_benchmark_regression.py
 ```
 
 `docs/` structure:
@@ -72,111 +72,117 @@ scripts/                 # Bulk log generation and CLI matrix runners
 ```text
 docs/
 
-├── DOCUMENT_MAP.md
-├── PRODUCT.md
-├── ROADMAP.md
-│
-├── planning/
-│   ├── POST_V1_STRATEGIC_ROADMAP.md
-│   ├── M4-FEATURE-EXPANSION.md
-│   ├── M5-PRODUCTION-READINESS.md
-│   ├── M6-LOG-FORMAT-INTELLIGENCE.md
-│   ├── M7-SEARCH-ENGINE.md
-│   ├── M8-ADVANCED-REPORTING.md
-│   ├── M9-ANALYTICS-ENGINE.md
-│   ├── M10-QUERY-LANGUAGE.md
-│   ├── M11-STORAGE-LAYER.md
-│   ├── PHASE-1-STABILIZATION.md
-│   └── PHASE-1-V152-SCENARIOS.md
-│
-│   (Long-horizon strategy beyond published Mn plans is maintained privately
-│    outside this repository; public Mn docs are added when implementation starts.)
-│
-├── tutorials/
-│   ├── 01-analyze-logs.md
-│   ├── 02-investigate-logs.md
-│   └── 03-plugins-and-ai.md
-│
-├── testing/
-│   ├── TESTING.md
-│   └── PERFORMANCE.md
-│
-├── api/
-│   ├── README.md
-│   ├── mainpage.md
-│   └── Doxyfile.in          # CMake-generated Doxygen config
-│
-├── release/
-│   ├── RELEASE.md
-│   ├── V1_VALIDATION.md
-│   ├── v1.5.2-RELEASE-NOTES.md
-│   ├── v2.0.0-RELEASE-NOTES.md
-│   ├── v2.0.1-RELEASE-NOTES.md
-│   ├── v2.0.2-RELEASE-NOTES.md
-│   └── v2.0.3-RELEASE-NOTES.md
-│
-├── handbook/
-│   ├── PROJECT_CONTEXT.md
-│   ├── CODE_REVIEW_CHECKLIST.md
-│   ├── CONFIGURATION_GUIDE.md
-│   ├── DEVELOPER_GUIDE.md
-│   ├── DEVELOPER_SETUP.md
-│   ├── GIT_CONVENTIONS.md
-│   ├── PULL_REQUEST_GUIDE.md
-│   ├── PLUGIN_DEVELOPMENT_GUIDE.md
-│   ├── SECURITY_REVIEW.md
-│   ├── THIRD_PARTY_LICENSES.md
-│   ├── USER_MANUAL.md
-│   ├── WINDOWS_RELEASE_SIGNING.md
-│   └── MACOS_RELEASE_NOTARIZATION.md
-│
-├── standards/
-│   ├── API_DESIGN_GUIDELINES.md
-│   ├── CPP_CODING_STANDARD.md
-│   ├── DOCUMENT_STANDARD.md
-│   ├── ENGINEERING_PRINCIPLES.md
-│   └── FOUNDATION_GUIDELINES.md
-│
-├── vision/
-│   ├── PROJECT_CHARTER.md
-│   └── PRODUCT_OVERVIEW.md
-│
-├── requirements/
-│   ├── functional/
-│   │   ├── FR-001-Analyze-Logs.md
-│   │   ├── FR-002-Investigate-Logs.md
-│   │   ├── FR-003-Generate-Reports.md
-│   │   └── FR-004-Extend-LogScope.md
-│   │
-│   ├── non_functional/
-│   │   └── NFR-001-Quality-Attributes.md
-│   │
-│   └── future/
-│       ├── README.md
-│       └── PRD-001-AI-Engineering-Agents.md
-│
-├── architecture/
-│   ├── ARCHITECTURE_OVERVIEW.md
-│   ├── ARCHITECTURE_PRINCIPLES.md
-│   ├── COMPONENT_CATALOG.md
-│   ├── DOMAIN_MODEL.md
-│   ├── DATA_FLOW.md
-│   ├── HLD-001-Logical-Architecture.md
-│   │
-│   ├── decisions/
-│   │   ├── ADR-001-Testing-Framework.md
-│   │   ├── ADR-002-Benchmark-Framework.md
-│   │   ├── ADR-003-PDF-Report-Generation.md
-│   │   ├── ADR-004-Query-DSL-Grammar.md
-│   │   ├── ADR-005-Storage-Architecture.md
-│   │   ├── ADR-006-Plugin-Loading.md
-│   │   └── ADR-007-AI-Integration.md
-│   │
-│   └── foundation/
-│       └── RESULT.md
-│
-└── implementation/
-    └── WORKSPACE_MODEL.md
+â”œâ”€â”€ DOCUMENT_MAP.md
+â”œâ”€â”€ PRODUCT.md
+â”œâ”€â”€ ROADMAP.md
+â”‚
+â”œâ”€â”€ planning/
+â”‚   â”œâ”€â”€ POST_V1_STRATEGIC_ROADMAP.md
+â”‚   â”œâ”€â”€ M4-FEATURE-EXPANSION.md
+â”‚   â”œâ”€â”€ M5-PRODUCTION-READINESS.md
+â”‚   â”œâ”€â”€ M6-LOG-FORMAT-INTELLIGENCE.md
+â”‚   â”œâ”€â”€ M7-SEARCH-ENGINE.md
+â”‚   â”œâ”€â”€ M8-ADVANCED-REPORTING.md
+â”‚   â”œâ”€â”€ M9-ANALYTICS-ENGINE.md
+â”‚   â”œâ”€â”€ M10-QUERY-LANGUAGE.md
+â”‚   â”œâ”€â”€ M11-STORAGE-LAYER.md
+â”‚   â”œâ”€â”€ PHASE-1-STABILIZATION.md
+â”‚   â”œâ”€â”€ PHASE-1-V152-SCENARIOS.md
+â”‚   â”œâ”€â”€ M15-WEB-PLATFORM.md
+â”‚   â”œâ”€â”€ M15-V210-WEB-SCENARIOS.md
+â”‚   â””â”€â”€ NEXT-VALUE-ADD.md
+â”‚
+â”‚   (Long-horizon strategy beyond published Mn plans is maintained privately
+â”‚    outside this repository; public Mn docs are added when implementation starts.)
+â”‚
+â”œâ”€â”€ tutorials/
+â”‚   â”œâ”€â”€ 01-analyze-logs.md
+â”‚   â”œâ”€â”€ 02-investigate-logs.md
+â”‚   â””â”€â”€ 03-plugins-and-ai.md
+â”‚
+â”œâ”€â”€ testing/
+â”‚   â”œâ”€â”€ TESTING.md
+â”‚   â””â”€â”€ PERFORMANCE.md
+â”‚
+â”œâ”€â”€ api/
+â”‚   â”œâ”€â”€ README.md
+â”‚   â”œâ”€â”€ mainpage.md
+â”‚   â””â”€â”€ Doxyfile.in          # CMake-generated Doxygen config
+â”‚
+â”œâ”€â”€ release/
+â”‚   â”œâ”€â”€ RELEASE.md
+â”‚   â”œâ”€â”€ V1_VALIDATION.md
+â”‚   â”œâ”€â”€ v1.5.2-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.1-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.2-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.3-RELEASE-NOTES.md
+â”‚   â””â”€â”€ v2.0.4-RELEASE-NOTES.md
+â”‚
+â”œâ”€â”€ handbook/
+â”‚   â”œâ”€â”€ PROJECT_CONTEXT.md
+â”‚   â”œâ”€â”€ CODE_REVIEW_CHECKLIST.md
+â”‚   â”œâ”€â”€ CONFIGURATION_GUIDE.md
+â”‚   â”œâ”€â”€ DEVELOPER_GUIDE.md
+â”‚   â”œâ”€â”€ DEVELOPER_SETUP.md
+â”‚   â”œâ”€â”€ GIT_CONVENTIONS.md
+â”‚   â”œâ”€â”€ PULL_REQUEST_GUIDE.md
+â”‚   â”œâ”€â”€ PLUGIN_DEVELOPMENT_GUIDE.md
+â”‚   â”œâ”€â”€ SECURITY_REVIEW.md
+â”‚   â”œâ”€â”€ THIRD_PARTY_LICENSES.md
+â”‚   â”œâ”€â”€ USER_MANUAL.md
+â”‚   â”œâ”€â”€ WINDOWS_RELEASE_SIGNING.md
+â”‚   â””â”€â”€ MACOS_RELEASE_NOTARIZATION.md
+â”‚
+â”œâ”€â”€ standards/
+â”‚   â”œâ”€â”€ API_DESIGN_GUIDELINES.md
+â”‚   â”œâ”€â”€ CPP_CODING_STANDARD.md
+â”‚   â”œâ”€â”€ DOCUMENT_STANDARD.md
+â”‚   â”œâ”€â”€ ENGINEERING_PRINCIPLES.md
+â”‚   â””â”€â”€ FOUNDATION_GUIDELINES.md
+â”‚
+â”œâ”€â”€ vision/
+â”‚   â”œâ”€â”€ PROJECT_CHARTER.md
+â”‚   â””â”€â”€ PRODUCT_OVERVIEW.md
+â”‚
+â”œâ”€â”€ requirements/
+â”‚   â”œâ”€â”€ functional/
+â”‚   â”‚   â”œâ”€â”€ FR-001-Analyze-Logs.md
+â”‚   â”‚   â”œâ”€â”€ FR-002-Investigate-Logs.md
+â”‚   â”‚   â”œâ”€â”€ FR-003-Generate-Reports.md
+â”‚   â”‚   â””â”€â”€ FR-004-Extend-LogScope.md
+â”‚   â”‚
+â”‚   â”œâ”€â”€ non_functional/
+â”‚   â”‚   â””â”€â”€ NFR-001-Quality-Attributes.md
+â”‚   â”‚
+â”‚   â””â”€â”€ future/
+â”‚       â”œâ”€â”€ README.md
+â”‚       â””â”€â”€ PRD-001-AI-Engineering-Agents.md
+â”‚
+â”œâ”€â”€ architecture/
+â”‚   â”œâ”€â”€ ARCHITECTURE_OVERVIEW.md
+â”‚   â”œâ”€â”€ ARCHITECTURE_PRINCIPLES.md
+â”‚   â”œâ”€â”€ COMPONENT_CATALOG.md
+â”‚   â”œâ”€â”€ DOMAIN_MODEL.md
+â”‚   â”œâ”€â”€ DATA_FLOW.md
+â”‚   â”œâ”€â”€ HLD-001-Logical-Architecture.md
+â”‚   â”‚
+â”‚   â”œâ”€â”€ decisions/
+â”‚   â”‚   â”œâ”€â”€ ADR-001-Testing-Framework.md
+â”‚   â”‚   â”œâ”€â”€ ADR-002-Benchmark-Framework.md
+â”‚   â”‚   â”œâ”€â”€ ADR-003-PDF-Report-Generation.md
+â”‚   â”‚   â”œâ”€â”€ ADR-004-Query-DSL-Grammar.md
+â”‚   â”‚   â”œâ”€â”€ ADR-005-Storage-Architecture.md
+â”‚   â”‚   â”œâ”€â”€ ADR-006-Plugin-Loading.md
+â”‚   â”‚   â”œâ”€â”€ ADR-007-AI-Integration.md
+â”‚   â”‚   â”œâ”€â”€ ADR-008-Desktop-Qt-Presentation.md
+â”‚   â”‚   â””â”€â”€ ADR-009-Web-Platform-REST.md
+â”‚   â”‚
+â”‚   â””â”€â”€ foundation/
+â”‚       â””â”€â”€ RESULT.md
+â”‚
+â””â”€â”€ implementation/
+    â””â”€â”€ WORKSPACE_MODEL.md
 ```
 
 ---
@@ -214,13 +220,13 @@ Developers new to LogScope should read the documentation in the following order.
 | 13 | CPP_CODING_STANDARD.md | Understand repository-wide C++ conventions. |
 | 14 | FOUNDATION_GUIDELINES.md | Understand Foundation implementation patterns. |
 | 15 | Functional Requirements | Understand the required capabilities. |
-| 16 | NFR-001 – Quality Attributes | Understand the quality expectations. |
+| 16 | NFR-001 â€“ Quality Attributes | Understand the quality expectations. |
 | 17 | ARCHITECTURE_OVERVIEW.md | Understand the overall system structure. |
 | 18 | ARCHITECTURE_PRINCIPLES.md | Understand architectural design rules. |
 | 19 | COMPONENT_CATALOG.md | Understand component responsibilities. |
 | 20 | DOMAIN_MODEL.md | Understand the primary business concepts. |
 | 21 | DATA_FLOW.md | Understand how information moves through the system. |
-| 22 | HLD-001 – Logical Architecture | Understand the complete system architecture. |
+| 22 | HLD-001 â€“ Logical Architecture | Understand the complete system architecture. |
 | 23 | WORKSPACE_MODEL.md | Understand the workspace and repository layout. |
 | 24 | DEVELOPER_SETUP.md | Prepare the development environment and begin implementation. |
 | 25 | DEVELOPER_GUIDE.md | Contribute features: workflow, testing, and PR expectations. |
@@ -237,38 +243,38 @@ The documentation is designed to provide complete traceability.
 
 ```text
 ROADMAP
-    │
-    ▼
+    â”‚
+    â–¼
 PROJECT CHARTER
-    │
-    ▼
+    â”‚
+    â–¼
 PRODUCT OVERVIEW
-    │
-    ▼
+    â”‚
+    â–¼
 FUNCTIONAL REQUIREMENTS
-    │
-    ▼
+    â”‚
+    â–¼
 NON-FUNCTIONAL REQUIREMENTS
-    │
-    ▼
+    â”‚
+    â–¼
 ARCHITECTURE OVERVIEW
-    │
-    ▼
+    â”‚
+    â–¼
 ARCHITECTURE PRINCIPLES
-    │
-    ▼
+    â”‚
+    â–¼
 COMPONENT CATALOG
-    │
-    ▼
+    â”‚
+    â–¼
 DOMAIN MODEL
-    │
-    ▼
+    â”‚
+    â–¼
 DATA FLOW
-    │
-    ▼
+    â”‚
+    â–¼
 HLD-001 LOGICAL ARCHITECTURE
-    │
-    ▼
+    â”‚
+    â–¼
 IMPLEMENTATION
 ```
 
@@ -376,3 +382,4 @@ These categories should be added only when they provide clear value and support 
 | 3.13.0 | 30-07-2026 | `WINDOWS_RELEASE_SIGNING.md` handbook guide. |
 | 3.14.0 | 30-07-2026 | `MACOS_RELEASE_NOTARIZATION.md` handbook guide. |
 | 3.15.0 | 30-07-2026 | `M14-DESKTOP-CLI-PARITY-GAPS.md` desktop polish planning. |
+| 3.16.0 | 30-07-2026 | M15 planning, ADR-009, v2.0.4 release notes in structure tree. |

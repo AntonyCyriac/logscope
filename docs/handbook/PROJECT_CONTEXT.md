@@ -27,10 +27,10 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.4` (shipped) � M14.12 Phase C desktop CLI parity.
+**Current release:** `v2.0.4` (shipped) � M14.12 Phase C desktop CLI parity.
 
 
-**Strategic next milestone:** **M15 – Web Platform** — see [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md) (`v2.1.0` track). See [Roadmap](../ROADMAP.md).
+**Strategic next milestone:** **M15 – Web Platform** — see [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md) (`v2.1.0` track). **M15.0 gate:** [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) accepted. See [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 

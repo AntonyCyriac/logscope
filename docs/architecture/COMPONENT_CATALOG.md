@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Component Catalog |
 | Category | Architecture |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -72,7 +72,8 @@ Every component SHALL:
 | C09 | CLI | Provide the command-line user interface. |
 | C10 | Platform Services | Provide platform abstraction for operating system services. |
 | C11 | Desktop (Qt Widgets) | Graphical investigation workbench (`logscope-desktop`, M14). |
-| C12 | Application orchestration | Shared pipeline wiring for CLI and desktop (`scope_application`, M14). |
+| C12 | Application orchestration | Shared pipeline wiring for CLI and desktop (scope_application, M14). |
+| C13 | Web Platform | HTTP server, REST handlers, static SPA (logscope-web, M15). Presentation ID **C12** in [ADR-009](decisions/ADR-009-Web-Platform-REST.md). |
 
 ## Component structure diagram
 
@@ -354,6 +355,29 @@ Abstract operating system services required by the product.
 ### Depends On
 
 - Core
+
+---
+
+---
+
+## C13 — Web Platform (M15 stub)
+
+### Responsibility
+
+Provide browser-accessible investigation workbench and REST API over `ApplicationService` without duplicating domain logic.
+
+### Owns
+
+- HTTP transport and `/api/v1` handlers
+- JSON request/response mapping
+- Session routing and static SPA asset serving
+
+### Depends On
+
+- Application orchestration (`scope_application`)
+- Core engines (via `ApplicationService`)
+
+See [ADR-009](decisions/ADR-009-Web-Platform-REST.md) for API surface, auth boundary, and test strategy.
 
 ---
 
