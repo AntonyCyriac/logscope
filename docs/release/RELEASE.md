@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.4.1 |
+| Version | 1.4.2 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -82,6 +82,8 @@ For tags matching `v*`, the [release workflow](../../.github/workflows/release.y
 
 The workflow creates the GitHub Release with binaries attached. Release notes are loaded automatically from `docs/release/vX.Y.Z-RELEASE-NOTES.md` matching the tag (for example `v2.0.1` → `docs/release/v2.0.1-RELEASE-NOTES.md`).
 
+**Windows Authenticode signing (optional):** When repository secrets `WINDOWS_CERTIFICATE` and `WINDOWS_CERTIFICATE_PASSWORD` are configured, the workflow signs `.exe` and `.dll` in Windows release folders before archiving. Without secrets, Windows binaries ship unsigned (SmartScreen may show **Unknown publisher**). See [Windows Release Signing](../handbook/WINDOWS_RELEASE_SIGNING.md).
+
 Maintainer steps after the workflow completes:
 
 1. Open **Releases** for the new tag and verify the notes body and attached artifacts.
@@ -138,3 +140,4 @@ logscope analyze samples/sample.log
 | 1.2.0 | 24-07-2026 | Release workflow runs bulk-log CLI matrix before publishing binaries. |
 | 1.3.0 | 24-07-2026 | Document 10k bulk matrix (restore 100k in v1.4.2); add post-release housekeeping checklist. |
 | 1.4.0 | 24-07-2026 | Header bump; 100k release matrix shipped in v1.4.2. |
+| 1.4.2 | 30-07-2026 | Optional Windows Authenticode signing via GitHub secrets. |

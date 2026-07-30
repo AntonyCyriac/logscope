@@ -57,6 +57,14 @@ jobs:
           cp "${{ matrix.binary_path }}" dist/
           cp -r samples dist/
 
+      - name: Sign Windows release binaries
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: ./scripts/sign_windows_binaries.ps1 -Path dist
+
       - name: Create Archive (Unix)
         if: runner.os != 'Windows'
         run: tar -czf ${{ matrix.archive_file }} -C dist .
@@ -193,7 +201,19 @@ jobs:
           New-Item -ItemType Directory -Force dist | Out-Null
           Copy-Item -Path "$dir\*" -Destination dist -Recurse -Force
           Copy-Item -Path samples -Destination dist\samples -Recurse -Force
-          Compress-Archive -Path dist\* -DestinationPath ${{ matrix.archive_file }} -Force
+
+      - name: Sign Windows desktop binaries
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: ./scripts/sign_windows_binaries.ps1 -Path dist
+
+      - name: Package Desktop Binary (Windows archive)
+        if: matrix.os == 'windows-latest'
+        shell: pwsh
+        run: Compress-Archive -Path dist\* -DestinationPath ${{ matrix.archive_file }} -Force
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v7
