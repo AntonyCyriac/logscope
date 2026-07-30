@@ -8,6 +8,7 @@
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
 #include "source_dataset.hpp"
+#include "source_open_options.hpp"
 
 namespace scope::source
 {
@@ -35,6 +36,11 @@ class SourceManager
      * @return Source dataset or error.
      */
     [[nodiscard]] foundation::Result<SourceDataset> open(const foundation::Path& path) const;
+
+    /**
+     * @brief Opens a log source with options (e.g. live tail follow).
+     */
+    [[nodiscard]] foundation::Result<SourceDataset> open(const foundation::Path& path, OpenOptions options) const;
 };
 
 } // namespace scope::source

@@ -12,6 +12,31 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.0.0] - 2026-07-30
+
+M14 Desktop Application — Qt Widgets GUI, shared `ApplicationService`, live tail, CLI parity for investigation workflows.
+
+### Added
+
+- `apps/common/` — `scope_application` (`ApplicationService`) shared by CLI and desktop.
+- `apps/desktop/` — `logscope-desktop` (Qt6 Widgets): open/analyze, filters, analytics panels, export, sessions, extensions, AI panel, tail toggle, themes.
+- `TailingFileLogSource` and `SourceManager::open(path, OpenOptions)` for live tail.
+- ADR-008, `M14-DESKTOP-APPLICATION.md`, `M14-V200-DESKTOP-SCENARIOS.md`.
+- CI `desktop` job (Ubuntu + Qt6); `scope_application_tests`.
+
+### Changed
+
+- `LogAnalyzer` uses `ApplicationService` for analyze pipeline.
+- Component catalog: C11 Desktop, C12 Application orchestration.
+- CMake `LOGSCOPE_DESKTOP` option (default OFF).
+
+### Upgrade notes
+
+- CLI behaviour preserved; desktop is an additional install target (`logscope-desktop`).
+- Live tail is desktop-first; CLI `--follow` is optional follow-up.
+
+---
+
 ## [1.5.2] - 2026-07-30
 
 Phase 1 stabilization — tutorials, regression hardening, `--stats` observability, fuzz expansion, and third-party license CI. **520** automated tests.

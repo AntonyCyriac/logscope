@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.8.0 |
+| Version | 2.9.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 30-07-2026 |
@@ -25,9 +25,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v1.5.2`](../../CHANGELOG.md) — **520** automated tests. Phase 1 stabilization complete.
+**Current release:** [`v2.0.0`](../../CHANGELOG.md) — **524** automated tests. M14 Desktop Application complete.
 
-**Next milestone:** M14 – Desktop Application (`v2.0.0`). M13 AI Assistant shipped in `v1.5.1`. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
+**Next milestone:** M15 – Web Platform (`v2.0.0` track). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
 ---
 
@@ -168,6 +168,18 @@ ctest --test-dir build -C Release --output-on-failure
 ```
 
 MSVC Release binary path: `build\apps\cli\Release\logscope.exe`. For `--persist-index` on Windows, see [User Manual §8](USER_MANUAL.md#8-large-logs-and-persistent-indexes).
+
+### Desktop application (optional, M14)
+
+Requires Qt6 Widgets. On Ubuntu: `qt6-base-dev`. On MSYS2 UCRT64: `pacman -S mingw-w64-ucrt-x86_64-qt6-base`.
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+cmake --build build --target logscope-desktop
+./build/apps/desktop/logscope-desktop
+```
+
+See [apps/desktop/README.md](../../apps/desktop/README.md) and [M14 planning](../planning/M14-DESKTOP-APPLICATION.md).
 
 ---
 
@@ -384,3 +396,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.6.0 | 25-07-2026 | Current release baseline (`v1.5.0`, 462 tests). |
 | 2.7.0 | 25-07-2026 | Current release baseline (`v1.5.1`, 513 tests); M13 AI Assistant. |
 | 2.8.0 | 30-07-2026 | Current release baseline (`v1.5.2`, 520 tests); Phase 1 stabilization. |
+| 2.9.0 | 30-07-2026 | Current release baseline (`v2.0.0`, 524 tests); M14 desktop build (`LOGSCOPE_DESKTOP`). |

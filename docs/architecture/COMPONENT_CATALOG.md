@@ -71,15 +71,22 @@ Every component SHALL:
 | C08 | Diagnostics Manager | Logging, diagnostics, metrics, tracing, and health information. |
 | C09 | CLI | Provide the command-line user interface. |
 | C10 | Platform Services | Provide platform abstraction for operating system services. |
+| C11 | Desktop (Qt Widgets) | Graphical investigation workbench (`logscope-desktop`, M14). |
+| C12 | Application orchestration | Shared pipeline wiring for CLI and desktop (`scope_application`, M14). |
 
 ## Component structure diagram
 
-Logical components (C01–C10) and supporting domain libraries through **v1.5.1** (M11 storage, M12 `scope_plugin`, M13 `scope_ai`). Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
+Logical components through **v2.0.0** (M14 desktop, `scope_application`, live tail). Solid arrows are the primary analysis pipeline; dashed arrows are supporting services.
 
 ```mermaid
 flowchart TB
   subgraph presentation [Presentation]
     CLI[C09 CLI]
+    Desktop[C11 Desktop]
+  end
+
+  subgraph applicationLayer [Application orchestration]
+    AppSvc[C12 ApplicationService]
   end
 
   subgraph application [Application components]
@@ -107,17 +114,18 @@ flowchart TB
     PLAT[C10 Platform Services]
   end
 
-  CLI --> CFG
-  CLI --> SRC
-  CLI --> ANA
-  CLI --> INV
-  CLI --> RPT
-  CLI --> EXT
-  CLI --> SESS
-  CLI -.-> AI
+  CLI --> AppSvc
+  Desktop --> AppSvc
+  AppSvc --> CFG
+  AppSvc --> SRC
+  AppSvc --> ANA
+  AppSvc --> INV
+  AppSvc --> RPT
+  AppSvc --> EXT
+  AppSvc --> SESS
+  AppSvc -.-> AI
 
   SRC --> ANA
-  ANA --> INV
   ANA --> RPT
   INV --> RPT
 

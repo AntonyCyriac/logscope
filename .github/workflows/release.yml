@@ -69,7 +69,6 @@ jobs:
       - name: CLI Matrix Smoke Test
         shell: bash
         env:
-          # Release-only: 100k stress matrix (CI cli-matrix stays at 10k).
           BULK_LOG_LINES: 100000
         run: |
           python3 scripts/generate_bulk_log.py --lines "${BULK_LOG_LINES}" --format plain --output /tmp/bulk.log
@@ -92,9 +91,40 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: ${{ matrix.archive_file }}
 
+  build-desktop-linux:
+    name: Build Desktop (Linux)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install Qt6
+        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+
+      - name: Build Desktop
+        run: cmake --build build --config Release --target logscope-desktop --parallel
+
+      - name: Package Desktop Binary
+        run: |
+          mkdir -p dist
+          cp build/apps/desktop/logscope-desktop dist/
+          cp -r samples dist/
+          tar -czf logscope-desktop-linux-amd64.tar.gz -C dist .
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v6
+        with:
+          name: logscope-desktop-linux-amd64
+          path: logscope-desktop-linux-amd64.tar.gz
+
   release:
     name: Publish GitHub Release
-    needs: build
+    needs: [build, build-desktop-linux]
     runs-on: ubuntu-latest
 
     steps:

@@ -41,7 +41,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M12 – Dynamic Plugins** | ✅ Complete | `.so`/`.dll` loading, parser/report/search/storage providers (`v1.5.0`). |
 | **M13 – AI Assistant** | ✅ Complete | NL queries, summaries, anomaly hints, `agent investigate` (`v1.5.1`). |
 | **Phase 1 – Stabilize v1.x** | ✅ Complete | Docs, regression, observability, fuzz, license CI (`v1.5.2`). |
-| **M14 – Desktop Application** | ⏳ Planned | Qt GUI. Target: `v2.0.0`. **Next milestone.** |
+| **M14 – Desktop Application** | ✅ Complete | Qt GUI, `logscope-desktop`, live tail (`v2.0.0`). |
 | **M15 – Web Platform** | ⏳ Planned | Dashboard, REST API, shared investigations. Target: `v2.0.0`. |
 | **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
 | **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v1.5.2`](CHANGELOG.md) — Phase 1 stabilization. **Next:** M14 – Desktop Application (`v2.0.0`).
+**Current release:** [`v2.0.0`](CHANGELOG.md) — M14 Desktop Application. **Next:** M15 – Web Platform (`v2.0.0` track).
 
 Pre-M3 milestones are tagged at `v0.2.0-design-baseline`. M3 is released as [`v0.3.0`](../CHANGELOG.md). M4 is released as [`v0.4.0`](../CHANGELOG.md). **v1.0.0** is the first stable production release — see [Changelog](../CHANGELOG.md). **M6** is released as [`v1.1.0`](../CHANGELOG.md); **M7** as [`v1.2.0`](../CHANGELOG.md); **M8** as [`v1.3.0`](../CHANGELOG.md). See [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md) for the full version evolution.
 
@@ -439,7 +439,7 @@ v2.0.0  — M14 GUI + M15 Web
 v2.x    — M16 Enterprise, M17 Cloud
 ```
 
-Tactical planning documents exist for M6–M13. M14–M17 plans will be added as preceding milestones near completion.
+Tactical planning documents exist for M6–M14. M15–M17 plans will be added as preceding milestones near completion.
 
 ---
 

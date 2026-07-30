@@ -273,3 +273,24 @@ jobs:
 
       - name: Run clang-tidy
         run: cmake --build build --target tidy --parallel
+
+  desktop:
+    name: Desktop Build Smoke (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v5
+
+      - name: Install Qt6
+        run: sudo apt-get update && sudo apt-get install -y qt6-base-dev
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+
+      - name: Build Desktop and Application Tests
+        run: cmake --build build --config Release --target logscope-desktop scope_application_tests --parallel
+
+      - name: Run Application Service Tests
+        run: ctest --test-dir build --output-on-failure --build-config Release -R scope_application_tests

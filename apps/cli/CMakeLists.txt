@@ -29,6 +29,7 @@ add_executable(logscope
 
 target_link_libraries(logscope
     PRIVATE
+        scope_application
         scope_analysis
         scope_analytics
         scope_configuration
