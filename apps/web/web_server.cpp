@@ -533,9 +533,14 @@ void WebServer::registerRoutes()
             return;
         }
 
-        std::lock_guard<std::mutex> lock(workspace->mutex);
-        removeTempUploadFile(*workspace);
-        const auto openResult = workspace->service->openSource(pathResult.value());
+        const foundation::Path sourcePath = pathResult.value();
+
+        {
+            std::lock_guard<std::mutex> lock(workspace->mutex);
+            removeTempUploadFile(*workspace);
+        }
+
+        const auto openResult = workspace->service->openSource(sourcePath);
 
         if (!openResult)
         {
@@ -545,7 +550,7 @@ void WebServer::registerRoutes()
         }
 
         setJsonResponse(response, 200,
-                        successEnvelope("{\"sourcePath\": \"" + escapeJsonString(pathResult->string()) + "\"}"));
+                        successEnvelope("{\"sourcePath\": \"" + escapeJsonString(sourcePath.string()) + "\"}"));
         response.set_header(kSessionHeader, sessionId);
     });
 
