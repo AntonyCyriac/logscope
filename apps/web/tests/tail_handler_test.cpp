@@ -7,6 +7,7 @@
 #include <httplib.h>
 
 #include <chrono>
+#include <filesystem>
 #include <fstream>
 #include <thread>
 
@@ -39,8 +40,10 @@ class TailHandlerTest : public ::testing::Test
         sessionId = sessionResult->get_header_value(scope::web::kSessionHeader);
         headers.emplace(scope::web::kSessionHeader, sessionId);
 
-        const std::string openBody = "{\"path\": \"" + tempLog.string() + "\"}";
-        ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+        const std::string openBody = "{\"path\": \"" + tempLog.generic_string() + "\"}";
+        const httplib::Result openResult = client->Post("/api/v1/sources/open", headers, openBody, "application/json");
+        ASSERT_TRUE(openResult);
+        ASSERT_EQ(200, openResult->status);
     }
 
     void TearDown() override
@@ -72,7 +75,10 @@ TEST_F(TailHandlerTest, PollWithoutStartReturns409)
 
 TEST_F(TailHandlerTest, DoubleStartReturns409)
 {
-    ASSERT_TRUE(client->Post("/api/v1/tail/start", headers, "", "application/json"));
+    const httplib::Result firstStart = client->Post("/api/v1/tail/start", headers, "", "application/json");
+    ASSERT_TRUE(firstStart);
+    ASSERT_EQ(200, firstStart->status);
+
     const httplib::Result secondStart = client->Post("/api/v1/tail/start", headers, "", "application/json");
 
     ASSERT_TRUE(secondStart);
@@ -81,12 +87,17 @@ TEST_F(TailHandlerTest, DoubleStartReturns409)
 
 TEST_F(TailHandlerTest, StartPollStopLifecycle)
 {
-    ASSERT_TRUE(client->Post("/api/v1/tail/start", headers, "", "application/json"));
+    const httplib::Result startResult = client->Post("/api/v1/tail/start", headers, "", "application/json");
+    ASSERT_TRUE(startResult);
+    ASSERT_EQ(200, startResult->status);
 
     {
         std::ofstream stream(tempLog, std::ios::app);
         stream << "line-two\n";
+        stream.flush();
     }
+
+    std::this_thread::sleep_for(std::chrono::milliseconds(200));
 
     const httplib::Result pollResult = client->Get("/api/v1/tail/poll", headers);
     ASSERT_TRUE(pollResult);

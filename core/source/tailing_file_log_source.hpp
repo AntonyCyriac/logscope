@@ -49,6 +49,11 @@ class TailingFileLogSource : public LogSource
 
     [[nodiscard]] bool isFollowing() const noexcept;
 
+    /**
+     * @brief Reads one appended line without blocking for new data (HTTP tail poll).
+     */
+    [[nodiscard]] foundation::Result<bool> pollLine(std::string& line);
+
   private:
     TailingFileLogSource(foundation::Path path, std::ifstream stream, bool follow, std::uint64_t readPosition);
 

@@ -123,12 +123,10 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
             return;
         }
 
-        foundation::Result<analysis::AnalysisModel> analyzeResult;
-
-        {
+        foundation::Result<analysis::AnalysisModel> analyzeResult = [&]() {
             std::lock_guard<std::mutex> sessionLock(workspaceSession->mutex);
-            analyzeResult = workspaceSession->service->analyze(config);
-        }
+            return workspaceSession->service->analyze(config);
+        }();
 
         std::lock_guard<std::mutex> lock(m_mutex);
         JobRecord& record = m_jobs[jobId];

@@ -9,6 +9,7 @@
 #include <thread>
 
 #include "analyze_job_queue.hpp"
+#include "analysis_config.hpp"
 #include "foundation/path.hpp"
 #include "session_store.hpp"
 #include "web_config.hpp"
@@ -54,7 +55,7 @@ TEST_F(AnalyzeJobQueueTest, CrossSessionPollReturnsNotFound)
         ASSERT_TRUE(workspace->service->openSource(scope::foundation::Path(samplePath)));
     }
 
-    analysis::AnalysisConfig analysisConfig;
+    scope::analysis::AnalysisConfig analysisConfig;
     const auto enqueueResult = localQueue.enqueue(sessionA, analysisConfig);
     ASSERT_TRUE(enqueueResult);
 

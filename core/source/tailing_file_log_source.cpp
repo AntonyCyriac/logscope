@@ -80,6 +80,21 @@ bool TailingFileLogSource::isFollowing() const noexcept
     return m_follow && !m_stopped;
 }
 
+foundation::Result<bool> TailingFileLogSource::pollLine(std::string& line)
+{
+    if (m_follow && !m_stopped)
+    {
+        const auto sizeResult = foundation::FileSystem::fileSize(m_path);
+
+        if (sizeResult && *sizeResult > m_readPosition && m_stream.eof())
+        {
+            reopenFromPosition(m_readPosition);
+        }
+    }
+
+    return tryReadLine(line);
+}
+
 void TailingFileLogSource::reopenFromPosition(const std::uint64_t position)
 {
     m_stream.close();
