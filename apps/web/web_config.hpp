@@ -35,6 +35,9 @@ struct WebConfig
     std::uint64_t asyncAnalyzeThresholdBytes = 10ULL * 1024ULL * 1024ULL;
     int jobTtlSeconds = 3600;
     int jobMaxConcurrentPerSession = 1;
+    int sessionTtlSeconds = 0;
+    int maxSessions = 0;
+    bool healthRequiresApiKey = false;
     foundation::Path tlsCertPath;
     foundation::Path tlsKeyPath;
     bool corsOriginsUserSet = false;
@@ -62,6 +65,8 @@ struct WebConfig
     [[nodiscard]] const char* urlScheme() const noexcept;
 
     [[nodiscard]] std::string listenUrl() const;
+
+    [[nodiscard]] static bool isLoopbackBindHost(const std::string& host);
 };
 
 } // namespace scope::web

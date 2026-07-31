@@ -18,6 +18,7 @@ add_executable(logscope-web
     web_config.cpp
     web_startup.cpp
     session_store.cpp
+    session_resource_cleanup.cpp
     workspace_store.cpp
     analyze_job_queue.cpp
     json_parse.cpp

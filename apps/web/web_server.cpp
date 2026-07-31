@@ -8,6 +8,7 @@
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
 #include "rest_json.hpp"
+#include "session_resource_cleanup.hpp"
 #include "web_request_parsers.hpp"
 
 #include "foundation/error.hpp"
@@ -19,6 +20,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <functional>
 #include <iostream>
 #include <sstream>
 
@@ -101,6 +103,52 @@ WorkspaceSession* requireSession(WebServer& server, const std::string& sessionId
     return workspace;
 }
 
+void warnIfExposedWithoutApiKey(const WebConfig& config)
+{
+    if (!config.apiKey.empty() || WebConfig::isLoopbackBindHost(config.bindHost))
+    {
+        return;
+    }
+
+    std::cerr << "logscope-web: WARNING: bind_host is not loopback and web.api_key is empty — API is exposed "
+                 "without authentication. Set web.api_key or use a reverse proxy with TLS."
+              << std::endl;
+}
+
+bool rejectStaleSessionHeader(const httplib::Request& request, const std::string& resolvedSessionId,
+                              httplib::Response& response)
+{
+    const auto iterator = request.headers.find(kSessionHeader);
+
+    if (iterator != request.headers.end() && !iterator->second.empty() && resolvedSessionId.empty())
+    {
+        setJsonResponse(response, 401, errorEnvelope("SESSION_EXPIRED", "Session expired or invalid."));
+
+        return true;
+    }
+
+    return false;
+}
+
+void sweepIdleSessions(WebServer& server)
+{
+    const WebConfig& config = server.config();
+
+    if (config.sessionTtlSeconds <= 0)
+    {
+        return;
+    }
+
+    (void)server.sessionStore().evictIdleSessions(
+        std::chrono::seconds(config.sessionTtlSeconds),
+        [&server](const std::string& sessionId) { return server.jobQueue().hasRunningJobForSession(sessionId); });
+}
+
+std::function<bool(const std::string&)> skipSessionsWithRunningJobs(WebServer& server)
+{
+    return [&server](const std::string& sessionId) { return server.jobQueue().hasRunningJobForSession(sessionId); };
+}
+
 } // namespace
 
 WebServer::WebServer(WebConfig config)
@@ -153,6 +201,7 @@ bool WebServer::run()
 
     m_running = true;
     m_port = m_config.bindPort;
+    warnIfExposedWithoutApiKey(m_config);
 
     return m_server->listen(m_config.bindHost.c_str(), m_config.bindPort);
 }
@@ -182,6 +231,7 @@ bool WebServer::startInBackground()
 
     m_port = boundPort;
     m_running = true;
+    warnIfExposedWithoutApiKey(m_config);
     m_thread = std::thread([this]() { m_server->listen_after_bind(); });
 
     return true;
@@ -206,6 +256,7 @@ void WebServer::stop()
         m_running = false;
     }
 
+    m_sessionStore.cleanupAllSessionResources();
     m_jobQueue.waitForIdle(std::chrono::seconds(30));
 }
 
@@ -290,6 +341,16 @@ void WebServer::registerRoutes()
     m_server->Get("/api/v1/health", [this](const httplib::Request& request, httplib::Response& response) {
         applyCors(m_config, request, response);
 
+        if (m_config.healthRequiresApiKey && !m_config.apiKey.empty())
+        {
+            if (!authorizeApiKey(m_config.apiKey, request, response))
+            {
+                return;
+            }
+        }
+
+        sweepIdleSessions(*this);
+
         std::ostringstream body;
         body << "{\n"
              << "  \"version\": \"" << escapeJsonString(LOGSCOPE_VERSION) << "\",\n"
@@ -308,6 +369,29 @@ void WebServer::registerRoutes()
 
         applyCors(m_config, request, response);
 
+        sweepIdleSessions(*this);
+
+        if (m_config.maxSessions > 0)
+        {
+            const auto skipSession = skipSessionsWithRunningJobs(*this);
+
+            while (m_sessionStore.sessionCount() >= static_cast<std::size_t>(m_config.maxSessions))
+            {
+                if (m_sessionStore.evictSessionsForCapacity(1U, skipSession) == 0U)
+                {
+                    break;
+                }
+            }
+
+            if (m_sessionStore.sessionCount() >= static_cast<std::size_t>(m_config.maxSessions))
+            {
+                setJsonResponse(response, 503,
+                                errorEnvelope("SERVICE_UNAVAILABLE", "Maximum session count reached."));
+
+                return;
+            }
+        }
+
         const std::string sessionId = m_sessionStore.createWorkspace();
         setJsonResponse(response, 200, successEnvelope("{\"sessionId\": \"" + escapeJsonString(sessionId) + "\"}"));
         response.set_header(kSessionHeader, sessionId);
@@ -322,6 +406,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -361,6 +451,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -398,6 +494,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -432,6 +534,7 @@ void WebServer::registerRoutes()
         }
 
         std::lock_guard<std::mutex> lock(workspace->mutex);
+        removeTempUploadFile(*workspace);
         const auto openResult = workspace->service->openSource(pathResult.value());
 
         if (!openResult)
@@ -455,6 +558,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -507,7 +616,7 @@ void WebServer::registerRoutes()
         }
 
         std::lock_guard<std::mutex> lock(workspace->mutex);
-        workspace->tempUploadPath = tempFile.string();
+        replaceStagedUpload(*workspace, tempFile.string());
         const auto openResult = workspace->service->openSource(tempFile);
 
         if (!openResult)
@@ -531,6 +640,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -622,6 +737,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -664,6 +785,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -704,6 +831,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -742,6 +875,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -810,6 +949,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -836,6 +981,7 @@ void WebServer::registerRoutes()
             return;
         }
 
+        removeTempUploadFile(*workspace);
         workspace->service->adoptModel(loadResult->analysisModel(), loadResult->sourcePath());
 
         if (!loadResult->configFile().string().empty())
@@ -869,6 +1015,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -943,6 +1095,11 @@ void WebServer::registerRoutes()
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
 
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         if (requireSession(*this, sessionId, response) == nullptr)
         {
             return;
@@ -970,6 +1127,11 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
 
         if (requireSession(*this, sessionId, response) == nullptr)
         {
@@ -999,6 +1161,11 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
 
         if (requireSession(*this, sessionId, response) == nullptr)
         {
@@ -1031,6 +1198,11 @@ void WebServer::registerRoutes()
 
                          const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
 
+                         if (rejectStaleSessionHeader(request, sessionId, response))
+                         {
+                             return;
+                         }
+
                          if (requireSession(*this, sessionId, response) == nullptr)
                          {
                              return;
@@ -1060,6 +1232,12 @@ void WebServer::registerRoutes()
                        applyCors(m_config, request, response);
 
                        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
                        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
                        if (workspace == nullptr)
@@ -1087,6 +1265,7 @@ void WebServer::registerRoutes()
                            return;
                        }
 
+                       removeTempUploadFile(*workspace);
                        workspace->service->adoptModel(loadResult->analysisModel(), loadResult->sourcePath());
 
                        if (!loadResult->configFile().string().empty())
@@ -1127,6 +1306,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1165,6 +1350,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1187,6 +1378,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1227,6 +1424,11 @@ void WebServer::registerRoutes()
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
 
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         if (requireSession(*this, sessionId, response) == nullptr)
         {
             return;
@@ -1256,6 +1458,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1278,6 +1486,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1310,6 +1524,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
@@ -1363,6 +1583,12 @@ void WebServer::registerRoutes()
         applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)

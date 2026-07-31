@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include <chrono>
+#include <functional>
 #include <memory>
 #include <mutex>
 #include <optional>
@@ -39,6 +41,18 @@ class SessionStore
      */
     [[nodiscard]] std::string resolveSession(const std::string& sessionId, bool autoCreate);
 
+    void touchSession(const std::string& sessionId);
+
+    [[nodiscard]] std::size_t evictIdleSessions(
+        std::chrono::seconds idleTtl, const std::function<bool(const std::string&)>& skipSession = nullptr);
+
+    [[nodiscard]] std::size_t evictSessionsForCapacity(
+        std::size_t slotsNeeded, const std::function<bool(const std::string&)>& skipSession = nullptr);
+
+    [[nodiscard]] bool removeSession(const std::string& sessionId);
+
+    void cleanupAllSessionResources();
+
     [[nodiscard]] WorkspaceSession* findSession(const std::string& sessionId);
 
     [[nodiscard]] const WorkspaceSession* findSession(const std::string& sessionId) const;
@@ -46,8 +60,14 @@ class SessionStore
     [[nodiscard]] std::size_t sessionCount() const;
 
   private:
+    struct SessionEntry
+    {
+        WorkspaceSession workspace;
+        std::chrono::steady_clock::time_point lastActivityAt{std::chrono::steady_clock::now()};
+    };
+
     mutable std::mutex m_mutex;
-    std::unordered_map<std::string, WorkspaceSession> m_sessions;
+    std::unordered_map<std::string, SessionEntry> m_sessions;
 };
 
 } // namespace scope::web

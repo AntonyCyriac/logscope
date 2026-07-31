@@ -64,6 +64,8 @@ class AnalyzeJobQueue
     /** Blocks until worker threads finish (used by WebServer::stop). */
     void waitForIdle(std::chrono::milliseconds maxWait = std::chrono::seconds(30));
 
+    [[nodiscard]] bool hasRunningJobForSession(const std::string& sessionId) const;
+
   private:
     struct JobRecord
     {
@@ -75,8 +77,6 @@ class AnalyzeJobQueue
         std::chrono::steady_clock::time_point createdAt{std::chrono::steady_clock::now()};
         std::chrono::steady_clock::time_point finishedAt{};
     };
-
-    [[nodiscard]] bool hasRunningJobForSession(const std::string& sessionId) const;
 
     const WebConfig& m_config;
     SessionStore& m_sessionStore;

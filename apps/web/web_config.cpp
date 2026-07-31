@@ -7,6 +7,7 @@
 #include <cstdlib>
 
 #include <algorithm>
+#include <cctype>
 
 #include "foundation/string.hpp"
 
@@ -90,6 +91,28 @@ void addOriginIfMissing(std::vector<std::string>& origins, const std::string& or
 void addSchemeOrigins(std::vector<std::string>& origins, const char* scheme, const std::string& host, const int port)
 {
     addOriginIfMissing(origins, std::string(scheme) + host + ":" + std::to_string(port));
+}
+
+bool parseBool(const std::string& value, const bool fallback)
+{
+    if (value.empty())
+    {
+        return fallback;
+    }
+
+    const std::string normalized = scope::foundation::trim(value);
+
+    if (normalized == "true" || normalized == "1" || normalized == "TRUE" || normalized == "yes" || normalized == "on")
+    {
+        return true;
+    }
+
+    if (normalized == "false" || normalized == "0" || normalized == "FALSE" || normalized == "no" || normalized == "off")
+    {
+        return false;
+    }
+
+    return fallback;
 }
 
 } // namespace
@@ -190,6 +213,21 @@ void WebConfig::mergeFromConfiguration(const configuration::ConfigurationManager
     {
         jobMaxConcurrentPerSession = parseInt(value.value(), jobMaxConcurrentPerSession);
     }
+
+    if (const auto value = configuration.get("web.session_ttl_seconds"))
+    {
+        sessionTtlSeconds = parseInt(value.value(), sessionTtlSeconds);
+    }
+
+    if (const auto value = configuration.get("web.max_sessions"))
+    {
+        maxSessions = parseInt(value.value(), maxSessions);
+    }
+
+    if (const auto value = configuration.get("web.health_requires_api_key"))
+    {
+        healthRequiresApiKey = parseBool(value.value(), healthRequiresApiKey);
+    }
 }
 
 void WebConfig::applyEnvironment()
@@ -244,6 +282,21 @@ void WebConfig::applyEnvironment()
     {
         jobMaxConcurrentPerSession = parseInt(value, jobMaxConcurrentPerSession);
     }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_SESSION_TTL_SECONDS"))
+    {
+        sessionTtlSeconds = parseInt(value, sessionTtlSeconds);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_MAX_SESSIONS"))
+    {
+        maxSessions = parseInt(value, maxSessions);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_HEALTH_REQUIRES_API_KEY"))
+    {
+        healthRequiresApiKey = parseBool(value, healthRequiresApiKey);
+    }
 }
 
 void WebConfig::applyDerivedDefaults()
@@ -289,6 +342,23 @@ const char* WebConfig::urlScheme() const noexcept
 std::string WebConfig::listenUrl() const
 {
     return std::string(urlScheme()) + "://" + bindHost + ':' + std::to_string(bindPort);
+}
+
+bool WebConfig::isLoopbackBindHost(const std::string& host)
+{
+    if (host.empty())
+    {
+        return false;
+    }
+
+    std::string normalized = scope::foundation::trim(host);
+
+    for (char& character : normalized)
+    {
+        character = static_cast<char>(std::tolower(static_cast<unsigned char>(character)));
+    }
+
+    return normalized == "127.0.0.1" || normalized == "::1" || normalized == "localhost";
 }
 
 } // namespace scope::web
