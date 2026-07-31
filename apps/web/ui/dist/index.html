@@ -20,6 +20,18 @@
         <input type="file" id="fileInput" accept=".log,.txt,.jsonl">
       </label>
       <button type="button" id="analyzeBtn" disabled>Analyze</button>
+      <button type="button" id="tailStartBtn" disabled>Start tail</button>
+      <button type="button" id="tailStopBtn" disabled>Stop tail</button>
+    </section>
+
+    <section class="panel">
+      <h2>Shared workspaces</h2>
+      <div class="row">
+        <label>Name <input type="text" id="workspaceNameInput" placeholder="incident-2026"></label>
+        <button type="button" id="createWorkspaceBtn">Create shared</button>
+        <button type="button" id="saveWorkspaceBtn" disabled>Save to shared</button>
+      </div>
+      <ul id="sharedWorkspacesList"></ul>
     </section>
 
     <section class="panel">
@@ -51,6 +63,11 @@
         </thead>
         <tbody></tbody>
       </table>
+    </section>
+
+    <section class="panel">
+      <h2>Tail output</h2>
+      <pre id="tailOutput">Tail inactive.</pre>
     </section>
 
     <section class="panel">

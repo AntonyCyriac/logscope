@@ -53,6 +53,16 @@ TEST(WebConfigTest, SkipsDerivedCorsWhenUserSet)
     EXPECT_EQ("http://custom.example:1234", config.corsOrigins.front());
 }
 
+TEST(WebConfigTest, M153Defaults)
+{
+    const scope::web::WebConfig defaults = scope::web::WebConfig::defaults();
+
+    EXPECT_EQ(100, defaults.workspacesListLimit);
+    EXPECT_EQ(10ULL * 1024ULL * 1024ULL, defaults.asyncAnalyzeThresholdBytes);
+    EXPECT_EQ(3600, defaults.jobTtlSeconds);
+    EXPECT_EQ(1, defaults.jobMaxConcurrentPerSession);
+}
+
 TEST(WebConfigTest, ListenUrlReflectsTls)
 {
     scope::web::WebConfig config = scope::web::WebConfig::defaults();

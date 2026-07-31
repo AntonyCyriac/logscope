@@ -30,9 +30,15 @@ struct WebConfig
     bool allowServerPaths = false;
     std::vector<foundation::Path> allowedPathRoots;
     int requestTimeoutSeconds = 300;
+    foundation::Path workspaceDir;
+    int workspacesListLimit = 100;
+    std::uint64_t asyncAnalyzeThresholdBytes = 10ULL * 1024ULL * 1024ULL;
+    int jobTtlSeconds = 3600;
+    int jobMaxConcurrentPerSession = 1;
     foundation::Path tlsCertPath;
     foundation::Path tlsKeyPath;
     bool corsOriginsUserSet = false;
+    bool workspaceDirUserSet = false;
 
     [[nodiscard]] static WebConfig defaults();
 

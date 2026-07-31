@@ -247,4 +247,126 @@ std::string formatAgentInvestigateJson(const application::AgentInvestigateResult
     return output.str();
 }
 
+namespace
+{
+
+std::string formatSourceRefJson(const WorkspaceSourceRef& ref)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "    \"type\": \"" << escapeJsonString(ref.type) << "\",\n"
+           << "    \"displayName\": \"" << escapeJsonString(ref.displayName) << "\"";
+
+    if (!ref.path.empty())
+    {
+        output << ",\n    \"path\": \"" << escapeJsonString(ref.path) << '"';
+    }
+
+    output << "\n  }";
+
+    return output.str();
+}
+
+std::string formatSummaryJson(const WorkspaceSummary& summary)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "    \"hasModel\": " << (summary.hasModel ? "true" : "false") << ",\n"
+           << "    \"lineCount\": " << summary.lineCount << ",\n"
+           << "    \"errorCount\": " << summary.errorCount << "\n"
+           << "  }";
+
+    return output.str();
+}
+
+} // namespace
+
+std::string formatWorkspaceMetadata(const WorkspaceMetadata& metadata)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(metadata.id) << "\",\n"
+           << "  \"name\": \"" << escapeJsonString(metadata.name) << "\",\n"
+           << "  \"description\": \"" << escapeJsonString(metadata.description) << "\",\n"
+           << "  \"createdAt\": \"" << escapeJsonString(metadata.createdAt) << "\",\n"
+           << "  \"updatedAt\": \"" << escapeJsonString(metadata.updatedAt) << "\",\n"
+           << "  \"sourceRef\": " << formatSourceRefJson(metadata.sourceRef) << ",\n"
+           << "  \"summary\": " << formatSummaryJson(metadata.summary) << "\n"
+           << '}';
+
+    return output.str();
+}
+
+std::string formatWorkspaceList(const WorkspaceListResult& list)
+{
+    std::ostringstream output;
+    output << "{\n  \"workspaces\": [";
+
+    for (std::size_t index = 0U; index < list.workspaces.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        const WorkspaceMetadata& metadata = list.workspaces[index];
+        output << "\n    {\n"
+               << "      \"id\": \"" << escapeJsonString(metadata.id) << "\",\n"
+               << "      \"name\": \"" << escapeJsonString(metadata.name) << "\",\n"
+               << "      \"updatedAt\": \"" << escapeJsonString(metadata.updatedAt) << "\",\n"
+               << "      \"summary\": " << formatSummaryJson(metadata.summary) << "\n"
+               << "    }";
+    }
+
+    output << "\n  ],\n  \"truncated\": " << (list.truncated ? "true" : "false") << "\n}";
+
+    return output.str();
+}
+
+std::string formatWorkspaceOpenResult(const std::string& workspaceId, const foundation::Path& sourcePath,
+                                      const WorkspaceSummary& summary)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"opened\": true,\n"
+           << "  \"workspaceId\": \"" << escapeJsonString(workspaceId) << "\",\n"
+           << "  \"sourcePath\": \"" << escapeJsonString(sourcePath.string()) << "\",\n"
+           << "  \"summary\": " << formatSummaryJson(summary) << "\n"
+           << '}';
+
+    return output.str();
+}
+
+std::string formatTailPollResult(const std::vector<std::string>& lines, const bool active)
+{
+    std::ostringstream output;
+    output << "{\n  \"lines\": [";
+
+    for (std::size_t index = 0U; index < lines.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(lines[index]) << '"';
+    }
+
+    output << "\n  ],\n  \"active\": " << (active ? "true" : "false") << "\n}";
+
+    return output.str();
+}
+
+std::string formatAnalyzeJobAccepted(const AnalyzeJobEnqueueResult& job)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"jobId\": \"" << escapeJsonString(job.jobId) << "\",\n"
+           << "  \"status\": \"running\",\n"
+           << "  \"pollUrl\": \"" << escapeJsonString(job.pollUrl) << "\"\n"
+           << '}';
+
+    return output.str();
+}
+
 } // namespace scope::web

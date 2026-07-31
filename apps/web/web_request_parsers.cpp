@@ -272,6 +272,14 @@ application::SessionSaveRequest parseSessionSaveRequest(const std::string_view b
         request.sessionFile = foundation::Path(*sessionFile);
     }
 
+    if (request.sessionFile.string().empty())
+    {
+        if (const std::optional<std::string> path = jsonStringField(body, "path"))
+        {
+            request.sessionFile = foundation::Path(*path);
+        }
+    }
+
     if (const std::optional<std::string> configFile = jsonStringField(body, "configFile"))
     {
         request.configFile = foundation::Path(*configFile);
@@ -283,6 +291,74 @@ application::SessionSaveRequest parseSessionSaveRequest(const std::string_view b
     if (const std::optional<std::string> search = jsonStringField(body, "search"))
     {
         request.searchQuery = *search;
+    }
+
+    if (const std::optional<std::string> searchQuery = jsonStringField(body, "searchQuery"))
+    {
+        request.searchQuery = *searchQuery;
+    }
+
+    return request;
+}
+
+WorkspaceCreateRequest parseWorkspaceCreateRequest(const std::string_view body)
+{
+    WorkspaceCreateRequest request;
+
+    if (const std::optional<std::string> name = jsonStringField(body, "name"))
+    {
+        request.name = *name;
+    }
+
+    if (const std::optional<std::string> description = jsonStringField(body, "description"))
+    {
+        request.description = *description;
+    }
+
+    if (const std::optional<bool> captureSession = jsonBoolField(body, "captureSession"))
+    {
+        request.captureSession = *captureSession;
+    }
+
+    const std::size_t sourceRefKey = body.find("\"sourceRef\"");
+
+    if (sourceRefKey != std::string::npos)
+    {
+        WorkspaceSourceRef sourceRef;
+
+        if (const std::optional<std::string> type = jsonStringField(body, "type"))
+        {
+            sourceRef.type = *type;
+        }
+
+        if (const std::optional<std::string> displayName = jsonStringField(body, "displayName"))
+        {
+            sourceRef.displayName = *displayName;
+        }
+
+        if (const std::optional<std::string> path = jsonStringField(body, "path"))
+        {
+            sourceRef.path = *path;
+        }
+
+        request.sourceRef = sourceRef;
+    }
+
+    return request;
+}
+
+WorkspaceUpdateRequest parseWorkspaceUpdateRequest(const std::string_view body)
+{
+    WorkspaceUpdateRequest request;
+
+    if (const std::optional<std::string> name = jsonStringField(body, "name"))
+    {
+        request.name = *name;
+    }
+
+    if (const std::optional<std::string> description = jsonStringField(body, "description"))
+    {
+        request.description = *description;
     }
 
     return request;

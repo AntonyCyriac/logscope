@@ -164,6 +164,32 @@ void WebConfig::mergeFromConfiguration(const configuration::ConfigurationManager
     {
         requestTimeoutSeconds = parseInt(value.value(), requestTimeoutSeconds);
     }
+
+    if (const auto value = configuration.get("web.workspace_dir"))
+    {
+        workspaceDir = foundation::Path(value.value());
+        workspaceDirUserSet = true;
+    }
+
+    if (const auto value = configuration.get("web.workspaces_list_limit"))
+    {
+        workspacesListLimit = parseInt(value.value(), workspacesListLimit);
+    }
+
+    if (const auto value = configuration.get("web.async_analyze_threshold_bytes"))
+    {
+        asyncAnalyzeThresholdBytes = parseByteSize(value.value(), asyncAnalyzeThresholdBytes);
+    }
+
+    if (const auto value = configuration.get("web.job_ttl_seconds"))
+    {
+        jobTtlSeconds = parseInt(value.value(), jobTtlSeconds);
+    }
+
+    if (const auto value = configuration.get("web.job_max_concurrent_per_session"))
+    {
+        jobMaxConcurrentPerSession = parseInt(value.value(), jobMaxConcurrentPerSession);
+    }
 }
 
 void WebConfig::applyEnvironment()
@@ -191,6 +217,32 @@ void WebConfig::applyEnvironment()
     if (const char* value = std::getenv("LOGSCOPE_WEB_TLS_KEY"))
     {
         tlsKeyPath = foundation::Path(value);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_WORKSPACE_DIR"))
+    {
+        workspaceDir = foundation::Path(value);
+        workspaceDirUserSet = true;
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_WORKSPACES_LIST_LIMIT"))
+    {
+        workspacesListLimit = parseInt(value, workspacesListLimit);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_ASYNC_ANALYZE_THRESHOLD_BYTES"))
+    {
+        asyncAnalyzeThresholdBytes = parseByteSize(value, asyncAnalyzeThresholdBytes);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_JOB_TTL_SECONDS"))
+    {
+        jobTtlSeconds = parseInt(value, jobTtlSeconds);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_JOB_MAX_CONCURRENT_PER_SESSION"))
+    {
+        jobMaxConcurrentPerSession = parseInt(value, jobMaxConcurrentPerSession);
     }
 }
 

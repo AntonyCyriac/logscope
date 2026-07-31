@@ -7,6 +7,9 @@ option(LOGSCOPE_WEB_UI_BUILD "Build web UI assets with Vite (optional; dist/ is 
 add_executable(scope_web_tests
     health_handler_test.cpp
     session_store_test.cpp
+    workspace_store_test.cpp
+    analyze_job_queue_test.cpp
+    tail_handler_test.cpp
     web_config_test.cpp
     web_request_parsers_test.cpp
     rest_json_test.cpp
@@ -17,6 +20,8 @@ add_executable(scope_web_tests
     ../web_config.cpp
     ../web_startup.cpp
     ../session_store.cpp
+    ../workspace_store.cpp
+    ../analyze_job_queue.cpp
     ../json_parse.cpp
     ../rest_json.cpp
     ../web_request_parsers.cpp

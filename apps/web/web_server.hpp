@@ -12,8 +12,10 @@
 #include <string>
 #include <thread>
 
+#include "analyze_job_queue.hpp"
 #include "session_store.hpp"
 #include "web_config.hpp"
+#include "workspace_store.hpp"
 
 namespace httplib
 {
@@ -51,6 +53,10 @@ class WebServer
 
     [[nodiscard]] SessionStore& sessionStore() noexcept;
 
+    [[nodiscard]] WorkspaceStore& workspaceStore() noexcept;
+
+    [[nodiscard]] AnalyzeJobQueue& jobQueue() noexcept;
+
     [[nodiscard]] const WebConfig& config() const noexcept;
 
   private:
@@ -58,6 +64,8 @@ class WebServer
 
     WebConfig m_config;
     SessionStore m_sessionStore;
+    WorkspaceStore m_workspaceStore;
+    AnalyzeJobQueue m_jobQueue;
     std::unique_ptr<httplib::Server> m_server;
     std::thread m_thread;
     std::atomic<bool> m_running{false};

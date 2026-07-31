@@ -103,7 +103,10 @@ WorkspaceSession* requireSession(WebServer& server, const std::string& sessionId
 
 } // namespace
 
-WebServer::WebServer(WebConfig config) : m_config(std::move(config))
+WebServer::WebServer(WebConfig config)
+    : m_config(std::move(config))
+    , m_workspaceStore(m_config)
+    , m_jobQueue(m_config, m_sessionStore)
 {
 #ifdef CPPHTTPLIB_OPENSSL_SUPPORT
     if (m_config.tlsEnabled())
@@ -211,6 +214,16 @@ SessionStore& WebServer::sessionStore() noexcept
     return m_sessionStore;
 }
 
+WorkspaceStore& WebServer::workspaceStore() noexcept
+{
+    return m_workspaceStore;
+}
+
+AnalyzeJobQueue& WebServer::jobQueue() noexcept
+{
+    return m_jobQueue;
+}
+
 const WebConfig& WebServer::config() const noexcept
 {
     return m_config;
@@ -248,7 +261,7 @@ void applyCors(const scope::web::WebConfig& config, const httplib::Request& requ
     }
 
     response.set_header("Access-Control-Allow-Headers", "Content-Type, X-LogScope-Session, X-LogScope-Api-Key");
-    response.set_header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+    response.set_header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
 }
 
 std::string resolveSessionId(scope::web::SessionStore& sessionStore, const httplib::Request& request,
@@ -520,17 +533,68 @@ void WebServer::registerRoutes()
             return;
         }
 
-        std::lock_guard<std::mutex> lock(workspace->mutex);
+        const analysis::AnalysisConfig analysisConfig =
+            parseAnalysisConfig(request.body, workspace->service->configurationManager());
 
-        if (workspace->service->sourcePath().string().empty())
+        std::uint64_t sourceSize = 0U;
+        bool hasSource = false;
+
         {
-            setJsonResponse(response, 409, errorEnvelope("INVALID_STATE", "Open a source before analyze."));
+            std::lock_guard<std::mutex> lock(workspace->mutex);
+
+            if (workspace->service->sourcePath().string().empty())
+            {
+                setJsonResponse(response, 409, errorEnvelope("INVALID_STATE", "Open a source before analyze."));
+
+                return;
+            }
+
+            const auto sizeResult = foundation::FileSystem::fileSize(workspace->service->sourcePath());
+
+            if (!sizeResult)
+            {
+                setErrorResponse(response, sizeResult.error());
+
+                return;
+            }
+
+            sourceSize = *sizeResult;
+            hasSource = true;
+        }
+
+        if (!hasSource)
+        {
+            return;
+        }
+
+        if (sourceSize >= m_config.asyncAnalyzeThresholdBytes)
+        {
+            const auto enqueueResult = m_jobQueue.enqueue(sessionId, analysisConfig);
+
+            if (!enqueueResult)
+            {
+                if (enqueueResult.error().message().find("already running") != std::string::npos)
+                {
+                    setJsonResponse(response, 409,
+                                    errorEnvelope("INVALID_STATE", enqueueResult.error().message()));
+                }
+                else
+                {
+                    setErrorResponse(response, enqueueResult.error());
+                }
+
+                return;
+            }
+
+            const std::string location = "/api/v1/jobs/" + enqueueResult->jobId;
+            setJsonResponse(response, 202, successEnvelope(formatAnalyzeJobAccepted(*enqueueResult)));
+            response.set_header("Location", location);
+            response.set_header(kSessionHeader, sessionId);
 
             return;
         }
 
-        const analysis::AnalysisConfig analysisConfig =
-            parseAnalysisConfig(request.body, workspace->service->configurationManager());
+        std::lock_guard<std::mutex> lock(workspace->mutex);
         const auto analyzeResult = workspace->service->analyze(analysisConfig);
 
         if (!analyzeResult)
@@ -681,6 +745,32 @@ void WebServer::registerRoutes()
         }
 
         application::SessionSaveRequest saveRequest = parseSessionSaveRequest(request.body);
+        const std::optional<std::string> workspaceId = jsonStringField(request.body, "workspaceId");
+
+        if (workspaceId.has_value())
+        {
+            const auto snapshotPath = m_workspaceStore.snapshotPathFor(*workspaceId);
+
+            if (!snapshotPath)
+            {
+                setErrorResponse(response, snapshotPath.error());
+
+                return;
+            }
+
+            if (saveRequest.sessionFile.string().empty())
+            {
+                saveRequest.sessionFile = *snapshotPath;
+            }
+        }
+
+        if (saveRequest.sessionFile.string().empty())
+        {
+            setJsonResponse(response, 400,
+                            errorEnvelope("INVALID_ARGUMENT", "Missing required field: path or workspaceId."));
+
+            return;
+        }
 
         if (saveRequest.configFile.string().empty())
         {
@@ -695,6 +785,11 @@ void WebServer::registerRoutes()
             setErrorResponse(response, saveResult.error());
 
             return;
+        }
+
+        if (workspaceId.has_value())
+        {
+            m_workspaceStore.updateSummaryFromService(*workspaceId, *workspace->service);
         }
 
         setJsonResponse(response, 200, successEnvelope("{\"saved\": true}"));
@@ -757,6 +852,393 @@ void WebServer::registerRoutes()
              << '}';
 
         setJsonResponse(response, 200, successEnvelope(data.str()));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Post("/api/v1/workspaces", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        const WorkspaceCreateRequest createRequest = parseWorkspaceCreateRequest(request.body);
+        auto createResult = m_workspaceStore.create(createRequest);
+
+        if (!createResult)
+        {
+            setErrorResponse(response, createResult.error());
+
+            return;
+        }
+
+        WorkspaceMetadata metadata = std::move(*createResult);
+
+        if (createRequest.captureSession)
+        {
+            const auto snapshotPath = m_workspaceStore.snapshotPathFor(metadata.id);
+
+            if (!snapshotPath)
+            {
+                setErrorResponse(response, snapshotPath.error());
+
+                return;
+            }
+
+            std::lock_guard<std::mutex> lock(workspace->mutex);
+
+            if (workspace->service->hasModel())
+            {
+                application::SessionSaveRequest saveRequest;
+                saveRequest.sessionFile = *snapshotPath;
+                saveRequest.configFile = workspace->service->configFilePath();
+                const auto saveResult = workspace->service->saveSession(saveRequest);
+
+                if (!saveResult)
+                {
+                    setErrorResponse(response, saveResult.error());
+
+                    return;
+                }
+
+                metadata.summary.hasModel = true;
+                metadata.summary.lineCount = workspace->service->model().totalLines();
+                metadata.summary.errorCount = workspace->service->model().levelCounts().errorLines();
+            }
+        }
+
+        m_workspaceStore.updateSummaryFromService(metadata.id, *workspace->service);
+        const auto refreshed = m_workspaceStore.getMetadata(metadata.id);
+
+        if (refreshed)
+        {
+            metadata = *refreshed;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatWorkspaceMetadata(metadata)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get("/api/v1/workspaces", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (requireSession(*this, sessionId, response) == nullptr)
+        {
+            return;
+        }
+
+        const auto listResult = m_workspaceStore.list(m_config.workspacesListLimit);
+
+        if (!listResult)
+        {
+            setErrorResponse(response, listResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatWorkspaceList(*listResult)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get(R"(/api/v1/workspaces/([^/]+))", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (requireSession(*this, sessionId, response) == nullptr)
+        {
+            return;
+        }
+
+        const std::string workspaceId = request.matches[1];
+        const auto metadataResult = m_workspaceStore.getMetadata(workspaceId);
+
+        if (!metadataResult)
+        {
+            setErrorResponse(response, metadataResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatWorkspaceMetadata(*metadataResult)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Put(R"(/api/v1/workspaces/([^/]+))", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (requireSession(*this, sessionId, response) == nullptr)
+        {
+            return;
+        }
+
+        const std::string workspaceId = request.matches[1];
+        const WorkspaceUpdateRequest updateRequest = parseWorkspaceUpdateRequest(request.body);
+        const auto updateResult = m_workspaceStore.updateMetadata(workspaceId, updateRequest);
+
+        if (!updateResult)
+        {
+            setErrorResponse(response, updateResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatWorkspaceMetadata(*updateResult)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Delete(R"(/api/v1/workspaces/([^/]+))",
+                     [this](const httplib::Request& request, httplib::Response& response) {
+                         if (!authorizeApiKey(m_config.apiKey, request, response))
+                         {
+                             return;
+                         }
+
+                         applyCors(m_config, request, response);
+
+                         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                         if (requireSession(*this, sessionId, response) == nullptr)
+                         {
+                             return;
+                         }
+
+                         const std::string workspaceId = request.matches[1];
+                         const auto removeResult = m_workspaceStore.remove(workspaceId);
+
+                         if (!removeResult)
+                         {
+                             setErrorResponse(response, removeResult.error());
+
+                             return;
+                         }
+
+                         setJsonResponse(response, 200, successEnvelope("{\"deleted\": true}"));
+                         response.set_header(kSessionHeader, sessionId);
+                     });
+
+    m_server->Post(R"(/api/v1/workspaces/([^/]+)/open)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+                       WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                       if (workspace == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string workspaceId = request.matches[1];
+                       const auto snapshotPath = m_workspaceStore.resolveSnapshotPath(workspaceId);
+
+                       if (!snapshotPath)
+                       {
+                           setErrorResponse(response, snapshotPath.error());
+
+                           return;
+                       }
+
+                       std::lock_guard<std::mutex> lock(workspace->mutex);
+                       const auto loadResult = workspace->service->loadSession(*snapshotPath);
+
+                       if (!loadResult)
+                       {
+                           setErrorResponse(response, loadResult.error());
+
+                           return;
+                       }
+
+                       workspace->service->adoptModel(loadResult->analysisModel(), loadResult->sourcePath());
+
+                       if (!loadResult->configFile().string().empty())
+                       {
+                           const auto configLoadResult = workspace->service->loadConfiguration(loadResult->configFile());
+
+                           if (!configLoadResult)
+                           {
+                               setErrorResponse(response, configLoadResult.error());
+
+                               return;
+                           }
+                       }
+
+                       m_workspaceStore.touchUpdatedAt(workspaceId);
+
+                       WorkspaceSummary summary;
+                       summary.hasModel = workspace->service->hasModel();
+
+                       if (workspace->service->hasModel())
+                       {
+                           summary.lineCount = workspace->service->model().totalLines();
+                           summary.errorCount = workspace->service->model().levelCounts().errorLines();
+                       }
+
+                       setJsonResponse(response, 200,
+                                       successEnvelope(formatWorkspaceOpenResult(
+                                           workspaceId, workspace->service->sourcePath(), summary)));
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
+    m_server->Post("/api/v1/tail/start", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(workspace->mutex);
+
+        if (workspace->service->isTailing())
+        {
+            setJsonResponse(response, 409, errorEnvelope("INVALID_STATE", "Tail is already active."));
+
+            return;
+        }
+
+        const auto startResult = workspace->service->startTail();
+
+        if (!startResult)
+        {
+            setErrorResponse(response, startResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope("{\"active\": true}"));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Post("/api/v1/tail/stop", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(workspace->mutex);
+        workspace->service->stopTail();
+        setJsonResponse(response, 200, successEnvelope("{\"active\": false}"));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get("/api/v1/tail/poll", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        std::lock_guard<std::mutex> lock(workspace->mutex);
+
+        if (!workspace->service->isTailing())
+        {
+            setJsonResponse(response, 409, errorEnvelope("INVALID_STATE", "Tail is not active."));
+
+            return;
+        }
+
+        const auto pollResult = workspace->service->pollTailLines();
+
+        if (!pollResult)
+        {
+            setErrorResponse(response, pollResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200,
+                        successEnvelope(formatTailPollResult(*pollResult, workspace->service->isTailing())));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get(R"(/api/v1/jobs/([^/]+))", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (requireSession(*this, sessionId, response) == nullptr)
+        {
+            return;
+        }
+
+        const std::string jobId = request.matches[1];
+        m_jobQueue.evictExpired();
+        const auto pollResult = m_jobQueue.poll(sessionId, jobId);
+
+        if (!pollResult)
+        {
+            setErrorResponse(response, pollResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(*pollResult));
         response.set_header(kSessionHeader, sessionId);
     });
 
