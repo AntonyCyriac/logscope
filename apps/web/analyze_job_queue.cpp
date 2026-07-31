@@ -41,6 +41,14 @@ AnalyzeJobQueue::AnalyzeJobQueue(const WebConfig& config, SessionStore& sessionS
 {
 }
 
+AnalyzeJobQueue::~AnalyzeJobQueue()
+{
+    while (m_activeWorkers.load(std::memory_order_acquire) > 0U)
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+}
+
 bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) const
 {
     for (const auto& entry : m_jobs)
@@ -109,16 +117,26 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
     }
 
     std::thread([this, jobId, sessionId, config]() {
+        m_activeWorkers.fetch_add(1U, std::memory_order_release);
+        const auto releaseWorker = [this]() { m_activeWorkers.fetch_sub(1U, std::memory_order_release); };
+
         WorkspaceSession* workspaceSession = m_sessionStore.findSession(sessionId);
 
         if (workspaceSession == nullptr)
         {
             std::lock_guard<std::mutex> lock(m_mutex);
-            JobRecord& record = m_jobs[jobId];
-            record.status = AnalyzeJobStatus::Failed;
-            record.errorCode = "INVALID_STATE";
-            record.errorMessage = "Session no longer exists.";
-            record.finishedAt = std::chrono::steady_clock::now();
+            const auto iterator = m_jobs.find(jobId);
+
+            if (iterator != m_jobs.end())
+            {
+                JobRecord& record = iterator->second;
+                record.status = AnalyzeJobStatus::Failed;
+                record.errorCode = "INVALID_STATE";
+                record.errorMessage = "Session no longer exists.";
+                record.finishedAt = std::chrono::steady_clock::now();
+            }
+
+            releaseWorker();
 
             return;
         }
@@ -129,7 +147,16 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
         }();
 
         std::lock_guard<std::mutex> lock(m_mutex);
-        JobRecord& record = m_jobs[jobId];
+        const auto iterator = m_jobs.find(jobId);
+
+        if (iterator == m_jobs.end())
+        {
+            releaseWorker();
+
+            return;
+        }
+
+        JobRecord& record = iterator->second;
         record.finishedAt = std::chrono::steady_clock::now();
 
         if (!analyzeResult)
@@ -137,12 +164,14 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
             record.status = AnalyzeJobStatus::Failed;
             record.errorCode = "INTERNAL";
             record.errorMessage = analyzeResult.error().message();
+            releaseWorker();
 
             return;
         }
 
         record.status = AnalyzeJobStatus::Completed;
         record.resultJson = formatAnalyzeJson(*analyzeResult);
+        releaseWorker();
     }).detach();
 
     AnalyzeJobEnqueueResult result;

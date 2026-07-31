@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include <atomic>
 #include <chrono>
 #include <mutex>
 #include <optional>
@@ -46,6 +47,8 @@ class AnalyzeJobQueue
   public:
     AnalyzeJobQueue(const WebConfig& config, SessionStore& sessionStore);
 
+    ~AnalyzeJobQueue();
+
     [[nodiscard]] foundation::Result<AnalyzeJobEnqueueResult> enqueue(const std::string& sessionId,
                                                                       const analysis::AnalysisConfig& config);
 
@@ -74,6 +77,7 @@ class AnalyzeJobQueue
     SessionStore& m_sessionStore;
     mutable std::mutex m_mutex;
     std::unordered_map<std::string, JobRecord> m_jobs;
+    std::atomic<std::size_t> m_activeWorkers{0};
 };
 
 } // namespace scope::web
