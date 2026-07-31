@@ -191,8 +191,12 @@ void WebServer::stop()
 {
     if (!m_running)
     {
+        m_jobQueue.waitForIdle(std::chrono::minutes(2));
+
         return;
     }
+
+    m_jobQueue.waitForIdle(std::chrono::minutes(2));
 
     m_server->stop();
 

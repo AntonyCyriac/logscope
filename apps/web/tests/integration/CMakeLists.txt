@@ -50,5 +50,5 @@ endif()
 include(GoogleTest)
 gtest_discover_tests(logscope_web_integration_tests
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    PROPERTIES LABELS "logscope_web_integration_tests"
+    PROPERTIES LABELS "logscope_web_integration_tests" TIMEOUT 180
 )

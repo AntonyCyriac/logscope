@@ -59,6 +59,9 @@ class AnalyzeJobQueue
 
     void evictExpired();
 
+    /** Blocks until detached workers finish (used by WebServer::stop). */
+    void waitForIdle(std::chrono::milliseconds maxWait = std::chrono::minutes(3)) const;
+
   private:
     struct JobRecord
     {

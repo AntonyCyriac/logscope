@@ -43,8 +43,20 @@ AnalyzeJobQueue::AnalyzeJobQueue(const WebConfig& config, SessionStore& sessionS
 
 AnalyzeJobQueue::~AnalyzeJobQueue()
 {
+    waitForIdle(std::chrono::minutes(3));
+}
+
+void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait) const
+{
+    const auto deadline = std::chrono::steady_clock::now() + maxWait;
+
     while (m_activeWorkers.load(std::memory_order_acquire) > 0U)
     {
+        if (std::chrono::steady_clock::now() >= deadline)
+        {
+            break;
+        }
+
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
 }

@@ -41,6 +41,51 @@ class WebApiIntegrationTest : public ::testing::Test
         server = std::make_unique<scope::web::WebServer>(config);
         ASSERT_TRUE(server->startInBackground());
         client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
+        client->set_connection_timeout(5, 0);
+        client->set_read_timeout(120, 0);
+    }
+
+    [[nodiscard]] bool pollAnalyzeJobUntilComplete(const std::string& sessionId, const std::string& jobId,
+                                                   const int maxAttempts = 200)
+    {
+        const httplib::Headers headers = sessionHeaders(sessionId);
+
+        for (int attempt = 0; attempt < maxAttempts; ++attempt)
+        {
+            const httplib::Result pollResult = client->Get("/api/v1/jobs/" + jobId, headers);
+
+            if (!pollResult || pollResult->status != 200)
+            {
+                return false;
+            }
+
+            if (pollResult->body.find("\"status\": \"completed\"") != std::string::npos)
+            {
+                return pollResult->body.find("\"totalLines\"") != std::string::npos;
+            }
+
+            if (pollResult->body.find("\"status\": \"failed\"") != std::string::npos)
+            {
+                return false;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+
+        return false;
+    }
+
+    void restartServer(const scope::web::WebConfig& newConfig)
+    {
+        client.reset();
+        server->stop();
+        server.reset();
+        config = newConfig;
+        server = std::make_unique<scope::web::WebServer>(config);
+        ASSERT_TRUE(server->startInBackground());
+        client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
+        client->set_connection_timeout(5, 0);
+        client->set_read_timeout(120, 0);
     }
 
     void TearDown() override
@@ -217,6 +262,10 @@ TEST_F(WebApiIntegrationTest, AgentInvestigateAskErrors)
 
 TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
 {
+    scope::web::WebConfig asyncConfig = config;
+    asyncConfig.asyncAnalyzeThresholdBytes = 1U;
+    restartServer(asyncConfig);
+
     const std::string sessionId = createSession();
     const httplib::Headers headers = sessionHeaders(sessionId);
 
@@ -229,9 +278,17 @@ TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
     const auto elapsed = std::chrono::steady_clock::now() - start;
 
     ASSERT_TRUE(analyzeResult);
-    EXPECT_EQ(200, analyzeResult->status);
-    EXPECT_LT(elapsed, std::chrono::seconds(120));
-    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"totalLines\""));
+    EXPECT_EQ(202, analyzeResult->status);
+    EXPECT_LT(elapsed, std::chrono::seconds(10));
+    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"jobId\""));
+
+    const std::size_t jobPos = analyzeResult->body.find("\"jobId\": \"");
+    ASSERT_NE(std::string::npos, jobPos);
+    const std::size_t jobStart = jobPos + 10U;
+    const std::size_t jobEnd = analyzeResult->body.find('"', jobStart);
+    const std::string jobId = analyzeResult->body.substr(jobStart, jobEnd - jobStart);
+
+    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId));
 }
 
 TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)
@@ -283,11 +340,9 @@ TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)
 
 TEST_F(WebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
-    config.asyncAnalyzeThresholdBytes = 1U;
-    server->stop();
-    server = std::make_unique<scope::web::WebServer>(config);
-    ASSERT_TRUE(server->startInBackground());
-    client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
+    scope::web::WebConfig asyncConfig = config;
+    asyncConfig.asyncAnalyzeThresholdBytes = 1U;
+    restartServer(asyncConfig);
 
     const std::string sessionId = createSession();
     const httplib::Headers headers = sessionHeaders(sessionId);
@@ -306,25 +361,7 @@ TEST_F(WebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
     const std::size_t jobEnd = analyzeResult->body.find('"', jobStart);
     const std::string jobId = analyzeResult->body.substr(jobStart, jobEnd - jobStart);
 
-    bool completed = false;
-
-    for (int attempt = 0; attempt < 100; ++attempt)
-    {
-        const httplib::Result pollResult = client->Get("/api/v1/jobs/" + jobId, headers);
-        ASSERT_TRUE(pollResult);
-        EXPECT_EQ(200, pollResult->status);
-
-        if (pollResult->body.find("\"status\": \"completed\"") != std::string::npos)
-        {
-            completed = true;
-            EXPECT_NE(std::string::npos, pollResult->body.find("\"totalLines\""));
-            break;
-        }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(50));
-    }
-
-    EXPECT_TRUE(completed);
+    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId));
 }
 
 namespace
