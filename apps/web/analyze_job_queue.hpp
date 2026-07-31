@@ -66,6 +66,11 @@ class AnalyzeJobQueue
 
     [[nodiscard]] bool hasRunningJobForSession(const std::string& sessionId) const;
 
+    /**
+     * @brief Inserts a job record without spawning a worker (unit tests only).
+     */
+    void seedJobForTest(const std::string& sessionId, const std::string& jobId, AnalyzeJobStatus status);
+
   private:
     struct JobRecord
     {

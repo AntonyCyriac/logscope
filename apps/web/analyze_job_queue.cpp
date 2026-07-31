@@ -88,6 +88,17 @@ bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) cons
     return false;
 }
 
+void AnalyzeJobQueue::seedJobForTest(const std::string& sessionId, const std::string& jobId, const AnalyzeJobStatus status)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+    JobRecord record;
+    record.sessionId = sessionId;
+    record.status = status;
+    record.createdAt = std::chrono::steady_clock::now();
+    record.finishedAt = std::chrono::steady_clock::now();
+    m_jobs.emplace(jobId, std::move(record));
+}
+
 void AnalyzeJobQueue::evictExpired()
 {
     const auto now = std::chrono::steady_clock::now();
