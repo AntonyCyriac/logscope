@@ -302,6 +302,7 @@ jobs:
     name: Web Build Smoke (Ubuntu)
 
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout Repository
@@ -314,7 +315,9 @@ jobs:
         run: cmake --build build --config Release --target logscope-web scope_web_tests logscope_web_integration_tests logscope_web_parity_tests --parallel
 
       - name: Run Web Unit Tests
+        timeout-minutes: 10
         run: ctest --test-dir build --output-on-failure --build-config Release -L scope_web_tests
 
       - name: Run Web Integration Tests
+        timeout-minutes: 15
         run: ctest --test-dir build --output-on-failure --build-config Release -L logscope_web_integration_tests

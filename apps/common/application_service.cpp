@@ -22,6 +22,7 @@
 #include "search_config.hpp"
 #include "session_store.hpp"
 #include "source.hpp"
+#include "tailing_file_log_source.hpp"
 #include "storage.hpp"
 #include "tailing_file_log_source.hpp"
 
@@ -502,9 +503,12 @@ foundation::Result<std::vector<std::string>> ApplicationService::pollTailLines()
     std::vector<std::string> lines;
     std::string line;
 
+    auto* tailing = dynamic_cast<source::TailingFileLogSource*>(m_tailSource.get());
+
     for (int i = 0; i < 64; ++i)
     {
-        const auto readResult = m_tailSource->readLine(line);
+        const foundation::Result<bool> readResult =
+            tailing != nullptr ? tailing->pollLine(line) : m_tailSource->readLine(line);
 
         if (!readResult)
         {

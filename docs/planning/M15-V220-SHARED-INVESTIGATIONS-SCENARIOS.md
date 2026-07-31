@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | M15 v2.2.0 Shared Investigations Scenarios |
 | Category | Project Planning |
-| Version | 0.1.0 |
+| Version | 0.2.0 |
 | Status | **Approved — G1 architecture gate** |
 | Design reference | `logscope-strategy/engos/artifacts/M15.3/design.md` · [ADR-009-M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) |
 | Created | 31-07-2026 |

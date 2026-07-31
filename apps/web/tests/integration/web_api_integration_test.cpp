@@ -29,13 +29,55 @@ class WebApiIntegrationTest : public ::testing::Test
   protected:
     void SetUp() override
     {
+        workspaceRoot = std::filesystem::temp_directory_path() / "logscope-web-api-integration";
+        std::filesystem::remove_all(workspaceRoot);
+        std::filesystem::create_directories(workspaceRoot);
+
         config = scope::web::WebConfig::defaults();
-        config.bindPort = 0;
-        config.allowServerPaths = true;
-        config.allowedPathRoots = {scope::foundation::Path(sourcePath("samples"))};
+        configureTestConfig(config);
         server = std::make_unique<scope::web::WebServer>(config);
         ASSERT_TRUE(server->startInBackground());
         client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
+        client->set_connection_timeout(5, 0);
+        client->set_read_timeout(30, 0);
+    }
+
+    virtual void configureTestConfig(scope::web::WebConfig& webConfig)
+    {
+        webConfig.bindPort = 0;
+        webConfig.allowServerPaths = true;
+        webConfig.allowedPathRoots = {scope::foundation::Path(sourcePath("samples"))};
+        webConfig.workspaceDir = scope::foundation::Path(workspaceRoot.string());
+    }
+
+    [[nodiscard]] bool pollAnalyzeJobUntilComplete(const std::string& sessionId, const std::string& jobId,
+                                                   const int maxAttempts = 200)
+    {
+        const httplib::Headers headers = sessionHeaders(sessionId);
+
+        for (int attempt = 0; attempt < maxAttempts; ++attempt)
+        {
+            const httplib::Result pollResult = client->Get("/api/v1/jobs/" + jobId, headers);
+
+            if (!pollResult || pollResult->status != 200)
+            {
+                return false;
+            }
+
+            if (pollResult->body.find("\"status\": \"completed\"") != std::string::npos)
+            {
+                return pollResult->body.find("\"totalLines\"") != std::string::npos;
+            }
+
+            if (pollResult->body.find("\"status\": \"failed\"") != std::string::npos)
+            {
+                return false;
+            }
+
+            std::this_thread::sleep_for(std::chrono::milliseconds(50));
+        }
+
+        return false;
     }
 
     void TearDown() override
@@ -43,6 +85,7 @@ class WebApiIntegrationTest : public ::testing::Test
         client.reset();
         server->stop();
         server.reset();
+        std::filesystem::remove_all(workspaceRoot);
     }
 
     std::string createSession()
@@ -70,6 +113,17 @@ class WebApiIntegrationTest : public ::testing::Test
     scope::web::WebConfig config;
     std::unique_ptr<scope::web::WebServer> server;
     std::unique_ptr<httplib::Client> client;
+    std::filesystem::path workspaceRoot;
+};
+
+class AsyncWebApiIntegrationTest : public WebApiIntegrationTest
+{
+  protected:
+    void configureTestConfig(scope::web::WebConfig& webConfig) override
+    {
+        WebApiIntegrationTest::configureTestConfig(webConfig);
+        webConfig.asyncAnalyzeThresholdBytes = 1U;
+    }
 };
 
 } // namespace
@@ -208,7 +262,7 @@ TEST_F(WebApiIntegrationTest, AgentInvestigateAskErrors)
     EXPECT_NE(std::string::npos, result->body.find("\"matchingLineCount\": 4"));
 }
 
-TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
+TEST_F(AsyncWebApiIntegrationTest, LargeAppAnalyzeSmoke)
 {
     const std::string sessionId = createSession();
     const httplib::Headers headers = sessionHeaders(sessionId);
@@ -218,13 +272,90 @@ TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
 
     const auto start = std::chrono::steady_clock::now();
     const httplib::Result analyzeResult =
-        client->Post("/api/v1/analyze", headers, "{\"persistIndex\": true}", "application/json");
+        client->Post("/api/v1/analyze", headers, "{}", "application/json");
     const auto elapsed = std::chrono::steady_clock::now() - start;
 
     ASSERT_TRUE(analyzeResult);
-    EXPECT_EQ(200, analyzeResult->status);
-    EXPECT_LT(elapsed, std::chrono::seconds(120));
-    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"totalLines\""));
+    EXPECT_EQ(202, analyzeResult->status);
+    EXPECT_LT(elapsed, std::chrono::seconds(10));
+    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"jobId\""));
+
+    const std::size_t jobPos = analyzeResult->body.find("\"jobId\": \"");
+    ASSERT_NE(std::string::npos, jobPos);
+    const std::size_t jobStart = jobPos + 10U;
+    const std::size_t jobEnd = analyzeResult->body.find('"', jobStart);
+    const std::string jobId = analyzeResult->body.substr(jobStart, jobEnd - jobStart);
+
+    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId, 600));
+}
+
+TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result createResult = client->Post("/api/v1/workspaces", headers,
+                                                      "{\"name\": \"shared-incident\", \"captureSession\": true}",
+                                                      "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+    EXPECT_NE(std::string::npos, createResult->body.find("\"name\": \"shared-incident\""));
+
+    const httplib::Result listResult = client->Get("/api/v1/workspaces", headers);
+    ASSERT_TRUE(listResult);
+    EXPECT_EQ(200, listResult->status);
+    EXPECT_NE(std::string::npos, listResult->body.find("shared-incident"));
+
+    const std::string newSessionId = createSession();
+    const httplib::Headers newHeaders = sessionHeaders(newSessionId);
+
+    const std::size_t idPos = createResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, idPos);
+    const std::size_t idStart = idPos + 7U;
+    const std::size_t idEnd = createResult->body.find('"', idStart);
+    const std::string workspaceId = createResult->body.substr(idStart, idEnd - idStart);
+
+    const httplib::Result openWorkspace =
+        client->Post("/api/v1/workspaces/" + workspaceId + "/open", newHeaders, "", "application/json");
+    ASSERT_TRUE(openWorkspace);
+    EXPECT_EQ(200, openWorkspace->status);
+    EXPECT_NE(std::string::npos, openWorkspace->body.find("\"opened\": true"));
+
+    const httplib::Result investigateResult =
+        client->Post("/api/v1/investigate", newHeaders, "{\"search\": \"error\"}", "application/json");
+    ASSERT_TRUE(investigateResult);
+    EXPECT_EQ(200, investigateResult->status);
+
+    const std::string saveBody = "{\"workspaceId\": \"" + workspaceId + "\"}";
+    const httplib::Result saveResult = client->Post("/api/v1/sessions/save", headers, saveBody, "application/json");
+    ASSERT_TRUE(saveResult);
+    EXPECT_EQ(200, saveResult->status);
+}
+
+TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+
+    const httplib::Result analyzeResult = client->Post("/api/v1/analyze", headers, "{}", "application/json");
+    ASSERT_TRUE(analyzeResult);
+    EXPECT_EQ(202, analyzeResult->status);
+    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"jobId\""));
+
+    const std::size_t jobPos = analyzeResult->body.find("\"jobId\": \"");
+    ASSERT_NE(std::string::npos, jobPos);
+    const std::size_t jobStart = jobPos + 10U;
+    const std::size_t jobEnd = analyzeResult->body.find('"', jobStart);
+    const std::string jobId = analyzeResult->body.substr(jobStart, jobEnd - jobStart);
+
+    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId));
 }
 
 namespace

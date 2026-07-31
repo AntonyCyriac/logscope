@@ -14,7 +14,9 @@
 #include "foundation/error.hpp"
 #include "foundation/path.hpp"
 #include "application_service.hpp"
+#include "analyze_job_queue.hpp"
 #include "investigation_result.hpp"
+#include "workspace_store.hpp"
 
 namespace scope::web
 {
@@ -43,5 +45,16 @@ namespace scope::web
 [[nodiscard]] std::string formatInvestigationJson(const investigation::InvestigationResult& result);
 
 [[nodiscard]] std::string formatAgentInvestigateJson(const application::AgentInvestigateResult& result);
+
+[[nodiscard]] std::string formatWorkspaceMetadata(const WorkspaceMetadata& metadata);
+
+[[nodiscard]] std::string formatWorkspaceList(const WorkspaceListResult& list);
+
+[[nodiscard]] std::string formatWorkspaceOpenResult(const std::string& workspaceId, const foundation::Path& sourcePath,
+                                                    const WorkspaceSummary& summary);
+
+[[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
+
+[[nodiscard]] std::string formatAnalyzeJobAccepted(const AnalyzeJobEnqueueResult& job);
 
 } // namespace scope::web

@@ -16,6 +16,7 @@
 #include "investigation_criteria.hpp"
 #include "report_options.hpp"
 #include "web_config.hpp"
+#include "workspace_store.hpp"
 
 namespace scope::web
 {
@@ -45,6 +46,10 @@ struct AgentInvestigateRequest
 };
 
 [[nodiscard]] AgentInvestigateRequest parseAgentInvestigateRequest(std::string_view body);
+
+[[nodiscard]] WorkspaceCreateRequest parseWorkspaceCreateRequest(std::string_view body);
+
+[[nodiscard]] WorkspaceUpdateRequest parseWorkspaceUpdateRequest(std::string_view body);
 
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 

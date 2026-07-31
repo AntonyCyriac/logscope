@@ -9,6 +9,8 @@ add_executable(logscope_web_parity_tests
     ${CMAKE_SOURCE_DIR}/apps/web/web_server.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/web_config.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/session_store.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/workspace_store.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/analyze_job_queue.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/json_parse.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/rest_json.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/web_request_parsers.cpp
@@ -35,6 +37,7 @@ target_compile_definitions(logscope_web_parity_tests
 target_link_libraries(logscope_web_parity_tests
     PRIVATE
         scope_application
+        scope_configuration
         logscope_httplib
         logscope_gtest_support
         GTest::gtest_main
@@ -54,5 +57,5 @@ endif()
 include(GoogleTest)
 gtest_discover_tests(logscope_web_parity_tests
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
-    PROPERTIES LABELS "logscope_web_integration_tests"
+    PROPERTIES LABELS "logscope_web_integration_tests" TIMEOUT 120
 )

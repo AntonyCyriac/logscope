@@ -4,12 +4,16 @@
   const state = {
     sessionId: null,
     analyzed: false,
+    activeWorkspaceId: null,
+    tailTimer: null,
   };
 
   const statusEl = document.getElementById('status');
   const summaryEl = document.getElementById('summary');
+  const tailOutputEl = document.getElementById('tailOutput');
   const tableBody = document.querySelector('#resultsTable tbody');
   const extensionsList = document.getElementById('extensionsList');
+  const sharedWorkspacesList = document.getElementById('sharedWorkspacesList');
   const fileInput = document.getElementById('fileInput');
   const analyzeBtn = document.getElementById('analyzeBtn');
   const investigateBtn = document.getElementById('investigateBtn');
@@ -18,6 +22,11 @@
   const searchInput = document.getElementById('searchInput');
   const filterInput = document.getElementById('filterInput');
   const askInput = document.getElementById('askInput');
+  const workspaceNameInput = document.getElementById('workspaceNameInput');
+  const createWorkspaceBtn = document.getElementById('createWorkspaceBtn');
+  const saveWorkspaceBtn = document.getElementById('saveWorkspaceBtn');
+  const tailStartBtn = document.getElementById('tailStartBtn');
+  const tailStopBtn = document.getElementById('tailStopBtn');
 
   function setStatus(text) {
     statusEl.textContent = text;
@@ -41,9 +50,9 @@
     return response;
   }
 
-  async function apiJson(path, body) {
+  async function apiJson(path, body, method) {
     const response = await api(path, {
-      method: 'POST',
+      method: method || 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body || {}),
     });
@@ -116,6 +125,64 @@
     });
   }
 
+  async function refreshSharedWorkspaces() {
+    const response = await api('/api/v1/workspaces');
+    const payload = await response.json();
+    const workspaces = (payload.data && payload.data.workspaces) || [];
+    sharedWorkspacesList.innerHTML = '';
+
+    workspaces.forEach(function (workspace) {
+      const item = document.createElement('li');
+      const openBtn = document.createElement('button');
+      openBtn.type = 'button';
+      openBtn.textContent = 'Open';
+      openBtn.addEventListener('click', function () {
+        openSharedWorkspace(workspace.id).catch(function (error) {
+          setStatus('Open shared error: ' + error.message);
+        });
+      });
+
+      item.textContent = workspace.name + ' (' + workspace.id.slice(0, 8) + '…) ';
+      item.appendChild(openBtn);
+      sharedWorkspacesList.appendChild(item);
+    });
+  }
+
+  async function openSharedWorkspace(workspaceId) {
+    const payload = await apiJson('/api/v1/workspaces/' + workspaceId + '/open', {}, 'POST');
+    state.activeWorkspaceId = workspaceId;
+    state.analyzed = !!(payload.data && payload.data.summary && payload.data.summary.hasModel);
+    investigateBtn.disabled = !state.analyzed;
+    exportBtn.disabled = !state.analyzed;
+    askBtn.disabled = !state.analyzed;
+    saveWorkspaceBtn.disabled = false;
+    tailStartBtn.disabled = false;
+    summaryEl.textContent = JSON.stringify(payload.data || payload, null, 2);
+    setStatus('Opened shared workspace ' + workspaceId);
+  }
+
+  async function createSharedWorkspace() {
+    const name = workspaceNameInput.value.trim() || ('workspace-' + Date.now());
+    const payload = await apiJson('/api/v1/workspaces', {
+      name: name,
+      captureSession: state.analyzed,
+    });
+    state.activeWorkspaceId = payload.data && payload.data.id;
+    saveWorkspaceBtn.disabled = !state.activeWorkspaceId;
+    await refreshSharedWorkspaces();
+    setStatus('Created shared workspace ' + name);
+  }
+
+  async function saveSharedWorkspace() {
+    if (!state.activeWorkspaceId) {
+      throw new Error('No shared workspace selected');
+    }
+
+    await apiJson('/api/v1/sessions/save', { workspaceId: state.activeWorkspaceId });
+    await refreshSharedWorkspaces();
+    setStatus('Saved to shared workspace');
+  }
+
   async function uploadFile(file) {
     const formData = new FormData();
     formData.append('file', file);
@@ -129,18 +196,59 @@
     }
     await response.json();
     analyzeBtn.disabled = false;
+    tailStartBtn.disabled = false;
     setStatus('Uploaded ' + file.name);
   }
 
+  async function pollAnalyzeJob(jobId) {
+    for (let attempt = 0; attempt < 120; attempt += 1) {
+      const response = await api('/api/v1/jobs/' + jobId);
+      const payload = await response.json();
+      const data = payload.data || payload;
+
+      if (data.status === 'completed') {
+        return data.result || data;
+      }
+
+      if (data.status === 'failed') {
+        throw new Error((data.error && data.error.message) || 'Analyze job failed');
+      }
+
+      setStatus('Analyze job running…');
+      await new Promise(function (resolve) { setTimeout(resolve, 500); });
+    }
+
+    throw new Error('Analyze job timed out');
+  }
+
   async function analyze() {
-    const payload = await apiJson('/api/v1/analyze', {});
-    const data = payload.data || payload;
-    summaryEl.textContent = JSON.stringify(data, null, 2);
-    state.analyzed = true;
+    const response = await api('/api/v1/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: '{}',
+    });
+
+    if (response.status === 202) {
+      const payload = await response.json();
+      const jobId = payload.data && payload.data.jobId;
+      const data = await pollAnalyzeJob(jobId);
+      summaryEl.textContent = JSON.stringify(data, null, 2);
+      state.analyzed = true;
+    } else if (!response.ok) {
+      const text = await response.text();
+      throw new Error('HTTP ' + response.status + ': ' + text);
+    } else {
+      const payload = await response.json();
+      const data = payload.data || payload;
+      summaryEl.textContent = JSON.stringify(data, null, 2);
+      state.analyzed = true;
+    }
+
     investigateBtn.disabled = false;
     exportBtn.disabled = false;
     askBtn.disabled = false;
-    setStatus('Analyzed — ' + (data.totalLines || '?') + ' lines');
+    saveWorkspaceBtn.disabled = !state.activeWorkspaceId;
+    setStatus('Analyzed');
   }
 
   async function investigate() {
@@ -183,6 +291,60 @@
     setStatus('AI ask complete');
   }
 
+  async function pollTail() {
+    const response = await api('/api/v1/tail/poll');
+    if (response.status === 409) {
+      stopTailPolling();
+      tailOutputEl.textContent = 'Tail inactive.';
+      return;
+    }
+
+    if (!response.ok) {
+      return;
+    }
+
+    const payload = await response.json();
+    const data = payload.data || payload;
+    const lines = data.lines || [];
+
+    if (lines.length > 0) {
+      tailOutputEl.textContent += (tailOutputEl.textContent ? '\n' : '') + lines.join('\n');
+    }
+  }
+
+  function stopTailPolling() {
+    if (state.tailTimer) {
+      clearInterval(state.tailTimer);
+      state.tailTimer = null;
+    }
+    tailStartBtn.disabled = false;
+    tailStopBtn.disabled = true;
+  }
+
+  async function startTail() {
+    await apiJson('/api/v1/tail/start', {}, 'POST');
+    tailOutputEl.textContent = 'Tail active…\n';
+    tailStartBtn.disabled = true;
+    tailStopBtn.disabled = false;
+
+    if (state.tailTimer) {
+      clearInterval(state.tailTimer);
+    }
+
+    state.tailTimer = setInterval(function () {
+      pollTail().catch(function () {
+        stopTailPolling();
+      });
+    }, 500);
+    setStatus('Tail started');
+  }
+
+  async function stopTail() {
+    await apiJson('/api/v1/tail/stop', {}, 'POST');
+    stopTailPolling();
+    setStatus('Tail stopped');
+  }
+
   fileInput.addEventListener('change', function () {
     const file = fileInput.files && fileInput.files[0];
     if (!file) {
@@ -217,9 +379,34 @@
     });
   });
 
+  createWorkspaceBtn.addEventListener('click', function () {
+    createSharedWorkspace().catch(function (error) {
+      setStatus('Create shared error: ' + error.message);
+    });
+  });
+
+  saveWorkspaceBtn.addEventListener('click', function () {
+    saveSharedWorkspace().catch(function (error) {
+      setStatus('Save shared error: ' + error.message);
+    });
+  });
+
+  tailStartBtn.addEventListener('click', function () {
+    startTail().catch(function (error) {
+      setStatus('Tail start error: ' + error.message);
+    });
+  });
+
+  tailStopBtn.addEventListener('click', function () {
+    stopTail().catch(function (error) {
+      setStatus('Tail stop error: ' + error.message);
+    });
+  });
+
   createWorkspace()
     .then(loadNoopConfig)
     .then(refreshExtensions)
+    .then(refreshSharedWorkspaces)
     .then(function () {
       setStatus('Ready — session ' + state.sessionId);
     })
