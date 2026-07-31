@@ -34,15 +34,20 @@ class WebApiIntegrationTest : public ::testing::Test
         std::filesystem::create_directories(workspaceRoot);
 
         config = scope::web::WebConfig::defaults();
-        config.bindPort = 0;
-        config.allowServerPaths = true;
-        config.allowedPathRoots = {scope::foundation::Path(sourcePath("samples"))};
-        config.workspaceDir = scope::foundation::Path(workspaceRoot.string());
+        configureTestConfig(config);
         server = std::make_unique<scope::web::WebServer>(config);
         ASSERT_TRUE(server->startInBackground());
         client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
         client->set_connection_timeout(5, 0);
-        client->set_read_timeout(120, 0);
+        client->set_read_timeout(30, 0);
+    }
+
+    virtual void configureTestConfig(scope::web::WebConfig& webConfig)
+    {
+        webConfig.bindPort = 0;
+        webConfig.allowServerPaths = true;
+        webConfig.allowedPathRoots = {scope::foundation::Path(sourcePath("samples"))};
+        webConfig.workspaceDir = scope::foundation::Path(workspaceRoot.string());
     }
 
     [[nodiscard]] bool pollAnalyzeJobUntilComplete(const std::string& sessionId, const std::string& jobId,
@@ -73,19 +78,6 @@ class WebApiIntegrationTest : public ::testing::Test
         }
 
         return false;
-    }
-
-    void restartServer(const scope::web::WebConfig& newConfig)
-    {
-        client.reset();
-        server->stop();
-        server.reset();
-        config = newConfig;
-        server = std::make_unique<scope::web::WebServer>(config);
-        ASSERT_TRUE(server->startInBackground());
-        client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
-        client->set_connection_timeout(5, 0);
-        client->set_read_timeout(120, 0);
     }
 
     void TearDown() override
@@ -122,6 +114,16 @@ class WebApiIntegrationTest : public ::testing::Test
     std::unique_ptr<scope::web::WebServer> server;
     std::unique_ptr<httplib::Client> client;
     std::filesystem::path workspaceRoot;
+};
+
+class AsyncWebApiIntegrationTest : public WebApiIntegrationTest
+{
+  protected:
+    void configureTestConfig(scope::web::WebConfig& webConfig) override
+    {
+        WebApiIntegrationTest::configureTestConfig(webConfig);
+        webConfig.asyncAnalyzeThresholdBytes = 1U;
+    }
 };
 
 } // namespace
@@ -260,12 +262,8 @@ TEST_F(WebApiIntegrationTest, AgentInvestigateAskErrors)
     EXPECT_NE(std::string::npos, result->body.find("\"matchingLineCount\": 4"));
 }
 
-TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
+TEST_F(AsyncWebApiIntegrationTest, LargeAppAnalyzeSmoke)
 {
-    scope::web::WebConfig asyncConfig = config;
-    asyncConfig.asyncAnalyzeThresholdBytes = 1U;
-    restartServer(asyncConfig);
-
     const std::string sessionId = createSession();
     const httplib::Headers headers = sessionHeaders(sessionId);
 
@@ -338,12 +336,8 @@ TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)
     EXPECT_EQ(200, saveResult->status);
 }
 
-TEST_F(WebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
+TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
-    scope::web::WebConfig asyncConfig = config;
-    asyncConfig.asyncAnalyzeThresholdBytes = 1U;
-    restartServer(asyncConfig);
-
     const std::string sessionId = createSession();
     const httplib::Headers headers = sessionHeaders(sessionId);
 

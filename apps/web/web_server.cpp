@@ -194,21 +194,19 @@ void WebServer::stop()
         return;
     }
 
-    m_jobQueue.waitForIdle(std::chrono::seconds(60));
-
-    if (!m_running)
+    if (m_running)
     {
-        return;
+        m_server->stop();
+
+        if (m_thread.joinable())
+        {
+            m_thread.join();
+        }
+
+        m_running = false;
     }
 
-    m_server->stop();
-
-    if (m_thread.joinable())
-    {
-        m_thread.join();
-    }
-
-    m_running = false;
+    m_jobQueue.waitForIdle(std::chrono::seconds(30));
 }
 
 int WebServer::port() const noexcept

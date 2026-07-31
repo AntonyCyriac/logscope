@@ -10,7 +10,9 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <thread>
 #include <unordered_map>
+#include <vector>
 
 #include "analysis_config.hpp"
 #include "foundation/result.hpp"
@@ -59,8 +61,8 @@ class AnalyzeJobQueue
 
     void evictExpired();
 
-    /** Blocks until detached workers finish (used by WebServer::stop). */
-    void waitForIdle(std::chrono::milliseconds maxWait = std::chrono::seconds(60)) const;
+    /** Blocks until worker threads finish (used by WebServer::stop). */
+    void waitForIdle(std::chrono::milliseconds maxWait = std::chrono::seconds(30));
 
   private:
     struct JobRecord
@@ -81,6 +83,8 @@ class AnalyzeJobQueue
     mutable std::mutex m_mutex;
     std::unordered_map<std::string, JobRecord> m_jobs;
     std::atomic<std::size_t> m_activeWorkers{0};
+    mutable std::mutex m_workerMutex;
+    std::vector<std::thread> m_workers;
 };
 
 } // namespace scope::web

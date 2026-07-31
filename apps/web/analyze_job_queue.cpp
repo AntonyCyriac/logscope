@@ -43,10 +43,10 @@ AnalyzeJobQueue::AnalyzeJobQueue(const WebConfig& config, SessionStore& sessionS
 
 AnalyzeJobQueue::~AnalyzeJobQueue()
 {
-    waitForIdle(std::chrono::seconds(60));
+    waitForIdle(std::chrono::seconds(30));
 }
 
-void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait) const
+void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait)
 {
     const auto deadline = std::chrono::steady_clock::now() + maxWait;
 
@@ -59,6 +59,18 @@ void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait) const
 
         std::this_thread::sleep_for(std::chrono::milliseconds(5));
     }
+
+    std::lock_guard<std::mutex> workerLock(m_workerMutex);
+
+    for (auto& worker : m_workers)
+    {
+        if (worker.joinable())
+        {
+            worker.join();
+        }
+    }
+
+    m_workers.clear();
 }
 
 bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) const
@@ -128,63 +140,102 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
         m_jobs.emplace(jobId, std::move(record));
     }
 
-    std::thread([this, jobId, sessionId, config]() {
-        m_activeWorkers.fetch_add(1U, std::memory_order_release);
-        const auto releaseWorker = [this]() { m_activeWorkers.fetch_sub(1U, std::memory_order_release); };
+    {
+        std::lock_guard<std::mutex> workerLock(m_workerMutex);
+        m_workers.emplace_back([this, jobId, sessionId, config]() {
+            m_activeWorkers.fetch_add(1U, std::memory_order_release);
+            const auto releaseWorker = [this]() { m_activeWorkers.fetch_sub(1U, std::memory_order_release); };
 
-        WorkspaceSession* workspaceSession = m_sessionStore.findSession(sessionId);
-
-        if (workspaceSession == nullptr)
-        {
-            std::lock_guard<std::mutex> lock(m_mutex);
-            const auto iterator = m_jobs.find(jobId);
-
-            if (iterator != m_jobs.end())
+            try
             {
+                WorkspaceSession* workspaceSession = m_sessionStore.findSession(sessionId);
+
+                if (workspaceSession == nullptr)
+                {
+                    std::lock_guard<std::mutex> lock(m_mutex);
+                    const auto iterator = m_jobs.find(jobId);
+
+                    if (iterator != m_jobs.end())
+                    {
+                        JobRecord& record = iterator->second;
+                        record.status = AnalyzeJobStatus::Failed;
+                        record.errorCode = "INVALID_STATE";
+                        record.errorMessage = "Session no longer exists.";
+                        record.finishedAt = std::chrono::steady_clock::now();
+                    }
+
+                    releaseWorker();
+
+                    return;
+                }
+
+                foundation::Result<analysis::AnalysisModel> analyzeResult = [&]() {
+                    std::lock_guard<std::mutex> sessionLock(workspaceSession->mutex);
+                    return workspaceSession->service->analyze(config);
+                }();
+
+                std::lock_guard<std::mutex> lock(m_mutex);
+                const auto iterator = m_jobs.find(jobId);
+
+                if (iterator == m_jobs.end())
+                {
+                    releaseWorker();
+
+                    return;
+                }
+
                 JobRecord& record = iterator->second;
-                record.status = AnalyzeJobStatus::Failed;
-                record.errorCode = "INVALID_STATE";
-                record.errorMessage = "Session no longer exists.";
                 record.finishedAt = std::chrono::steady_clock::now();
+
+                if (!analyzeResult)
+                {
+                    record.status = AnalyzeJobStatus::Failed;
+                    record.errorCode = "INTERNAL";
+                    record.errorMessage = analyzeResult.error().message();
+                    record.finishedAt = std::chrono::steady_clock::now();
+                    releaseWorker();
+
+                    return;
+                }
+
+                record.status = AnalyzeJobStatus::Completed;
+                record.resultJson = formatAnalyzeJson(*analyzeResult);
+                releaseWorker();
             }
+            catch (const std::exception& exception)
+            {
+                std::lock_guard<std::mutex> lock(m_mutex);
+                const auto iterator = m_jobs.find(jobId);
 
-            releaseWorker();
+                if (iterator != m_jobs.end())
+                {
+                    JobRecord& record = iterator->second;
+                    record.status = AnalyzeJobStatus::Failed;
+                    record.errorCode = "INTERNAL";
+                    record.errorMessage = exception.what();
+                    record.finishedAt = std::chrono::steady_clock::now();
+                }
 
-            return;
-        }
+                releaseWorker();
+            }
+            catch (...)
+            {
+                std::lock_guard<std::mutex> lock(m_mutex);
+                const auto iterator = m_jobs.find(jobId);
 
-        foundation::Result<analysis::AnalysisModel> analyzeResult = [&]() {
-            std::lock_guard<std::mutex> sessionLock(workspaceSession->mutex);
-            return workspaceSession->service->analyze(config);
-        }();
+                if (iterator != m_jobs.end())
+                {
+                    JobRecord& record = iterator->second;
+                    record.status = AnalyzeJobStatus::Failed;
+                    record.errorCode = "INTERNAL";
+                    record.errorMessage = "Analyze job failed.";
+                    record.finishedAt = std::chrono::steady_clock::now();
+                }
 
-        std::lock_guard<std::mutex> lock(m_mutex);
-        const auto iterator = m_jobs.find(jobId);
-
-        if (iterator == m_jobs.end())
-        {
-            releaseWorker();
-
-            return;
-        }
-
-        JobRecord& record = iterator->second;
-        record.finishedAt = std::chrono::steady_clock::now();
-
-        if (!analyzeResult)
-        {
-            record.status = AnalyzeJobStatus::Failed;
-            record.errorCode = "INTERNAL";
-            record.errorMessage = analyzeResult.error().message();
-            releaseWorker();
-
-            return;
-        }
-
-        record.status = AnalyzeJobStatus::Completed;
-        record.resultJson = formatAnalyzeJson(*analyzeResult);
-        releaseWorker();
-    }).detach();
+                releaseWorker();
+            }
+        });
+    }
 
     AnalyzeJobEnqueueResult result;
     result.jobId = jobId;
