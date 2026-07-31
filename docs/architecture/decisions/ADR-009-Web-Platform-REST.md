@@ -326,7 +326,7 @@ Implementation order:
 
 1. **M15.1** — `logscope-web` skeleton, health, session, open/upload, analyze, investigate, extensions; no SPA.
 2. **M15.2** — static SPA MVP; export + agent investigate; parity tests green.
-3. **M15.3** — shared saved workspaces API, tail poll, async analyze jobs if needed.
+3. **M15.3** — shared saved workspaces API, tail poll, async analyze jobs — see [ADR-009-M15.3-Shared-Investigations.md](ADR-009-M15.3-Shared-Investigations.md).
 4. **M15.4 / M16** — optional API key hardening, RBAC, TLS deployment guides.
 
 CLI output formatters remain in `apps/cli/`; C12 adds **JSON mappers** from domain types (`AnalysisModel`, `InvestigationResult`, …) to REST schema. Prefer reusing any shared serialization helpers extracted from CLI JSON formatters during M15.1 refactor.
@@ -361,3 +361,14 @@ CLI output formatters remain in `apps/cli/`; C12 adds **JSON mappers** from doma
 - [TESTING.md](../../testing/TESTING.md)
 - [RELEASE.md §8](../../release/RELEASE.md#8-post-release-housekeeping)
 - [application_service.hpp](../../../apps/common/application_service.hpp)
+- [ADR-009-M15.3 Shared Investigations](ADR-009-M15.3-Shared-Investigations.md)
+- [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](../../planning/M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md)
+
+---
+
+## Revision history
+
+| Version | Date | Description |
+|---------|------|-------------|
+| 1.0 | 30-07-2026 | Initial ADR — M15 Web Platform REST (`v2.1.0`) |
+| 1.1 | 31-07-2026 | M15.3 amendment reference — shared workspaces, tail poll, async analyze (`v2.2.0`) |
