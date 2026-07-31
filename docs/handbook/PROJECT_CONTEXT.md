@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.5.0 |
+| Version | 2.6.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 31-07-2026 |
 
 ---
 
@@ -27,10 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.1.0` (shipped) — M15 Web Platform (`logscope-web` + browser MVP).
+**Current release:** `v2.2.0` (shipped) — M15.3 shared investigations (workspaces API, tail poll, async analyze) on `logscope-web`.
 
-
-**Strategic next milestone:** **M16 – Enterprise** — see [Roadmap](../ROADMAP.md). M15.3 (shared investigations API) on `v2.1.x` track.
+**Strategic next milestone:** **M16 – Enterprise** or M15.4 thin auth — see [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -52,7 +51,7 @@ The project follows architecture-first development. Every implementation should 
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries, `agent investigate` (`v1.5.1`) |
 | Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
-| M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`) |
+| M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`) |
 
 **Next:**
 

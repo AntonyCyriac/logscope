@@ -1,0 +1,49 @@
+# LogScope code map (agent quick reference)
+
+Pointers for AI assistants — **where code and tests live**. Full web detail: same table in private strategy `engos/contexts/logscope/CODE_MAP.md` when both repos are in workspace.
+
+## Layout
+
+| Path | Role |
+|------|------|
+| `apps/cli/` | CLI binary |
+| `apps/desktop/` | Qt desktop (`LOGSCOPE_DESKTOP=ON`) |
+| `apps/web/` | REST server + SPA (`LOGSCOPE_WEB=ON`) |
+| `apps/common/application_service.*` | Shared orchestration (C10) |
+| `core/` | Domain libraries (analysis, investigation, …) |
+| `tests/` | Integration, e2e, regression, benchmarks |
+| `samples/` | `sample.log`, `large-app.log`, `web.properties` |
+
+## Web (`apps/web/`)
+
+| Area | Paths |
+|------|--------|
+| Routes | `web_server.cpp` |
+| Shared workspaces (v2.2.0) | `workspace_store.*` |
+| Async analyze jobs | `analyze_job_queue.*` |
+| Sessions | `session_store.*` |
+| SPA assets | `ui/dist/` |
+
+## Tests
+
+| Label | Location |
+|-------|----------|
+| `scope_web_tests` | `apps/web/tests/` |
+| `logscope_web_integration_tests` | `apps/web/tests/integration/`, `tests/integration/web/` |
+
+```bash
+ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir build --output-on-failure
+```
+
+## Docs for web work
+
+- [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md)
+- [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](../planning/M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md)
+- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3 amendment](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md)
+- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.2.0 release notes](../release/v2.2.0-RELEASE-NOTES.md)
+
+## CI
+
+`.github/workflows/ci.yml` — jobs run **in parallel**; **Web Build Smoke** for web changes; **clang-tidy** often ~12–15 min.
+
+See [Developer Guide](DEVELOPER_GUIDE.md) for build commands.

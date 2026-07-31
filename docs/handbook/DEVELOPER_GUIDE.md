@@ -27,6 +27,7 @@ Phase 1 stabilization deliverable — see [Post-v1 Strategic Roadmap](../plannin
 |------|----------|
 | Environment ready | [Developer Setup](DEVELOPER_SETUP.md) |
 | Engineering mindset | [Project Context](PROJECT_CONTEXT.md) |
+| Code locations (agents) | [Code map](CODE_MAP.md) |
 | Coding rules | [C++ Coding Standard](../standards/CPP_CODING_STANDARD.md), [Foundation Guidelines](../standards/FOUNDATION_GUIDELINES.md) |
 | Architecture context | [Architecture Overview](../architecture/ARCHITECTURE_OVERVIEW.md), [Component Catalog](../architecture/COMPONENT_CATALOG.md) |
 | Git workflow | [Git Conventions](GIT_CONVENTIONS.md), [Pull Request Guide](PULL_REQUEST_GUIDE.md) |
