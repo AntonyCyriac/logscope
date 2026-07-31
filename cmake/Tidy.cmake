@@ -23,6 +23,10 @@ if(CLANG_TIDY_EXECUTABLE)
         list(FILTER TIDY_SOURCE_FILES EXCLUDE REGEX "/apps/desktop/")
     endif()
 
+    if(NOT LOGSCOPE_WEB)
+        list(FILTER TIDY_SOURCE_FILES EXCLUDE REGEX "/apps/web/")
+    endif()
+
     add_custom_target(tidy
         COMMAND ${CLANG_TIDY_EXECUTABLE} -p ${CMAKE_BINARY_DIR} ${TIDY_SOURCE_FILES}
         WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}

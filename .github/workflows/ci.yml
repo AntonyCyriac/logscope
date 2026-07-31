@@ -269,7 +269,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang-tidy qt6-base-dev
 
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLOGSCOPE_DESKTOP=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLOGSCOPE_DESKTOP=ON -DLOGSCOPE_WEB=ON
 
       - name: Run clang-tidy
         run: cmake --build build --target tidy --parallel

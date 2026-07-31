@@ -158,14 +158,14 @@ std::optional<std::int64_t> jsonIntField(const std::string_view body, const std:
         remainder.remove_prefix(1U);
     }
 
-    if (remainder.empty() || !std::isdigit(static_cast<unsigned char>(remainder.front())) != 0)
+    if (remainder.empty() || !std::isdigit(static_cast<unsigned char>(remainder.front())))
     {
         return std::nullopt;
     }
 
     for (const char character : remainder)
     {
-        if (!std::isdigit(static_cast<unsigned char>(character)) != 0)
+        if (!std::isdigit(static_cast<unsigned char>(character)))
         {
             break;
         }
