@@ -1,0 +1,21 @@
+---
+description: Public LogScope agent bootstrap — project context and code map
+alwaysApply: true
+---
+
+# LogScope project context (public repo)
+
+When editing **logscope** without strategy workspace:
+
+1. `@docs/handbook/PROJECT_CONTEXT.md` — engineering mindset, current release, milestones
+2. `@docs/handbook/CODE_MAP.md` — where CLI/desktop/web code and tests live
+3. Current release: `@docs/release/v2.2.0-RELEASE-NOTES.md`
+
+When **logscope-strategy** is in workspace, prefer EngOS routing:
+
+- `@logscope-strategy/engos/AGENT_QUICKREF.md`
+- `@logscope-strategy/.cursor/rules/engos-routing.mdc`
+
+Do not paste private strategy content into public PRs.
+
+Shipped-tag regressions: see `release-regression-issues.mdc`.
