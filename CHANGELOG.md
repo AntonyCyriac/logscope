@@ -12,6 +12,32 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.1.0] - 2026-07-31
+
+**M15 Web Platform** — REST API and browser MVP over `ApplicationService`.
+
+### Added
+
+- `logscope-web` executable (`apps/web/`) — embedded cpp-httplib server on `127.0.0.1:8080` by default
+- REST API `/api/v1/*`: health, workspace sessions, config, upload/open source, analyze, investigate, analytics, export (HTML/PDF/JSON), agent investigate, extensions
+- Browser MVP SPA (`apps/web/ui/dist/`) — upload, analyze, search, filter DSL, export, extensions panel, AI ask (noop provider)
+- Optional API key (`web.api_key` / `LOGSCOPE_WEB_API_KEY`); health exempt when key configured
+- CMake option `LOGSCOPE_WEB=ON`; CI `web` job on Ubuntu
+- **32** web tests (`scope_web_tests`, `logscope_web_integration_tests`) including CLI/REST parity
+
+### Changed
+
+- Shared `logscope_httplib` target for `scope_ai` and web server
+- CORS reflects request `Origin` when listed in `web.cors_origins`
+
+### Upgrade notes
+
+- Build web: `cmake -DLOGSCOPE_WEB=ON && cmake --build build --target logscope-web`
+- Run: `./build/apps/web/logscope-web` then open `http://127.0.0.1:8080/`
+- CLI and desktop unchanged for default workflows
+
+---
+
 ## [2.0.6] - 2026-07-30
 
 Hotfix for **v2.0.5 CI** — clang-tidy static analysis on desktop `AiPanel`.

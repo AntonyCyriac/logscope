@@ -16,3 +16,7 @@ include(GoogleTest)
 gtest_discover_tests(logscope_integration_tests
     WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
 )
+
+if(LOGSCOPE_WEB)
+    add_subdirectory(web)
+endif()

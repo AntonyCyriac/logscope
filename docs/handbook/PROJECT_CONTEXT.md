@@ -27,10 +27,10 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.0.6` (shipped) — clang-tidy CI hotfix on `AiPanel`.
+**Current release:** `v2.1.0` (shipped) — M15 Web Platform (`logscope-web` + browser MVP).
 
 
-**Strategic next milestone:** **M15 – Web Platform** — see [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md) (`v2.1.0` track). **M15.0 gate:** [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) accepted. See [Roadmap](../ROADMAP.md).
+**Strategic next milestone:** **M16 – Enterprise** — see [Roadmap](../ROADMAP.md). M15.3 (shared investigations API) on `v2.1.x` track.
 
 **Completed milestones:**
 
@@ -52,12 +52,13 @@ The project follows architecture-first development. Every implementation should 
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries, `agent investigate` (`v1.5.1`) |
 | Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
+| M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`) |
 
 **Next:**
 
 | Milestone | Target | Focus |
 |-----------|--------|-------|
-| M15 – Web Platform | `v2.0.0` | Browser UI, REST API integration |
+| M16 – Enterprise | `v2.x` | RBAC, agents, streaming |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 

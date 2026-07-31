@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | M15 – Web Platform |
 | Category | Project Planning |
-| Version | 0.2.0 |
-| Status | Draft — M15.0 planning gate satisfied |
+| Version | 0.3.0 |
+| Status | M15.2 complete — `v2.1.0` |
 | Created | 30-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 31-07-2026 |
 
 ---
 
@@ -60,8 +60,8 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | Phase | Focus | Target |
 |-------|-------|--------|
 | M15.0 | ADR-009 + scenario matrix + API sketch | ✅ Planning complete |
-| M15.1 | REST service over `ApplicationService` | `v2.1.0` alpha |
-| M15.2 | Browser MVP (investigate workflow) | `v2.1.0` |
+| M15.1 | REST service over `ApplicationService` | ✅ `v2.1.0` |
+| M15.2 | Browser MVP (investigate workflow) | ✅ `v2.1.0` |
 | M15.3 | Shared investigations / saved workspaces API | `v2.1.x` |
 | M15.4 | Thin auth (optional; or defer to M16) | TBD |
 
@@ -97,3 +97,4 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 |---------|------|-------------|
 | 0.1.0 | 30-07-2026 | Initial draft; graduation stub before ADR-009. |
 | 0.2.0 | 30-07-2026 | ADR-009 accepted; M15.0 gate satisfied; scenario matrix linked. |
+| 0.3.0 | 31-07-2026 | M15.1 + M15.2 shipped in `v2.1.0` (`logscope-web` + SPA). |

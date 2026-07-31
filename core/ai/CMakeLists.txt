@@ -3,16 +3,7 @@
 # Core AI Assistant
 # ==========================================================
 
-include(FetchContent)
-
-FetchContent_Declare(
-    httplib
-    GIT_REPOSITORY https://github.com/yhirose/cpp-httplib.git
-    GIT_TAG v0.14.3
-    GIT_SHALLOW TRUE
-)
-
-FetchContent_MakeAvailable(httplib)
+include(${CMAKE_SOURCE_DIR}/cmake/LogScopeHttplib.cmake)
 
 add_library(scope_ai
     ai_analytics_context_builder.cpp
@@ -37,7 +28,7 @@ target_link_libraries(scope_ai
         scope_query
         scope_runtime
     PRIVATE
-        httplib::httplib
+        logscope_httplib
 )
 
 if(WIN32)

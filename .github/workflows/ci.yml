@@ -269,7 +269,7 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y clang-tidy qt6-base-dev
 
       - name: Configure CMake
-        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLOGSCOPE_DESKTOP=ON
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXPORT_COMPILE_COMMANDS=ON -DLOGSCOPE_DESKTOP=ON -DLOGSCOPE_WEB=ON
 
       - name: Run clang-tidy
         run: cmake --build build --target tidy --parallel
@@ -297,3 +297,24 @@ jobs:
 
       - name: Run Desktop GUI Tests
         run: ctest --test-dir build --output-on-failure --build-config Release -L logscope_desktop_tests
+
+  web:
+    name: Web Build Smoke (Ubuntu)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Configure CMake
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
+
+      - name: Build Web and Tests
+        run: cmake --build build --config Release --target logscope-web scope_web_tests logscope_web_integration_tests logscope_web_parity_tests --parallel
+
+      - name: Run Web Unit Tests
+        run: ctest --test-dir build --output-on-failure --build-config Release -L scope_web_tests
+
+      - name: Run Web Integration Tests
+        run: ctest --test-dir build --output-on-failure --build-config Release -L logscope_web_integration_tests
