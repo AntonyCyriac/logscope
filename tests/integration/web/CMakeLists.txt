@@ -9,6 +9,7 @@ add_executable(logscope_web_parity_tests
     ${CMAKE_SOURCE_DIR}/apps/web/web_server.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/web_config.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/session_store.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/session_resource_cleanup.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/workspace_store.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/analyze_job_queue.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/json_parse.cpp
