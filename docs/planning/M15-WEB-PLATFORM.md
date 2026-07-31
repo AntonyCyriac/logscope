@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | M15 – Web Platform |
 | Category | Project Planning |
-| Version | 0.3.0 |
-| Status | M15.2 complete — `v2.1.0` |
+| Version | 0.4.0 |
+| Status | M15.2 complete — `v2.1.0`; **M15.3 active @ `v2.2.0`** |
 | Created | 30-07-2026 |
 | Last Updated | 31-07-2026 |
 
@@ -62,12 +62,14 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | M15.0 | ADR-009 + scenario matrix + API sketch | ✅ Planning complete |
 | M15.1 | REST service over `ApplicationService` | ✅ `v2.1.0` |
 | M15.2 | Browser MVP (investigate workflow) | ✅ `v2.1.0` |
-| M15.3 | Shared investigations / saved workspaces API | `v2.1.x` |
-| M15.4 | Thin auth (optional; or defer to M16) | TBD |
+| M15.3 | Shared investigations / saved workspaces API, tail poll, async analyze | **`v2.2.0`** (G0 approved) |
+| M15.4 | Thin auth | **Deferred** to `v2.2.1` or M16 |
 
 ---
 
-# 6. Acceptance (M15.2 MVP)
+# 6. Acceptance
+
+## M15.2 MVP (`v2.1.0`) — shipped
 
 | Scenario | Expected |
 |----------|----------|
@@ -76,6 +78,18 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | Export | Report sections match CLI/desktop export options |
 | Session | Save/load session via API |
 | Plugins + AI | Existing `.properties` providers work through service layer |
+
+## M15.3 (`v2.2.0`) — active
+
+| Area | Expected |
+|------|----------|
+| Shared workspaces | CRUD + open/save server-persisted named investigations (file-first JSON storage) |
+| Tail poll | `POST /api/v1/tail/*` + `GET /api/v1/tail/poll` per ADR-009 |
+| Async analyze | `202` + job poll for large logs; small logs remain synchronous |
+| SPA | W2 flows for shared list/open/save and tail panel |
+| Parity + security | See [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) |
+
+**G0 decisions (2026-07-31):** M15.4 thin auth deferred; Playwright CI deferred; M16 re-charter after `v2.2.0` ship.
 
 ---
 
@@ -86,6 +100,7 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | [ADR-008 Desktop Qt](../architecture/decisions/ADR-008-Desktop-Qt-Presentation.md) | ApplicationService graduation path |
 | [ADR-009 Web REST](../architecture/decisions/ADR-009-Web-Platform-REST.md) | HTTP server, API contract, auth, test strategy |
 | [M15-V210-WEB-SCENARIOS.md](M15-V210-WEB-SCENARIOS.md) | v2.1.0 acceptance scenario matrix |
+| [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) | **v2.2.0** M15.3 acceptance scenario matrix |
 | [NEXT-VALUE-ADD.md](NEXT-VALUE-ADD.md) | Prioritized backlog before/during M15 |
 | [ROADMAP.md](../ROADMAP.md) | Milestone status |
 
@@ -98,3 +113,4 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | 0.1.0 | 30-07-2026 | Initial draft; graduation stub before ADR-009. |
 | 0.2.0 | 30-07-2026 | ADR-009 accepted; M15.0 gate satisfied; scenario matrix linked. |
 | 0.3.0 | 31-07-2026 | M15.1 + M15.2 shipped in `v2.1.0` (`logscope-web` + SPA). |
+| 0.4.0 | 31-07-2026 | G0: M15.3 active @ `v2.2.0`; M15.4 deferred; scenario matrix linked. |
