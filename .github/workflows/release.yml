@@ -291,9 +291,117 @@ jobs:
           name: ${{ matrix.artifact_name }}
           path: logscope-desktop-${{ github.ref_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
 
+  build-web:
+    name: Build Web (${{ matrix.artifact_name }})
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            artifact_name: logscope-web-linux-amd64
+            binary_path: build/apps/web/logscope-web
+            platform: linux-amd64
+            archive_ext: tar.gz
+          - os: windows-latest
+            artifact_name: logscope-web-windows-amd64
+            binary_path: build/apps/web/Release/logscope-web.exe
+            platform: windows-amd64
+            archive_ext: zip
+          - os: macos-latest
+            artifact_name: logscope-web-macos-amd64
+            binary_path: build/apps/web/logscope-web
+            platform: macos-amd64
+            archive_ext: tar.gz
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Configure CMake (Windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          CMAKE_TLS_VERIFY: '0'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
+
+      - name: Configure CMake (Unix)
+        if: matrix.os != 'windows-latest'
+        run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
+
+      - name: Build Web
+        run: cmake --build build --config Release --target logscope-web --parallel
+
+      - name: Package Web Binary (Unix)
+        if: runner.os != 'Windows'
+        shell: bash
+        run: |
+          mkdir -p dist/ui/dist
+          cp "${{ matrix.binary_path }}" dist/
+          cp -r apps/web/ui/dist/* dist/ui/dist/
+          cp -r samples dist/
+
+      - name: Package Web Binary (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist/ui/dist | Out-Null
+          Copy-Item -Path "${{ matrix.binary_path }}" -Destination dist/
+          Copy-Item -Path apps/web/ui/dist/* -Destination dist/ui/dist/ -Recurse -Force
+          Copy-Item -Path samples -Destination dist/samples -Recurse -Force
+
+      - name: Import macOS signing certificate
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+        run: |
+          chmod +x scripts/macos_*.sh
+          ./scripts/macos_import_certificate.sh
+
+      - name: Sign and notarize macOS web binary
+        if: matrix.os == 'macos-latest'
+        env:
+          MACOS_CERTIFICATE: ${{ secrets.MACOS_CERTIFICATE }}
+          MACOS_CERTIFICATE_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PASSWORD }}
+          MACOS_SIGNING_IDENTITY: ${{ secrets.MACOS_SIGNING_IDENTITY }}
+          APPLE_API_KEY_BASE64: ${{ secrets.APPLE_API_KEY_BASE64 }}
+          APPLE_API_KEY_ID: ${{ secrets.APPLE_API_KEY_ID }}
+          APPLE_API_ISSUER_ID: ${{ secrets.APPLE_API_ISSUER_ID }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+        run: |
+          ./scripts/macos_sign_release.sh --binary dist/logscope-web
+          ./scripts/macos_notarize_release.sh dist/logscope-web
+
+      - name: Sign Windows web binary
+        if: runner.os == 'Windows'
+        shell: pwsh
+        env:
+          WINDOWS_CERTIFICATE: ${{ secrets.WINDOWS_CERTIFICATE }}
+          WINDOWS_CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERTIFICATE_PASSWORD }}
+        run: ./scripts/sign_windows_binaries.ps1 -Path dist
+
+      - name: Create Archive (Unix)
+        if: runner.os != 'Windows'
+        run: tar -czf "logscope-web-${RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -C dist .
+
+      - name: Create Archive (Windows)
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: Compress-Archive -Path dist/* -DestinationPath "logscope-web-${env:RELEASE_TAG}-${{ matrix.platform }}.${{ matrix.archive_ext }}" -Force
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: logscope-web-${{ github.ref_name }}-${{ matrix.platform }}.${{ matrix.archive_ext }}
+
   release:
     name: Publish GitHub Release
-    needs: [build, build-desktop]
+    needs: [build, build-desktop, build-web]
     runs-on: ubuntu-latest
 
     steps:

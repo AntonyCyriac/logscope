@@ -16,6 +16,7 @@
 
 #include <httplib.h>
 
+#include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <sstream>
@@ -35,6 +36,42 @@ std::string uptimeSeconds(const std::chrono::steady_clock::time_point startTime)
     const auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(std::chrono::steady_clock::now() - startTime);
 
     return std::to_string(elapsed.count());
+}
+
+std::filesystem::path resolveUiDirectory()
+{
+    if (const char* envPath = std::getenv("LOGSCOPE_WEB_UI_DIR"))
+    {
+        const std::filesystem::path candidate(envPath);
+
+        if (std::filesystem::is_directory(candidate))
+        {
+            return candidate;
+        }
+    }
+
+    const std::filesystem::path compileTime(LOGSCOPE_WEB_UI_DIR);
+
+    if (std::filesystem::is_directory(compileTime))
+    {
+        return compileTime;
+    }
+
+    const std::filesystem::path bundleUi = std::filesystem::current_path() / "ui" / "dist";
+
+    if (std::filesystem::is_directory(bundleUi))
+    {
+        return bundleUi;
+    }
+
+    const std::filesystem::path devUi = std::filesystem::current_path() / "apps" / "web" / "ui" / "dist";
+
+    if (std::filesystem::is_directory(devUi))
+    {
+        return devUi;
+    }
+
+    return compileTime;
 }
 
 void setJsonResponse(httplib::Response& response, const int status, const std::string& body)
@@ -832,7 +869,7 @@ void WebServer::registerRoutes()
         response.set_header(kSessionHeader, sessionId);
     });
 
-    const std::filesystem::path uiDirectory = std::filesystem::path(LOGSCOPE_WEB_UI_DIR);
+    const std::filesystem::path uiDirectory = resolveUiDirectory();
 
     if (std::filesystem::is_directory(uiDirectory))
     {
