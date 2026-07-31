@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v2.1.0`](CHANGELOG.md) — M15 Web Platform (`logscope-web` + browser MVP). See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v2.2.0`](CHANGELOG.md) — M15.3 shared investigations (workspaces, tail poll, async analyze). See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 
@@ -46,6 +46,8 @@ ctest --test-dir build --output-on-failure
 More examples (formats, config, investigation, sessions): [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started).
 
 ### Web platform (v2.1.0+)
+
+`logscope-web` serves REST + SPA on `127.0.0.1:8080` by default. **v2.2.0** adds shared workspaces, tail poll, and async analyze for large logs.
 
 ```bash
 cmake -S . -B build -DLOGSCOPE_WEB=ON

@@ -1,0 +1,192 @@
+openapi: 3.0.3
+info:
+  title: LogScope Web API
+  version: 2.2.0
+  description: |
+    REST API for `logscope-web` (ADR-009). Session header `X-LogScope-Session` required
+  on most routes. Error envelope `{ "error": { "code", "message" } }`; success `{ "data": ... }`.
+servers:
+  - url: http://127.0.0.1:8080
+    description: Default loopback bind
+tags:
+  - name: health
+  - name: sessions
+  - name: sources
+  - name: analysis
+  - name: workspaces
+  - name: tail
+  - name: jobs
+paths:
+  /api/v1/health:
+    get:
+      tags: [health]
+      summary: Health and version
+      responses:
+        '200':
+          description: OK
+  /api/v1/sessions/workspace:
+    post:
+      tags: [sessions]
+      summary: Create workspace session
+      responses:
+        '200':
+          description: Session created (X-LogScope-Session header)
+  /api/v1/sessions/save:
+    post:
+      tags: [sessions]
+      summary: Save session snapshot
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                workspaceId:
+                  type: string
+                  description: Optional shared workspace id (M15.3)
+      responses:
+        '200':
+          description: Saved
+  /api/v1/sources/open:
+    post:
+      tags: [sources]
+      summary: Open log source
+      responses:
+        '200':
+          description: Source opened
+  /api/v1/analyze:
+    post:
+      tags: [analysis]
+      summary: Analyze opened source (sync or async)
+      description: |
+        Returns 200 with result when source size < `web.async_analyze_threshold_bytes`;
+        202 with jobId when async (M15.3).
+      responses:
+        '200':
+          description: Synchronous analyze complete
+        '202':
+          description: Async job accepted (Location header)
+  /api/v1/investigate:
+    post:
+      tags: [analysis]
+      summary: Investigate with filter DSL
+      responses:
+        '200':
+          description: Investigation result
+  /api/v1/workspaces:
+    get:
+      tags: [workspaces]
+      summary: List shared workspaces
+      responses:
+        '200':
+          description: Workspace metadata array
+    post:
+      tags: [workspaces]
+      summary: Create shared workspace
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                captureSession:
+                  type: boolean
+      responses:
+        '200':
+          description: Workspace created
+  /api/v1/workspaces/{id}:
+    get:
+      tags: [workspaces]
+      summary: Get workspace metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata
+        '404':
+          description: Not found
+    put:
+      tags: [workspaces]
+      summary: Update workspace metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [workspaces]
+      summary: Delete workspace
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+  /api/v1/workspaces/{id}/open:
+    post:
+      tags: [workspaces]
+      summary: Open workspace into caller session
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Workspace loaded into session
+  /api/v1/tail/start:
+    post:
+      tags: [tail]
+      summary: Start tail on open source
+      responses:
+        '200':
+          description: Tail started
+        '409':
+          description: Already tailing
+  /api/v1/tail/stop:
+    post:
+      tags: [tail]
+      summary: Stop tail
+      responses:
+        '200':
+          description: Tail stopped
+  /api/v1/tail/poll:
+    get:
+      tags: [tail]
+      summary: Poll new tail lines (non-blocking)
+      responses:
+        '200':
+          description: New lines since last poll
+        '409':
+          description: Tail not active
+  /api/v1/jobs/{jobId}:
+    get:
+      tags: [jobs]
+      summary: Poll async analyze job
+      parameters:
+        - name: jobId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Job status (running | completed | failed)
+        '404':
+          description: Job not found or wrong session

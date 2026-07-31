@@ -42,7 +42,7 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **M13 – AI Assistant** | ✅ Complete | NL queries, summaries, anomaly hints, `agent investigate` (`v1.5.1`). |
 | **Phase 1 – Stabilize v1.x** | ✅ Complete | Docs, regression, observability, fuzz, license CI (`v1.5.2`). |
 | **M14 – Desktop Application** | ✅ Complete | Qt GUI, `logscope-desktop`, live tail (`v2.0.0`; all-platform binaries `v2.0.1`). |
-| **M15 – Web Platform** | ✅ Complete | REST API + browser MVP (`logscope-web`, SPA). [ADR-009](architecture/decisions/ADR-009-Web-Platform-REST.md). Released: `v2.1.0`. |
+| **M15 – Web Platform** | ✅ Complete | REST API + browser MVP + M15.3 shared investigations. [ADR-009](architecture/decisions/ADR-009-Web-Platform-REST.md). Released: `v2.1.0` (MVP), `v2.2.0` (shared workspaces, tail, async analyze). |
 | **M16 – Enterprise** | ⏳ Planned | RBAC, agents, streaming, multi-node. Target: `v2.x`. |
 | **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
 
@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.1.0`](CHANGELOG.md) — M15 Web Platform (`logscope-web` + browser MVP). **Next:** [M16 – Enterprise](planning/POST_V1_STRATEGIC_ROADMAP.md) or M15.3 follow-on.
+**Current release:** [`v2.2.0`](CHANGELOG.md) — M15.3 shared investigations (workspaces, tail poll, async analyze). **Next:** [M16 – Enterprise](planning/POST_V1_STRATEGIC_ROADMAP.md) or M15.4 thin auth.
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 

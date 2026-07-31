@@ -31,4 +31,8 @@ The [CI workflow](../../.github/workflows/ci.yml) `docs` job builds the site on 
 
 Doxygen scans `core/` and `apps/` headers (`.hpp`, `.h`, `.inl`), excluding test and fuzz directories. Only documented public APIs appear when `EXTRACT_ALL = NO`.
 
+## REST API sketch (OpenAPI)
+
+Human-maintained OpenAPI 3 stub for `logscope-web` routes: [openapi-v1.yaml](openapi-v1.yaml) (M15.1 + M15.3). Not a runtime dependency; update when REST surface changes.
+
 See [Configuration Guide](../handbook/CONFIGURATION_GUIDE.md) and [Developer Setup](../handbook/DEVELOPER_SETUP.md) for broader onboarding.

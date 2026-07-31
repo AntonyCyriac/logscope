@@ -12,6 +12,34 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.2.0] - 2026-07-31
+
+**M15.3 Shared Investigations** — shared workspaces API, tail poll, async analyze jobs.
+
+### Added
+
+- Shared workspaces REST API (`POST/GET/PUT/DELETE /api/v1/workspaces`, `POST .../open`) with file-first JSON persistence (`WorkspaceStore`)
+- Tail poll REST (`POST /api/v1/tail/start|stop`, `GET /api/v1/tail/poll`) delegating to `ApplicationService` tail APIs
+- Async analyze: `POST /api/v1/analyze` returns `202` + `Location` for large sources; `GET /api/v1/jobs/{id}` poll
+- `POST /api/v1/sessions/save` optional `workspaceId` to update shared workspace snapshot
+- SPA W2 flows: shared workspace list/open/save, tail panel, async analyze UX (`apps/web/ui/dist/`)
+- Web config: `web.workspace_dir`, `web.workspaces_list_limit`, `web.async_analyze_threshold_bytes`, `web.job_ttl_seconds`, `web.job_max_concurrent_per_session`
+- OpenAPI stub `docs/api/openapi-v1.yaml` (M15.1 + M15.3 routes)
+- **47** web tests (`scope_web_tests`, `logscope_web_integration_tests`, `logscope_web_parity_tests`)
+
+### Changed
+
+- `TailingFileLogSource::pollLine` for non-blocking tail poll over HTTP
+- `WebServer::stop` stops listener before draining analyze job workers
+
+### Upgrade notes
+
+- Build: `cmake -DLOGSCOPE_WEB=ON && cmake --build build --target logscope-web`
+- Release archive: `logscope-web-v2.2.0-*` then `./logscope-web` from extracted directory
+- Workspaces default to `{data_dir}/workspaces`; large logs analyze async (default threshold 10 MiB)
+
+---
+
 ## [2.1.0] - 2026-07-31
 
 **M15 Web Platform** — REST API and browser MVP over `ApplicationService`.
