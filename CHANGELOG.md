@@ -10,6 +10,17 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Added
+
+- M15.4 thin auth (`v2.2.1`): session idle TTL, upload temp cleanup, optional health API key policy, bind exposure warning, stale session `401`
+- Handbook [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md)
+- Web config: `web.session_ttl_seconds`, `web.max_sessions`, `web.health_requires_api_key`
+
+### Changed
+
+- Stale or unknown `X-LogScope-Session` on mutating routes → **401** `SESSION_EXPIRED` (was `400` for some cases)
+- **57** web-labelled tests (`scope_web_tests`, integration, parity)
+
 ---
 
 ## [2.2.0] - 2026-07-31

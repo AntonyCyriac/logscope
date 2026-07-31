@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v2.2.0`](CHANGELOG.md) — M15.3 shared investigations (workspaces, tail poll, async analyze). See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v2.2.1`](CHANGELOG.md) — M15.4 thin auth (session TTL, upload cleanup, securing guide). See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 
@@ -47,7 +47,7 @@ More examples (formats, config, investigation, sessions): [User Manual §2](docs
 
 ### Web platform (v2.1.0+)
 
-`logscope-web` serves REST + SPA on `127.0.0.1:8080` by default. **v2.2.0** adds shared workspaces, tail poll, and async analyze for large logs.
+`logscope-web` serves REST + SPA on `127.0.0.1:8080` by default. **v2.2.0** adds shared workspaces, tail poll, and async analyze. **v2.2.1** adds session TTL, upload cleanup, and [securing guidance](docs/handbook/SECURING_LOGSCOPE_WEB.md).
 
 ```bash
 cmake -S . -B build -DLOGSCOPE_WEB=ON
@@ -67,7 +67,7 @@ cmake --build build --target logscope-web
 
 CORS origins default from bind host/port (http + https when TLS enabled). Override with `web.cors_origins`.
 
-REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md). Optional API key via `web.api_key` or `LOGSCOPE_WEB_API_KEY`.
+REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md). Optional API key via `web.api_key` or `LOGSCOPE_WEB_API_KEY`. See [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md).
 
 ---
 
