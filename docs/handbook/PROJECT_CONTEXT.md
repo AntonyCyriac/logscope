@@ -200,6 +200,8 @@ Includes:
 - Fuzz smoke tests (where applicable)
 - CLI matrix on bulk-generated logs (Ubuntu CI: 10k lines; release: 100k lines per OS)
 
+**Docs-only PRs:** when a pull request changes only `*.md` files, the full matrix is skipped and a **Docs only (CI waived)** job passes instead. Any non-`.md` change (code, CMake, workflows, `openapi-v1.yaml`, `samples/*.properties`, etc.) runs the full matrix. Release workflow (`release.yml`) is unchanged — it runs only on `v*` tag push.
+
 Do not introduce changes that weaken CI quality.
 
 ---
