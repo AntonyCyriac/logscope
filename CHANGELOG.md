@@ -10,16 +10,29 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+---
+
+## [2.2.1] - 2026-07-31
+
+**M15.4 Thin Auth** — session idle TTL, upload temp cleanup, health key policy.
+
 ### Added
 
-- M15.4 thin auth (`v2.2.1`): session idle TTL, upload temp cleanup, optional health API key policy, bind exposure warning, stale session `401`
+- Session idle TTL (`web.session_ttl_seconds`) and capacity eviction (`web.max_sessions`); evicted sessions return `401 SESSION_EXPIRED`
+- Upload temp cleanup on replace, evict, and shutdown (`session_resource_cleanup`)
+- Optional health API key policy (`web.health_requires_api_key`); bind exposure warning when non-loopback without API key
 - Handbook [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md)
-- Web config: `web.session_ttl_seconds`, `web.max_sessions`, `web.health_requires_api_key`
+- ADR amendment [ADR-009-M15.4-Thin-Auth](docs/architecture/decisions/ADR-009-M15.4-Thin-Auth.md)
+- **57** web-labelled tests (`scope_web_tests`, integration, parity)
 
 ### Changed
 
 - Stale or unknown `X-LogScope-Session` on mutating routes → **401** `SESSION_EXPIRED` (was `400` for some cases)
-- **57** web-labelled tests (`scope_web_tests`, integration, parity)
+
+### Upgrade notes
+
+- Defaults preserve v2.2.0 behavior (`session_ttl_seconds=0`, `health_requires_api_key=false`); no migration required
+- See [v2.2.1 release notes](docs/release/v2.2.1-RELEASE-NOTES.md) and [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md)
 
 ---
 
