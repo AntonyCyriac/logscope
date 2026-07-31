@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.0.6`](CHANGELOG.md) — M14 Desktop + v2.0.6 CI hotfix. **Next ship:** [M15 – Web Platform](planning/M15-WEB-PLATFORM.md) (`v2.1.0` track).
+**Current release:** [`v2.1.0`](CHANGELOG.md) — M15 Web Platform (`logscope-web` + browser MVP). **Next:** [M16 – Enterprise](planning/POST_V1_STRATEGIC_ROADMAP.md) or M15.3 follow-on.
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
