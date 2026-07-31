@@ -11,6 +11,12 @@
 #include <fstream>
 #include <thread>
 
+#ifdef _WIN32
+#include <process.h>
+#else
+#include <unistd.h>
+#endif
+
 #include "foundation/path.hpp"
 #include "middleware/api_key.hpp"
 #include "web_config.hpp"
@@ -29,7 +35,14 @@ class WebApiIntegrationTest : public ::testing::Test
   protected:
     void SetUp() override
     {
-        workspaceRoot = std::filesystem::temp_directory_path() / "logscope-web-api-integration";
+        workspaceRoot = std::filesystem::temp_directory_path() /
+                        ("logscope-web-api-integration-" + std::to_string(
+#ifdef _WIN32
+                             static_cast<unsigned long>(_getpid())
+#else
+                             static_cast<unsigned long>(getpid())
+#endif
+                             ));
         std::filesystem::remove_all(workspaceRoot);
         std::filesystem::create_directories(workspaceRoot);
 
@@ -119,6 +132,12 @@ class WebApiIntegrationTest : public ::testing::Test
 class AsyncWebApiIntegrationTest : public WebApiIntegrationTest
 {
   protected:
+    void SetUp() override
+    {
+        WebApiIntegrationTest::SetUp();
+        client->set_read_timeout(120, 0);
+    }
+
     void configureTestConfig(scope::web::WebConfig& webConfig) override
     {
         WebApiIntegrationTest::configureTestConfig(webConfig);

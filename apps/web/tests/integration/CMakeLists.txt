@@ -7,6 +7,7 @@ add_executable(logscope_web_integration_tests
     ../../web_server.cpp
     ../../web_config.cpp
     ../../session_store.cpp
+    ../../session_resource_cleanup.cpp
     ../../workspace_store.cpp
     ../../analyze_job_queue.cpp
     ../../json_parse.cpp

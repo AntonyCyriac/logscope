@@ -21,22 +21,25 @@ namespace scope::web
  */
 struct WebConfig
 {
-    std::string bindHost = "127.0.0.1";
-    int bindPort = 8080;
-    std::string apiKey;
-    std::vector<std::string> corsOrigins{"http://127.0.0.1:8080", "http://localhost:8080"};
     std::uint64_t maxUploadBytes = 256ULL * 1024ULL * 1024ULL;
-    foundation::Path uploadTempDir;
-    bool allowServerPaths = false;
-    std::vector<foundation::Path> allowedPathRoots;
-    int requestTimeoutSeconds = 300;
-    foundation::Path workspaceDir;
-    int workspacesListLimit = 100;
     std::uint64_t asyncAnalyzeThresholdBytes = 10ULL * 1024ULL * 1024ULL;
-    int jobTtlSeconds = 3600;
-    int jobMaxConcurrentPerSession = 1;
+    std::vector<std::string> corsOrigins{"http://127.0.0.1:8080", "http://localhost:8080"};
+    std::vector<foundation::Path> allowedPathRoots;
+    std::string bindHost = "127.0.0.1";
+    std::string apiKey;
+    foundation::Path uploadTempDir;
+    foundation::Path workspaceDir;
     foundation::Path tlsCertPath;
     foundation::Path tlsKeyPath;
+    int bindPort = 8080;
+    int requestTimeoutSeconds = 300;
+    int workspacesListLimit = 100;
+    int jobTtlSeconds = 3600;
+    int jobMaxConcurrentPerSession = 1;
+    int sessionTtlSeconds = 0;
+    int maxSessions = 0;
+    bool allowServerPaths = false;
+    bool healthRequiresApiKey = false;
     bool corsOriginsUserSet = false;
     bool workspaceDirUserSet = false;
 
@@ -62,6 +65,8 @@ struct WebConfig
     [[nodiscard]] const char* urlScheme() const noexcept;
 
     [[nodiscard]] std::string listenUrl() const;
+
+    [[nodiscard]] static bool isLoopbackBindHost(const std::string& host);
 };
 
 } // namespace scope::web

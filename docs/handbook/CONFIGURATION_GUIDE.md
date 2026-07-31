@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Configuration Guide |
 | Category | Handbook |
-| Version | 1.1.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 24-07-2026 |
-| Last Updated | 24-07-2026 |
+| Last Updated | 31-07-2026 |
 
 ---
 
@@ -318,11 +318,57 @@ logscope agent investigate --config my-openai.properties --summarize samples/sam
 
 ---
 
-# 10. Related documents
+# 10. Web platform (`logscope-web`)
+
+Keys apply to `logscope-web` (M15 / ADR-009). Load via `--config` or environment (`LOGSCOPE_WEB_*`). See [Securing logscope-web](SECURING_LOGSCOPE_WEB.md) for deployment guidance.
+
+| Key | Default | Description |
+|-----|---------|-------------|
+| `web.bind_host` | `127.0.0.1` | Listen address |
+| `web.bind_port` | `8080` | Listen port |
+| `web.api_key` | empty | When set, require `X-LogScope-Api-Key` on mutating `/api/v1/*` |
+| `web.health_requires_api_key` | `false` | When `true` and `api_key` set, `GET /api/v1/health` requires the key |
+| `web.cors_origins` | (derived) | Comma-separated allowed browser origins |
+| `web.tls_cert` / `web.tls_key` | empty | PEM paths for embedded HTTPS (OpenSSL build) |
+| `web.max_upload_bytes` | 268435456 | Max multipart upload size (bytes) |
+| `web.upload_temp_dir` | (system temp) | Directory for staged upload files |
+| `web.allow_server_paths` | `false` | Allow `POST /api/v1/sources/open` with server paths |
+| `web.allowed_path_roots` | empty | Allowlist for server path open |
+| `web.request_timeout_seconds` | `300` | HTTP read/write timeout (sync analyze) |
+| `web.workspace_dir` | `{data_dir}/workspaces` | Shared workspace persistence root (M15.3) |
+| `web.workspaces_list_limit` | `100` | Max workspaces in list response |
+| `web.async_analyze_threshold_bytes` | `10485760` | Async analyze threshold (10 MiB) |
+| `web.job_ttl_seconds` | `3600` | Completed/failed job record TTL |
+| `web.job_max_concurrent_per_session` | `1` | Max in-flight analyze jobs per session |
+| `web.session_ttl_seconds` | `0` | Idle session TTL; `0` disables eviction (M15.4) |
+| `web.max_sessions` | `0` | Max in-memory sessions; `0` unlimited (M15.4) |
+
+Environment overrides:
+
+| Variable | Maps to |
+|----------|---------|
+| `LOGSCOPE_WEB_API_KEY` | `web.api_key` |
+| `LOGSCOPE_WEB_BIND_HOST` | `web.bind_host` |
+| `LOGSCOPE_WEB_BIND_PORT` | `web.bind_port` |
+| `LOGSCOPE_WEB_TLS_CERT` / `LOGSCOPE_WEB_TLS_KEY` | TLS paths |
+| `LOGSCOPE_WEB_WORKSPACE_DIR` | `web.workspace_dir` |
+| `LOGSCOPE_WEB_WORKSPACES_LIST_LIMIT` | `web.workspaces_list_limit` |
+| `LOGSCOPE_WEB_ASYNC_ANALYZE_THRESHOLD_BYTES` | `web.async_analyze_threshold_bytes` |
+| `LOGSCOPE_WEB_JOB_TTL_SECONDS` | `web.job_ttl_seconds` |
+| `LOGSCOPE_WEB_JOB_MAX_CONCURRENT_PER_SESSION` | `web.job_max_concurrent_per_session` |
+| `LOGSCOPE_WEB_SESSION_TTL_SECONDS` | `web.session_ttl_seconds` |
+| `LOGSCOPE_WEB_MAX_SESSIONS` | `web.max_sessions` |
+| `LOGSCOPE_WEB_HEALTH_REQUIRES_API_KEY` | `web.health_requires_api_key` (`true`/`1`/`yes`) |
+
+Sample: `samples/web.properties`.
+
+---
+
+# 11. Related documents
 
 | Document | Purpose |
 |----------|---------|
-| [CLI Reference](CLI_REFERENCE.md) | Commands, flags, and per-command options |
+| [Securing logscope-web](SECURING_LOGSCOPE_WEB.md) | `logscope-web` API key, bind, TLS, session TTL |
 | [Developer Setup](DEVELOPER_SETUP.md) | Build environment and workflow |
 | [M6 – Log Format Intelligence](../planning/M6-LOG-FORMAT-INTELLIGENCE.md) | Format profiles and field extraction |
 | [M10 – Query Language](../planning/M10-QUERY-LANGUAGE.md) | Filter DSL grammar |
@@ -338,3 +384,4 @@ logscope agent investigate --config my-openai.properties --summarize samples/sam
 |---------|------|-------------|
 | 1.0.0 | 24-07-2026 | Initial Phase 1 configuration guide. |
 | 1.2.0 | 25-07-2026 | M12 plugin configuration keys (`plugins.*`, provider selectors). |
+| 1.3.0 | 31-07-2026 | §10 Web platform (`web.*`) + M15.4 thin auth keys. |

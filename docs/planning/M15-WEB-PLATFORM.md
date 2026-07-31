@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | M15 – Web Platform |
 | Category | Project Planning |
-| Version | 0.6.0 |
-| Status | M15.3 complete — `v2.2.0`; **M15.4 active @ `v2.2.1`** |
+| Version | 0.7.0 |
+| Status | M15.4 complete — `v2.2.1`; M16 next |
 | Created | 30-07-2026 |
 | Last Updated | 31-07-2026 |
 
@@ -63,11 +63,23 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | M15.1 | REST service over `ApplicationService` | ✅ `v2.1.0` |
 | M15.2 | Browser MVP (investigate workflow) | ✅ `v2.1.0` |
 | M15.3 | Shared investigations / saved workspaces API, tail poll, async analyze | ✅ `v2.2.0` |
-| M15.4 | Thin auth | **Active @ `v2.2.1`** (G0 draft) |
+| M15.4 | Thin auth | ✅ `v2.2.1` |
 
 ---
 
 # 6. Acceptance
+
+## M15.4 (`v2.2.1`) — shipped (docs)
+
+| Area | Expected |
+|------|----------|
+| Session TTL | `web.session_ttl_seconds`; stale session `401` |
+| Temp cleanup | Upload temps removed on replace/evict/shutdown |
+| Health policy | Optional `web.health_requires_api_key` |
+| Bind warning | Non-loopback + no key → startup WARNING |
+| Handbook | [SECURING_LOGSCOPE_WEB.md](../handbook/SECURING_LOGSCOPE_WEB.md) |
+
+See [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md).
 
 ## M15.2 MVP (`v2.1.0`) — shipped
 
@@ -89,7 +101,7 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | SPA | W2 flows for shared list/open/save and tail panel |
 | Parity + security | See [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) |
 
-**Shipped:** `v2.2.0` (2026-07-31). **Active:** M15.4 thin auth @ `v2.2.1` (G0). Playwright CI deferred; M16 after M15.4.
+**Shipped:** `v2.2.0` (2026-07-31). **M15.4** thin auth @ `v2.2.1` (G4 docs). Playwright CI deferred; **M16** next.
 
 ---
 
@@ -101,7 +113,8 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | [ADR-009 Web REST](../architecture/decisions/ADR-009-Web-Platform-REST.md) | HTTP server, API contract, auth, test strategy |
 | [M15-V210-WEB-SCENARIOS.md](M15-V210-WEB-SCENARIOS.md) | v2.1.0 acceptance scenario matrix |
 | [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) | **v2.2.0** M15.3 acceptance scenario matrix |
-| [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md) | **v2.2.1** M15.4 thin auth scenario matrix (G0) |
+| [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md) | **v2.2.1** M15.4 thin auth scenario matrix |
+| [SECURING_LOGSCOPE_WEB.md](../handbook/SECURING_LOGSCOPE_WEB.md) | Operator guide for shared-host deployment |
 | [NEXT-VALUE-ADD.md](NEXT-VALUE-ADD.md) | Prioritized backlog before/during M15 |
 | [ROADMAP.md](../ROADMAP.md) | Milestone status |
 
@@ -114,4 +127,4 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 | 0.1.0 | 30-07-2026 | Initial draft; graduation stub before ADR-009. |
 | 0.2.0 | 30-07-2026 | ADR-009 accepted; M15.0 gate satisfied; scenario matrix linked. |
 | 0.3.0 | 31-07-2026 | M15.1 + M15.2 shipped in `v2.1.0` (`logscope-web` + SPA). |
-| 0.6.0 | 31-07-2026 | M15.4 thin auth active @ `v2.2.1` (G0 draft). |
+| 0.7.0 | 31-07-2026 | M15.4 thin auth @ `v2.2.1` (G4 docs). |

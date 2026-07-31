@@ -134,7 +134,71 @@ TEST_F(WebSecurityTest, SessionIsolationDeniesUnknownSessionInvestigate)
         client.Post("/api/v1/investigate", headersB, "{\"search\": \"error\"}", "application/json");
 
     ASSERT_TRUE(investigate);
-    EXPECT_EQ(400, investigate->status);
+    EXPECT_EQ(401, investigate->status);
+    EXPECT_NE(std::string::npos, investigate->body.find("SESSION_EXPIRED"));
+}
+
+TEST_F(WebSecurityTest, HealthRequiresApiKeyWhenConfigured)
+{
+    server->stop();
+    config.apiKey = "secret-key";
+    config.healthRequiresApiKey = true;
+    server = std::make_unique<scope::web::WebServer>(config);
+    ASSERT_TRUE(server->startInBackground());
+
+    httplib::Client client("127.0.0.1", server->port());
+    const httplib::Result health = client.Get("/api/v1/health");
+    ASSERT_TRUE(health);
+    EXPECT_EQ(401, health->status);
+
+    httplib::Headers headers;
+    headers.emplace(scope::web::kApiKeyHeader, "secret-key");
+    const httplib::Result authorized = client.Get("/api/v1/health", headers);
+    ASSERT_TRUE(authorized);
+    EXPECT_EQ(200, authorized->status);
+}
+
+TEST_F(WebSecurityTest, SessionTtlEvictsStaleSessionOnHealthSweep)
+{
+    server->stop();
+    config.sessionTtlSeconds = 1;
+    server = std::make_unique<scope::web::WebServer>(config);
+    ASSERT_TRUE(server->startInBackground());
+
+    const std::string sessionId = createSession();
+    std::this_thread::sleep_for(std::chrono::milliseconds(1200));
+
+    httplib::Client client("127.0.0.1", server->port());
+    ASSERT_TRUE(client.Get("/api/v1/health"));
+
+    httplib::Headers headers;
+    headers.emplace(scope::web::kSessionHeader, sessionId);
+    const httplib::Result analyze = client.Post("/api/v1/analyze", headers, "{}", "application/json");
+
+    ASSERT_TRUE(analyze);
+    EXPECT_EQ(401, analyze->status);
+    EXPECT_NE(std::string::npos, analyze->body.find("SESSION_EXPIRED"));
+}
+
+TEST_F(WebSecurityTest, MaxSessionsEvictsOldestOnCreate)
+{
+    server->stop();
+    config.maxSessions = 1;
+    server = std::make_unique<scope::web::WebServer>(config);
+    ASSERT_TRUE(server->startInBackground());
+
+    const std::string firstSessionId = createSession();
+    httplib::Client client("127.0.0.1", server->port());
+    const httplib::Result second = client.Post("/api/v1/sessions/workspace");
+    ASSERT_TRUE(second);
+    EXPECT_EQ(200, second->status);
+
+    httplib::Headers staleHeaders;
+    staleHeaders.emplace(scope::web::kSessionHeader, firstSessionId);
+    const httplib::Result stale = client.Post("/api/v1/analyze", staleHeaders, "{}", "application/json");
+    ASSERT_TRUE(stale);
+    EXPECT_EQ(401, stale->status);
+    EXPECT_NE(std::string::npos, stale->body.find("SESSION_EXPIRED"));
 }
 
 TEST_F(WebSecurityTest, SpaShellServedAtRoot)

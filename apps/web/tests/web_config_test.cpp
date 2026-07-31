@@ -63,6 +63,23 @@ TEST(WebConfigTest, M153Defaults)
     EXPECT_EQ(1, defaults.jobMaxConcurrentPerSession);
 }
 
+TEST(WebConfigTest, M154ThinAuthDefaults)
+{
+    const scope::web::WebConfig defaults = scope::web::WebConfig::defaults();
+
+    EXPECT_EQ(0, defaults.sessionTtlSeconds);
+    EXPECT_EQ(0, defaults.maxSessions);
+    EXPECT_FALSE(defaults.healthRequiresApiKey);
+}
+
+TEST(WebConfigTest, LoopbackBindHostDetection)
+{
+    EXPECT_TRUE(scope::web::WebConfig::isLoopbackBindHost("127.0.0.1"));
+    EXPECT_TRUE(scope::web::WebConfig::isLoopbackBindHost("localhost"));
+    EXPECT_TRUE(scope::web::WebConfig::isLoopbackBindHost("::1"));
+    EXPECT_FALSE(scope::web::WebConfig::isLoopbackBindHost("192.168.0.10"));
+}
+
 TEST(WebConfigTest, ListenUrlReflectsTls)
 {
     scope::web::WebConfig config = scope::web::WebConfig::defaults();
