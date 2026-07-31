@@ -1,0 +1,57 @@
+# ==========================================================
+# REST vs CLI parity tests (M15.1)
+# ==========================================================
+
+include(${CMAKE_SOURCE_DIR}/cmake/LogScopeHttplib.cmake)
+
+add_executable(logscope_web_parity_tests
+    cli_rest_parity_test.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/web_server.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/web_config.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/session_store.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/json_parse.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/rest_json.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/web_request_parsers.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/middleware/api_key.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/investigation_output.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/report_output.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/report_config.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/output_format.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/cli_analysis_config.cpp
+    ${CMAKE_SOURCE_DIR}/apps/cli/analytics_output.cpp
+)
+
+add_dependencies(logscope_web_parity_tests logscope logscope-web)
+
+target_compile_definitions(logscope_web_parity_tests
+    PRIVATE
+        "LOGSCOPE_EXECUTABLE=R\"($<TARGET_FILE:logscope>)\""
+        "LOGSCOPE_WEB_EXECUTABLE=R\"($<TARGET_FILE:logscope-web>)\""
+        "LOGSCOPE_SOURCE_DIR=R\"(${CMAKE_SOURCE_DIR})\""
+        LOGSCOPE_VERSION="${PROJECT_VERSION}"
+)
+
+target_link_libraries(logscope_web_parity_tests
+    PRIVATE
+        scope_application
+        logscope_httplib
+        logscope_gtest_support
+        GTest::gtest_main
+)
+
+target_include_directories(logscope_web_parity_tests
+    PRIVATE
+        ${CMAKE_SOURCE_DIR}/tests/end_to_end
+        ${CMAKE_SOURCE_DIR}/apps/web
+        ${CMAKE_SOURCE_DIR}/apps/cli
+)
+
+if(WIN32)
+    target_link_libraries(logscope_web_parity_tests PRIVATE ws2_32 crypt32)
+endif()
+
+include(GoogleTest)
+gtest_discover_tests(logscope_web_parity_tests
+    WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
+    PROPERTIES LABELS "logscope_web_integration_tests"
+)

@@ -19,6 +19,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 # ----------------------------------------------------------
 
 option(LOGSCOPE_DESKTOP "Build Qt desktop application" OFF)
+option(LOGSCOPE_WEB "Build logscope-web REST server" OFF)
 option(LOGSCOPE_BENCHMARKS "Build performance benchmarks" OFF)
 option(LOGSCOPE_FUZZING "Build libFuzzer targets (requires Clang)" OFF)
 option(LOGSCOPE_BUILD_SAMPLE_PLUGINS "Build example dynamic plugins" ON)
