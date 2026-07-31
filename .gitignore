@@ -36,6 +36,7 @@ Thumbs.db
 *.bak
 *.swp
 *.html
+!apps/web/ui/dist/index.html
 pipeline_integration_empty.log
 benchmark_synthetic.log
 benchmark_results.json
