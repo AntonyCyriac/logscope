@@ -20,6 +20,10 @@
 #include <fstream>
 #include <sstream>
 
+#ifndef LOGSCOPE_WEB_UI_DIR
+#define LOGSCOPE_WEB_UI_DIR "apps/web/ui/dist"
+#endif
+
 namespace scope::web
 {
 
@@ -147,18 +151,32 @@ const WebConfig& WebServer::config() const noexcept
 namespace
 {
 
-void applyCors(const scope::web::WebConfig& config, httplib::Response& response)
+void applyCors(const scope::web::WebConfig& config, const httplib::Request& request, httplib::Response& response)
 {
     if (config.corsOrigins.empty())
     {
         return;
     }
 
-    response.set_header("Access-Control-Allow-Origin", config.corsOrigins.front());
+    const std::string origin = request.get_header_value("Origin");
+    bool originAllowed = false;
 
-    for (std::size_t index = 1U; index < config.corsOrigins.size(); ++index)
+    if (!origin.empty())
     {
-        response.set_header("Access-Control-Allow-Origin", config.corsOrigins[index]);
+        for (const std::string& allowed : config.corsOrigins)
+        {
+            if (allowed == origin)
+            {
+                response.set_header("Access-Control-Allow-Origin", origin);
+                originAllowed = true;
+                break;
+            }
+        }
+    }
+
+    if (!originAllowed)
+    {
+        response.set_header("Access-Control-Allow-Origin", config.corsOrigins.front());
     }
 
     response.set_header("Access-Control-Allow-Headers", "Content-Type, X-LogScope-Session, X-LogScope-Api-Key");
@@ -178,18 +196,13 @@ std::string resolveSessionId(scope::web::SessionStore& sessionStore, const httpl
 
 void WebServer::registerRoutes()
 {
-    m_server->Options(R"(/.*)", [this](const httplib::Request&, httplib::Response& response) {
-        applyCors(m_config, response);
+    m_server->Options(R"(/.*)", [this](const httplib::Request& request, httplib::Response& response) {
+        applyCors(m_config, request, response);
         response.status = 204;
     });
 
     m_server->Get("/api/v1/health", [this](const httplib::Request& request, httplib::Response& response) {
-        if (!authorizeApiKey(m_config.apiKey, request, response))
-        {
-            return;
-        }
-
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         std::ostringstream body;
         body << "{\n"
@@ -207,7 +220,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = m_sessionStore.createWorkspace();
         setJsonResponse(response, 200, successEnvelope("{\"sessionId\": \"" + escapeJsonString(sessionId) + "\"}"));
@@ -220,7 +233,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -259,7 +272,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -296,13 +309,21 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
 
         if (workspace == nullptr)
         {
+            return;
+        }
+
+        if (!m_config.allowServerPaths)
+        {
+            setJsonResponse(response, 403,
+                            errorEnvelope("FORBIDDEN", "Server path open is disabled (web.allow_server_paths=false)."));
+
             return;
         }
 
@@ -345,7 +366,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -421,7 +442,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -461,7 +482,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -503,7 +524,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -543,7 +564,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -581,7 +602,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -618,7 +639,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -677,7 +698,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -699,7 +720,7 @@ void WebServer::registerRoutes()
             return;
         }
 
-        applyCors(m_config, response);
+        applyCors(m_config, request, response);
 
         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
         WorkspaceSession* workspace = requireSession(*this, sessionId, response);
@@ -724,6 +745,146 @@ void WebServer::registerRoutes()
         setJsonResponse(response, 200, successEnvelope(formatExtensionInfo(*describeResult)));
         response.set_header(kSessionHeader, sessionId);
     });
+
+    m_server->Post("/api/v1/export", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        const reporting::ReportOptions options = parseReportOptions(request.body);
+
+        std::lock_guard<std::mutex> lock(workspace->mutex);
+
+        if (!workspace->service->hasModel())
+        {
+            setJsonResponse(response, 409, errorEnvelope("INVALID_STATE", "Analyze a source before export."));
+
+            return;
+        }
+
+        const reporting::Report report = workspace->service->generateReport(options);
+
+        if (report.isBinary())
+        {
+            response.status = 200;
+            response.set_content(reinterpret_cast<const char*>(report.bytes().data()), report.bytes().size(),
+                               report.mimeType().c_str());
+        }
+        else if (options.format == reporting::ReportFormat::Html)
+        {
+            response.status = 200;
+            response.set_content(report.text(), "text/html; charset=utf-8");
+        }
+        else if (options.format == reporting::ReportFormat::Json)
+        {
+            setJsonResponse(response, 200, successEnvelope(report.text()));
+        }
+        else
+        {
+            response.status = 200;
+            response.set_content(report.text(), "text/plain; charset=utf-8");
+        }
+
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Post("/api/v1/agent/investigate", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        const AgentInvestigateRequest agentRequest = parseAgentInvestigateRequest(request.body);
+
+        std::lock_guard<std::mutex> lock(workspace->mutex);
+        const auto agentResult = workspace->service->agentInvestigate(agentRequest.criteria, agentRequest.askQuery,
+                                                                      agentRequest.summarize, agentRequest.hints);
+
+        if (!agentResult)
+        {
+            setErrorResponse(response, agentResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatAgentInvestigateJson(*agentResult)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    const std::filesystem::path uiDirectory = std::filesystem::path(LOGSCOPE_WEB_UI_DIR);
+
+    if (std::filesystem::is_directory(uiDirectory))
+    {
+        const auto serveUiFile = [this, uiDirectory](const std::string& relativePath, const char* contentType,
+                                                     httplib::Response& response) {
+            std::ifstream stream(uiDirectory / relativePath, std::ios::binary);
+
+            if (!stream)
+            {
+                response.status = 404;
+
+                return;
+            }
+
+            std::ostringstream buffer;
+            buffer << stream.rdbuf();
+            response.status = 200;
+            response.set_content(buffer.str(), contentType);
+        };
+
+        m_server->Get("/", [this, serveUiFile](const httplib::Request& request, httplib::Response& response) {
+            applyCors(m_config, request, response);
+            serveUiFile("index.html", "text/html; charset=utf-8", response);
+        });
+
+        m_server->Get("/index.html", [this, serveUiFile](const httplib::Request& request, httplib::Response& response) {
+            applyCors(m_config, request, response);
+            serveUiFile("index.html", "text/html; charset=utf-8", response);
+        });
+
+        m_server->Get("/app.js", [this, serveUiFile](const httplib::Request& request, httplib::Response& response) {
+            applyCors(m_config, request, response);
+            serveUiFile("app.js", "application/javascript; charset=utf-8", response);
+        });
+
+        m_server->Get("/styles.css", [this, serveUiFile](const httplib::Request& request, httplib::Response& response) {
+            applyCors(m_config, request, response);
+            serveUiFile("styles.css", "text/css; charset=utf-8", response);
+        });
+
+        m_server->Get(R"(/.*)", [this, serveUiFile](const httplib::Request& request, httplib::Response& response) {
+            if (request.path.rfind("/api/", 0) == 0)
+            {
+                response.status = 404;
+
+                return;
+            }
+
+            applyCors(m_config, request, response);
+            serveUiFile("index.html", "text/html; charset=utf-8", response);
+        });
+    }
 }
 
 } // namespace scope::web

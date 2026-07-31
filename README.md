@@ -5,7 +5,7 @@
 
 Analyze any log format through one CLI workflow — parse, investigate, report, and persist indexes without custom scripts.
 
-**Status:** [`v2.0.6`](CHANGELOG.md) — M14 Desktop + v2.0.6 CI hotfix. See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
+**Status:** [`v2.1.0`](CHANGELOG.md) — M15 Web Platform (`logscope-web` + browser MVP). See [Roadmap](docs/ROADMAP.md) and [Changelog](CHANGELOG.md).
 
 ---
 
@@ -45,6 +45,17 @@ ctest --test-dir build --output-on-failure
 
 More examples (formats, config, investigation, sessions): [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started).
 
+### Web platform (v2.1.0+)
+
+```bash
+cmake -S . -B build -DLOGSCOPE_WEB=ON
+cmake --build build --target logscope-web
+./build/apps/web/logscope-web
+# Open http://127.0.0.1:8080/
+```
+
+REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md). Optional API key via `web.api_key` or `LOGSCOPE_WEB_API_KEY`.
+
 ---
 
 ## Build from source
@@ -68,7 +79,7 @@ GoogleTest and SQLite (amalgamation) are fetched automatically by CMake.
 ## Repository layout
 
 ```text
-apps/       CLI application
+apps/       CLI, desktop (optional), web (optional)
 core/       Libraries (foundation, source, analysis, investigation, reporting, …)
 docs/       Product, architecture, handbook, planning
 samples/    Example logs and configuration (see [samples/README.md](samples/README.md))

@@ -6,6 +6,11 @@
 #include <gtest/gtest.h>
 #include <httplib.h>
 
+#include <chrono>
+#include <filesystem>
+#include <fstream>
+#include <thread>
+
 #include "foundation/path.hpp"
 #include "middleware/api_key.hpp"
 #include "web_config.hpp"
@@ -112,4 +117,145 @@ TEST_F(WebApiIntegrationTest, ListsExtensions)
     ASSERT_TRUE(result);
     EXPECT_EQ(200, result->status);
     EXPECT_NE(std::string::npos, result->body.find("\"id\""));
+}
+
+TEST_F(WebApiIntegrationTest, SessionSaveLoadRoundTrip)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result exportBefore =
+        client->Post("/api/v1/export", headers, "{\"format\": \"json\"}", "application/json");
+    ASSERT_TRUE(exportBefore);
+    EXPECT_EQ(200, exportBefore->status);
+
+    const std::filesystem::path sessionFile =
+        std::filesystem::temp_directory_path() / "logscope-web-session-test.session";
+    std::filesystem::remove(sessionFile);
+
+    const std::string saveBody = "{\"sessionFile\": \"" + sessionFile.generic_string() + "\"}";
+    const httplib::Result saveResult = client->Post("/api/v1/sessions/save", headers, saveBody, "application/json");
+    ASSERT_TRUE(saveResult);
+    EXPECT_EQ(200, saveResult->status);
+    EXPECT_TRUE(std::filesystem::exists(sessionFile));
+
+    const std::string newSessionId = createSession();
+    const httplib::Headers newHeaders = sessionHeaders(newSessionId);
+    const std::string loadBody = "{\"path\": \"" + sessionFile.generic_string() + "\"}";
+    const httplib::Result loadResult = client->Post("/api/v1/sessions/load", newHeaders, loadBody, "application/json");
+    ASSERT_TRUE(loadResult);
+    EXPECT_EQ(200, loadResult->status);
+
+    const httplib::Result exportAfter =
+        client->Post("/api/v1/export", newHeaders, "{\"format\": \"json\"}", "application/json");
+    ASSERT_TRUE(exportAfter);
+    EXPECT_EQ(200, exportAfter->status);
+    EXPECT_NE(std::string::npos, exportAfter->body.find("\"totalLines\": 8"));
+    EXPECT_NE(std::string::npos, exportAfter->body.find("\"errorLines\": 4"));
+    EXPECT_NE(std::string::npos, exportBefore->body.find("\"totalLines\": 8"));
+    EXPECT_NE(std::string::npos, exportBefore->body.find("\"errorLines\": 4"));
+
+    std::filesystem::remove(sessionFile);
+}
+
+TEST_F(WebApiIntegrationTest, ExportHtmlAndPdf)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result htmlResult =
+        client->Post("/api/v1/export", headers, "{\"format\": \"html\"}", "application/json");
+    ASSERT_TRUE(htmlResult);
+    EXPECT_EQ(200, htmlResult->status);
+    EXPECT_NE(std::string::npos, htmlResult->body.find("<html"));
+
+    const httplib::Result pdfResult =
+        client->Post("/api/v1/export", headers, "{\"format\": \"pdf\"}", "application/json");
+    ASSERT_TRUE(pdfResult);
+    EXPECT_EQ(200, pdfResult->status);
+    EXPECT_GE(pdfResult->body.size(), 4U);
+    EXPECT_EQ('%', pdfResult->body[0]);
+    EXPECT_EQ('P', pdfResult->body[1]);
+    EXPECT_EQ('D', pdfResult->body[2]);
+    EXPECT_EQ('F', pdfResult->body[3]);
+}
+
+TEST_F(WebApiIntegrationTest, AgentInvestigateAskErrors)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    ASSERT_TRUE(client->Post("/api/v1/config/load", headers,
+                             "{\"path\": \"" + sourcePath("samples/ai-noop.properties") + "\"}",
+                             "application/json"));
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result result =
+        client->Post("/api/v1/agent/investigate", headers, "{\"ask\": \"errors\"}", "application/json");
+    ASSERT_TRUE(result);
+    EXPECT_EQ(200, result->status);
+    EXPECT_NE(std::string::npos, result->body.find("\"matchingLineCount\": 4"));
+}
+
+TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/large-app.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+
+    const auto start = std::chrono::steady_clock::now();
+    const httplib::Result analyzeResult =
+        client->Post("/api/v1/analyze", headers, "{\"persistIndex\": true}", "application/json");
+    const auto elapsed = std::chrono::steady_clock::now() - start;
+
+    ASSERT_TRUE(analyzeResult);
+    EXPECT_EQ(200, analyzeResult->status);
+    EXPECT_LT(elapsed, std::chrono::seconds(120));
+    EXPECT_NE(std::string::npos, analyzeResult->body.find("\"totalLines\""));
+}
+
+namespace
+{
+
+class WebApiKeyIntegrationTest : public WebApiIntegrationTest
+{
+  protected:
+    void SetUp() override
+    {
+        config = scope::web::WebConfig::defaults();
+        config.bindPort = 0;
+        config.apiKey = "integration-secret";
+        server = std::make_unique<scope::web::WebServer>(config);
+        ASSERT_TRUE(server->startInBackground());
+        client = std::make_unique<httplib::Client>("127.0.0.1", server->port());
+        client->set_connection_timeout(2, 0);
+    }
+};
+
+} // namespace
+
+TEST_F(WebApiKeyIntegrationTest, ApiKeyRequiredOnMutatingRoutes)
+{
+    const httplib::Result missingKey = client->Post("/api/v1/sessions/workspace");
+    ASSERT_TRUE(missingKey);
+    EXPECT_EQ(401, missingKey->status);
+
+    httplib::Headers headers;
+    headers.emplace(scope::web::kApiKeyHeader, "integration-secret");
+    const httplib::Result withKey = client->Post("/api/v1/sessions/workspace", headers);
+    ASSERT_TRUE(withKey);
+    EXPECT_EQ(200, withKey->status);
 }

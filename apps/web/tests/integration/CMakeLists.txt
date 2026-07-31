@@ -22,6 +22,7 @@ add_executable(logscope_web_integration_tests
 target_compile_definitions(logscope_web_integration_tests
     PRIVATE
         LOGSCOPE_VERSION="${PROJECT_VERSION}"
+        "LOGSCOPE_WEB_UI_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../../ui/dist\""
         "LOGSCOPE_SOURCE_DIR=R\"(${CMAKE_SOURCE_DIR})\""
 )
 

@@ -240,6 +240,29 @@ reporting::ReportOptions parseReportOptions(const std::string_view body)
     return options;
 }
 
+AgentInvestigateRequest parseAgentInvestigateRequest(const std::string_view body)
+{
+    AgentInvestigateRequest request;
+    request.criteria = parseInvestigationCriteria(body);
+
+    if (const std::optional<std::string> ask = jsonStringField(body, "ask"))
+    {
+        request.askQuery = *ask;
+    }
+
+    if (const std::optional<bool> summarize = jsonBoolField(body, "summarize"))
+    {
+        request.summarize = *summarize;
+    }
+
+    if (const std::optional<bool> hints = jsonBoolField(body, "hints"))
+    {
+        request.hints = *hints;
+    }
+
+    return request;
+}
+
 application::SessionSaveRequest parseSessionSaveRequest(const std::string_view body)
 {
     application::SessionSaveRequest request;

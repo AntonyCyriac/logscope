@@ -2,12 +2,16 @@
 # Web platform unit tests (M15.1)
 # ==========================================================
 
+option(LOGSCOPE_WEB_UI_BUILD "Build web UI assets with Vite (optional; dist/ is vendored)" OFF)
+
 add_executable(scope_web_tests
     health_handler_test.cpp
     session_store_test.cpp
     web_request_parsers_test.cpp
     rest_json_test.cpp
     api_key_middleware_test.cpp
+    web_security_test.cpp
+    upload_size_limit_test.cpp
     ../web_server.cpp
     ../web_config.cpp
     ../session_store.cpp
@@ -26,6 +30,8 @@ add_executable(scope_web_tests
 target_compile_definitions(scope_web_tests
     PRIVATE
         LOGSCOPE_VERSION="${PROJECT_VERSION}"
+        "LOGSCOPE_WEB_UI_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/../ui/dist\""
+        "LOGSCOPE_SOURCE_DIR=R\"(${CMAKE_SOURCE_DIR})\""
 )
 
 target_link_libraries(scope_web_tests

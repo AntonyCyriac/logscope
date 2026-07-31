@@ -225,4 +225,26 @@ std::string formatInvestigationJson(const investigation::InvestigationResult& re
     return scope::cli::formatInvestigationOutput(result, scope::cli::OutputFormat::Json);
 }
 
+std::string formatAgentInvestigateJson(const application::AgentInvestigateResult& result)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigation\": " << formatInvestigationJson(result.investigation) << ",\n"
+           << "  \"aiErrors\": [";
+
+    for (std::size_t index = 0U; index < result.aiErrors.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << '"' << escapeJsonString(result.aiErrors[index]) << '"';
+    }
+
+    output << "]\n}";
+
+    return output.str();
+}
+
 } // namespace scope::web

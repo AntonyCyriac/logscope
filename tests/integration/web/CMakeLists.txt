@@ -29,6 +29,7 @@ target_compile_definitions(logscope_web_parity_tests
         "LOGSCOPE_WEB_EXECUTABLE=R\"($<TARGET_FILE:logscope-web>)\""
         "LOGSCOPE_SOURCE_DIR=R\"(${CMAKE_SOURCE_DIR})\""
         LOGSCOPE_VERSION="${PROJECT_VERSION}"
+        "LOGSCOPE_WEB_UI_DIR=\"${CMAKE_SOURCE_DIR}/apps/web/ui/dist\""
 )
 
 target_link_libraries(logscope_web_parity_tests

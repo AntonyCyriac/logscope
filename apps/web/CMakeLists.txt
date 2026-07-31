@@ -28,6 +28,7 @@ add_executable(logscope-web
 target_compile_definitions(logscope-web
     PRIVATE
         LOGSCOPE_VERSION="${PROJECT_VERSION}"
+        "LOGSCOPE_WEB_UI_DIR=\"${CMAKE_CURRENT_SOURCE_DIR}/ui/dist\""
 )
 
 target_link_libraries(logscope-web

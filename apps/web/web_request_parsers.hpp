@@ -33,6 +33,19 @@ namespace scope::web
 
 [[nodiscard]] application::SessionSaveRequest parseSessionSaveRequest(std::string_view body);
 
+/**
+ * @brief Parsed body for POST /api/v1/agent/investigate.
+ */
+struct AgentInvestigateRequest
+{
+    investigation::InvestigationCriteria criteria;
+    std::string askQuery;
+    bool summarize = false;
+    bool hints = false;
+};
+
+[[nodiscard]] AgentInvestigateRequest parseAgentInvestigateRequest(std::string_view body);
+
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 
 } // namespace scope::web

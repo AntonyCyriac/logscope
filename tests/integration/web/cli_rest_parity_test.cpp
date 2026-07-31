@@ -161,3 +161,56 @@ TEST_F(CliRestParityTest, InvestigateMatchingLineCountMatchesSampleLog)
 
     EXPECT_EQ(*cliMatchCount, *restMatchCount);
 }
+
+TEST_F(CliRestParityTest, AnalyticsBucketCountsMatchSampleLog)
+{
+    const std::string cliOutput = runLogscope("analytics --format json " +
+                                              scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+    const std::optional<std::size_t> cliClusterCount = extractJsonSizeT(cliOutput, "clusterCount");
+    ASSERT_TRUE(cliClusterCount.has_value());
+
+    const std::string sessionId = createSession();
+    httplib::Headers headers;
+    headers.emplace(scope::web::kSessionHeader, sessionId);
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result analyticsResult = client->Post("/api/v1/analytics", headers, "{}", "application/json");
+    ASSERT_TRUE(analyticsResult);
+    const std::optional<std::size_t> restClusterCount = extractJsonSizeT(analyticsResult->body, "clusterCount");
+    ASSERT_TRUE(restClusterCount.has_value());
+
+    EXPECT_EQ(*cliClusterCount, *restClusterCount);
+}
+
+TEST_F(CliRestParityTest, AgentInvestigateAskErrorsMatchesCli)
+{
+    const std::string cliOutput =
+        runLogscope("agent investigate --config " + scope::test_support::quoteArgument(sourcePath("samples/ai-noop.properties")) +
+                    " --format json --ask errors " +
+                    scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+    const std::optional<std::size_t> cliMatchCount = extractJsonSizeT(cliOutput, "matchingLineCount");
+    ASSERT_TRUE(cliMatchCount.has_value());
+
+    const std::string sessionId = createSession();
+    httplib::Headers headers;
+    headers.emplace(scope::web::kSessionHeader, sessionId);
+
+    ASSERT_TRUE(client->Post("/api/v1/config/load", headers,
+                             "{\"path\": \"" + sourcePath("samples/ai-noop.properties") + "\"}",
+                             "application/json"));
+
+    const std::string openBody = "{\"path\": \"" + sourcePath("samples/sample.log") + "\"}";
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers, openBody, "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result agentResult =
+        client->Post("/api/v1/agent/investigate", headers, "{\"ask\": \"errors\"}", "application/json");
+    ASSERT_TRUE(agentResult);
+    const std::optional<std::size_t> restMatchCount = extractJsonSizeT(agentResult->body, "matchingLineCount");
+    ASSERT_TRUE(restMatchCount.has_value());
+
+    EXPECT_EQ(*cliMatchCount, *restMatchCount);
+}

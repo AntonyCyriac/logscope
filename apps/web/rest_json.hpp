@@ -13,6 +13,7 @@
 #include "extension_info.hpp"
 #include "foundation/error.hpp"
 #include "foundation/path.hpp"
+#include "application_service.hpp"
 #include "investigation_result.hpp"
 
 namespace scope::web
@@ -40,5 +41,7 @@ namespace scope::web
 [[nodiscard]] std::string formatAnalyzeJson(const analysis::AnalysisModel& model);
 
 [[nodiscard]] std::string formatInvestigationJson(const investigation::InvestigationResult& result);
+
+[[nodiscard]] std::string formatAgentInvestigateJson(const application::AgentInvestigateResult& result);
 
 } // namespace scope::web
