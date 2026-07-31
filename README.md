@@ -50,9 +50,20 @@ More examples (formats, config, investigation, sessions): [User Manual §2](docs
 ```bash
 cmake -S . -B build -DLOGSCOPE_WEB=ON
 cmake --build build --target logscope-web
-./build/apps/web/logscope-web
-# Open http://127.0.0.1:8080/
+./build/apps/web/logscope-web --config samples/web.properties
+# Open http://127.0.0.1:8080/ (or https when TLS is configured)
 ```
+
+**Bind / TLS** (also `web.bind_host`, `web.bind_port`, `web.tls_cert`, `web.tls_key` in properties):
+
+| Flag / env | Purpose |
+|------------|---------|
+| `--bind-host` / `LOGSCOPE_WEB_BIND_HOST` | Listen address (default `127.0.0.1`) |
+| `--bind-port` / `LOGSCOPE_WEB_BIND_PORT` | Listen port (default `8080`) |
+| `--tls-cert` / `LOGSCOPE_WEB_TLS_CERT` | HTTPS certificate (PEM; requires OpenSSL build) |
+| `--tls-key` / `LOGSCOPE_WEB_TLS_KEY` | HTTPS private key (PEM) |
+
+CORS origins default from bind host/port (http + https when TLS enabled). Override with `web.cors_origins`.
 
 REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md). Optional API key via `web.api_key` or `LOGSCOPE_WEB_API_KEY`.
 

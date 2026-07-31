@@ -61,6 +61,9 @@ Each public tag produces a **separate GitHub Release** with its own binaries. **
 | Desktop Linux | `logscope-desktop-vX.Y.Z-linux-amd64.tar.gz` |
 | Desktop Windows | `logscope-desktop-vX.Y.Z-windows-amd64.zip` |
 | Desktop macOS | `logscope-desktop-vX.Y.Z-macos-amd64.tar.gz` |
+| Web Linux | `logscope-web-vX.Y.Z-linux-amd64.tar.gz` |
+| Web Windows | `logscope-web-vX.Y.Z-windows-amd64.zip` |
+| Web macOS | `logscope-web-vX.Y.Z-macos-amd64.tar.gz` |
 
 Pre-`v2.0.5` releases used unversioned names (`logscope-linux-amd64.tar.gz`, etc.).
 

@@ -23,6 +23,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 - Browser MVP SPA (`apps/web/ui/dist/`) — upload, analyze, search, filter DSL, export, extensions panel, AI ask (noop provider)
 - Optional API key (`web.api_key` / `LOGSCOPE_WEB_API_KEY`); health exempt when key configured
 - CMake option `LOGSCOPE_WEB=ON`; CI `web` job on Ubuntu
+- GitHub Release **`logscope-web-v2.1.0-*`** bundles (binary, SPA `ui/dist`, `samples`)
 - **32** web tests (`scope_web_tests`, `logscope_web_integration_tests`) including CLI/REST parity
 
 ### Changed
@@ -33,7 +34,8 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 ### Upgrade notes
 
 - Build web: `cmake -DLOGSCOPE_WEB=ON && cmake --build build --target logscope-web`
-- Run: `./build/apps/web/logscope-web` then open `http://127.0.0.1:8080/`
+- Run from release archive: extract `logscope-web-v2.1.0-*`, then `./logscope-web` from that directory
+- Or run: `./build/apps/web/logscope-web` then open `http://127.0.0.1:8080/`
 - CLI and desktop unchanged for default workflows
 
 ---

@@ -5,6 +5,7 @@
 
 #include "web_config.hpp"
 #include "web_server.hpp"
+#include "web_startup.hpp"
 
 #include <iostream>
 
@@ -12,14 +13,26 @@
 #define LOGSCOPE_VERSION "unknown"
 #endif
 
-int main()
+int main(int argc, char* argv[])
 {
-    scope::web::WebConfig config = scope::web::WebConfig::defaults();
-    config.applyEnvironment();
+    const auto configResult = scope::web::loadStartupConfig(argc, argv);
 
+    if (!configResult)
+    {
+        if (configResult.error().message() == "Help requested.")
+        {
+            return 0;
+        }
+
+        std::cerr << configResult.error().message() << std::endl;
+
+        return 1;
+    }
+
+    const scope::web::WebConfig& config = *configResult;
     scope::web::WebServer server(config);
 
-    std::cout << "logscope-web listening on http://" << config.bindHost << ':' << config.bindPort << std::endl;
+    std::cout << "logscope-web " << LOGSCOPE_VERSION << " listening on " << config.listenUrl() << std::endl;
 
     if (!server.run())
     {

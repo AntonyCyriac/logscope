@@ -16,6 +16,7 @@ set(LOGSCOPE_WEB_CLI_SOURCES
 add_executable(logscope-web
     main.cpp
     web_config.cpp
+    web_startup.cpp
     session_store.cpp
     json_parse.cpp
     rest_json.cpp
@@ -34,8 +35,22 @@ target_compile_definitions(logscope-web
 target_link_libraries(logscope-web
     PRIVATE
         scope_application
+        scope_configuration
         logscope_httplib
 )
+
+option(LOGSCOPE_WEB_TLS "Enable HTTPS in logscope-web via OpenSSL" ON)
+
+if(LOGSCOPE_WEB_TLS)
+    find_package(OpenSSL)
+
+    if(OpenSSL_FOUND)
+        target_compile_definitions(logscope-web PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
+        target_link_libraries(logscope-web PRIVATE OpenSSL::SSL OpenSSL::Crypto)
+    else()
+        message(WARNING "OpenSSL not found; logscope-web HTTPS support disabled")
+    endif()
+endif()
 
 target_include_directories(logscope-web
     PRIVATE
