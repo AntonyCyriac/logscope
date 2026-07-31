@@ -7,6 +7,7 @@ option(LOGSCOPE_WEB_UI_BUILD "Build web UI assets with Vite (optional; dist/ is 
 add_executable(scope_web_tests
     health_handler_test.cpp
     session_store_test.cpp
+    web_config_test.cpp
     web_request_parsers_test.cpp
     rest_json_test.cpp
     api_key_middleware_test.cpp
@@ -14,6 +15,7 @@ add_executable(scope_web_tests
     upload_size_limit_test.cpp
     ../web_server.cpp
     ../web_config.cpp
+    ../web_startup.cpp
     ../session_store.cpp
     ../json_parse.cpp
     ../rest_json.cpp
@@ -37,6 +39,7 @@ target_compile_definitions(scope_web_tests
 target_link_libraries(scope_web_tests
     PRIVATE
         scope_application
+        scope_configuration
         logscope_httplib
         logscope_gtest_support
         GTest::gtest_main

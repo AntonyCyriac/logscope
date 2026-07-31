@@ -19,6 +19,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 
 #ifndef LOGSCOPE_WEB_UI_DIR
@@ -104,7 +105,32 @@ WorkspaceSession* requireSession(WebServer& server, const std::string& sessionId
 
 WebServer::WebServer(WebConfig config) : m_config(std::move(config))
 {
+#ifdef CPPHTTPLIB_OPENSSL_SUPPORT
+    if (m_config.tlsEnabled())
+    {
+        m_server = std::make_unique<httplib::SSLServer>(m_config.tlsCertPath.string().c_str(),
+                                                        m_config.tlsKeyPath.string().c_str());
+    }
+    else
+    {
+        m_server = std::make_unique<httplib::Server>();
+    }
+#else
+    if (m_config.tlsEnabled())
+    {
+        std::cerr << "TLS is configured but logscope-web was built without OpenSSL support." << std::endl;
+
+        return;
+    }
+
     m_server = std::make_unique<httplib::Server>();
+#endif
+
+    if (m_server == nullptr)
+    {
+        return;
+    }
+
     m_server->set_read_timeout(m_config.requestTimeoutSeconds, 0);
     m_server->set_write_timeout(m_config.requestTimeoutSeconds, 0);
     registerRoutes();
@@ -117,6 +143,11 @@ WebServer::~WebServer()
 
 bool WebServer::run()
 {
+    if (m_server == nullptr)
+    {
+        return false;
+    }
+
     m_running = true;
     m_port = m_config.bindPort;
 
@@ -125,7 +156,7 @@ bool WebServer::run()
 
 bool WebServer::startInBackground()
 {
-    if (m_running)
+    if (m_running || m_server == nullptr)
     {
         return false;
     }

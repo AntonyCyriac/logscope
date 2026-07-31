@@ -6,6 +6,8 @@
 
 #include <cstdlib>
 
+#include <algorithm>
+
 #include "foundation/string.hpp"
 
 namespace scope::web
@@ -77,6 +79,19 @@ std::vector<std::string> splitCommaList(const std::string& value)
     return items;
 }
 
+void addOriginIfMissing(std::vector<std::string>& origins, const std::string& origin)
+{
+    if (std::find(origins.begin(), origins.end(), origin) == origins.end())
+    {
+        origins.push_back(origin);
+    }
+}
+
+void addSchemeOrigins(std::vector<std::string>& origins, const char* scheme, const std::string& host, const int port)
+{
+    addOriginIfMissing(origins, std::string(scheme) + host + ":" + std::to_string(port));
+}
+
 } // namespace
 
 WebConfig WebConfig::defaults()
@@ -106,6 +121,17 @@ void WebConfig::mergeFromConfiguration(const configuration::ConfigurationManager
     if (const auto value = configuration.get("web.cors_origins"))
     {
         corsOrigins = splitCommaList(value.value());
+        corsOriginsUserSet = true;
+    }
+
+    if (const auto value = configuration.get("web.tls_cert"))
+    {
+        tlsCertPath = foundation::Path(value.value());
+    }
+
+    if (const auto value = configuration.get("web.tls_key"))
+    {
+        tlsKeyPath = foundation::Path(value.value());
     }
 
     if (const auto value = configuration.get("web.max_upload_bytes"))
@@ -156,6 +182,61 @@ void WebConfig::applyEnvironment()
     {
         bindPort = parseInt(value, bindPort);
     }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_TLS_CERT"))
+    {
+        tlsCertPath = foundation::Path(value);
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_TLS_KEY"))
+    {
+        tlsKeyPath = foundation::Path(value);
+    }
+}
+
+void WebConfig::applyDerivedDefaults()
+{
+    if (corsOriginsUserSet || bindPort == 0)
+    {
+        return;
+    }
+
+    std::vector<std::string> derived;
+    addSchemeOrigins(derived, "http://", bindHost, bindPort);
+
+    if (tlsEnabled())
+    {
+        addSchemeOrigins(derived, "https://", bindHost, bindPort);
+    }
+
+    if (bindHost == "127.0.0.1" || bindHost == "0.0.0.0" || bindHost == "localhost")
+    {
+        addSchemeOrigins(derived, "http://", "localhost", bindPort);
+        addSchemeOrigins(derived, "http://", "127.0.0.1", bindPort);
+
+        if (tlsEnabled())
+        {
+            addSchemeOrigins(derived, "https://", "localhost", bindPort);
+            addSchemeOrigins(derived, "https://", "127.0.0.1", bindPort);
+        }
+    }
+
+    corsOrigins = std::move(derived);
+}
+
+bool WebConfig::tlsEnabled() const
+{
+    return !tlsCertPath.isEmpty() && !tlsKeyPath.isEmpty();
+}
+
+const char* WebConfig::urlScheme() const noexcept
+{
+    return tlsEnabled() ? "https" : "http";
+}
+
+std::string WebConfig::listenUrl() const
+{
+    return std::string(urlScheme()) + "://" + bindHost + ':' + std::to_string(bindPort);
 }
 
 } // namespace scope::web

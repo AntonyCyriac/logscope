@@ -6,6 +6,7 @@
 #pragma once
 
 #include <cstdint>
+#include <ostream>
 #include <string>
 #include <vector>
 
@@ -29,6 +30,9 @@ struct WebConfig
     bool allowServerPaths = false;
     std::vector<foundation::Path> allowedPathRoots;
     int requestTimeoutSeconds = 300;
+    foundation::Path tlsCertPath;
+    foundation::Path tlsKeyPath;
+    bool corsOriginsUserSet = false;
 
     [[nodiscard]] static WebConfig defaults();
 
@@ -41,6 +45,17 @@ struct WebConfig
      * @brief Applies LOGSCOPE_WEB_* environment overrides.
      */
     void applyEnvironment();
+
+    /**
+     * @brief When web.cors_origins was not set explicitly, build http/https origins from bind host/port.
+     */
+    void applyDerivedDefaults();
+
+    [[nodiscard]] bool tlsEnabled() const;
+
+    [[nodiscard]] const char* urlScheme() const noexcept;
+
+    [[nodiscard]] std::string listenUrl() const;
 };
 
 } // namespace scope::web
