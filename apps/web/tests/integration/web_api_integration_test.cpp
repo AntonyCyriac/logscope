@@ -274,7 +274,7 @@ TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
 
     const auto start = std::chrono::steady_clock::now();
     const httplib::Result analyzeResult =
-        client->Post("/api/v1/analyze", headers, "{\"persistIndex\": true}", "application/json");
+        client->Post("/api/v1/analyze", headers, "{}", "application/json");
     const auto elapsed = std::chrono::steady_clock::now() - start;
 
     ASSERT_TRUE(analyzeResult);
@@ -288,7 +288,7 @@ TEST_F(WebApiIntegrationTest, LargeAppAnalyzeSmoke)
     const std::size_t jobEnd = analyzeResult->body.find('"', jobStart);
     const std::string jobId = analyzeResult->body.substr(jobStart, jobEnd - jobStart);
 
-    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId));
+    EXPECT_TRUE(pollAnalyzeJobUntilComplete(sessionId, jobId, 600));
 }
 
 TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)

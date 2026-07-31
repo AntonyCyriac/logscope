@@ -69,6 +69,7 @@ class WebServer
     std::unique_ptr<httplib::Server> m_server;
     std::thread m_thread;
     std::atomic<bool> m_running{false};
+    std::atomic<bool> m_stopped{false};
     std::atomic<int> m_port{0};
     const std::chrono::steady_clock::time_point m_startTime{std::chrono::steady_clock::now()};
 };

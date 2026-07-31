@@ -43,7 +43,7 @@ AnalyzeJobQueue::AnalyzeJobQueue(const WebConfig& config, SessionStore& sessionS
 
 AnalyzeJobQueue::~AnalyzeJobQueue()
 {
-    waitForIdle(std::chrono::minutes(3));
+    waitForIdle(std::chrono::seconds(60));
 }
 
 void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait) const

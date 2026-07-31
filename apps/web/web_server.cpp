@@ -189,14 +189,17 @@ bool WebServer::startInBackground()
 
 void WebServer::stop()
 {
-    if (!m_running)
+    if (m_stopped.exchange(true))
     {
-        m_jobQueue.waitForIdle(std::chrono::minutes(2));
-
         return;
     }
 
-    m_jobQueue.waitForIdle(std::chrono::minutes(2));
+    m_jobQueue.waitForIdle(std::chrono::seconds(60));
+
+    if (!m_running)
+    {
+        return;
+    }
 
     m_server->stop();
 
