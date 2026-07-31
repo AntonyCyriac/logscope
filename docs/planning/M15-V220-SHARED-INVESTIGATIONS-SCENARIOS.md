@@ -5,7 +5,8 @@
 | Document | M15 v2.2.0 Shared Investigations Scenarios |
 | Category | Project Planning |
 | Version | 0.1.0 |
-| Status | **Approved — G0 planning gate** |
+| Status | **Approved — G1 architecture gate** |
+| Design reference | `logscope-strategy/engos/artifacts/M15.3/design.md` · [ADR-009-M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) |
 | Created | 31-07-2026 |
 | Last Updated | 31-07-2026 |
 
@@ -125,3 +126,4 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 | Version | Date | Description |
 |---------|------|-------------|
 | 0.1.0 | 31-07-2026 | Initial scenario matrix; G0 approved for M15.3 @ v2.2.0. |
+| 0.2.0 | 31-07-2026 | G1 complete — design contract + ADR-009-M15.3 amendment; implementer unlocked. |
