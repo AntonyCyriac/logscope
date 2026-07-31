@@ -18,7 +18,7 @@ void removeTempUploadFile(WorkspaceSession& session);
 /** @brief Stops tail and removes staged upload temp files. */
 void cleanupSessionResources(WorkspaceSession& session);
 
-/** @brief Removes a superseded staged upload before assigning a new temp path. */
+/** @brief Removes a superseded staged upload before assigning a new temp path (caller must hold session mutex). */
 void replaceStagedUpload(WorkspaceSession& session, const std::string& newTempPath);
 
 } // namespace scope::web

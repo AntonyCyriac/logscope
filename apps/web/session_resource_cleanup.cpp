@@ -46,8 +46,6 @@ void cleanupSessionResources(WorkspaceSession& session)
 
 void replaceStagedUpload(WorkspaceSession& session, const std::string& newTempPath)
 {
-    std::lock_guard<std::mutex> lock(session.mutex);
-
     if (!session.tempUploadPath.empty() && session.tempUploadPath != newTempPath)
     {
         deletePathIfPresent(session.tempUploadPath);
