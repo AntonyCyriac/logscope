@@ -36,13 +36,13 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Expected | Test | Status |
 |----|----------|----------|------|--------|
-| L1.1 | Health | `GET /api/v1/health` returns version | U | ⬜ |
-| L1.2 | Upload source | Multipart upload `sample.log` → open succeeds | I | ⬜ |
-| L1.3 | Analyze | Returns line counts matching CLI analyze JSON | U+I+P | ⬜ |
-| L1.4 | Investigate filters | Same `matchCount` as CLI `investigate` | U+I+P | ⬜ |
-| L1.5 | Analytics | Same bucket counts as CLI `analytics` | U+P | ⬜ |
+| L1.1 | Health | `GET /api/v1/health` returns version | U | ✅ |
+| L1.2 | Upload source | Multipart upload `sample.log` → open succeeds | I | ✅ |
+| L1.3 | Analyze | Returns line counts matching CLI analyze JSON | U+I+P | ✅ |
+| L1.4 | Investigate filters | Same `matchCount` as CLI `investigate` | U+I+P | ✅ |
+| L1.5 | Analytics | Same bucket counts as CLI `analytics` | U+P | 🟡 |
 | L1.6 | Session save/load | Round-trip reproduces report sections | I | ⬜ |
-| L1.7 | Path traversal guard | `sources/open` with `..` rejected | U | ⬜ |
+| L1.7 | Path traversal guard | `sources/open` with `..` rejected | U | ✅ |
 | L1.8 | Upload size limit | Payload over `web.max_upload_bytes` → 413 | U | ⬜ |
 
 ---
@@ -51,9 +51,9 @@ Status: ⬜ planned · 🟡 in progress · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| R1.1 | Create session | First request / explicit create | `X-LogScope-Session` issued | I | ⬜ |
+| R1.1 | Create session | First request / explicit create | `X-LogScope-Session` issued | I | ✅ |
 | R1.2 | API key optional | `web.api_key` set | Missing key → 401 | U | ⬜ |
-| R1.3 | List extensions | `GET /extensions` | Lists registered extensions | I | ⬜ |
+| R1.3 | List extensions | `GET /extensions` | Lists registered extensions | I | ✅ |
 | R1.4 | Agent investigate | POST ask `errors` + noop AI | Match count = CLI agent | I+P | ⬜ |
 | R1.5 | Export HTML | POST export `format=html` | Non-empty HTML body | I | ⬜ |
 | R1.6 | Export PDF | POST export `format=pdf` | Valid PDF bytes | I | ⬜ |
