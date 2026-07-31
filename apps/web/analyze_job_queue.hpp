@@ -72,6 +72,8 @@ class AnalyzeJobQueue
     void seedJobForTest(const std::string& sessionId, const std::string& jobId, AnalyzeJobStatus status);
 
   private:
+    [[nodiscard]] bool hasRunningJobForSessionUnlocked(const std::string& sessionId) const;
+
     struct JobRecord
     {
         std::string sessionId;

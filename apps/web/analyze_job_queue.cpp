@@ -73,10 +73,8 @@ void AnalyzeJobQueue::waitForIdle(const std::chrono::milliseconds maxWait)
     m_workers.clear();
 }
 
-bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) const
+bool AnalyzeJobQueue::hasRunningJobForSessionUnlocked(const std::string& sessionId) const
 {
-    std::lock_guard<std::mutex> lock(m_mutex);
-
     for (const auto& entry : m_jobs)
     {
         if (entry.second.sessionId == sessionId && entry.second.status == AnalyzeJobStatus::Running)
@@ -86,6 +84,13 @@ bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) cons
     }
 
     return false;
+}
+
+bool AnalyzeJobQueue::hasRunningJobForSession(const std::string& sessionId) const
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    return hasRunningJobForSessionUnlocked(sessionId);
 }
 
 void AnalyzeJobQueue::seedJobForTest(const std::string& sessionId, const std::string& jobId, const AnalyzeJobStatus status)
@@ -135,7 +140,7 @@ foundation::Result<AnalyzeJobEnqueueResult> AnalyzeJobQueue::enqueue(const std::
         std::lock_guard<std::mutex> lock(m_mutex);
         evictExpired();
 
-        if (m_config.jobMaxConcurrentPerSession > 0 && hasRunningJobForSession(sessionId))
+        if (m_config.jobMaxConcurrentPerSession > 0 && hasRunningJobForSessionUnlocked(sessionId))
         {
             return foundation::Result<AnalyzeJobEnqueueResult>(foundation::Error(
                 foundation::ErrorCode::InvalidArgument, "An analyze job is already running for this session."));
