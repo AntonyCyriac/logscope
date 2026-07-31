@@ -68,7 +68,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.2.0`](CHANGELOG.md) — M15.3 shared investigations (workspaces, tail poll, async analyze). **Next:** [M16 – Enterprise](planning/POST_V1_STRATEGIC_ROADMAP.md) or M15.4 thin auth.
+**Current release:** [`v2.2.0`](CHANGELOG.md) — M15.3 shared investigations. **Active:** [M15.4 thin auth](planning/M15.4-THIN-AUTH-SCENARIOS.md) @ `v2.2.1` (G0 approved). **Then:** [M16 – Enterprise](planning/POST_V1_STRATEGIC_ROADMAP.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
