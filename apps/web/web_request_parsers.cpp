@@ -292,7 +292,9 @@ foundation::Result<bool> validateServerPath(const WebConfig& config, const found
 
     if (config.allowedPathRoots.empty())
     {
-        return foundation::Result<bool>(true);
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "web.allowed_path_roots must be configured when web.allow_server_paths is enabled."));
     }
 
     const std::string absoluteString = absolutePath.string();

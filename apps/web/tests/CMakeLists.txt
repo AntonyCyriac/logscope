@@ -5,6 +5,7 @@
 add_executable(scope_web_tests
     health_handler_test.cpp
     session_store_test.cpp
+    web_request_parsers_test.cpp
     rest_json_test.cpp
     api_key_middleware_test.cpp
     ../web_server.cpp

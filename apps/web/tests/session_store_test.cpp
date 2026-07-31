@@ -31,3 +31,11 @@ TEST(SessionStoreTest, ResolveSessionReturnsEmptyWhenDisabled)
 
     EXPECT_TRUE(store.resolveSession("missing", false).empty());
 }
+
+TEST(SessionStoreTest, StaleSessionIdDoesNotAutoCreate)
+{
+    scope::web::SessionStore store;
+
+    EXPECT_TRUE(store.resolveSession("stale-session-id", true).empty());
+    EXPECT_EQ(0U, store.sessionCount());
+}

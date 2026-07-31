@@ -249,7 +249,6 @@ void WebServer::registerRoutes()
             return;
         }
 
-        m_config.mergeFromConfiguration(workspace->service->configurationManager());
         setJsonResponse(response, 200, successEnvelope("{\"loaded\": true}"));
         response.set_header(kSessionHeader, sessionId);
     });

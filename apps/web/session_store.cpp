@@ -30,6 +30,9 @@ std::string SessionStore::resolveSession(const std::string& sessionId, const boo
         {
             return sessionId;
         }
+
+        // Stale or unknown session id — never silently allocate a new workspace.
+        return {};
     }
 
     if (!autoCreate)
