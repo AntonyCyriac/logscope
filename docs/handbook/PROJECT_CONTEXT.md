@@ -11,7 +11,7 @@
 
 ---
 
-> **Usage:** Attach or reference this file at the start of a new agent session so the assistant begins with the same engineering mindset and project constraints established for LogScope.
+> **Usage:** Attach or reference this file at the start of a new assistant session so the AI begins with the same engineering mindset and project constraints established for LogScope. Tool-agnostic bootstrap: [AGENTS.md](../../AGENTS.md).
 
 ---
 
@@ -313,14 +313,16 @@ See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vis
 
 ---
 
-# AI Agent Context
+# AI Assistant Context
 
 Two layers apply to AI-assisted LogScope work. Do not conflate them.
 
 | Layer | Scope | Where |
 |-------|--------|-------|
-| **Operational (today)** | AI IDE instructions for contributors building LogScope | This file; detailed agent specs live in a private strategy `.ai/` layer (not linked publicly) |
-| **Product (shipped)** | User-facing AI assistant: NL queries, summaries, anomaly hints, `logscope agent investigate` | M13 (`v1.5.1`); pluggable `AiProvider` |
+| **Coding assistant (any tool)** | Instructions for contributors building LogScope in an IDE | [AGENTS.md](../../AGENTS.md), this file, [CODE_MAP.md](CODE_MAP.md) |
+| **Product (shipped)** | User-facing AI: NL queries, summaries, anomaly hints, `logscope agent investigate` | M13 (`v1.5.1`); pluggable `AiProvider` |
+
+**Bootstrap:** Start with [AGENTS.md](../../AGENTS.md) — works for Cursor, Copilot, Claude Code, and other assistants. Keep contributions in the **public** repo only.
 
 See [Future Requirements README](../requirements/future/README.md) for scope and graduation. **M12 – Dynamic Plugins** enables provider registration; it is not the AI agent runtime.
 

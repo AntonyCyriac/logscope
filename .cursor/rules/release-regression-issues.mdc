@@ -1,0 +1,39 @@
+---
+description: File GitHub issues for user-visible bugs found in shipped releases before or alongside hotfixes
+alwaysApply: true
+---
+
+# Release regression GitHub issues
+
+When a **shipped public tag** (`vX.Y.Z`) has a user-visible defect, **open a GitHub issue before or alongside the fix** — do not fix silently in chat, CHANGELOG, or commits only.
+
+## When to file
+
+- GUI shows empty/wrong data (e.g. table empty but status says analyzed)
+- CLI vs desktop parity break in a shipped release
+- Crash, corrupt export, or misleading AI/CLI output tied to a release tag
+
+## Issue workflow
+
+1. `gh issue create` on `AntonyCyriac/logscope` with label `bug`
+2. **Title:** short symptom + `(vX.Y.Z regression)` when the bug shipped in that tag
+3. **Body:** symptoms, repro steps, expected vs actual, root cause (if known), planned fix version
+4. After hotfix is tagged: comment with fix commit/tag → **close issue**
+5. Link issue in `docs/release/vX.Y.Z-RELEASE-NOTES.md` when helpful
+
+## Example
+
+- [#86](https://github.com/AntonyCyriac/logscope/issues/86) — desktop empty table / Ask `Matches: 0` (v2.0.2), fixed in v2.0.3
+
+## References
+
+- `docs/release/RELEASE.md` — §8 post-release checklist
+- `docs/handbook/GIT_CONVENTIONS.md` — §5
+
+## Assistant duties
+
+When you discover or fix a release regression during a session:
+
+1. File the issue (or remind the user and offer to file it) **before** calling the work complete
+2. Add regression tests when practical (`logscope_desktop_tests`, `scope_application_tests`, e2e)
+3. Do not skip the issue because a hotfix tag was already pushed — file retroactively if needed
