@@ -19,13 +19,15 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v1.5.0** ships M12 Dynamic Plugins: runtime `.so`/`.dll` loading, parser/report/search/storage provider registration, and a Plugin SDK. M0–M12 are complete (M11 storage: schema v2, compression, JSON field pushdown, query cache, incremental append, and FTS5 at `v1.4.3`).
+LogScope **v2.2.1** ships M15 Web Platform (complete): REST API + browser SPA, shared workspaces, async analyze, tail poll, and M15.4 thin auth (session TTL, upload cleanup). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`). M0–M15 are complete; M12 plugins, M13 AI assistant, and M14 desktop shipped in earlier v1.x–v2.0.x releases.
 
 ```text
-Configuration → Source → Analysis → Investigation → Reporting → CLI
+Source → Analysis → Investigation → Reporting
+         ↑__________________________|
+              CLI · Desktop · Web
 ```
 
-Capabilities include analysis depth, stdin/directory sources, multi-format reporting, extensions, session persistence, multi-OS CI, benchmarks, fuzz testing, and installable/binary distribution.
+Capabilities include format intelligence, search and query DSL, HTML/PDF reporting, analytics, SQLite persistent indexes, dynamic plugins, AI-assisted investigation, multi-OS CI, benchmarks, fuzz testing, and installable/binary distribution on Windows, macOS, and Linux.
 
 See [Roadmap](ROADMAP.md) and [Changelog](../CHANGELOG.md) for milestone history.
 
