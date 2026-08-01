@@ -47,6 +47,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 
 FetchContent_MakeAvailable(googletest)
 
+# Defer --gtest_list_tests to ctest time (avoids Windows POST_BUILD discovery timeouts).
+set(CMAKE_GTEST_DISCOVER_TESTS_DISCOVERY_MODE PRE_TEST)
+
 include(cmake/LogScopeGTestSupport.cmake)
 
 if(LOGSCOPE_BENCHMARKS)

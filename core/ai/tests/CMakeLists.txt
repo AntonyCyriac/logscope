@@ -30,4 +30,6 @@ if(WIN32)
 endif()
 
 include(GoogleTest)
-gtest_discover_tests(scope_ai_tests)
+gtest_discover_tests(scope_ai_tests
+    DISCOVERY_TIMEOUT 60
+)
