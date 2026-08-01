@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.6.0 |
+| Version | 2.7.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 31-07-2026 |
+| Last Updated | 01-08-2026 |
 
 ---
 
@@ -27,9 +27,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.2.0` (shipped) — M15.3 shared investigations (workspaces API, tail poll, async analyze) on `logscope-web`.
+**Current release:** `v2.2.1` (shipped) — M15 Web Platform complete: REST API + browser SPA (`v2.1.0`), shared workspaces / tail / async analyze (`v2.2.0`), thin auth — session TTL, upload cleanup, securing guide (`v2.2.1`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Strategic next milestone:** **M16 – Enterprise** or M15.4 thin auth — see [Roadmap](../ROADMAP.md).
+**Strategic next milestone:** **M16 – Enterprise** — see [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -51,7 +51,7 @@ The project follows architecture-first development. Every implementation should 
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries, `agent investigate` (`v1.5.1`) |
 | Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
-| M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`) |
+| M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`); thin auth (`v2.2.1`) |
 
 **Next:**
 
@@ -237,14 +237,12 @@ Follow:
 - Small reusable components
 - Clear module boundaries
 
-Core pipeline (v1.0.0):
+Core pipeline:
 
 ```text
-ConfigurationManager → SourceManager → AnalysisEngine → AnalysisModel
-                                              ↓
-              InvestigationEngine / ReportGenerator / ExtensionManager
-                                              ↓
-                         SessionStore → CLI
+Source → Analysis → Investigation → Reporting
+         ↑__________________________|
+              CLI · Desktop · Web
 ```
 
 See: [Architecture Overview](../architecture/ARCHITECTURE_OVERVIEW.md), [Component Catalog](../architecture/COMPONENT_CATALOG.md), [Data Flow](../architecture/DATA_FLOW.md).
@@ -320,7 +318,7 @@ Two layers apply to AI-assisted LogScope work. Do not conflate them.
 | Layer | Scope | Where |
 |-------|--------|-------|
 | **Operational (today)** | AI IDE instructions for contributors building LogScope | This file; detailed agent specs live in a private strategy `.ai/` layer (not linked publicly) |
-| **Product (future)** | User-facing agents analyzing logs, cores, and workflows via LogScope itself | [PRD-001 v1.1.0](../requirements/future/PRD-001-AI-Engineering-Agents.md); first delivery **M13 – AI Assistant** |
+| **Product (shipped)** | User-facing AI assistant: NL queries, summaries, anomaly hints, `logscope agent investigate` | M13 (`v1.5.1`); pluggable `AiProvider` |
 
 See [Future Requirements README](../requirements/future/README.md) for scope and graduation. **M12 – Dynamic Plugins** enables provider registration; it is not the AI agent runtime.
 
@@ -359,4 +357,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
 | 2.5.0 | 30-07-2026 | Current release `v2.0.3` (desktop regression hotfix). |
 | 2.6.0 | 30-07-2026 | Current release `v2.0.5` (CI/build hotfix, versioned artifacts). |
-| 2.7.0 | 30-07-2026 | Current release `v2.0.6` (clang-tidy CI hotfix). |
+| 2.7.0 | 01-08-2026 | Current release `v2.2.1` (M15 complete); docs-only CI waiver; homepage refresh. M16 is next. |
