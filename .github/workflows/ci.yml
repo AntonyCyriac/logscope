@@ -25,6 +25,7 @@ jobs:
             code:
               - '**'
               - '!**/*.md'
+              - '!**/*.mdc'
               - '!docs/assets/**'
 
   docs-only:
@@ -33,7 +34,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code != 'true'
     steps:
-      - run: echo "Only documentation changed (.md and docs/assets); full CI matrix skipped."
+      - run: echo "Only documentation changed (.md, .mdc, docs/assets); full CI matrix skipped."
 
   build:
     name: Build and Test (${{ matrix.os }})
