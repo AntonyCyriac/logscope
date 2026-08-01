@@ -200,7 +200,7 @@ Includes:
 - Fuzz smoke tests (where applicable)
 - CLI matrix on bulk-generated logs (Ubuntu CI: 10k lines; release: 100k lines per OS)
 
-**Docs-only PRs:** when a pull request changes only `*.md` files, the full matrix is skipped and a **Docs only (CI waived)** job passes instead. Any non-`.md` change (code, CMake, workflows, `openapi-v1.yaml`, `samples/*.properties`, etc.) runs the full matrix. Editing `.github/workflows/*.yml` is not md-only. Release workflow (`release.yml`) is unchanged — it runs only on `v*` tag push.
+**Docs-only PRs:** when a pull request changes only `*.md` files and/or `docs/assets/**` (README screenshots), the full matrix is skipped and a **Docs only (CI waived)** job passes instead. Any other change (code, CMake, workflows, `openapi-v1.yaml`, `samples/*.properties`, etc.) runs the full matrix. Editing `.github/workflows/*.yml` is not docs-only. `paths-filter` uses `predicate-quantifier: every` so `!**/*.md` and `!docs/assets/**` negation works with the catch-all `**` include. Release workflow (`release.yml`) is unchanged — it runs only on `v*` tag push.
 
 Do not introduce changes that weaken CI quality.
 
