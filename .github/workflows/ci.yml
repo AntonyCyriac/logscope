@@ -20,10 +20,12 @@ jobs:
       - uses: dorny/paths-filter@v3
         id: filter
         with:
+          predicate-quantifier: 'some-with-excludes'
           filters: |
             code:
               - '**'
               - '!**/*.md'
+              - '!docs/assets/**'
 
   docs-only:
     name: Docs only (CI waived)
@@ -31,7 +33,7 @@ jobs:
     needs: changes
     if: needs.changes.outputs.code != 'true'
     steps:
-      - run: echo "Only .md files changed; full CI matrix skipped."
+      - run: echo "Only documentation changed (.md and docs/assets); full CI matrix skipped."
 
   build:
     name: Build and Test (${{ matrix.os }})
