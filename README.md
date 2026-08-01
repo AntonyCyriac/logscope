@@ -15,13 +15,19 @@
 
 ## Screenshots
 
-**Desktop** — filter, investigate, analytics, and AI in one window:
+**CLI** — analyze and investigate from the terminal:
+
+![LogScope CLI](docs/assets/logscope-cli.png)
+
+**Desktop** — filter, investigate, analytics, and AI in one window *(representative UI)*:
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
-**Web** — upload, shared workspaces, investigate, and export in the browser:
+**Web** — upload, shared workspaces, investigate, and export in the browser *(representative UI)*:
 
 ![LogScope Web](docs/assets/logscope-web.png)
+
+> Desktop and web images are layout-accurate mockups. Replace with real captures from `logscope-desktop` and `logscope-web` when convenient (`docs/assets/`).
 
 **Current release:** [`v2.2.1`](CHANGELOG.md) — M15.4 thin auth (session TTL, upload cleanup, [securing guide](docs/handbook/SECURING_LOGSCOPE_WEB.md)). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
