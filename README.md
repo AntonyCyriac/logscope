@@ -19,7 +19,7 @@
 
 ![LogScope CLI](docs/assets/logscope-cli.png)
 
-**Desktop** — real `logscope-desktop` (v2.2.1, Windows):
+**Desktop** — real `logscope-desktop` with `samples/sample.log` analyzed (8 lines):
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 

@@ -152,6 +152,7 @@ Complete after the public tag and GitHub Release are live:
 | **Release regressions** | **Open a GitHub issue** for user-visible bugs found in a shipped tag (empty UI, wrong results, crash) before or alongside the hotfix PR — label `bug`, note affected tag, link fix commit/tag, close when released |
 | Private strategy sync | On the private strategy repository: update long-horizon docs for the shipped milestone, then tag `sync/vX.Y.Z` on that commit (annotated message: `sync/vX.Y.Z — public vX.Y.Z <milestone summary>`) and push the tag |
 | Bulk matrix (when ready) | CI at `10000` lines; release runners at `100000` lines |
+| Social preview | Upload [`.github/social-preview.png`](../../.github/social-preview.png) via **Settings → General → Social preview** (PNG ≤ 1 MB; 1280×640 recommended) |
 
 ### Release regression issues (required)
 
