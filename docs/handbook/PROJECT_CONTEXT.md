@@ -23,6 +23,8 @@ This is **not a demo project**. It is intended to become a production-quality so
 
 The project follows architecture-first development. Every implementation should respect the existing architecture and engineering standards.
 
+**Living product:** LogScope evolves every day — expect frequent merges to `master`, patch releases, and doc updates. Use tagged releases for reproducibility; track changes via [Changelog](../../CHANGELOG.md) and [Roadmap](../ROADMAP.md).
+
 ---
 
 # Current Project Status

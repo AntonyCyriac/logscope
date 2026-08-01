@@ -2,6 +2,8 @@
 
 LogScope is a generic log analysis platform designed to help engineers understand machine-generated log data through a consistent and reusable workflow. Over time it aims to support broader **system investigation** (answering “what happened?”), while remaining CLI-first and log-centric in the near term.
 
+**Living product:** LogScope evolves every day — continuous delivery on `master`, tagged releases for stability, and public [Roadmap](ROADMAP.md) / [Changelog](../CHANGELOG.md) for traceability.
+
 For the full product description, see [Product Overview](vision/PRODUCT_OVERVIEW.md).
 
 ## Problem
