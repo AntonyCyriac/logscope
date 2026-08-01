@@ -7,6 +7,8 @@
 
 **Investigate any log format — CLI, desktop, or browser.** Parse, search, report, and persist indexes without one-off scripts.
 
+> **Living product** — LogScope evolves every day. We ship on `master` continuously (features, fixes, docs, and releases). Pin a [release tag](https://github.com/AntonyCyriac/logscope/releases) for stability; follow the [Changelog](CHANGELOG.md) and [Roadmap](docs/ROADMAP.md) for what changed.
+
 | Surface | Binary | Best for |
 |---------|--------|----------|
 | **CLI** | `logscope` | Automation, CI, power users |
