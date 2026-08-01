@@ -1,6 +1,6 @@
-# LogScope code map (agent quick reference)
+# LogScope code map (assistant quick reference)
 
-Pointers for AI assistants — **where code and tests live**. Full web detail: same table in private strategy `engos/contexts/logscope/CODE_MAP.md` when both repos are in workspace.
+Pointers for AI assistants — **where code and tests live**. Session bootstrap: [AGENTS.md](../../AGENTS.md).
 
 ## Layout
 

@@ -138,7 +138,7 @@ Open `http://127.0.0.1:8080` (or HTTPS with TLS). REST API: [ADR-009](docs/archi
 | Audience | Start here |
 |----------|------------|
 | **Users** | [User Manual](docs/handbook/USER_MANUAL.md) · [CLI Reference](docs/handbook/CLI_REFERENCE.md) · [Configuration](docs/handbook/CONFIGURATION_GUIDE.md) |
-| **Contributors** | [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Tutorials](docs/tutorials/README.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
+| **Contributors** | [AGENTS.md](AGENTS.md) · [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Tutorials](docs/tutorials/README.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
 | **Architecture** | [Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) · [Component Catalog](docs/architecture/COMPONENT_CATALOG.md) · [Product](docs/PRODUCT.md) |
 
 Full index: [Document Map](docs/DOCUMENT_MAP.md)
@@ -160,7 +160,7 @@ tests/      Unit, integration, e2e, regression, benchmarks
 
 ## Contributing
 
-1. [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) → [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md)
+1. [AGENTS.md](AGENTS.md) (AI assistants) → [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) → [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md)
 2. [Git Conventions](docs/handbook/GIT_CONVENTIONS.md) · [Pull Request Guide](docs/handbook/PULL_REQUEST_GUIDE.md)
 3. Build, test, and format before opening a PR (`cmake --build build --target format`)
 

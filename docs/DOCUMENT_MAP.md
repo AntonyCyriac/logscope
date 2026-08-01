@@ -59,6 +59,7 @@ Repository-level documents:
 
 ```text
 README.md
+AGENTS.md
 CHANGELOG.md
 scripts/                 # Bulk log generation and CLI matrix runners
 â”‚   â”œâ”€â”€ README.md
@@ -195,7 +196,8 @@ Developers new to LogScope should read the documentation in the following order.
 
 | Step | Document | Purpose |
 |------|----------|---------|
-| 0 | PROJECT_CONTEXT.md | Agent session bootstrap; engineering mindset and constraints. |
+| 0 | AGENTS.md | Tool-agnostic AI assistant bootstrap (any IDE). |
+| 0a | PROJECT_CONTEXT.md | Engineering mindset and constraints. |
 | 1 | ROADMAP.md | Understand the project milestones and current development phase. |
 | 2 | POST_V1_STRATEGIC_ROADMAP.md | Understand the long-term post-v1 vision and version targets. |
 | 3 | M6-LOG-FORMAT-INTELLIGENCE.md | Understand the completed M6 log format intelligence plan. |
