@@ -25,11 +25,11 @@
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
-**Web** — real `logscope-web` SPA (v2.2.1, session ready):
+**Web** — real `logscope-web` SPA (v2.2.2, session ready):
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.2.1`](CHANGELOG.md) — M15.4 thin auth (session TTL, upload cleanup, [securing guide](docs/handbook/SECURING_LOGSCOPE_WEB.md)). **Next:** `v2.2.2` security patch → investigation stories (`v2.3.0`+). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.2.2`](CHANGELOG.md) — API key hashing at rest ([securing guide](docs/handbook/SECURING_LOGSCOPE_WEB.md)). **Next:** investigation stories (`v2.3.0`+). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 

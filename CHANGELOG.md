@@ -25,6 +25,7 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 ### Changed
 
 - API key verification uses constant-time compare; clients still send plain key in `X-LogScope-Api-Key`
+- CI: clang-tidy enforces `bugprone-unused-result` for ignored `[[nodiscard]]` returns
 
 ### Migration
 

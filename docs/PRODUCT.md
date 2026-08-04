@@ -21,9 +21,9 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.2.1** ships M15 Web Platform (complete): REST API + browser SPA, shared workspaces, async analyze, tail poll, and M15.4 thin auth (session TTL, upload cleanup). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`). M0–M15 are complete; M12 plugins, M13 AI assistant, and M14 desktop shipped in earlier v1.x–v2.0.x releases.
+LogScope **v2.2.2** ships M15 Web Platform (complete) plus API key hashing at rest for `logscope-web`. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`). M0–M15 are complete; M12 plugins, M13 AI assistant, and M14 desktop shipped in earlier v1.x–v2.0.x releases.
 
-**Next:** **`v2.2.2`** API key hashing patch → **`v2.3.0`+** investigation stories (Create an Investigation, multi-source, timeline, crash analysis).
+**Next:** **`v2.3.0`+** investigation stories (Create an Investigation, multi-source, timeline, crash analysis).
 
 ```text
 Source → Analysis → Investigation → Reporting
