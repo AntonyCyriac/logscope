@@ -1,4 +1,4 @@
 ---
-Checks: 'clang-analyzer-*'
+Checks: 'clang-analyzer-*,bugprone-unused-result'
 HeaderFilterRegex: '.*'
-WarningsAsErrors: 'clang-analyzer-*'
+WarningsAsErrors: 'clang-analyzer-*,bugprone-unused-result'

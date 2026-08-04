@@ -149,7 +149,7 @@ For discoverable capabilities and report hooks, see [Plugin Development Guide](P
 | Headers | Public API in `.hpp`; optional `.inl` for templates |
 | Comments | Doxygen on public APIs ([C++ Coding Standard](../standards/CPP_CODING_STANDARD.md)) |
 | Formatting | `clang-format` via `.clang-format`; `cmake --build build --target format` |
-| Static analysis | `cmake --build build --target tidy` (clang-analyzer via `.clang-tidy`; warnings fail CI) |
+| Static analysis | `cmake --build build --target tidy` (`.clang-tidy`: `clang-analyzer-*`, `bugprone-unused-result`; enabled checks fail CI) |
 
 ---
 
@@ -247,7 +247,7 @@ Release tagging and strategy sync: [Release process](../release/RELEASE.md).
 | Benchmark | Regression check against `baseline.json` |
 | Docs | Doxygen HTML artifact |
 | Fuzz | libFuzzer smoke (Clang) |
-| tidy | clang-tidy static analyzer (`clang-analyzer-*`; warnings fail CI) |
+| tidy | clang-tidy static analyzer (`.clang-tidy`: `clang-analyzer-*`, `bugprone-unused-result`; enabled checks fail CI) |
 
 ---
 

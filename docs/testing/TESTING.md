@@ -197,7 +197,7 @@ cmake -S . -B build -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
 cmake --build build --target tidy
 ```
 
-Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.clang-tidy` (`clang-analyzer-*`).
+Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.clang-tidy` (`clang-analyzer-*`, `bugprone-unused-result` for `[[nodiscard]]`).
 
 ---
 
