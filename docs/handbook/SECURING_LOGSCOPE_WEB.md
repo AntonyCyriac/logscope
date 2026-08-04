@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Securing logscope-web |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
 | Created | 31-07-2026 |
 | Applies to | `v2.2.1+` (M15.4 thin auth) |
@@ -13,7 +13,7 @@
 
 # 1. Purpose
 
-Operators run `logscope-web` on shared hosts, LAN servers, or behind reverse proxies. This guide covers **thin auth** shipped in **v2.2.1**: API key policy, session lifecycle, bind exposure, and TLS termination patterns. Full RBAC is **M16** (out of scope).
+Operators run `logscope-web` on shared hosts, LAN servers, or behind reverse proxies. This guide covers **thin auth** shipped in **v2.2.1**: API key policy, session lifecycle, bind exposure, and TLS termination patterns. Full RBAC is **long-term enterprise scope** (out of scope for current investigation releases).
 
 See [ADR-009 Web Platform REST](../architecture/decisions/ADR-009-Web-Platform-REST.md) and [ADR-009 M15.4 Thin Auth](../architecture/decisions/ADR-009-M15.4-Thin-Auth.md).
 
@@ -45,7 +45,7 @@ on all mutating `/api/v1/*` routes (sessions, sources, analyze, workspaces, tail
 
 **Health checks:** By default, `GET /api/v1/health` does **not** require the key (Kubernetes/liveness friendly). Set `web.health_requires_api_key=true` to protect health when the key is configured.
 
-**Storage:** Keys are compared in plain text in v2.2.1. Do not commit keys to git; use environment variables or secret managers. Hashing at rest is deferred to M16.
+**Storage:** Keys are compared in plain text in **v2.2.1**. Do not commit keys to git; use environment variables or secret managers. **Hashing at rest** ships in **`v2.2.2`** (security patch).
 
 Example properties:
 
@@ -130,3 +130,4 @@ Idle session eviction runs on health when `web.session_ttl_seconds > 0` (amortiz
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 31-07-2026 | Initial M15.4 / v2.2.1 thin auth operator guide |
+| 1.1.0 | 04-08-2026 | API key hashing planned for v2.2.2; RBAC long-term enterprise scope. |

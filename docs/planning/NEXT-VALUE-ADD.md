@@ -4,76 +4,75 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.2.0 |
+| Version | 1.3.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 04-08-2026 |
 
 ---
 
 # 1. Purpose
 
-Prioritized **documented** work not yet shipped, derived from the full planning corpus audit (roadmap, M14 gaps, Phase 1, M11 scenarios, strategy themes). Use this to sequence releases before and during [M15](M15-WEB-PLATFORM.md).
+Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.0.5`. **Next ship:** [M15 – Web Platform](M15-WEB-PLATFORM.md) (`v2.1.0` track).
+**Current public release:** `v2.2.1` (M15 complete). **Next ship:** **`v2.2.2`** — API key hashing at rest → **`v2.3.0`** — Create an Investigation.
 
 ---
 
 # 2. Recommended sequence
 
 ```text
-v2.0.5  → shipped (v2.0.4 CI/build hotfix, versioned artifacts)
-v2.1.0  → M15 REST API + browser MVP
-v2.2.0+ → Shared investigations, thin auth (or M16)
+v2.2.1  → shipped (M15.4 thin auth)
+v2.2.2  → API key hashing at rest (security patch)
+v2.3.0  → Create an Investigation
+v2.4.0+ → Multi-source, unified timeline, crash analysis stories
 ```
+
+Enterprise (M16) and cloud (M17) remain long-term — see [Roadmap](../ROADMAP.md).
 
 ---
 
-# 3. Immediate — shipped `v2.0.5` (completed)
+# 3. Immediate — next (`v2.2.2`)
 
 | Item | Status |
 |------|--------|
-| M14.12 Phase C | ✅ `v2.0.4` |
-| `logscope_desktop_tests` (14 cases) | ✅ |
-| `samples/large-app.log` | ✅ |
-| v2.0.5 CI/build hotfix | ✅ Linux desktop build + e2e isolation |
-| Versioned release artifacts | ✅ since `v2.0.5` |
+| API key hashing at rest | ⏳ Planned — [Securing logscope-web](../handbook/SECURING_LOGSCOPE_WEB.md) |
+| Migration from plaintext `web.api_key` config | ⏳ Planned |
 
 ---
 
-# 4. Short-term — M15 kickoff (high value)
+# 4. Near-term — investigation stories (`v2.3.0`–`v2.6.0`)
 
-| Item | Source | Notes |
+| Item | Target | Notes |
 |------|--------|-------|
-| ~~**ADR-009** Web/REST~~ | Graduation gate | ✅ Accepted — [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) |
-| [M15-WEB-PLATFORM.md](M15-WEB-PLATFORM.md) | ROADMAP | M15.0 gate satisfied; M15.1 implementation next |
-| REST over `ApplicationService` | ADR-008 | M15.1 — core deliverable |
-| Browser MVP | Strategic roadmap Phase 7 | M15.2 |
-| Strategy `sync/v2.0.5` | RELEASE.md §8 | After public tag |
+| Create an Investigation | `v2.3.0` | Portable incident container; artifacts; save/reopen |
+| Multi-source inputs | `v2.4.0` | App + system logs, core, pstack in one investigation |
+| Unified timeline view | `v2.5.0` | Chronological story inside investigation |
+| Crash analysis (basic) | `v2.6.0` | Understand why it crashed |
+
+Tactical planning docs graduate when G0/architect gates open per story.
 
 ---
 
-# 5. Medium value — optional before M15 code
+# 5. Shipped — M15 Web Platform (completed)
 
-| Item | Source | Effort |
-|------|--------|--------|
-| CLI `--follow` / tail | ADR-008 follow-up | M |
-| M11 scenarios S4.8, S2.5, S2.7 | [M11-V143-STORAGE-SCENARIOS.md](M11-V143-STORAGE-SCENARIOS.md) | S–M |
-| Win/mac release signing | RELEASE.md | Ops |
-| GitHub Pages API docs | [api/README.md](../api/README.md) | S |
-| Thread-safe diagnostics | strategy `ideas/` | S — before concurrent web |
+| Item | Status |
+|------|--------|
+| M15 REST API + browser MVP | ✅ `v2.1.0` |
+| M15.3 shared workspaces, tail, async analyze | ✅ `v2.2.0` |
+| M15.4 thin auth | ✅ `v2.2.1` |
 
 ---
 
-# 6. Defer (documented non-goals / future-private)
+# 6. Defer (documented non-goals / long-term)
 
 | Item | Why defer |
 |------|-----------|
-| M16 Enterprise (RBAC, agents, streaming) | Product boundary |
-| M17 Cloud (K8s, Helm, gRPC) | After M15 REST |
+| M16 Enterprise (RBAC, agents, streaming) | Long-term; after investigation stories |
+| M17 Cloud (K8s, Helm, gRPC) | After enterprise charter |
 | Plugin marketplace / `logscope install` | M12/M14 non-goals |
-| CrashScope, playbooks, multi-source workspace | Strategy future-private |
-| SIMD / zero-copy perf | Phase 1 deferred; profile first |
+| CrashScope flagship program, playbooks | Folded into investigation stories where applicable |
+| SIMD / zero-copy perf | Profile first |
 | Distro packages (DEB/RPM/Homebrew) | GitHub Releases sufficient |
 | PRD-001 lifecycle agents | Future vision |
 
@@ -85,3 +84,5 @@ v2.2.0+ → Shared investigations, thin auth (or M16)
 |---------|------|-------------|
 | 1.0.0 | 30-07-2026 | Initial backlog from planning corpus audit. |
 | 1.1.0 | 30-07-2026 | ADR-009 accepted; M15.0 planning gate complete. |
+| 1.2.0 | 30-07-2026 | M15 ship track through v2.1.0. |
+| 1.3.0 | 04-08-2026 | M15 complete at v2.2.1; v2.2.2 patch and investigation stories are active queue. |

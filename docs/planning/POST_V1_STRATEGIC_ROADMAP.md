@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 1.9.0 |
+| Version | 2.0.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 04-08-2026 |
 
 ---
 
@@ -40,7 +40,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
 
-**Immediate next milestone:** **M15 – Web Platform** at **`v2.0.0`**. M14 Desktop Application shipped at **`v2.0.0`** (features) and **`v2.0.1`** (all-platform desktop release artifacts). Phase 1 stabilization shipped at **`v1.5.2`**. See [Roadmap](../ROADMAP.md).
+**Current execution (post-M15):** M15 Web Platform is complete through **`v2.2.1`**. **Next:** **`v2.2.2`** — API key hashing (security patch) → **`v2.3.0`–`v2.6.0`** — investigation user stories (Create an Investigation, multi-source, unified timeline, crash analysis). Enterprise (M16) and cloud (M17) are **long-term** — deferred until investigation stories ship. See [Roadmap](../ROADMAP.md) and [Project Context](../handbook/PROJECT_CONTEXT.md).
 
 ---
 
@@ -470,3 +470,4 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.6.0 | 25-07-2026 | v1.5.0 released; M12 complete; immediate next milestone is M13. |
 | 1.8.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
 | 1.9.0 | 30-07-2026 | `v2.0.1` all-platform desktop release; doc sync. |
+| 2.0.0 | 04-08-2026 | M15 complete at v2.2.1; post-M15 investigation stories active; M16/M17 long-term. |
