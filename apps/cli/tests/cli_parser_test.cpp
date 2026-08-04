@@ -304,6 +304,22 @@ TEST(CliParserTest, ParsesSessionSaveContentSearch)
     EXPECT_EQ("timeout", parsed->sessionSave.contentCriteria.contentSearch);
 }
 
+TEST(CliParserTest, ParsesInvestigationCreateOptions)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "create";
+    std::string nameFlag = "--name";
+    std::string nameValue = "incident-alpha";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(nameFlag), toArgv(nameValue)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationCreate, parsed->command);
+    EXPECT_EQ("incident-alpha", parsed->investigationCreate.name);
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

@@ -1222,6 +1222,268 @@ std::optional<SessionListOptions> parseSessionListArguments(int argc, char* argv
     return options;
 }
 
+std::optional<InvestigationCreateOptions> parseInvestigationCreateArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationCreateOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--name" && index + 1 < argc)
+        {
+            options.name = argv[++index];
+            continue;
+        }
+
+        if (argument == "--description" && index + 1 < argc)
+        {
+            options.description = argv[++index];
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigationAddOptions> parseInvestigationAddArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationAddOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--display-name" && index + 1 < argc)
+        {
+            options.displayName = argv[++index];
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        if (options.logFile.string().empty())
+        {
+            options.logFile = foundation::Path(argument);
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty() || options.logFile.string().empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigationAddNoteOptions> parseInvestigationAddNoteArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationAddNoteOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--title" && index + 1 < argc)
+        {
+            options.title = argv[++index];
+            continue;
+        }
+
+        if (argument == "--body" && index + 1 < argc)
+        {
+            options.body = argv[++index];
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigationListOptions> parseInvestigationListArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationListOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigationShowOptions> parseInvestigationShowArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationShowOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
+std::optional<InvestigationOpenOptions> parseInvestigationOpenArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationOpenOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1303,6 +1565,54 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::SessionList;
             parsed.sessionList.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "create")
+        {
+            parsed.command = CliCommand::InvestigationCreate;
+            parsed.investigationCreate.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "add")
+        {
+            parsed.command = CliCommand::InvestigationAdd;
+            parsed.investigationAdd.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "add-note")
+        {
+            parsed.command = CliCommand::InvestigationAddNote;
+            parsed.investigationAddNote.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "list")
+        {
+            parsed.command = CliCommand::InvestigationList;
+            parsed.investigationList.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "show")
+        {
+            parsed.command = CliCommand::InvestigationShow;
+            parsed.investigationShow.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "open")
+        {
+            parsed.command = CliCommand::InvestigationOpen;
+            parsed.investigationOpen.showHelp = true;
 
             return parsed;
         }
@@ -1514,6 +1824,108 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::SessionList;
             parsed.sessionList = *options;
+
+            return parsed;
+        }
+
+        return std::nullopt;
+    }
+
+    if (firstArgument == "investigation")
+    {
+        if (argc < 3)
+        {
+            return std::nullopt;
+        }
+
+        const std::string_view subcommand = argv[2];
+
+        if (subcommand == "create")
+        {
+            const auto options = parseInvestigationCreateArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationCreate;
+            parsed.investigationCreate = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "add")
+        {
+            const auto options = parseInvestigationAddArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationAdd;
+            parsed.investigationAdd = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "add-note")
+        {
+            const auto options = parseInvestigationAddNoteArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationAddNote;
+            parsed.investigationAddNote = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "list")
+        {
+            const auto options = parseInvestigationListArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationList;
+            parsed.investigationList = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "show")
+        {
+            const auto options = parseInvestigationShowArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationShow;
+            parsed.investigationShow = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "open")
+        {
+            const auto options = parseInvestigationOpenArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationOpen;
+            parsed.investigationOpen = *options;
 
             return parsed;
         }

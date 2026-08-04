@@ -11,6 +11,7 @@ add_executable(logscope_web_integration_tests
     ../../session_store.cpp
     ../../session_resource_cleanup.cpp
     ../../workspace_store.cpp
+    ../../investigation_store.cpp
     ../../analyze_job_queue.cpp
     ../../json_parse.cpp
     ../../rest_json.cpp
@@ -36,6 +37,7 @@ target_link_libraries(logscope_web_integration_tests
     PRIVATE
         scope_application
         scope_configuration
+        scope_workspace
         logscope_httplib
         logscope_gtest_support
         GTest::gtest_main

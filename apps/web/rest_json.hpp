@@ -16,6 +16,7 @@
 #include "application_service.hpp"
 #include "analyze_job_queue.hpp"
 #include "investigation_result.hpp"
+#include "investigation_store.hpp"
 #include "workspace_store.hpp"
 
 namespace scope::web
@@ -52,6 +53,16 @@ namespace scope::web
 
 [[nodiscard]] std::string formatWorkspaceOpenResult(const std::string& workspaceId, const foundation::Path& sourcePath,
                                                     const WorkspaceSummary& summary);
+
+[[nodiscard]] std::string formatInvestigationManifest(const scope::workspace::InvestigationManifest& manifest);
+
+[[nodiscard]] std::string formatInvestigationList(const InvestigationListResult& list);
+
+[[nodiscard]] std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact);
+
+[[nodiscard]] std::string formatInvestigationOpenResult(const std::string& investigationId,
+                                                        const foundation::Path& sourcePath,
+                                                        const scope::workspace::InvestigationSummary& summary);
 
 [[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
 

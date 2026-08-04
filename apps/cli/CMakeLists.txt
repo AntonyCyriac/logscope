@@ -20,6 +20,7 @@ add_executable(logscope
     extensions_command.cpp
     main.cpp
     session_command.cpp
+    investigation_command.cpp
     stats_output.cpp
     output_format.cpp
     report_config.cpp

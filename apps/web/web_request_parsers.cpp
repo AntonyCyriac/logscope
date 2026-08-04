@@ -364,6 +364,122 @@ WorkspaceUpdateRequest parseWorkspaceUpdateRequest(const std::string_view body)
     return request;
 }
 
+InvestigationCreateBody parseInvestigationCreateRequest(const std::string_view body)
+{
+    InvestigationCreateBody request;
+
+    if (const std::optional<std::string> name = jsonStringField(body, "name"))
+    {
+        request.name = *name;
+    }
+
+    if (const std::optional<std::string> description = jsonStringField(body, "description"))
+    {
+        request.description = *description;
+    }
+
+    if (const std::optional<bool> captureSession = jsonBoolField(body, "captureSession"))
+    {
+        request.captureSession = *captureSession;
+    }
+
+    return request;
+}
+
+foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(const std::string_view body)
+{
+    ArtifactAddRequest request;
+
+    if (const std::optional<std::string> type = jsonStringField(body, "type"))
+    {
+        request.type = *type;
+    }
+
+    if (request.type.empty())
+    {
+        return foundation::Result<ArtifactAddRequest>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "Missing required field: type."));
+    }
+
+    if (request.type != "log" && request.type != "note")
+    {
+        return foundation::Result<ArtifactAddRequest>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "Artifact type must be log or note."));
+    }
+
+    if (const std::optional<std::string> name = jsonStringField(body, "name"))
+    {
+        request.name = *name;
+    }
+
+    if (const std::optional<std::string> title = jsonStringField(body, "title"))
+    {
+        if (request.name.empty())
+        {
+            request.name = *title;
+        }
+    }
+
+    if (const std::optional<std::string> noteBody = jsonStringField(body, "body"))
+    {
+        request.body = *noteBody;
+    }
+
+    if (const std::optional<std::string> sourcePath = jsonStringField(body, "sourcePath"))
+    {
+        request.sourcePath = *sourcePath;
+    }
+
+    if (const std::optional<std::string> path = jsonStringField(body, "path"))
+    {
+        if (request.sourcePath.empty())
+        {
+            request.sourcePath = *path;
+        }
+    }
+
+    if (const std::optional<std::string> displayName = jsonStringField(body, "displayName"))
+    {
+        request.displayName = *displayName;
+    }
+
+    if (request.type == "note" && request.name.empty())
+    {
+        return foundation::Result<ArtifactAddRequest>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "Note title is required."));
+    }
+
+    if (request.type == "log" && request.sourcePath.empty())
+    {
+        return foundation::Result<ArtifactAddRequest>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "Log source path is required."));
+    }
+
+    return foundation::Result<ArtifactAddRequest>(std::move(request));
+}
+
+InvestigationUpdateRequest parseInvestigationUpdateRequest(const std::string_view body)
+{
+    InvestigationUpdateRequest request;
+
+    if (const std::optional<std::string> name = jsonStringField(body, "name"))
+    {
+        request.name = *name;
+    }
+
+    if (const std::optional<std::string> description = jsonStringField(body, "description"))
+    {
+        request.description = *description;
+    }
+
+    if (const std::optional<std::string> primaryArtifactId = jsonStringField(body, "primaryArtifactId"))
+    {
+        request.primaryArtifactId = *primaryArtifactId;
+    }
+
+    return request;
+}
+
 foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path)
 {
     if (!config.allowServerPaths)

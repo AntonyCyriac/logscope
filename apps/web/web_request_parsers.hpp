@@ -14,6 +14,7 @@
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
 #include "investigation_criteria.hpp"
+#include "investigation_store.hpp"
 #include "report_options.hpp"
 #include "web_config.hpp"
 #include "workspace_store.hpp"
@@ -50,6 +51,34 @@ struct AgentInvestigateRequest
 [[nodiscard]] WorkspaceCreateRequest parseWorkspaceCreateRequest(std::string_view body);
 
 [[nodiscard]] WorkspaceUpdateRequest parseWorkspaceUpdateRequest(std::string_view body);
+
+/**
+ * @brief Parsed body for POST /api/v1/investigations.
+ */
+struct InvestigationCreateBody
+{
+    std::string name;
+    std::string description;
+    bool captureSession = false;
+};
+
+[[nodiscard]] InvestigationCreateBody parseInvestigationCreateRequest(std::string_view body);
+
+/**
+ * @brief Parsed body for POST /api/v1/investigations/{id}/artifacts.
+ */
+struct ArtifactAddRequest
+{
+    std::string type;
+    std::string name;
+    std::string body;
+    std::string sourcePath;
+    std::string displayName;
+};
+
+[[nodiscard]] foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(std::string_view body);
+
+[[nodiscard]] InvestigationUpdateRequest parseInvestigationUpdateRequest(std::string_view body);
 
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 

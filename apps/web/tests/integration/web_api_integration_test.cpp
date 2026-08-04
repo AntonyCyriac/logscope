@@ -355,6 +355,25 @@ TEST_F(WebApiIntegrationTest, SharedWorkspaceCreateOpenSaveFlow)
     EXPECT_EQ(200, saveResult->status);
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationCreateViaRest)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const httplib::Result createResult = client->Post("/api/v1/investigations", headers,
+                                                      "{\"name\": \"rest-investigation\"}",
+                                                      "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+    EXPECT_NE(std::string::npos, createResult->body.find("\"name\": \"rest-investigation\""));
+    EXPECT_NE(std::string::npos, createResult->body.find("\"id\": \""));
+
+    const httplib::Result listResult = client->Get("/api/v1/investigations", headers);
+    ASSERT_TRUE(listResult);
+    EXPECT_EQ(200, listResult->status);
+    EXPECT_NE(std::string::npos, listResult->body.find("rest-investigation"));
+}
+
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
     const std::string sessionId = createSession();
