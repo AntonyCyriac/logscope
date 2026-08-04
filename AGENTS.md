@@ -33,3 +33,5 @@ Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI
 ## Cursor users
 
 Rules in [`.cursor/rules/`](.cursor/rules/) mirror this file. Prefer **this `AGENTS.md`** when sharing context across tools.
+
+<!-- discard: CI docs-only waiver smoke test -->

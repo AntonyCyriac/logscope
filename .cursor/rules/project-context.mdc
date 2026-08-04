@@ -17,3 +17,5 @@ When editing **logscope**:
 When **logscope-strategy** is in workspace, EngOS routing is optional (private); do not paste strategy content into public PRs.
 
 Shipped-tag regressions: see `release-regression-issues.mdc`.
+
+<!-- discard: CI docs-only waiver smoke test -->
