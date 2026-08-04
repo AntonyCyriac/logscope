@@ -21,9 +21,9 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.2.2** ships M15 Web Platform (complete) plus API key hashing at rest for `logscope-web`. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`). M0–M15 are complete; M12 plugins, M13 AI assistant, and M14 desktop shipped in earlier v1.x–v2.0.x releases.
+LogScope **v2.3.0** ships **Story 1: Create an Investigation** — portable incident containers with log + note artifacts (CLI, REST, web). M15 Web Platform complete through `v2.2.2`. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`).
 
-**Next:** **`v2.3.0`+** investigation stories (Create an Investigation, multi-source, timeline, crash analysis).
+**Next:** **`v2.4.0`** — Story 2: Understand Everything (multi-source correlation).
 
 ```text
 Source → Analysis → Investigation → Reporting

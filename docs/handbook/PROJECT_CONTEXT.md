@@ -29,9 +29,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.2.2` (shipped) — security patch: API key hashing at rest for `logscope-web` (`web.api_key_hash`, `LOGSCOPE_WEB_API_KEY_HASH`, `--hash-api-key`). Builds on M15 Web Platform (REST API `v2.1.0`, shared workspaces `v2.2.0`, thin auth `v2.2.1`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
+**Current release:** `v2.3.0` (shipped) — **Story 1: Create an Investigation** — portable incident container with log + note artifacts, REST `/api/v1/investigations`, CLI `investigation` commands, web Investigations UI. Builds on M15 Web Platform through `v2.2.2`. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Next release:** **`v2.3.0`** — **Create an Investigation** — portable incident container with artifacts and save/reopen. Broader horizon: [Roadmap](../ROADMAP.md).
+**Next release:** **`v2.4.0`** — **Story 2: Understand Everything** — multi-artifact correlation. Broader horizon: [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -59,9 +59,9 @@ The project follows architecture-first development. Every implementation should 
 
 | Release | Target | Focus |
 |---------|--------|-------|
-| Security patch | `v2.2.2` | API key hashing at rest (shipped) |
-| Investigation — Story 1 | `v2.3.0` | Create an Investigation (artifacts, save/reopen) |
-| Investigation — Stories 2–4 | `v2.4.0`–`v2.6.0` | Multi-source inputs, unified timeline, crash analysis |
+| Investigation — Story 2 | `v2.4.0` | Understand Everything (multi-source) |
+| Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) |
+| Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -366,4 +366,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.7.0 | 01-08-2026 | Current release `v2.2.1` (M15 complete); docs-only CI waiver; homepage refresh. |
 | 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation. |
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
-| 3.0.0 | 04-08-2026 | Current release `v2.2.2` (API key hashing); next `v2.3.0` Create an Investigation. |
+| 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
