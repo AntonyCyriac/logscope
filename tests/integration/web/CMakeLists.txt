@@ -3,6 +3,7 @@
 # ==========================================================
 
 include(${CMAKE_SOURCE_DIR}/cmake/LogScopeHttplib.cmake)
+include(${CMAKE_SOURCE_DIR}/apps/web/cmake/LogScopeWebOpenSSL.cmake)
 
 add_executable(logscope_web_parity_tests
     cli_rest_parity_test.cpp
@@ -16,6 +17,7 @@ add_executable(logscope_web_parity_tests
     ${CMAKE_SOURCE_DIR}/apps/web/rest_json.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/web_request_parsers.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/middleware/api_key.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/middleware/api_key_credential.cpp
     ${CMAKE_SOURCE_DIR}/apps/cli/investigation_output.cpp
     ${CMAKE_SOURCE_DIR}/apps/cli/report_output.cpp
     ${CMAKE_SOURCE_DIR}/apps/cli/report_config.cpp
@@ -54,6 +56,8 @@ target_include_directories(logscope_web_parity_tests
 if(WIN32)
     target_link_libraries(logscope_web_parity_tests PRIVATE ws2_32 crypt32)
 endif()
+
+logscope_web_link_openssl(logscope_web_parity_tests)
 
 include(GoogleTest)
 gtest_discover_tests(logscope_web_parity_tests
