@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.7.0 |
+| Version | 2.8.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 01-08-2026 |
+| Last Updated | 04-08-2026 |
 
 ---
 
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 **Current release:** `v2.2.1` (shipped) — M15 Web Platform complete: REST API + browser SPA (`v2.1.0`), shared workspaces / tail / async analyze (`v2.2.0`), thin auth — session TTL, upload cleanup, securing guide (`v2.2.1`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Strategic next milestone:** **M16 – Enterprise** — see [Roadmap](../ROADMAP.md).
+**Next releases:** **`v2.2.2`** — API key hashing at rest (security patch; see [Securing logscope-web](SECURING_LOGSCOPE_WEB.md)). **`v2.3.0`** — **Create an Investigation** — portable incident container with artifacts and save/reopen. Broader horizon: [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -57,9 +57,12 @@ The project follows architecture-first development. Every implementation should 
 
 **Next:**
 
-| Milestone | Target | Focus |
-|-----------|--------|-------|
-| M16 – Enterprise | `v2.x` | RBAC, agents, streaming |
+| Release | Target | Focus |
+|---------|--------|-------|
+| Security patch | `v2.2.2` | API key hashing at rest |
+| Investigation — Story 1 | `v2.3.0` | Create an Investigation (artifacts, save/reopen) |
+| Investigation — Stories 2–4 | `v2.4.0`–`v2.6.0` | Multi-source inputs, unified timeline, crash analysis |
+| Enterprise (M16) | Long-term | RBAC, agents, streaming — deferred until investigation stories ship |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -362,3 +365,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.5.0 | 30-07-2026 | Current release `v2.0.3` (desktop regression hotfix). |
 | 2.6.0 | 30-07-2026 | Current release `v2.0.5` (CI/build hotfix, versioned artifacts). |
 | 2.7.0 | 01-08-2026 | Current release `v2.2.1` (M15 complete); docs-only CI waiver; homepage refresh. M16 is next. |
+| 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation; M16 enterprise deferred to long-term horizon. |
