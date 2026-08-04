@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "api_key_credential.hpp"
+
 #include <string>
 
 namespace httplib
@@ -24,7 +26,7 @@ constexpr const char* kApiKeyHeader = "X-LogScope-Api-Key";
  *
  * @return true when the request may proceed.
  */
-[[nodiscard]] bool authorizeApiKey(const std::string& configuredKey, const httplib::Request& request,
+[[nodiscard]] bool authorizeApiKey(const ApiKeyCredential& credential, const httplib::Request& request,
                                  httplib::Response& response);
 
 } // namespace scope::web

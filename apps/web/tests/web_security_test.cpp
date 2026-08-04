@@ -96,7 +96,7 @@ TEST_F(WebSecurityTest, RejectsServerPathWhenDisabled)
 TEST_F(WebSecurityTest, HealthAccessibleWithoutApiKeyWhenConfigured)
 {
     server->stop();
-    config.apiKey = "secret-key";
+    config.apiKey = scope::web::ApiKeyCredential::fromPlaintext("secret-key");
     server = std::make_unique<scope::web::WebServer>(config);
     ASSERT_TRUE(server->startInBackground());
 
@@ -141,7 +141,7 @@ TEST_F(WebSecurityTest, SessionIsolationDeniesUnknownSessionInvestigate)
 TEST_F(WebSecurityTest, HealthRequiresApiKeyWhenConfigured)
 {
     server->stop();
-    config.apiKey = "secret-key";
+    config.apiKey = scope::web::ApiKeyCredential::fromPlaintext("secret-key");
     config.healthRequiresApiKey = true;
     server = std::make_unique<scope::web::WebServer>(config);
     ASSERT_TRUE(server->startInBackground());

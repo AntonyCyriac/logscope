@@ -12,6 +12,8 @@
 
 #include "configuration_manager.hpp"
 #include "foundation/path.hpp"
+#include "foundation/result.hpp"
+#include "middleware/api_key_credential.hpp"
 
 namespace scope::web
 {
@@ -26,7 +28,7 @@ struct WebConfig
     std::vector<std::string> corsOrigins{"http://127.0.0.1:8080", "http://localhost:8080"};
     std::vector<foundation::Path> allowedPathRoots;
     std::string bindHost = "127.0.0.1";
-    std::string apiKey;
+    ApiKeyCredential apiKey;
     foundation::Path uploadTempDir;
     foundation::Path workspaceDir;
     foundation::Path tlsCertPath;
@@ -43,6 +45,13 @@ struct WebConfig
     bool corsOriginsUserSet = false;
     bool workspaceDirUserSet = false;
 
+    std::string configuredApiKey;
+    std::string configuredApiKeyHash;
+    bool envApiKeySet = false;
+    std::string envApiKey;
+    bool envApiKeyHashSet = false;
+    std::string envApiKeyHash;
+
     [[nodiscard]] static WebConfig defaults();
 
     /**
@@ -54,6 +63,13 @@ struct WebConfig
      * @brief Applies LOGSCOPE_WEB_* environment overrides.
      */
     void applyEnvironment();
+
+    /**
+     * @brief Resolves {@code apiKey} from config file values and environment overrides.
+     *
+     * Call after {@code mergeFromConfiguration} and {@code applyEnvironment}.
+     */
+    [[nodiscard]] foundation::Result<bool> finalizeApiKey();
 
     /**
      * @brief When web.cors_origins was not set explicitly, build http/https origins from bind host/port.

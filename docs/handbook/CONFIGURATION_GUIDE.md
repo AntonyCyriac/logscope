@@ -326,7 +326,8 @@ Keys apply to `logscope-web` (M15 / ADR-009). Load via `--config` or environment
 |-----|---------|-------------|
 | `web.bind_host` | `127.0.0.1` | Listen address |
 | `web.bind_port` | `8080` | Listen port |
-| `web.api_key` | empty | When set, require `X-LogScope-Api-Key` on mutating `/api/v1/*` |
+| `web.api_key` | empty | Legacy plaintext key (startup warning in v2.2.2+); prefer `web.api_key_hash` |
+| `web.api_key_hash` | empty | Salted SHA-256 hash at rest (`sha256:<salt>:<digest>`); generate with `logscope-web --hash-api-key` |
 | `web.health_requires_api_key` | `false` | When `true` and `api_key` set, `GET /api/v1/health` requires the key |
 | `web.cors_origins` | (derived) | Comma-separated allowed browser origins |
 | `web.tls_cert` / `web.tls_key` | empty | PEM paths for embedded HTTPS (OpenSSL build) |
@@ -347,7 +348,8 @@ Environment overrides:
 
 | Variable | Maps to |
 |----------|---------|
-| `LOGSCOPE_WEB_API_KEY` | `web.api_key` |
+| `LOGSCOPE_WEB_API_KEY` | `web.api_key` (plaintext override) |
+| `LOGSCOPE_WEB_API_KEY_HASH` | `web.api_key_hash` |
 | `LOGSCOPE_WEB_BIND_HOST` | `web.bind_host` |
 | `LOGSCOPE_WEB_BIND_PORT` | `web.bind_port` |
 | `LOGSCOPE_WEB_TLS_CERT` / `LOGSCOPE_WEB_TLS_KEY` | TLS paths |

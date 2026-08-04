@@ -5,6 +5,7 @@
 #include "web_startup.hpp"
 
 #include "configuration_manager.hpp"
+#include "middleware/api_key_credential.hpp"
 
 #include <iostream>
 #include <optional>
@@ -19,6 +20,8 @@ namespace
 struct WebCliOptions
 {
     bool help = false;
+    bool hashApiKey = false;
+    std::string hashApiKeyValue;
     bool configPathSet = false;
     foundation::Path configPath;
     std::optional<std::string> bindHost;
@@ -51,6 +54,22 @@ foundation::Result<WebCliOptions> parseCliOptions(const int argc, char* argv[])
     for (int index = 1; index < argc; ++index)
     {
         const std::string argument(argv[index]);
+
+        if (argument == "--hash-api-key")
+        {
+            const auto value = requireValue(argc, argv, index, "--hash-api-key");
+
+            if (!value)
+            {
+                return foundation::Result<WebCliOptions>(value.error());
+            }
+
+            options.hashApiKey = true;
+            options.hashApiKeyValue = *value;
+            ++index;
+
+            continue;
+        }
 
         if (argument == "--help" || argument == "-h")
         {
@@ -159,9 +178,10 @@ void printWebUsage(std::ostream& output)
            << "  --bind-port <port>    Listen port (default 8080)\n"
            << "  --tls-cert <file>     TLS certificate (PEM); requires OpenSSL build\n"
            << "  --tls-key <file>      TLS private key (PEM); requires OpenSSL build\n"
+           << "  --hash-api-key <key>  Print sha256 hash for web.api_key_hash and exit\n"
            << "  --help                Show this help\n\n"
            << "Environment: LOGSCOPE_WEB_BIND_HOST, LOGSCOPE_WEB_BIND_PORT, LOGSCOPE_WEB_API_KEY,\n"
-           << "  LOGSCOPE_WEB_TLS_CERT, LOGSCOPE_WEB_TLS_KEY, LOGSCOPE_WEB_UI_DIR\n";
+           << "  LOGSCOPE_WEB_API_KEY_HASH, LOGSCOPE_WEB_TLS_CERT, LOGSCOPE_WEB_TLS_KEY, LOGSCOPE_WEB_UI_DIR\n";
 }
 
 foundation::Result<WebConfig> loadStartupConfig(const int argc, char* argv[])
@@ -181,6 +201,21 @@ foundation::Result<WebConfig> loadStartupConfig(const int argc, char* argv[])
 
         return foundation::Result<WebConfig>(
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Help requested."));
+    }
+
+    if (options.hashApiKey)
+    {
+        const auto hash = ApiKeyCredential::hashPlaintextForStorage(options.hashApiKeyValue);
+
+        if (!hash)
+        {
+            return foundation::Result<WebConfig>(hash.error());
+        }
+
+        std::cout << *hash << '\n';
+
+        return foundation::Result<WebConfig>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "Hash printed."));
     }
 
     WebConfig config = WebConfig::defaults();
@@ -229,6 +264,13 @@ foundation::Result<WebConfig> loadStartupConfig(const int argc, char* argv[])
     {
         return foundation::Result<WebConfig>(
             foundation::Error(foundation::ErrorCode::InvalidArgument, "TLS private key requires TLS certificate."));
+    }
+
+    const auto finalizeResult = config.finalizeApiKey();
+
+    if (!finalizeResult)
+    {
+        return foundation::Result<WebConfig>(finalizeResult.error());
     }
 
     config.applyDerivedDefaults();

@@ -587,7 +587,11 @@ void WorkspaceStore::touchUpdatedAt(const std::string& workspaceId)
     }
 
     metadataResult->updatedAt = currentTimestampIso();
-    saveMetadata(workspaceDir, *metadataResult);
+
+    if (!saveMetadata(workspaceDir, *metadataResult))
+    {
+        return;
+    }
 }
 
 void WorkspaceStore::updateSummaryFromService(const std::string& workspaceId,
@@ -617,7 +621,11 @@ void WorkspaceStore::updateSummaryFromService(const std::string& workspaceId,
     }
 
     metadataResult->updatedAt = currentTimestampIso();
-    saveMetadata(workspaceDir, *metadataResult);
+
+    if (!saveMetadata(workspaceDir, *metadataResult))
+    {
+        return;
+    }
 }
 
 } // namespace scope::web

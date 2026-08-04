@@ -26,6 +26,7 @@ add_executable(logscope-web
     web_request_parsers.cpp
     web_server.cpp
     middleware/api_key.cpp
+    middleware/api_key_credential.cpp
     ${LOGSCOPE_WEB_CLI_SOURCES}
 )
 
@@ -44,15 +45,18 @@ target_link_libraries(logscope-web
 
 option(LOGSCOPE_WEB_TLS "Enable HTTPS in logscope-web via OpenSSL" ON)
 
-if(LOGSCOPE_WEB_TLS)
-    find_package(OpenSSL)
+find_package(OpenSSL)
 
-    if(OpenSSL_FOUND)
+if(OpenSSL_FOUND)
+    target_compile_definitions(logscope-web PRIVATE LOGSCOPE_WEB_API_KEY_HASHING)
+    target_link_libraries(logscope-web PRIVATE OpenSSL::Crypto)
+
+    if(LOGSCOPE_WEB_TLS)
         target_compile_definitions(logscope-web PRIVATE CPPHTTPLIB_OPENSSL_SUPPORT)
-        target_link_libraries(logscope-web PRIVATE OpenSSL::SSL OpenSSL::Crypto)
-    else()
-        message(WARNING "OpenSSL not found; logscope-web HTTPS support disabled")
+        target_link_libraries(logscope-web PRIVATE OpenSSL::SSL)
     endif()
+else()
+    message(WARNING "OpenSSL not found; logscope-web API key hashing and HTTPS support disabled")
 endif()
 
 target_include_directories(logscope-web
