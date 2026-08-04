@@ -108,6 +108,40 @@ TEST(WebConfigTest, FinalizeApiKeyEnvOverridesConfigFile)
     EXPECT_TRUE(config.apiKey.verify("env-secret"));
 }
 
+TEST(WebConfigTest, FinalizeApiKeyIgnoresEmptyEnvPlaintextForConfigHash)
+{
+    scope::web::WebConfig config = scope::web::WebConfig::defaults();
+    const auto stored = scope::web::ApiKeyCredential::hashPlaintextForStorage("hashed-secret");
+
+    ASSERT_TRUE(stored.hasValue()) << stored.error().message();
+
+    config.configuredApiKeyHash = *stored;
+    config.envApiKeySet = true;
+    config.envApiKey.clear();
+
+    const auto finalized = config.finalizeApiKey();
+
+    ASSERT_TRUE(finalized.hasValue()) << finalized.error().message();
+    EXPECT_TRUE(config.apiKey.verify("hashed-secret"));
+}
+
+TEST(WebConfigTest, FinalizeApiKeyIgnoresEmptyEnvHashForConfigHash)
+{
+    scope::web::WebConfig config = scope::web::WebConfig::defaults();
+    const auto stored = scope::web::ApiKeyCredential::hashPlaintextForStorage("hashed-secret");
+
+    ASSERT_TRUE(stored.hasValue()) << stored.error().message();
+
+    config.configuredApiKeyHash = *stored;
+    config.envApiKeyHashSet = true;
+    config.envApiKeyHash.clear();
+
+    const auto finalized = config.finalizeApiKey();
+
+    ASSERT_TRUE(finalized.hasValue()) << finalized.error().message();
+    EXPECT_TRUE(config.apiKey.verify("hashed-secret"));
+}
+
 TEST(WebConfigTest, ListenUrlReflectsTls)
 {
     scope::web::WebConfig config = scope::web::WebConfig::defaults();

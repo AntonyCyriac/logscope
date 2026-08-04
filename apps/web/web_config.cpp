@@ -244,14 +244,24 @@ void WebConfig::applyEnvironment()
 {
     if (const char* value = std::getenv("LOGSCOPE_WEB_API_KEY"))
     {
-        envApiKeySet = true;
-        envApiKey = value;
+        const std::string trimmed = scope::foundation::trim(value);
+
+        if (!trimmed.empty())
+        {
+            envApiKeySet = true;
+            envApiKey = trimmed;
+        }
     }
 
     if (const char* value = std::getenv("LOGSCOPE_WEB_API_KEY_HASH"))
     {
-        envApiKeyHashSet = true;
-        envApiKeyHash = value;
+        const std::string trimmed = scope::foundation::trim(value);
+
+        if (!trimmed.empty())
+        {
+            envApiKeyHashSet = true;
+            envApiKeyHash = trimmed;
+        }
     }
 
     if (const char* value = std::getenv("LOGSCOPE_WEB_BIND_HOST"))
@@ -320,13 +330,13 @@ foundation::Result<bool> WebConfig::finalizeApiKey()
 {
     apiKey = ApiKeyCredential::disabled();
 
-    if (envApiKeySet)
+    if (envApiKeySet && !envApiKey.empty())
     {
         apiKey = ApiKeyCredential::fromPlaintext(envApiKey);
         return foundation::Result<bool>(true);
     }
 
-    if (envApiKeyHashSet)
+    if (envApiKeyHashSet && !envApiKeyHash.empty())
     {
         const auto credential = ApiKeyCredential::fromStoredHash(envApiKeyHash);
 
