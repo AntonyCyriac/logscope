@@ -1,9 +1,9 @@
 /**
- * @file investigation.cpp
+ * @file investigation_container.cpp
  * @brief Investigation aggregate root implementation.
  */
 
-#include "investigation.hpp"
+#include "investigation_container.hpp"
 
 #include "artifact_handler.hpp"
 #include "investigation_manifest_io.hpp"

@@ -4,7 +4,7 @@
 
 #include "web_server.hpp"
 
-#include "investigation.hpp"
+#include "investigation_container.hpp"
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
 #include "rest_json.hpp"

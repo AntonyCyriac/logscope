@@ -1,5 +1,5 @@
 /**
- * @file investigation.hpp
+ * @file investigation_container.hpp
  * @brief Investigation aggregate root (Story 1 / v2.3.0).
  */
 

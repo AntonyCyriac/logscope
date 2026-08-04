@@ -5,7 +5,7 @@
 
 add_library(scope_workspace
     artifact_handler.cpp
-    investigation.cpp
+    investigation_container.cpp
     investigation_manifest_io.cpp
     investigation_session.cpp
     session_serializer.cpp
