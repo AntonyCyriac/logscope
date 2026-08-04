@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.15.0 |
+| Version | 3.16.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 04-08-2026 |
@@ -66,9 +66,9 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.2.1`](CHANGELOG.md) — M15.4 thin auth.
+**Current release:** [`v2.2.2`](CHANGELOG.md) — API key hashing at rest (security patch).
 
-**Next:** **`v2.2.2`** — API key hashing at rest (security patch) → **`v2.3.0`** — **Create an Investigation** (first post-M15 user story). See [Project Context](handbook/PROJECT_CONTEXT.md).
+**Next:** **`v2.3.0`** — **Create an Investigation** (first post-M15 user story). See [Project Context](handbook/PROJECT_CONTEXT.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
@@ -438,7 +438,7 @@ v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web MVP (released)
 v2.2.0  — M15.3 shared workspaces, tail, async analyze (released)
 v2.2.1  — M15.4 thin auth (released)
-v2.2.2  — API key hashing at rest (planned security patch)
+v2.2.2  — API key hashing at rest (released)
 v2.3.0  — Create an Investigation (planned)
 v2.4.0–v2.6.0 — Investigation stories: multi-source, timeline, crash analysis (planned)
 ```
@@ -487,3 +487,4 @@ The roadmap is considered successful when:
 | 3.13.0 | 30-07-2026 | Phase 1 complete; v1.5.2 released (stabilize v1.x); M14 next. |
 | 3.14.0 | 04-08-2026 | M15 complete at v2.2.1; next v2.2.2 patch and v2.3.0+ investigation stories. |
 | 3.15.0 | 04-08-2026 | Removed enterprise/cloud horizon from public roadmap (strategy-only). |
+| 3.16.0 | 04-08-2026 | Current release v2.2.2 (API key hashing); next v2.3.0 Create an Investigation. |
