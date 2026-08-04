@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Testing Guide |
 | Category | Testing |
-| Version | 1.12.0 |
+| Version | 1.17.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 04-08-2026 |
 
 ---
 
@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **529** automated tests (unit, integration, end-to-end, and regression). Coverage includes `scope_application_tests` (M14), `logscope_desktop_tests` (M14 GUI headless), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
+**Current baseline:** **529+** automated tests (unit, integration, end-to-end, and regression) through **`v2.2.1`**. Coverage includes `scope_application_tests` (M14), `logscope_desktop_tests` (M14 GUI headless), web integration tests (M15), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 
@@ -220,3 +220,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.14.0 | 30-07-2026 | Current release baseline `v2.0.2`; M14.12 desktop CLI parity polish. |
 | 1.15.0 | 30-07-2026 | Current release baseline `v2.0.3`; `logscope_desktop_tests` (529 tests). |
 | 1.16.0 | 30-07-2026 | Current release baseline `v2.0.5`; directory e2e isolation, versioned release artifacts. |
+| 1.17.0 | 04-08-2026 | Baseline through `v2.2.1`; M15 web integration tests noted. |

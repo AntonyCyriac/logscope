@@ -35,7 +35,7 @@ Optional extended process docs may live in a private strategy repository (not li
 | **Coding assistant (today)** | Bootstrap for any AI IDE helping contributors | [AGENTS.md](../../AGENTS.md), [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) |
 | **Product (future)** | Runtime agents invoked by users (`logscope agent …`, investigation AI) | PRD-001; delivery via M13+ |
 
-Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) (M15 Web Platform; M14 shipped at `v2.0.0` / `v2.0.1`).
+Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) and [Project Context](../../handbook/PROJECT_CONTEXT.md) (`v2.2.2` security patch, then investigation stories from `v2.3.0`).
 
 ---
 

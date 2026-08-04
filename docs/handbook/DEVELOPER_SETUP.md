@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.10.0 |
+| Version | 2.14.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
-| Last Updated | 30-07-2026 |
+| Last Updated | 04-08-2026 |
 
 ---
 
@@ -25,9 +25,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.0.5`](../../CHANGELOG.md) — **529** automated tests. M14 Desktop + v2.0.5 CI/build hotfix.
+**Current release:** [`v2.2.1`](../../CHANGELOG.md) — M15 Web Platform complete (CLI, desktop, web). See [CHANGELOG](../../CHANGELOG.md) for test baseline.
 
-**Next milestone:** M15 – Web Platform (`v2.1.0` track). Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
+**Next releases:** **`v2.2.2`** security patch → **`v2.3.0`** Create an Investigation. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
 
 ---
 
@@ -441,3 +441,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.11.0 | 30-07-2026 | Current release baseline (`v2.0.2`); M14.12 desktop CLI parity polish. |
 | 2.12.0 | 30-07-2026 | Current release baseline (`v2.0.3`); desktop regression hotfix + `logscope_desktop_tests`. |
 | 2.13.0 | 30-07-2026 | Current release baseline (`v2.0.5`); CI/build hotfix, versioned release artifacts. |
+| 2.14.0 | 04-08-2026 | Current release baseline (`v2.2.1`); M15 complete; next v2.2.2 and investigation stories. |
