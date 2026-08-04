@@ -113,7 +113,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | ID | Scenario | Expected | Status |
 |----|----------|----------|--------|
 | REL.1 | CI green | All scenario rows pass on `web` job | ✅ |
-| REL.2 | Tag + binaries | `v2.3.0` GitHub Release with `logscope-web-v2.3.0-*` | ⬜ |
+| REL.2 | Tag + binaries | `v2.3.0` GitHub Release with `logscope-web-v2.3.0-*` | ✅ |
 
 ---
 
