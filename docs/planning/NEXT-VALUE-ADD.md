@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.3.0 |
+| Version | 1.4.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 04-08-2026 |
@@ -28,8 +28,6 @@ v2.3.0  → Create an Investigation
 v2.4.0+ → Multi-source, unified timeline, crash analysis stories
 ```
 
-Enterprise (M16) and cloud (M17) remain long-term — see [Roadmap](../ROADMAP.md).
-
 ---
 
 # 3. Immediate — next (`v2.2.2`)
@@ -50,7 +48,7 @@ Enterprise (M16) and cloud (M17) remain long-term — see [Roadmap](../ROADMAP.m
 | Unified timeline view | `v2.5.0` | Chronological story inside investigation |
 | Crash analysis (basic) | `v2.6.0` | Understand why it crashed |
 
-Tactical planning docs graduate when G0/architect gates open per story.
+Tactical planning docs are added when each investigation story is chartered for implementation.
 
 ---
 
@@ -64,12 +62,12 @@ Tactical planning docs graduate when G0/architect gates open per story.
 
 ---
 
-# 6. Defer (documented non-goals / long-term)
+# 6. Defer (documented non-goals)
 
 | Item | Why defer |
 |------|-----------|
-| M16 Enterprise (RBAC, agents, streaming) | Long-term; after investigation stories |
-| M17 Cloud (K8s, Helm, gRPC) | After enterprise charter |
+| Full RBAC / multi-tenant auth | Out of scope for current investigation releases |
+| Hosted multi-tenant SaaS | Out of product scope |
 | Plugin marketplace / `logscope install` | M12/M14 non-goals |
 | CrashScope flagship program, playbooks | Folded into investigation stories where applicable |
 | SIMD / zero-copy perf | Profile first |
@@ -83,6 +81,7 @@ Tactical planning docs graduate when G0/architect gates open per story.
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 30-07-2026 | Initial backlog from planning corpus audit. |
-| 1.1.0 | 30-07-2026 | ADR-009 accepted; M15.0 planning gate complete. |
+| 1.1.0 | 30-07-2026 | ADR-009 accepted; M15.0 planning complete. |
 | 1.2.0 | 30-07-2026 | M15 ship track through v2.1.0. |
 | 1.3.0 | 04-08-2026 | M15 complete at v2.2.1; v2.2.2 patch and investigation stories are active queue. |
+| 1.4.0 | 04-08-2026 | Removed enterprise/cloud backlog rows; public horizon ends at investigation stories. |

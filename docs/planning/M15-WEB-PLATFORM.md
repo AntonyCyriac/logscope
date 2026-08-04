@@ -47,8 +47,8 @@ Strategic phase: [Post-v1 Strategic Roadmap § Phase 7](POST_V1_STRATEGIC_ROADMA
 
 | Item | Notes |
 |------|-------|
-| Full RBAC / multi-tenant enterprise | M16 |
-| K8s / Helm / gRPC / OpenTelemetry | M17 |
+| Full RBAC / multi-tenant auth | Out of scope for M15 |
+| Large-scale deployment packaging (orchestrators, service mesh) | Out of scope for M15 |
 | Plugin marketplace install UX | M12 non-goal |
 | QML or native desktop changes | M14 complete |
 | Replacing CLI for scripting | CLI remains primary automation surface |
@@ -101,7 +101,7 @@ See [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md).
 | SPA | W2 flows for shared list/open/save and tail panel |
 | Parity + security | See [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) |
 
-**Shipped:** `v2.2.0` (2026-07-31). **M15.4** thin auth @ `v2.2.1` (G4 docs). Playwright CI deferred. **Next:** `v2.2.2` API key hashing, then investigation stories — see [Roadmap](../ROADMAP.md).
+**Shipped:** `v2.2.0` (2026-07-31). **M15.4** thin auth @ `v2.2.1`. Playwright CI deferred. **Next:** `v2.2.2` API key hashing, then investigation stories — see [Roadmap](../ROADMAP.md).
 
 ---
 
@@ -127,4 +127,4 @@ See [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md).
 | 0.1.0 | 30-07-2026 | Initial draft; graduation stub before ADR-009. |
 | 0.2.0 | 30-07-2026 | ADR-009 accepted; M15.0 gate satisfied; scenario matrix linked. |
 | 0.3.0 | 31-07-2026 | M15.1 + M15.2 shipped in `v2.1.0` (`logscope-web` + SPA). |
-| 0.7.0 | 31-07-2026 | M15.4 thin auth @ `v2.2.1` (G4 docs). |
+| 0.7.0 | 31-07-2026 | M15.4 thin auth @ `v2.2.1` (operator handbook). |

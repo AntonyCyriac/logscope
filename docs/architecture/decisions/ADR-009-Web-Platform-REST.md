@@ -17,7 +17,7 @@ Requirements:
 - Cross-platform: Windows, Linux, macOS (match existing CI matrix).
 - CLI remains the primary automation surface; REST must not fork behaviour.
 - Parity: investigate counts, analytics buckets, and export sections must match CLI `--format json` on the same fixtures (`samples/sample.log`, `samples/large-app.log`).
-- Security baseline for v1: safe defaults on a trusted LAN; enterprise RBAC deferred.
+- Security baseline for v1: safe defaults on a trusted LAN; full RBAC deferred.
 
 **Planning gate:** [M15-WEB-PLATFORM.md](../../planning/M15-WEB-PLATFORM.md) M15.0 requires this ADR before implementation.
 
@@ -138,7 +138,7 @@ M15.1 returns full `InvestigationResult` (same as CLI). M15.2+ may add `limit` /
 | Authentication | **None by default** — suitable for localhost / trusted LAN |
 | Optional API key | When `web.api_key` is set (or `LOGSCOPE_WEB_API_KEY` env), require header `X-LogScope-Api-Key: <key>` on all `/api/v1/*` routes; health may remain open |
 | TLS | Out of scope for embedded server v1; terminate TLS at reverse proxy if needed |
-| RBAC / multi-tenant / OAuth | **Deferred to M16** |
+| RBAC / multi-tenant / OAuth | **Out of scope** for current investigation releases |
 | CORS | `web.cors_origins` list; default `http://127.0.0.1:8080` and `http://localhost:8080` for dev SPA |
 
 Document in handbook: **do not bind `0.0.0.0` without API key** in untrusted networks.
@@ -191,8 +191,8 @@ Upload flow:
 
 | Item | Target |
 |------|--------|
-| Full RBAC, organizations, audit log | M16 |
-| K8s Helm charts, gRPC, OpenTelemetry collectors | M17 |
+| Full RBAC, organizations, audit log | Out of scope for M15 |
+| Orchestrated or multi-node deployment packaging | Out of scope for M15 |
 | Plugin marketplace / `logscope install` UX | M12 non-goal |
 | Replacing CLI for scripting | CLI stays primary |
 | QML / native desktop changes | M14 complete |
@@ -327,7 +327,7 @@ Implementation order:
 1. **M15.1** — `logscope-web` skeleton, health, session, open/upload, analyze, investigate, extensions; no SPA.
 2. **M15.2** — static SPA MVP; export + agent investigate; parity tests green.
 3. **M15.3** — shared saved workspaces API, tail poll, async analyze jobs — see [ADR-009-M15.3-Shared-Investigations.md](ADR-009-M15.3-Shared-Investigations.md).
-4. **M15.4 / M16** — optional API key hardening, RBAC, TLS deployment guides.
+4. **M15.4+** — optional API key hardening, TLS deployment guides.
 
 CLI output formatters remain in `apps/cli/`; C12 adds **JSON mappers** from domain types (`AnalysisModel`, `InvestigationResult`, …) to REST schema. Prefer reusing any shared serialization helpers extracted from CLI JSON formatters during M15.1 refactor.
 
@@ -341,7 +341,7 @@ CLI output formatters remain in `apps/cli/`; C12 adds **JSON mappers** from doma
 - cpp-httplib reuse minimizes new dependencies and license review.
 - Session-per-workspace model scales to multiple tabs and API clients.
 - Parity test matrix prevents web/CLI drift (lesson from desktop v2.0.2 regression).
-- Clear M16/M17 boundary for enterprise and cloud features.
+- Clear boundary between shipped web auth and future RBAC work.
 
 ### Negative
 

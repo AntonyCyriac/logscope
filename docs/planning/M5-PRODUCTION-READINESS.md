@@ -191,7 +191,7 @@ flowchart TD
 - Dynamic shared-library plugin loading
 - Vendor-specific log format parsers
 - Full SDK / marketplace
-- Enterprise features (auth, multi-tenancy)
+- Multi-tenant auth and remote log collection (out of scope)
 
 ---
 

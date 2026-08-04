@@ -13,7 +13,7 @@
 
 # 1. Purpose
 
-Operators run `logscope-web` on shared hosts, LAN servers, or behind reverse proxies. This guide covers **thin auth** shipped in **v2.2.1**: API key policy, session lifecycle, bind exposure, and TLS termination patterns. Full RBAC is **long-term enterprise scope** (out of scope for current investigation releases).
+Operators run `logscope-web` on shared hosts, LAN servers, or behind reverse proxies. This guide covers **thin auth** shipped in **v2.2.1**: API key policy, session lifecycle, bind exposure, and TLS termination patterns. Full RBAC is **out of scope** for current investigation releases.
 
 See [ADR-009 Web Platform REST](../architecture/decisions/ADR-009-Web-Platform-REST.md) and [ADR-009 M15.4 Thin Auth](../architecture/decisions/ADR-009-M15.4-Thin-Auth.md).
 
@@ -137,5 +137,5 @@ Idle session eviction runs on health when `web.session_ttl_seconds > 0` (amortiz
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 31-07-2026 | Initial M15.4 / v2.2.1 thin auth operator guide |
-| 1.1.0 | 04-08-2026 | API key hashing planned for v2.2.2; RBAC long-term enterprise scope. |
+| 1.1.0 | 04-08-2026 | API key hashing planned for v2.2.2; RBAC out of scope for investigation releases. |
 | 1.2.0 | 04-08-2026 | v2.2.2: `web.api_key_hash`, `--hash-api-key`, migration from plaintext `web.api_key`. |

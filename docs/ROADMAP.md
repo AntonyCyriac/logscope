@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.14.0 |
+| Version | 3.15.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 04-08-2026 |
@@ -17,7 +17,7 @@ This roadmap defines the planned evolution of LogScope from project inception th
 
 The roadmap is milestone-driven. Each milestone represents a stable engineering baseline before progressing to the next phase.
 
-For the long-term strategic vision (phases 1–10, version targets, product boundaries), see [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
+For the long-term strategic vision (post-v1 phases, version targets, product boundaries), see [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
 
 ---
 
@@ -43,8 +43,6 @@ For the long-term strategic vision (phases 1–10, version targets, product boun
 | **Phase 1 – Stabilize v1.x** | ✅ Complete | Docs, regression, observability, fuzz, license CI (`v1.5.2`). |
 | **M14 – Desktop Application** | ✅ Complete | Qt GUI, `logscope-desktop`, live tail (`v2.0.0`; all-platform binaries `v2.0.1`). |
 | **M15 – Web Platform** | ✅ Complete | REST API + browser MVP + M15.3 shared investigations + M15.4 thin auth. [ADR-009](architecture/decisions/ADR-009-Web-Platform-REST.md). Released: `v2.1.0` (MVP), `v2.2.0` (shared workspaces), `v2.2.1` (thin auth). |
-| **M16 – Enterprise** | 🔮 Long-term | RBAC, agents, streaming — deferred until investigation stories ship (`v2.3.0`–`v2.6.0`). |
-| **M17 – Cloud Deployment** | ⏳ Planned | K8s, Helm, gRPC, OpenTelemetry. Target: `v2.x`. |
 
 ---
 
@@ -70,7 +68,7 @@ P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 
 **Current release:** [`v2.2.1`](CHANGELOG.md) — M15.4 thin auth.
 
-**Next:** **`v2.2.2`** — API key hashing at rest (security patch) → **`v2.3.0`** — **Create an Investigation** (first post-M15 user story). See [Project Context](handbook/PROJECT_CONTEXT.md). Enterprise (M16) is long-term — [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
+**Next:** **`v2.2.2`** — API key hashing at rest (security patch) → **`v2.3.0`** — **Create an Investigation** (first post-M15 user story). See [Project Context](handbook/PROJECT_CONTEXT.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
@@ -407,7 +405,7 @@ M6 deepens analysis beyond plain-text heuristics toward format-aware, field-rich
 
 ---
 
-# Post-v1 Milestones (M7–M17)
+# Post-v1 Milestones (M7–M15)
 
 Summary of planned milestones after M6. Full strategic context: [Post-v1 Strategic Roadmap](planning/POST_V1_STRATEGIC_ROADMAP.md).
 
@@ -422,8 +420,6 @@ Summary of planned milestones after M6. Full strategic context: [Post-v1 Strateg
 | M13 – AI Assistant | Summaries, anomaly hints, NL queries | `v1.5.1` |
 | M14 – Desktop Application | Qt GUI | `v2.0.0` |
 | M15 – Web Platform | Dashboard, REST API, shared investigations | `v2.0.0` |
-| M16 – Enterprise | RBAC, agents, streaming, multi-node | Long-term (deferred) |
-| M17 – Cloud Deployment | K8s, Helm, gRPC, OpenTelemetry | `v2.x` |
 
 ### Version evolution
 
@@ -445,10 +441,9 @@ v2.2.1  — M15.4 thin auth (released)
 v2.2.2  — API key hashing at rest (planned security patch)
 v2.3.0  — Create an Investigation (planned)
 v2.4.0–v2.6.0 — Investigation stories: multi-source, timeline, crash analysis (planned)
-v4.x+   — M16 Enterprise, M17 Cloud (long-term)
 ```
 
-Tactical planning documents exist for M6–M15. Post-M15 investigation releases are tracked in [Project Context](handbook/PROJECT_CONTEXT.md). M16–M17 remain long-term.
+Tactical planning documents exist for M6–M15. Post-M15 investigation releases are tracked in [Project Context](handbook/PROJECT_CONTEXT.md).
 
 ---
 
@@ -490,4 +485,5 @@ The roadmap is considered successful when:
 | 3.11.0 | 25-07-2026 | M12 complete; v1.5.0 released (dynamic plugins, Plugin SDK). |
 | 3.12.0 | 25-07-2026 | M13 complete; v1.5.1 released (AI Assistant, agent investigate). |
 | 3.13.0 | 30-07-2026 | Phase 1 complete; v1.5.2 released (stabilize v1.x); M14 next. |
-| 3.14.0 | 04-08-2026 | M15 complete at v2.2.1; next v2.2.2 patch and v2.3.0+ investigation stories; M16 deferred long-term. |
+| 3.14.0 | 04-08-2026 | M15 complete at v2.2.1; next v2.2.2 patch and v2.3.0+ investigation stories. |
+| 3.15.0 | 04-08-2026 | Removed enterprise/cloud horizon from public roadmap (strategy-only). |
