@@ -11,6 +11,7 @@ add_executable(scope_web_tests
     session_store_test.cpp
     session_resource_cleanup_test.cpp
     workspace_store_test.cpp
+    investigation_store_test.cpp
     analyze_job_queue_test.cpp
     tail_handler_test.cpp
     web_config_test.cpp
@@ -26,6 +27,7 @@ add_executable(scope_web_tests
     ../session_store.cpp
     ../session_resource_cleanup.cpp
     ../workspace_store.cpp
+    ../investigation_store.cpp
     ../analyze_job_queue.cpp
     ../json_parse.cpp
     ../rest_json.cpp
@@ -51,6 +53,7 @@ target_link_libraries(scope_web_tests
     PRIVATE
         scope_application
         scope_configuration
+        scope_workspace
         logscope_httplib
         logscope_gtest_support
         GTest::gtest_main

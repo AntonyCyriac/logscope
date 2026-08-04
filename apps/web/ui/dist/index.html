@@ -25,13 +25,19 @@
     </section>
 
     <section class="panel">
-      <h2>Shared workspaces</h2>
+      <h2>Investigations</h2>
       <div class="row">
-        <label>Name <input type="text" id="workspaceNameInput" placeholder="incident-2026"></label>
-        <button type="button" id="createWorkspaceBtn">Create shared</button>
-        <button type="button" id="saveWorkspaceBtn" disabled>Save to shared</button>
+        <label>Name <input type="text" id="investigationNameInput" placeholder="incident-2026"></label>
+        <button type="button" id="createInvestigationBtn">Create</button>
+        <button type="button" id="saveInvestigationBtn" disabled>Save</button>
+        <button type="button" id="addLogArtifactBtn" disabled>Add log</button>
       </div>
-      <ul id="sharedWorkspacesList"></ul>
+      <div class="row">
+        <label>Note title <input type="text" id="noteTitleInput" placeholder="triage"></label>
+        <label>Note body <input type="text" id="noteBodyInput" placeholder="Customer reported outage"></label>
+        <button type="button" id="addNoteBtn" disabled>Add note</button>
+      </div>
+      <ul id="investigationsList"></ul>
     </section>
 
     <section class="panel">

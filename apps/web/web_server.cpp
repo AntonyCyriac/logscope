@@ -4,12 +4,13 @@
 
 #include "web_server.hpp"
 
-#include "investigation.hpp"
+#include "investigation_container.hpp"
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
 #include "rest_json.hpp"
 #include "session_resource_cleanup.hpp"
 #include "web_request_parsers.hpp"
+#include "workspace.hpp"
 
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
@@ -21,6 +22,7 @@
 #include <filesystem>
 #include <fstream>
 #include <functional>
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 
@@ -908,11 +910,14 @@ void WebServer::registerRoutes()
         }
 
         application::SessionSaveRequest saveRequest = parseSessionSaveRequest(request.body);
+        const std::optional<std::string> investigationId = jsonStringField(request.body, "investigationId");
         const std::optional<std::string> workspaceId = jsonStringField(request.body, "workspaceId");
+        const std::optional<std::string> containerId =
+            investigationId.has_value() ? investigationId : workspaceId;
 
-        if (workspaceId.has_value())
+        if (containerId.has_value())
         {
-            const auto snapshotPath = m_workspaceStore.snapshotPathFor(*workspaceId);
+            const auto snapshotPath = m_workspaceStore.investigationStore().snapshotPathFor(*containerId);
 
             if (!snapshotPath)
             {
@@ -930,7 +935,8 @@ void WebServer::registerRoutes()
         if (saveRequest.sessionFile.string().empty())
         {
             setJsonResponse(response, 400,
-                            errorEnvelope("INVALID_ARGUMENT", "Missing required field: path or workspaceId."));
+                            errorEnvelope("INVALID_ARGUMENT",
+                                          "Missing required field: path, investigationId, or workspaceId."));
 
             return;
         }
@@ -950,9 +956,9 @@ void WebServer::registerRoutes()
             return;
         }
 
-        if (workspaceId.has_value())
+        if (containerId.has_value())
         {
-            m_workspaceStore.updateSummaryFromService(*workspaceId, *workspace->service);
+            m_workspaceStore.investigationStore().updateSummaryFromService(*containerId, *workspace->service);
         }
 
         setJsonResponse(response, 200, successEnvelope("{\"saved\": true}"));
@@ -1313,6 +1319,541 @@ void WebServer::registerRoutes()
                        setJsonResponse(response, 200,
                                        successEnvelope(formatWorkspaceOpenResult(
                                            workspaceId, workspace->service->sourcePath(), summary)));
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
+    m_server->Post("/api/v1/investigations", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
+        WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+        if (workspace == nullptr)
+        {
+            return;
+        }
+
+        const InvestigationCreateBody createBody = parseInvestigationCreateRequest(request.body);
+        auto createResult = m_workspaceStore.investigationStore().create(createBody.name, createBody.description);
+
+        if (!createResult)
+        {
+            setErrorResponse(response, createResult.error());
+
+            return;
+        }
+
+        scope::workspace::InvestigationManifest manifest = std::move(*createResult);
+
+        if (createBody.captureSession)
+        {
+            const auto snapshotPath =
+                m_workspaceStore.investigationStore().snapshotPathFor(manifest.id);
+
+            if (!snapshotPath)
+            {
+                setErrorResponse(response, snapshotPath.error());
+
+                return;
+            }
+
+            std::lock_guard<std::mutex> lock(workspace->mutex);
+
+            if (workspace->service->hasModel())
+            {
+                application::SessionSaveRequest saveRequest;
+                saveRequest.sessionFile = *snapshotPath;
+                saveRequest.configFile = workspace->service->configFilePath();
+                const auto saveResult = workspace->service->saveSession(saveRequest);
+
+                if (!saveResult)
+                {
+                    setErrorResponse(response, saveResult.error());
+
+                    return;
+                }
+            }
+        }
+
+        m_workspaceStore.investigationStore().updateSummaryFromService(manifest.id, *workspace->service);
+        const auto refreshed = m_workspaceStore.investigationStore().get(manifest.id);
+
+        if (refreshed)
+        {
+            manifest = *refreshed;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatInvestigationManifest(manifest)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get("/api/v1/investigations", [this](const httplib::Request& request, httplib::Response& response) {
+        if (!authorizeApiKey(m_config.apiKey, request, response))
+        {
+            return;
+        }
+
+        applyCors(m_config, request, response);
+
+        const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+        if (rejectStaleSessionHeader(request, sessionId, response))
+        {
+            return;
+        }
+
+        if (requireSession(*this, sessionId, response) == nullptr)
+        {
+            return;
+        }
+
+        const auto listResult = m_workspaceStore.investigationStore().list(m_config.workspacesListLimit);
+
+        if (!listResult)
+        {
+            setErrorResponse(response, listResult.error());
+
+            return;
+        }
+
+        setJsonResponse(response, 200, successEnvelope(formatInvestigationList(*listResult)));
+        response.set_header(kSessionHeader, sessionId);
+    });
+
+    m_server->Get(R"(/api/v1/investigations/([^/]+))",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const auto manifestResult = m_workspaceStore.investigationStore().get(investigationId);
+
+                      if (!manifestResult)
+                      {
+                          setErrorResponse(response, manifestResult.error());
+
+                          return;
+                      }
+
+                      setJsonResponse(response, 200, successEnvelope(formatInvestigationManifest(*manifestResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
+    m_server->Put(R"(/api/v1/investigations/([^/]+))",
+                [this](const httplib::Request& request, httplib::Response& response) {
+                    if (!authorizeApiKey(m_config.apiKey, request, response))
+                    {
+                        return;
+                    }
+
+                    applyCors(m_config, request, response);
+
+                    const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                    if (rejectStaleSessionHeader(request, sessionId, response))
+                    {
+                        return;
+                    }
+
+                    if (requireSession(*this, sessionId, response) == nullptr)
+                    {
+                        return;
+                    }
+
+                    const std::string investigationId = request.matches[1];
+                    const InvestigationUpdateRequest updateRequest = parseInvestigationUpdateRequest(request.body);
+                    const auto updateResult =
+                        m_workspaceStore.investigationStore().update(investigationId, updateRequest);
+
+                    if (!updateResult)
+                    {
+                        setErrorResponse(response, updateResult.error());
+
+                        return;
+                    }
+
+                    setJsonResponse(response, 200, successEnvelope(formatInvestigationManifest(*updateResult)));
+                    response.set_header(kSessionHeader, sessionId);
+                });
+
+    m_server->Delete(R"(/api/v1/investigations/([^/]+))",
+                     [this](const httplib::Request& request, httplib::Response& response) {
+                         if (!authorizeApiKey(m_config.apiKey, request, response))
+                         {
+                             return;
+                         }
+
+                         applyCors(m_config, request, response);
+
+                         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                         if (rejectStaleSessionHeader(request, sessionId, response))
+                         {
+                             return;
+                         }
+
+                         if (requireSession(*this, sessionId, response) == nullptr)
+                         {
+                             return;
+                         }
+
+                         const std::string investigationId = request.matches[1];
+                         const auto removeResult = m_workspaceStore.investigationStore().remove(investigationId);
+
+                         if (!removeResult)
+                         {
+                             setErrorResponse(response, removeResult.error());
+
+                             return;
+                         }
+
+                         setJsonResponse(response, 200, successEnvelope("{\"deleted\": true}"));
+                         response.set_header(kSessionHeader, sessionId);
+                     });
+
+    m_server->Post(R"(/api/v1/investigations/([^/]+)/artifacts)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
+                       WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                       if (workspace == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string investigationId = request.matches[1];
+                       const auto artifactRequest = parseArtifactAddRequest(request.body);
+
+                       if (!artifactRequest)
+                       {
+                           setErrorResponse(response, artifactRequest.error());
+
+                           return;
+                       }
+
+                       if (artifactRequest->type == "note")
+                       {
+                           const auto noteResult = m_workspaceStore.investigationStore().addNoteArtifact(
+                               investigationId, artifactRequest->name, artifactRequest->body);
+
+                           if (!noteResult)
+                           {
+                               setErrorResponse(response, noteResult.error());
+
+                               return;
+                           }
+
+                           setJsonResponse(response, 200, successEnvelope(formatArtifactRecord(*noteResult)));
+                           response.set_header(kSessionHeader, sessionId);
+
+                           return;
+                       }
+
+                       foundation::Path sourcePath = foundation::Path(artifactRequest->sourcePath);
+                       const bool useSessionSource = sourcePath.string().empty();
+
+                       if (useSessionSource)
+                       {
+                           std::lock_guard<std::mutex> lock(workspace->mutex);
+                           sourcePath = workspace->service->sourcePath();
+                       }
+
+                       if (sourcePath.string().empty())
+                       {
+                           setJsonResponse(response, 400,
+                                           errorEnvelope("INVALID_ARGUMENT", "Missing log source path."));
+
+                           return;
+                       }
+
+                       if (!useSessionSource)
+                       {
+                           const auto pathValidation = validateServerPath(m_config, sourcePath);
+
+                           if (!pathValidation)
+                           {
+                               setErrorResponse(response, pathValidation.error());
+
+                               return;
+                           }
+                       }
+
+                       const auto logResult = m_workspaceStore.investigationStore().addLogArtifact(
+                           investigationId, sourcePath,
+                           artifactRequest->displayName.empty() ? artifactRequest->name : artifactRequest->displayName);
+
+                       if (!logResult)
+                       {
+                           setErrorResponse(response, logResult.error());
+
+                           return;
+                       }
+
+                       setJsonResponse(response, 200, successEnvelope(formatArtifactRecord(*logResult)));
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+))",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const std::string artifactId = request.matches[2];
+                      const auto manifestResult = m_workspaceStore.investigationStore().get(investigationId);
+
+                      if (!manifestResult)
+                      {
+                          setErrorResponse(response, manifestResult.error());
+
+                          return;
+                      }
+
+                      const auto iterator = std::find_if(manifestResult->artifacts.begin(),
+                                                         manifestResult->artifacts.end(),
+                                                         [&artifactId](const scope::workspace::ArtifactRecord& artifact) {
+                                                             return artifact.id == artifactId;
+                                                         });
+
+                      if (iterator == manifestResult->artifacts.end())
+                      {
+                          setJsonResponse(response, 404, errorEnvelope("NOT_FOUND", "Artifact not found."));
+
+                          return;
+                      }
+
+                      std::ostringstream data;
+                      data << "{\n  \"artifact\": " << formatArtifactRecord(*iterator);
+
+                      if (iterator->type == "note")
+                      {
+                          const foundation::Path investigationDir = foundation::Path(
+                              m_workspaceStore.investigationStore().rootDirectory().string() + "/" + investigationId);
+                          const auto investigationResult = scope::workspace::Investigation::open(investigationDir);
+
+                          if (investigationResult)
+                          {
+                              const scope::workspace::IArtifactHandler* handler =
+                                  scope::workspace::findArtifactHandler("note");
+
+                              if (handler != nullptr)
+                              {
+                                  const auto dataPathResult =
+                                      handler->resolveDataPath(investigationResult->rootDirectory(), *iterator);
+
+                                  if (dataPathResult)
+                                  {
+                                      std::ifstream stream(dataPathResult->string());
+
+                                      if (stream)
+                                      {
+                                          std::ostringstream bodyBuffer;
+                                          bodyBuffer << stream.rdbuf();
+                                          data << ",\n  \"body\": \"" << escapeJsonString(bodyBuffer.str()) << '"';
+                                      }
+                                  }
+                              }
+                          }
+                      }
+
+                      data << "\n}";
+                      setJsonResponse(response, 200, successEnvelope(data.str()));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
+    m_server->Delete(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+))",
+                     [this](const httplib::Request& request, httplib::Response& response) {
+                         if (!authorizeApiKey(m_config.apiKey, request, response))
+                         {
+                             return;
+                         }
+
+                         applyCors(m_config, request, response);
+
+                         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                         if (rejectStaleSessionHeader(request, sessionId, response))
+                         {
+                             return;
+                         }
+
+                         if (requireSession(*this, sessionId, response) == nullptr)
+                         {
+                             return;
+                         }
+
+                         const std::string investigationId = request.matches[1];
+                         const std::string artifactId = request.matches[2];
+                         const auto removeResult =
+                             m_workspaceStore.investigationStore().removeArtifact(investigationId, artifactId);
+
+                         if (!removeResult)
+                         {
+                             setErrorResponse(response, removeResult.error());
+
+                             return;
+                         }
+
+                         setJsonResponse(response, 200, successEnvelope("{\"deleted\": true}"));
+                         response.set_header(kSessionHeader, sessionId);
+                     });
+
+    m_server->Post(R"(/api/v1/investigations/([^/]+)/open)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
+                       WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                       if (workspace == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string investigationId = request.matches[1];
+                       const auto snapshotPath =
+                           m_workspaceStore.investigationStore().resolveSnapshotPath(investigationId);
+                       const auto entryLogPath =
+                           m_workspaceStore.investigationStore().resolveEntryLogPath(investigationId);
+
+                       std::lock_guard<std::mutex> lock(workspace->mutex);
+
+                       bool loadedFromSnapshot = false;
+
+                       if (snapshotPath)
+                       {
+                           std::error_code errorCode;
+
+                           if (std::filesystem::exists(snapshotPath->string(), errorCode))
+                           {
+                               const auto loadResult = workspace->service->loadSession(*snapshotPath);
+
+                               if (loadResult)
+                               {
+                                   removeTempUploadFile(*workspace);
+                                   workspace->service->adoptModel(loadResult->analysisModel(),
+                                                                  loadResult->sourcePath());
+
+                                   if (!loadResult->configFile().string().empty())
+                                   {
+                                       const auto configLoadResult =
+                                           workspace->service->loadConfiguration(loadResult->configFile());
+
+                                       if (!configLoadResult)
+                                       {
+                                           setErrorResponse(response, configLoadResult.error());
+
+                                           return;
+                                       }
+                                   }
+
+                                   loadedFromSnapshot = true;
+                               }
+                           }
+                       }
+
+                       if (!loadedFromSnapshot)
+                       {
+                           if (!entryLogPath)
+                           {
+                               setErrorResponse(response, entryLogPath.error());
+
+                               return;
+                           }
+
+                           const auto openResult = workspace->service->openSource(*entryLogPath);
+
+                           if (!openResult)
+                           {
+                               setErrorResponse(response, openResult.error());
+
+                               return;
+                           }
+
+                           removeTempUploadFile(*workspace);
+                       }
+
+                       m_workspaceStore.investigationStore().touchUpdatedAt(investigationId);
+
+                       scope::workspace::InvestigationSummary summary;
+
+                       if (workspace->service->hasModel())
+                       {
+                           summary.hasModel = true;
+                           summary.lineCount = workspace->service->model().totalLines();
+                           summary.errorCount = workspace->service->model().levelCounts().errorLines();
+                       }
+
+                       setJsonResponse(response, 200,
+                                       successEnvelope(formatInvestigationOpenResult(
+                                           investigationId, workspace->service->sourcePath(), summary)));
                        response.set_header(kSessionHeader, sessionId);
                    });
 

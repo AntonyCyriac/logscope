@@ -39,6 +39,12 @@ enum class CliCommand
     SessionSave,
     SessionLoad,
     SessionList,
+    InvestigationCreate,
+    InvestigationAdd,
+    InvestigationAddNote,
+    InvestigationList,
+    InvestigationShow,
+    InvestigationOpen,
     AgentHelp,
     AgentInvestigate
 };
@@ -162,6 +168,52 @@ struct SessionListOptions
     bool showHelp = false;
 };
 
+struct InvestigationCreateOptions
+{
+    std::string name;
+    std::string description;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
+struct InvestigationAddOptions
+{
+    std::string investigationId;
+    foundation::Path logFile;
+    std::string displayName;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
+struct InvestigationAddNoteOptions
+{
+    std::string investigationId;
+    std::string title;
+    std::string body;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
+struct InvestigationListOptions
+{
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
+struct InvestigationShowOptions
+{
+    std::string investigationId;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
+struct InvestigationOpenOptions
+{
+    std::string investigationId;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    bool showHelp = false;
+};
+
 /**
  * @brief Parsed CLI invocation.
  */
@@ -179,6 +231,12 @@ struct ParsedCli
     SessionSaveOptions sessionSave;
     SessionLoadOptions sessionLoad;
     SessionListOptions sessionList;
+    InvestigationCreateOptions investigationCreate;
+    InvestigationAddOptions investigationAdd;
+    InvestigationAddNoteOptions investigationAddNote;
+    InvestigationListOptions investigationList;
+    InvestigationShowOptions investigationShow;
+    InvestigationOpenOptions investigationOpen;
     AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
 };

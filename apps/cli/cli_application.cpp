@@ -11,6 +11,7 @@
 #include "config_validate_command.hpp"
 #include "extensions_command.hpp"
 #include "investigate_command.hpp"
+#include "investigation_command.hpp"
 #include "query_command.hpp"
 #include "search_command.hpp"
 #include "session_command.hpp"
@@ -35,6 +36,12 @@ void CliApplication::printUsage(std::ostream& output)
            << "  session save       Save investigation context to a session file\n"
            << "  session load       Restore a session and reproduce its report\n"
            << "  session list       List saved session files in a directory\n"
+           << "  investigation create  Create a portable investigation container\n"
+           << "  investigation add     Add a log artifact to an investigation\n"
+           << "  investigation add-note Add a note artifact to an investigation\n"
+           << "  investigation list    List investigations in a root directory\n"
+           << "  investigation show    Show investigation metadata and artifacts\n"
+           << "  investigation open    Print entry log path for an investigation\n"
            << "  agent investigate  AI-assisted log investigation\n"
            << "  help [command]     Show help for a command\n"
            << "\n"
@@ -78,6 +85,18 @@ int CliApplication::run(const ParsedCli& parsed,
         return runSessionLoadCommand(parsed.sessionLoad, output, errorOutput);
     case CliCommand::SessionList:
         return runSessionListCommand(parsed.sessionList, output, errorOutput);
+    case CliCommand::InvestigationCreate:
+        return runInvestigationCreateCommand(parsed.investigationCreate, output, errorOutput);
+    case CliCommand::InvestigationAdd:
+        return runInvestigationAddCommand(parsed.investigationAdd, output, errorOutput);
+    case CliCommand::InvestigationAddNote:
+        return runInvestigationAddNoteCommand(parsed.investigationAddNote, output, errorOutput);
+    case CliCommand::InvestigationList:
+        return runInvestigationListCommand(parsed.investigationList, output, errorOutput);
+    case CliCommand::InvestigationShow:
+        return runInvestigationShowCommand(parsed.investigationShow, output, errorOutput);
+    case CliCommand::InvestigationOpen:
+        return runInvestigationOpenCommand(parsed.investigationOpen, output, errorOutput);
     case CliCommand::AgentHelp:
         printAgentUsage(output);
 

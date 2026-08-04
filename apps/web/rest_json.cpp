@@ -279,6 +279,29 @@ std::string formatSummaryJson(const WorkspaceSummary& summary)
     return output.str();
 }
 
+std::string formatInvestigationSummaryJson(const scope::workspace::InvestigationSummary& summary)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "    \"hasModel\": " << (summary.hasModel ? "true" : "false") << ",\n"
+           << "    \"lineCount\": " << summary.lineCount << ",\n"
+           << "    \"errorCount\": " << summary.errorCount << "\n"
+           << "  }";
+
+    return output.str();
+}
+
+std::string formatArtifactSourceJson(const scope::workspace::ArtifactSource& source)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "      \"kind\": \"" << escapeJsonString(source.kind) << "\",\n"
+           << "      \"displayName\": \"" << escapeJsonString(source.displayName) << "\"\n"
+           << "    }";
+
+    return output.str();
+}
+
 } // namespace
 
 std::string formatWorkspaceMetadata(const WorkspaceMetadata& metadata)
@@ -332,6 +355,93 @@ std::string formatWorkspaceOpenResult(const std::string& workspaceId, const foun
            << "  \"workspaceId\": \"" << escapeJsonString(workspaceId) << "\",\n"
            << "  \"sourcePath\": \"" << escapeJsonString(sourcePath.string()) << "\",\n"
            << "  \"summary\": " << formatSummaryJson(summary) << "\n"
+           << '}';
+
+    return output.str();
+}
+
+std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(artifact.id) << "\",\n"
+           << "  \"type\": \"" << escapeJsonString(artifact.type) << "\",\n"
+           << "  \"name\": \"" << escapeJsonString(artifact.name) << "\",\n"
+           << "  \"relativePath\": \"" << escapeJsonString(artifact.relativePath) << "\",\n"
+           << "  \"importedAt\": \"" << escapeJsonString(artifact.importedAt) << "\",\n"
+           << "  \"source\": " << formatArtifactSourceJson(artifact.source) << ",\n"
+           << "  \"status\": \"" << escapeJsonString(artifact.status) << "\"\n"
+           << '}';
+
+    return output.str();
+}
+
+std::string formatInvestigationManifest(const scope::workspace::InvestigationManifest& manifest)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"schemaVersion\": " << manifest.schemaVersion << ",\n"
+           << "  \"id\": \"" << escapeJsonString(manifest.id) << "\",\n"
+           << "  \"name\": \"" << escapeJsonString(manifest.name) << "\",\n"
+           << "  \"description\": \"" << escapeJsonString(manifest.description) << "\",\n"
+           << "  \"createdAt\": \"" << escapeJsonString(manifest.createdAt) << "\",\n"
+           << "  \"updatedAt\": \"" << escapeJsonString(manifest.updatedAt) << "\",\n"
+           << "  \"primaryArtifactId\": \"" << escapeJsonString(manifest.primaryArtifactId) << "\",\n"
+           << "  \"summary\": " << formatInvestigationSummaryJson(manifest.summary) << ",\n"
+           << "  \"snapshotFile\": \"" << escapeJsonString(manifest.snapshotFile) << "\",\n"
+           << "  \"artifacts\": [";
+
+    for (std::size_t index = 0U; index < manifest.artifacts.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    " << formatArtifactRecord(manifest.artifacts[index]);
+    }
+
+    output << "\n  ]\n}";
+
+    return output.str();
+}
+
+std::string formatInvestigationList(const InvestigationListResult& list)
+{
+    std::ostringstream output;
+    output << "{\n  \"investigations\": [";
+
+    for (std::size_t index = 0U; index < list.investigations.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        const scope::workspace::InvestigationManifest& manifest = list.investigations[index];
+        output << "\n    {\n"
+               << "      \"id\": \"" << escapeJsonString(manifest.id) << "\",\n"
+               << "      \"name\": \"" << escapeJsonString(manifest.name) << "\",\n"
+               << "      \"updatedAt\": \"" << escapeJsonString(manifest.updatedAt) << "\",\n"
+               << "      \"summary\": " << formatInvestigationSummaryJson(manifest.summary) << ",\n"
+               << "      \"artifactCount\": " << manifest.artifacts.size() << "\n"
+               << "    }";
+    }
+
+    output << "\n  ],\n  \"truncated\": " << (list.truncated ? "true" : "false") << "\n}";
+
+    return output.str();
+}
+
+std::string formatInvestigationOpenResult(const std::string& investigationId, const foundation::Path& sourcePath,
+                                         const scope::workspace::InvestigationSummary& summary)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"opened\": true,\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"sourcePath\": \"" << escapeJsonString(sourcePath.string()) << "\",\n"
+           << "  \"summary\": " << formatInvestigationSummaryJson(summary) << "\n"
            << '}';
 
     return output.str();

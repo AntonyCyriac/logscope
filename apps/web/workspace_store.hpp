@@ -14,6 +14,7 @@
 #include "application_service.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
+#include "investigation_store.hpp"
 #include "web_config.hpp"
 
 namespace scope::web
@@ -115,18 +116,12 @@ class WorkspaceStore
 
     [[nodiscard]] static bool isValidWorkspaceId(const std::string& workspaceId);
 
+    [[nodiscard]] InvestigationStore& investigationStore() noexcept;
+
+    [[nodiscard]] const InvestigationStore& investigationStore() const noexcept;
+
   private:
-    [[nodiscard]] foundation::Path workspaceDirectory(const std::string& workspaceId) const;
-
-    [[nodiscard]] foundation::Result<WorkspaceMetadata> loadMetadata(const foundation::Path& workspaceDir) const;
-
-    [[nodiscard]] foundation::Result<bool> saveMetadata(const foundation::Path& workspaceDir,
-                                                        const WorkspaceMetadata& metadata) const;
-
-    [[nodiscard]] foundation::Result<bool> ensureUnderRoot(const foundation::Path& path) const;
-
-    foundation::Path m_rootDirectory;
-    mutable std::mutex m_mutex;
+    InvestigationStore m_investigationStore;
 };
 
 } // namespace scope::web

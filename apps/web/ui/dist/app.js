@@ -4,7 +4,7 @@
   const state = {
     sessionId: null,
     analyzed: false,
-    activeWorkspaceId: null,
+    activeInvestigationId: null,
     tailTimer: null,
   };
 
@@ -13,7 +13,7 @@
   const tailOutputEl = document.getElementById('tailOutput');
   const tableBody = document.querySelector('#resultsTable tbody');
   const extensionsList = document.getElementById('extensionsList');
-  const sharedWorkspacesList = document.getElementById('sharedWorkspacesList');
+  const investigationsList = document.getElementById('investigationsList');
   const fileInput = document.getElementById('fileInput');
   const analyzeBtn = document.getElementById('analyzeBtn');
   const investigateBtn = document.getElementById('investigateBtn');
@@ -22,9 +22,13 @@
   const searchInput = document.getElementById('searchInput');
   const filterInput = document.getElementById('filterInput');
   const askInput = document.getElementById('askInput');
-  const workspaceNameInput = document.getElementById('workspaceNameInput');
-  const createWorkspaceBtn = document.getElementById('createWorkspaceBtn');
-  const saveWorkspaceBtn = document.getElementById('saveWorkspaceBtn');
+  const investigationNameInput = document.getElementById('investigationNameInput');
+  const createInvestigationBtn = document.getElementById('createInvestigationBtn');
+  const saveInvestigationBtn = document.getElementById('saveInvestigationBtn');
+  const addLogArtifactBtn = document.getElementById('addLogArtifactBtn');
+  const noteTitleInput = document.getElementById('noteTitleInput');
+  const noteBodyInput = document.getElementById('noteBodyInput');
+  const addNoteBtn = document.getElementById('addNoteBtn');
   const tailStartBtn = document.getElementById('tailStartBtn');
   const tailStopBtn = document.getElementById('tailStopBtn');
 
@@ -68,6 +72,12 @@
     } catch (error) {
       return { raw: text };
     }
+  }
+
+  function setInvestigationActionsEnabled(enabled) {
+    saveInvestigationBtn.disabled = !enabled;
+    addLogArtifactBtn.disabled = !enabled;
+    addNoteBtn.disabled = !enabled;
   }
 
   function renderInvestigation(payload) {
@@ -125,62 +135,94 @@
     });
   }
 
-  async function refreshSharedWorkspaces() {
-    const response = await api('/api/v1/workspaces');
+  async function refreshInvestigations() {
+    const response = await api('/api/v1/investigations');
     const payload = await response.json();
-    const workspaces = (payload.data && payload.data.workspaces) || [];
-    sharedWorkspacesList.innerHTML = '';
+    const investigations = (payload.data && payload.data.investigations) || [];
+    investigationsList.innerHTML = '';
 
-    workspaces.forEach(function (workspace) {
+    investigations.forEach(function (investigation) {
       const item = document.createElement('li');
       const openBtn = document.createElement('button');
       openBtn.type = 'button';
       openBtn.textContent = 'Open';
       openBtn.addEventListener('click', function () {
-        openSharedWorkspace(workspace.id).catch(function (error) {
-          setStatus('Open shared error: ' + error.message);
+        openInvestigation(investigation.id).catch(function (error) {
+          setStatus('Open error: ' + error.message);
         });
       });
 
-      item.textContent = workspace.name + ' (' + workspace.id.slice(0, 8) + '…) ';
+      item.textContent = investigation.name + ' (' + investigation.id.slice(0, 8) + '…) ';
       item.appendChild(openBtn);
-      sharedWorkspacesList.appendChild(item);
+      investigationsList.appendChild(item);
     });
   }
 
-  async function openSharedWorkspace(workspaceId) {
-    const payload = await apiJson('/api/v1/workspaces/' + workspaceId + '/open', {}, 'POST');
-    state.activeWorkspaceId = workspaceId;
+  async function openInvestigation(investigationId) {
+    const payload = await apiJson('/api/v1/investigations/' + investigationId + '/open', {}, 'POST');
+    state.activeInvestigationId = investigationId;
     state.analyzed = !!(payload.data && payload.data.summary && payload.data.summary.hasModel);
     investigateBtn.disabled = !state.analyzed;
     exportBtn.disabled = !state.analyzed;
     askBtn.disabled = !state.analyzed;
-    saveWorkspaceBtn.disabled = false;
-    tailStartBtn.disabled = false;
+    setInvestigationActionsEnabled(true);
     summaryEl.textContent = JSON.stringify(payload.data || payload, null, 2);
-    setStatus('Opened shared workspace ' + workspaceId);
+    setStatus('Opened investigation ' + investigationId);
   }
 
-  async function createSharedWorkspace() {
-    const name = workspaceNameInput.value.trim() || ('workspace-' + Date.now());
-    const payload = await apiJson('/api/v1/workspaces', {
+  async function createInvestigation() {
+    const name = investigationNameInput.value.trim() || ('investigation-' + Date.now());
+    const payload = await apiJson('/api/v1/investigations', {
       name: name,
       captureSession: state.analyzed,
     });
-    state.activeWorkspaceId = payload.data && payload.data.id;
-    saveWorkspaceBtn.disabled = !state.activeWorkspaceId;
-    await refreshSharedWorkspaces();
-    setStatus('Created shared workspace ' + name);
+    state.activeInvestigationId = payload.data && payload.data.id;
+    setInvestigationActionsEnabled(!!state.activeInvestigationId);
+    await refreshInvestigations();
+    setStatus('Created investigation ' + name);
   }
 
-  async function saveSharedWorkspace() {
-    if (!state.activeWorkspaceId) {
-      throw new Error('No shared workspace selected');
+  async function saveInvestigation() {
+    if (!state.activeInvestigationId) {
+      throw new Error('No investigation selected');
     }
 
-    await apiJson('/api/v1/sessions/save', { workspaceId: state.activeWorkspaceId });
-    await refreshSharedWorkspaces();
-    setStatus('Saved to shared workspace');
+    await apiJson('/api/v1/sessions/save', { investigationId: state.activeInvestigationId });
+    await refreshInvestigations();
+    setStatus('Saved investigation snapshot');
+  }
+
+  async function addLogArtifact() {
+    if (!state.activeInvestigationId) {
+      throw new Error('No investigation selected');
+    }
+
+    await apiJson('/api/v1/investigations/' + state.activeInvestigationId + '/artifacts', {
+      type: 'log',
+    });
+    await refreshInvestigations();
+    setStatus('Added log artifact');
+  }
+
+  async function addNoteArtifact() {
+    if (!state.activeInvestigationId) {
+      throw new Error('No investigation selected');
+    }
+
+    const title = noteTitleInput.value.trim();
+    const body = noteBodyInput.value.trim();
+
+    if (!title) {
+      throw new Error('Note title is required');
+    }
+
+    await apiJson('/api/v1/investigations/' + state.activeInvestigationId + '/artifacts', {
+      type: 'note',
+      title: title,
+      body: body,
+    });
+    await refreshInvestigations();
+    setStatus('Added note artifact');
   }
 
   async function uploadFile(file) {
@@ -247,7 +289,7 @@
     investigateBtn.disabled = false;
     exportBtn.disabled = false;
     askBtn.disabled = false;
-    saveWorkspaceBtn.disabled = !state.activeWorkspaceId;
+    addLogArtifactBtn.disabled = !state.activeInvestigationId;
     setStatus('Analyzed');
   }
 
@@ -379,15 +421,27 @@
     });
   });
 
-  createWorkspaceBtn.addEventListener('click', function () {
-    createSharedWorkspace().catch(function (error) {
-      setStatus('Create shared error: ' + error.message);
+  createInvestigationBtn.addEventListener('click', function () {
+    createInvestigation().catch(function (error) {
+      setStatus('Create error: ' + error.message);
     });
   });
 
-  saveWorkspaceBtn.addEventListener('click', function () {
-    saveSharedWorkspace().catch(function (error) {
-      setStatus('Save shared error: ' + error.message);
+  saveInvestigationBtn.addEventListener('click', function () {
+    saveInvestigation().catch(function (error) {
+      setStatus('Save error: ' + error.message);
+    });
+  });
+
+  addLogArtifactBtn.addEventListener('click', function () {
+    addLogArtifact().catch(function (error) {
+      setStatus('Add log error: ' + error.message);
+    });
+  });
+
+  addNoteBtn.addEventListener('click', function () {
+    addNoteArtifact().catch(function (error) {
+      setStatus('Add note error: ' + error.message);
     });
   });
 
@@ -406,7 +460,7 @@
   createWorkspace()
     .then(loadNoopConfig)
     .then(refreshExtensions)
-    .then(refreshSharedWorkspaces)
+    .then(refreshInvestigations)
     .then(function () {
       setStatus('Ready — session ' + state.sessionId);
     })
