@@ -17,8 +17,9 @@ Makefile
 
 # IDE
 .vs/
+.cursor/
 
-# User-specific VS Code/Cursor files
+# User-specific VS Code files
 .vscode/*.log
 
 # Keep shared workspace configuration
