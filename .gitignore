@@ -32,6 +32,7 @@ Makefile
 Thumbs.db
 
 # Temporary
+.tmp-screenshots/
 *.tmp
 *.bak
 *.swp
