@@ -92,10 +92,10 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Expected | Test | Status |
 |----|----------|----------|------|--------|
-| UI.1 | Panel label | **Investigations** (not Shared workspaces) | B | ⬜ |
-| UI.2 | Create + list | User can create and see investigations | B | ⬜ |
-| UI.3 | Add log + note | Upload and note form work | B | ⬜ |
-| UI.4 | Open + save | Open loads workbench; save updates snapshot | B | ⬜ |
+| UI.1 | Panel label | **Investigations** (not Shared workspaces) | B | ✅ |
+| UI.2 | Create + list | User can create and see investigations | B | ✅ |
+| UI.3 | Add log + note | Upload and note form work | B | ✅ |
+| UI.4 | Open + save | Open loads workbench; save updates snapshot | B | ✅ |
 
 ---
 

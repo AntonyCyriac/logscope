@@ -53,7 +53,7 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](../planning/M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md)
 - [V230-CREATE-INVESTIGATION-SCENARIOS.md](../planning/V230-CREATE-INVESTIGATION-SCENARIOS.md)
 - [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3 amendment](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5 amendment](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md)
-- [openapi-v1.yaml](../api/openapi-v1.yaml) (sketch; investigations routes — see ADR-009-M15.5) · [v2.3.0 release notes](../release/v2.3.0-RELEASE-NOTES.md)
+- [openapi-v1.yaml](../api/openapi-v1.yaml) (sketch; see ADR-009-M15.5 for investigations) · [v2.3.0 release notes](../release/v2.3.0-RELEASE-NOTES.md)
 
 ## CI
 

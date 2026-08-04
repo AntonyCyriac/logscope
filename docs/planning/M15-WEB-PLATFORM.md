@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | M15 – Web Platform |
 | Category | Project Planning |
-| Version | 0.7.0 |
-| Status | M15.4 complete — `v2.2.1`; next `v2.2.2` patch → investigation stories (`v2.3.0`+) |
+| Version | 0.8.0 |
+| Status | M15 complete through **`v2.3.0`** (Story 1 investigations); next Phase A Story 2 (`v2.4.0`) |
 | Created | 30-07-2026 |
-| Last Updated | 31-07-2026 |
+| Last Updated | 05-08-2026 |
 
 ---
 
@@ -101,7 +101,7 @@ See [M15.4-THIN-AUTH-SCENARIOS.md](M15.4-THIN-AUTH-SCENARIOS.md).
 | SPA | W2 flows for shared list/open/save and tail panel |
 | Parity + security | See [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md) |
 
-**Shipped:** `v2.2.0` (2026-07-31). **M15.4** thin auth @ `v2.2.1`. Playwright CI deferred. **Next:** `v2.2.2` API key hashing, then investigation stories — see [Roadmap](../ROADMAP.md).
+**Shipped:** M15 through **`v2.3.0`** (2026-08-05) — Story 1 investigations on web/CLI/REST. Playwright CI deferred. **Next:** Story 2 multi-source correlation (`v2.4.0`) — see [Roadmap](../ROADMAP.md).
 
 ---
 

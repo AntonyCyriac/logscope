@@ -1,11 +1,12 @@
 openapi: 3.0.3
 info:
   title: LogScope Web API
-  version: 2.2.1
+  version: 2.3.0
   description: |
     REST API for `logscope-web` (ADR-009). Session header `X-LogScope-Session` required
     on most routes. Error envelope `{ "error": { "code", "message" } }`; success `{ "data": ... }`.
     v2.2.1: optional `web.health_requires_api_key`; stale sessions return 401 SESSION_EXPIRED.
+    v2.3.0: `/api/v1/investigations` (Story 1); `/api/v1/workspaces` remains alias (M15.3 compat).
 servers:
   - url: http://127.0.0.1:8080
     description: Default loopback bind
@@ -14,6 +15,7 @@ tags:
   - name: sessions
   - name: sources
   - name: analysis
+  - name: investigations
   - name: workspaces
   - name: tail
   - name: jobs
@@ -47,7 +49,10 @@ paths:
               properties:
                 workspaceId:
                   type: string
-                  description: Optional shared workspace id (M15.3)
+                  description: Optional shared workspace id (M15.3 alias)
+                investigationId:
+                  type: string
+                  description: Investigation id (v2.3.0 Story 1; preferred over workspaceId)
       responses:
         '200':
           description: Saved
@@ -77,10 +82,139 @@ paths:
       responses:
         '200':
           description: Investigation result
+  /api/v1/investigations:
+    get:
+      tags: [investigations]
+      summary: List investigations
+      description: Newest `updatedAt` first; bounded by `web.workspaces_list_limit`.
+      responses:
+        '200':
+          description: Investigation metadata array
+    post:
+      tags: [investigations]
+      summary: Create investigation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                captureSession:
+                  type: boolean
+      responses:
+        '200':
+          description: Investigation created
+  /api/v1/investigations/{id}:
+    get:
+      tags: [investigations]
+      summary: Get investigation metadata and artifact index
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Metadata
+        '404':
+          description: Not found
+    put:
+      tags: [investigations]
+      summary: Update investigation metadata
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Updated
+    delete:
+      tags: [investigations]
+      summary: Delete investigation
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deleted
+  /api/v1/investigations/{id}/artifacts:
+    post:
+      tags: [investigations]
+      summary: Add log or note artifact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artifact added
+  /api/v1/investigations/{id}/artifacts/{artifactId}:
+    get:
+      tags: [investigations]
+      summary: Get artifact metadata or note body
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Artifact payload
+    delete:
+      tags: [investigations]
+      summary: Remove artifact
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Removed
+  /api/v1/investigations/{id}/open:
+    post:
+      tags: [investigations]
+      summary: Open entry log artifact into caller session
+      description: Entry artifact must be type `log` in v2.3.0; returns 409 otherwise.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Investigation loaded into session
+        '409':
+          description: No suitable entry artifact
   /api/v1/workspaces:
     get:
       tags: [workspaces]
-      summary: List shared workspaces
+      summary: List shared workspaces (alias for investigations)
       responses:
         '200':
           description: Workspace metadata array
