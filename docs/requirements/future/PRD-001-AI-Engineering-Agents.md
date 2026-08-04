@@ -483,7 +483,7 @@ The architecture should remain extensible so that additional agents can be intro
 |-------|-----------|-----------------|
 | Now | M13 complete (`v1.5.1`) | AI Assistant shipped; plugin SDK enables future AI analyzer providers |
 | Next | M13 AI Assistant (`v1.5.1+`) | First product AI: summaries, anomaly hints, NL queries |
-| Later | M14–M16 | GUI, Web, Enterprise agents and orchestration |
+| Later | M14–M15 | GUI and Web agents and orchestration |
 
 An **ADR for AI integration** is required before M13 implementation starts.
 

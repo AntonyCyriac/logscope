@@ -285,7 +285,7 @@ The following remain out of scope for M6:
 - Vendor-specific log format parsers (Splunk, Datadog proprietary schemas, etc.)
 - Full extension SDK / marketplace
 - Compressed archive sources (`.gz`, `.zip`) — optional stretch only
-- Enterprise features (auth, multi-tenancy, remote storage)
+- Multi-tenant auth and remote log collection (out of scope)
 
 ---
 

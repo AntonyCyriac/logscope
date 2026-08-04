@@ -18,7 +18,7 @@ Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs
 
 - **Living product** — LogScope evolves every day; pin a [release tag](https://github.com/AntonyCyriac/logscope/releases) for stability.
 - **Architecture-first** — extend the existing pipeline; do not bypass layers or weaken CI.
-- **Public repo only** — code, tests, ADRs, and handbook live here. Do not paste private strategy or unreleased planning into public PRs.
+- **Public repo only** — code, tests, ADRs, and handbook live here. Do not paste private strategy, EngOS gate labels (G0–G5), or unreleased horizon (enterprise/cloud) into public PRs.
 - **No tool branding in git** — do not add vendor footers (e.g. “Made with …”) to commit messages, PR descriptions, or release notes.
 - **Shipped-tag regressions** — user-visible bugs in a released `vX.Y.Z` need a [GitHub issue](https://github.com/AntonyCyriac/logscope/issues) before or with the fix (label `bug`). See [Release process — regression issues](docs/release/RELEASE.md#release-regression-issues-required).
 
