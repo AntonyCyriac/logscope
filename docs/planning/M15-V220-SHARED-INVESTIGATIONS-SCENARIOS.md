@@ -6,7 +6,7 @@
 | Category | Project Planning |
 | Version | 0.3.0 |
 | Status | **Shipped — `v2.2.0`** |
-| Design reference | `logscope-strategy/engos/artifacts/M15.3/design.md` · [ADR-009-M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) |
+| Design reference | [ADR-009-M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) |
 | Created | 31-07-2026 |
 | Last Updated | 31-07-2026 |
 
@@ -56,7 +56,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | T1.2 | Poll lines | `GET /api/v1/tail/poll` while file appends | Returns new lines since last poll; non-blocking | I+P | ✅ |
 | T1.3 | Stop tail | `POST /api/v1/tail/stop` | Tail inactive; poll returns empty or terminal state | U+I | ✅ |
 | T1.4 | Double start | Start when tail already running | 409 `InvalidState` | U | ✅ |
-| T1.5 | Poll without start | `GET /api/v1/tail/poll` before start | 409 or empty per G1 design | U | ✅ |
+| T1.5 | Poll without start | `GET /api/v1/tail/poll` before start | 409 or empty per design | U | ✅ |
 
 ---
 
@@ -125,6 +125,6 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | Version | Date | Description |
 |---------|------|-------------|
-| 0.1.0 | 31-07-2026 | Initial scenario matrix; G0 approved for M15.3 @ v2.2.0. |
-| 0.2.0 | 31-07-2026 | G1 complete — design contract + ADR-009-M15.3 amendment; implementer unlocked. |
-| 0.3.0 | 31-07-2026 | `v2.2.0` shipped — scenario statuses updated post G3/G5. |
+| 0.1.0 | 31-07-2026 | Initial scenario matrix for M15.3 @ v2.2.0. |
+| 0.2.0 | 31-07-2026 | Design contract + ADR-009-M15.3 amendment; implementation started. |
+| 0.3.0 | 31-07-2026 | `v2.2.0` shipped — scenario statuses updated post-release. |

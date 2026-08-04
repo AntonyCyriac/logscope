@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Post-v1 Strategic Roadmap |
 | Category | Project Planning |
-| Version | 2.0.0 |
+| Version | 2.1.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 04-08-2026 |
@@ -15,7 +15,7 @@
 
 This document defines the long-term strategic direction for LogScope after the first stable production release ([`v1.0.0`](../../CHANGELOG.md)).
 
-It captures the consolidated post-v1 vision across ten strategic phases, maps each phase to tactical milestones (M6–M17), and establishes version targets. Tactical implementation details live in per-milestone planning documents; this document is the strategic layer.
+It captures the consolidated post-v1 vision across strategic phases, maps each phase to tactical milestones (M6–M15), and establishes version targets. Tactical implementation details live in per-milestone planning documents; this document is the strategic layer.
 
 See also: [Roadmap](../ROADMAP.md) for milestone tracking and status.
 
@@ -36,11 +36,10 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 5. Expand the plugin ecosystem (extensibility without core changes).
 6. Add AI-assisted insights (bounded, optional).
 7. Deliver GUI and Web surfaces (v2.0 major evolution).
-8. Pursue enterprise and cloud deployment (long-term).
 
-**Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web → Enterprise.
+**Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web.
 
-**Current execution (post-M15):** M15 Web Platform is complete through **`v2.2.1`**. **Next:** **`v2.2.2`** — API key hashing (security patch) → **`v2.3.0`–`v2.6.0`** — investigation user stories (Create an Investigation, multi-source, unified timeline, crash analysis). Enterprise (M16) and cloud (M17) are **long-term** — deferred until investigation stories ship. See [Roadmap](../ROADMAP.md) and [Project Context](../handbook/PROJECT_CONTEXT.md).
+**Current execution (post-M15):** M15 Web Platform is complete through **`v2.2.1`**. **Next:** **`v2.2.2`** — API key hashing (security patch) → **`v2.3.0`–`v2.6.0`** — investigation user stories (Create an Investigation, multi-source, unified timeline, crash analysis). See [Roadmap](../ROADMAP.md) and [Project Context](../handbook/PROJECT_CONTEXT.md).
 
 ---
 
@@ -53,7 +52,7 @@ LogScope intentionally avoids becoming (see [Product Overview §8](../vision/PRO
 - A monitoring system or log collection agent.
 - A log storage platform or general-purpose data processing framework.
 
-The primary responsibility remains helping engineers **understand existing log data**. Enterprise collection, real-time monitoring, and alerting remain out of scope unless explicitly re-chartered.
+The primary responsibility remains helping engineers **understand existing log data**. Large-scale log collection, real-time monitoring, and alerting remain out of scope unless explicitly re-chartered.
 
 ---
 
@@ -269,38 +268,7 @@ Browser-based interface:
 
 ---
 
-## Phase 8 — Enterprise (M16)
-
-Long-term enterprise capabilities:
-
-- Remote agents
-- Distributed log collection
-- Streaming
-- Real-time monitoring
-- Alerts
-- Multi-node deployments
-- RBAC
-- Audit logging
-
-**Guardrail:** Remains outside product boundaries unless explicitly re-chartered.
-
----
-
-## Phase 9 — Cloud (M17)
-
-Future deployment options:
-
-- Kubernetes
-- Docker
-- Helm charts
-- REST API
-- gRPC
-- OpenTelemetry integration
-- Prometheus metrics
-
----
-
-## Phase 10 — Ecosystem
+## Phase 8 — Ecosystem
 
 The broader companion product vision:
 
@@ -310,7 +278,6 @@ The broader companion product vision:
 - LogScope SDK
 - LogScope Plugin SDK
 - LogScope AI
-- LogScope Cloud
 
 ---
 
@@ -329,9 +296,7 @@ The broader companion product vision:
 | Phase 5 — AI | M13 | `v1.5.1`+ |
 | Phase 6 — GUI | M14 | `v2.0.0` |
 | Phase 7 — Web UI | M15 | `v2.0.0` |
-| Phase 8 — Enterprise | M16 | `v2.x` |
-| Phase 9 — Cloud | M17 | `v2.x` |
-| Phase 10 — Ecosystem | Cross-cutting | `v2.x+` |
+| Phase 8 — Ecosystem | Cross-cutting | `v2.x+` |
 
 ```mermaid
 flowchart LR
@@ -368,7 +333,8 @@ v1.5.0  — M12: Dynamic Plugins (released)
 v1.5.1  — M13: AI Assistant (released)
 v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web + major API evolution
-v2.x    — M16 Enterprise, M17 Cloud, ecosystem
+v2.2.x  — M15.3–M15.4 web hardening (released)
+v2.3.0+ — Investigation user stories (planned)
 ```
 
 ---
@@ -436,7 +402,7 @@ Ongoing engineering practices (some already complete at v1.0.0):
 1. **Search before Storage** — in-memory / streaming index first (M6–M7); SQLite (M11) only when query patterns justify persistence.
 2. **Configuration before plugins** — format profiles (M6.5) before dynamic parsers (M12).
 3. **CLI-first until v2.0** — GUI/Web consume the same core APIs; no UI-specific logic in `core/`.
-4. **Product boundaries** — enterprise collection, monitoring, and alerting remain out of scope unless re-chartered.
+4. **Product boundaries** — large-scale collection, monitoring, and alerting remain out of scope unless re-chartered.
 5. **ADR gates** — Qt GUI, SQLite storage, query DSL grammar, and AI integration each require an ADR before coding starts.
 
 ---
@@ -470,4 +436,5 @@ Ongoing engineering practices (some already complete at v1.0.0):
 | 1.6.0 | 25-07-2026 | v1.5.0 released; M12 complete; immediate next milestone is M13. |
 | 1.8.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
 | 1.9.0 | 30-07-2026 | `v2.0.1` all-platform desktop release; doc sync. |
-| 2.0.0 | 04-08-2026 | M15 complete at v2.2.1; post-M15 investigation stories active; M16/M17 long-term. |
+| 2.0.0 | 04-08-2026 | M15 complete at v2.2.1; post-M15 investigation stories active. |
+| 2.1.0 | 04-08-2026 | Removed enterprise/cloud phases from public strategic roadmap (strategy-only). |

@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 2.9.0 |
+| Version | 3.0.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 04-08-2026 |
@@ -62,7 +62,6 @@ The project follows architecture-first development. Every implementation should 
 | Security patch | `v2.2.2` | API key hashing at rest (shipped) |
 | Investigation — Story 1 | `v2.3.0` | Create an Investigation (artifacts, save/reopen) |
 | Investigation — Stories 2–4 | `v2.4.0`–`v2.6.0` | Multi-source inputs, unified timeline, crash analysis |
-| Enterprise (M16) | Long-term | RBAC, agents, streaming — deferred until investigation stories ship |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 
@@ -364,6 +363,7 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.4.0 | 30-07-2026 | v2.0.0 released; M14 complete; M15 is next. |
 | 2.5.0 | 30-07-2026 | Current release `v2.0.3` (desktop regression hotfix). |
 | 2.6.0 | 30-07-2026 | Current release `v2.0.5` (CI/build hotfix, versioned artifacts). |
-| 2.7.0 | 01-08-2026 | Current release `v2.2.1` (M15 complete); docs-only CI waiver; homepage refresh. M16 is next. |
-| 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation; M16 enterprise deferred to long-term horizon. |
-| 2.9.0 | 04-08-2026 | Current release `v2.2.2` (API key hashing); next `v2.3.0` Create an Investigation. |
+| 2.7.0 | 01-08-2026 | Current release `v2.2.1` (M15 complete); docs-only CI waiver; homepage refresh. |
+| 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation. |
+| 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
+| 3.0.0 | 04-08-2026 | Current release `v2.2.2` (API key hashing); next `v2.3.0` Create an Investigation. |
