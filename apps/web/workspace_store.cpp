@@ -104,7 +104,10 @@ foundation::Result<WorkspaceMetadata> WorkspaceStore::create(const WorkspaceCrea
 
         if (!artifactResult)
         {
-            m_investigationStore.remove(createResult->id);
+            if (const auto cleanup = m_investigationStore.remove(createResult->id); !cleanup)
+            {
+                // Best-effort rollback after failed artifact import.
+            }
 
             return foundation::Result<WorkspaceMetadata>(artifactResult.error());
         }

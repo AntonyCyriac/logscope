@@ -12,6 +12,7 @@ add_executable(logscope_web_parity_tests
     ${CMAKE_SOURCE_DIR}/apps/web/session_store.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/session_resource_cleanup.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/workspace_store.cpp
+    ${CMAKE_SOURCE_DIR}/apps/web/investigation_store.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/analyze_job_queue.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/json_parse.cpp
     ${CMAKE_SOURCE_DIR}/apps/web/rest_json.cpp
@@ -41,6 +42,7 @@ target_link_libraries(logscope_web_parity_tests
     PRIVATE
         scope_application
         scope_configuration
+        scope_workspace
         logscope_httplib
         logscope_gtest_support
         GTest::gtest_main

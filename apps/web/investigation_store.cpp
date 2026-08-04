@@ -276,7 +276,11 @@ foundation::Result<scope::workspace::InvestigationManifest> InvestigationStore::
 
     if (changed)
     {
-        investigation.touchUpdatedAt();
+        if (const auto touchResult = investigation.touchUpdatedAt(); !touchResult)
+        {
+            return foundation::Result<scope::workspace::InvestigationManifest>(touchResult.error());
+        }
+
         manifest.updatedAt = investigation.manifest().updatedAt;
 
         const auto saveResult = saveManifest(investigation.rootDirectory(), manifest);
@@ -482,8 +486,16 @@ void InvestigationStore::touchUpdatedAt(const std::string& investigationId)
     }
 
     Investigation investigation = std::move(*investigationResult);
-    investigation.touchUpdatedAt();
-    investigation.persist();
+
+    if (!investigation.touchUpdatedAt())
+    {
+        return;
+    }
+
+    if (!investigation.persist())
+    {
+        return;
+    }
 }
 
 void InvestigationStore::updateSummaryFromService(const std::string& investigationId,
@@ -514,8 +526,15 @@ void InvestigationStore::updateSummaryFromService(const std::string& investigati
         summary.errorCount = service.model().levelCounts().errorLines();
     }
 
-    investigation.updateSummary(summary);
-    investigation.persist();
+    if (!investigation.updateSummary(summary))
+    {
+        return;
+    }
+
+    if (!investigation.persist())
+    {
+        return;
+    }
 }
 
 } // namespace scope::web
