@@ -1,10 +1,10 @@
 # AI assistant guide (LogScope)
 
-Tool-agnostic bootstrap for **any** coding assistant (Cursor, GitHub Copilot, Claude Code, Codex, Windsurf, etc.). No vendor-specific setup required.
+Tool-agnostic bootstrap for **any** coding assistant. No vendor-specific setup or repo config required.
 
 ## Start here
 
-At the beginning of a session, load (attach or `@`-reference):
+At the beginning of a session, load (attach or reference):
 
 | Order | Document | Purpose |
 |-------|----------|---------|
@@ -19,7 +19,8 @@ Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs
 - **Living product** — LogScope evolves every day; pin a [release tag](https://github.com/AntonyCyriac/logscope/releases) for stability.
 - **Architecture-first** — extend the existing pipeline; do not bypass layers or weaken CI.
 - **Public repo only** — code, tests, ADRs, and handbook live here. Do not paste private strategy or unreleased planning into public PRs.
-- **Shipped-tag regressions** — user-visible bugs in a released `vX.Y.Z` need a [GitHub issue](https://github.com/AntonyCyriac/logscope/issues) before or with the fix (label `bug`). See `.cursor/rules/release-regression-issues.mdc` when using Cursor.
+- **No tool branding in git** — do not add vendor footers (e.g. “Made with …”) to commit messages, PR descriptions, or release notes.
+- **Shipped-tag regressions** — user-visible bugs in a released `vX.Y.Z` need a [GitHub issue](https://github.com/AntonyCyriac/logscope/issues) before or with the fix (label `bug`). See [Release process — regression issues](docs/release/RELEASE.md#release-regression-issues-required).
 
 ## Product vs assistant (do not conflate)
 
@@ -29,7 +30,3 @@ Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs
 | **LogScope product AI** | User-facing `logscope agent investigate`, summaries, NL queries (`AiProvider`, M13+) |
 
 Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI-Engineering-Agents.md) (not current milestone scope).
-
-## Cursor users
-
-Rules in [`.cursor/rules/`](.cursor/rules/) mirror this file. Prefer **this `AGENTS.md`** when sharing context across tools.
