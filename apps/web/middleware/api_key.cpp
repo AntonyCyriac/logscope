@@ -3,6 +3,7 @@
  */
 
 #include "api_key.hpp"
+#include "api_key_credential.hpp"
 
 #include "rest_json.hpp"
 
@@ -11,17 +12,18 @@
 namespace scope::web
 {
 
-bool authorizeApiKey(const std::string& configuredKey, const httplib::Request& request,
+bool authorizeApiKey(const ApiKeyCredential& credential, const httplib::Request& request,
                      httplib::Response& response)
 {
-    if (configuredKey.empty())
+    if (credential.empty())
     {
         return true;
     }
 
     const auto iterator = request.headers.find(kApiKeyHeader);
+    const std::string presented = iterator == request.headers.end() ? std::string{} : iterator->second;
 
-    if (iterator == request.headers.end() || iterator->second != configuredKey)
+    if (!credential.verify(presented))
     {
         response.status = 401;
         response.set_content(errorEnvelope("UNAUTHORIZED", "Missing or invalid API key"), "application/json");

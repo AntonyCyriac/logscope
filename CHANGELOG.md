@@ -12,6 +12,29 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.2.2] - 2026-08-04
+
+**Security patch** — API key hashing at rest for `logscope-web`.
+
+### Added
+
+- `web.api_key_hash` config key (salted SHA-256); `LOGSCOPE_WEB_API_KEY_HASH` environment override
+- `logscope-web --hash-api-key <secret>` helper to generate hashes for properties files
+- Startup warning when legacy plaintext `web.api_key` is used in config
+
+### Changed
+
+- API key verification uses constant-time compare; clients still send plain key in `X-LogScope-Api-Key`
+
+### Migration
+
+- **No change required** — existing `web.api_key` / `LOGSCOPE_WEB_API_KEY` continue to work
+- **Recommended:** run `logscope-web --hash-api-key <secret>`, set `web.api_key_hash`, remove `web.api_key` from committed config
+
+See [v2.2.2 release notes](docs/release/v2.2.2-RELEASE-NOTES.md) and [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md).
+
+---
+
 ## [2.2.1] - 2026-07-31
 
 **M15.4 Thin Auth** — session idle TTL, upload temp cleanup, health key policy.

@@ -2,6 +2,8 @@
 # Web platform unit tests (M15.1)
 # ==========================================================
 
+include(${CMAKE_CURRENT_SOURCE_DIR}/../cmake/LogScopeWebOpenSSL.cmake)
+
 option(LOGSCOPE_WEB_UI_BUILD "Build web UI assets with Vite (optional; dist/ is vendored)" OFF)
 
 add_executable(scope_web_tests
@@ -15,6 +17,7 @@ add_executable(scope_web_tests
     web_request_parsers_test.cpp
     rest_json_test.cpp
     api_key_middleware_test.cpp
+    api_key_credential_test.cpp
     web_security_test.cpp
     upload_size_limit_test.cpp
     ../web_server.cpp
@@ -28,6 +31,7 @@ add_executable(scope_web_tests
     ../rest_json.cpp
     ../web_request_parsers.cpp
     ../middleware/api_key.cpp
+    ../middleware/api_key_credential.cpp
     ../../cli/investigation_output.cpp
     ../../cli/report_output.cpp
     ../../cli/report_config.cpp
@@ -62,6 +66,8 @@ target_include_directories(scope_web_tests
 if(WIN32)
     target_link_libraries(scope_web_tests PRIVATE ws2_32 crypt32)
 endif()
+
+logscope_web_link_openssl(scope_web_tests)
 
 include(GoogleTest)
 gtest_discover_tests(scope_web_tests

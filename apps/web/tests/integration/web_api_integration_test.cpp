@@ -387,7 +387,7 @@ class WebApiKeyIntegrationTest : public WebApiIntegrationTest
     {
         config = scope::web::WebConfig::defaults();
         config.bindPort = 0;
-        config.apiKey = "integration-secret";
+        config.apiKey = scope::web::ApiKeyCredential::fromPlaintext("integration-secret");
         server = std::make_unique<scope::web::WebServer>(config);
         ASSERT_TRUE(server->startInBackground());
         client = std::make_unique<httplib::Client>("127.0.0.1", server->port());

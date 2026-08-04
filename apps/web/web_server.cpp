@@ -115,6 +115,18 @@ void warnIfExposedWithoutApiKey(const WebConfig& config)
               << std::endl;
 }
 
+void warnIfPlaintextApiKeyInConfig(const WebConfig& config)
+{
+    if (!config.apiKey.isPlaintextInConfig())
+    {
+        return;
+    }
+
+    std::cerr << "logscope-web: WARNING: web.api_key is stored in plain text. Prefer web.api_key_hash "
+                 "(generate with: logscope-web --hash-api-key <secret>)."
+              << std::endl;
+}
+
 bool rejectStaleSessionHeader(const httplib::Request& request, const std::string& resolvedSessionId,
                               httplib::Response& response)
 {
@@ -202,6 +214,7 @@ bool WebServer::run()
     m_running = true;
     m_port = m_config.bindPort;
     warnIfExposedWithoutApiKey(m_config);
+    warnIfPlaintextApiKeyInConfig(m_config);
 
     return m_server->listen(m_config.bindHost.c_str(), m_config.bindPort);
 }
@@ -232,6 +245,7 @@ bool WebServer::startInBackground()
     m_port = boundPort;
     m_running = true;
     warnIfExposedWithoutApiKey(m_config);
+    warnIfPlaintextApiKeyInConfig(m_config);
     m_thread = std::thread([this]() { m_server->listen_after_bind(); });
 
     return true;

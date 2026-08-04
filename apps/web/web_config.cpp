@@ -115,6 +115,11 @@ bool parseBool(const std::string& value, const bool fallback)
     return fallback;
 }
 
+bool startsWith(const std::string& value, const char* prefix)
+{
+    return value.rfind(prefix, 0) == 0;
+}
+
 } // namespace
 
 WebConfig WebConfig::defaults()
@@ -138,7 +143,12 @@ void WebConfig::mergeFromConfiguration(const configuration::ConfigurationManager
 
     if (const auto value = configuration.get("web.api_key"))
     {
-        apiKey = value.value();
+        configuredApiKey = value.value();
+    }
+
+    if (const auto value = configuration.get("web.api_key_hash"))
+    {
+        configuredApiKeyHash = value.value();
     }
 
     if (const auto value = configuration.get("web.cors_origins"))
@@ -234,7 +244,14 @@ void WebConfig::applyEnvironment()
 {
     if (const char* value = std::getenv("LOGSCOPE_WEB_API_KEY"))
     {
-        apiKey = value;
+        envApiKeySet = true;
+        envApiKey = value;
+    }
+
+    if (const char* value = std::getenv("LOGSCOPE_WEB_API_KEY_HASH"))
+    {
+        envApiKeyHashSet = true;
+        envApiKeyHash = value;
     }
 
     if (const char* value = std::getenv("LOGSCOPE_WEB_BIND_HOST"))
@@ -297,6 +314,64 @@ void WebConfig::applyEnvironment()
     {
         healthRequiresApiKey = parseBool(value, healthRequiresApiKey);
     }
+}
+
+foundation::Result<bool> WebConfig::finalizeApiKey()
+{
+    apiKey = ApiKeyCredential::disabled();
+
+    if (envApiKeySet)
+    {
+        apiKey = ApiKeyCredential::fromPlaintext(envApiKey);
+        return foundation::Result<bool>(true);
+    }
+
+    if (envApiKeyHashSet)
+    {
+        const auto credential = ApiKeyCredential::fromStoredHash(envApiKeyHash);
+
+        if (!credential)
+        {
+            return foundation::Result<bool>(credential.error());
+        }
+
+        apiKey = std::move(*credential);
+        return foundation::Result<bool>(true);
+    }
+
+    if (!configuredApiKeyHash.empty())
+    {
+        const auto credential = ApiKeyCredential::fromStoredHash(configuredApiKeyHash);
+
+        if (!credential)
+        {
+            return foundation::Result<bool>(credential.error());
+        }
+
+        apiKey = std::move(*credential);
+        return foundation::Result<bool>(true);
+    }
+
+    if (!configuredApiKey.empty())
+    {
+        if (startsWith(configuredApiKey, "sha256:"))
+        {
+            const auto credential = ApiKeyCredential::fromStoredHash(configuredApiKey);
+
+            if (!credential)
+            {
+                return foundation::Result<bool>(credential.error());
+            }
+
+            apiKey = std::move(*credential);
+            return foundation::Result<bool>(true);
+        }
+
+        apiKey = ApiKeyCredential::fromPlaintextInConfig(configuredApiKey);
+        return foundation::Result<bool>(true);
+    }
+
+    return foundation::Result<bool>(true);
 }
 
 void WebConfig::applyDerivedDefaults()

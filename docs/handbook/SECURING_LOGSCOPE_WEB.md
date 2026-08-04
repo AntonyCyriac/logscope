@@ -7,7 +7,7 @@
 | Version | 1.1.0 |
 | Status | Approved |
 | Created | 31-07-2026 |
-| Applies to | `v2.2.1+` (M15.4 thin auth) |
+| Applies to | `v2.2.1+` (M15.4 thin auth); hashed keys at rest `v2.2.2+` |
 
 ---
 
@@ -35,7 +35,7 @@ See [ADR-009 Web Platform REST](../architecture/decisions/ADR-009-Web-Platform-R
 
 # 3. API key
 
-When `web.api_key` is set (or `LOGSCOPE_WEB_API_KEY` in the environment), clients must send:
+When an API key is configured (`web.api_key_hash`, legacy `web.api_key`, or `LOGSCOPE_WEB_API_KEY` / `LOGSCOPE_WEB_API_KEY_HASH`), clients must send:
 
 ```http
 X-LogScope-Api-Key: <your-key>
@@ -45,14 +45,21 @@ on all mutating `/api/v1/*` routes (sessions, sources, analyze, workspaces, tail
 
 **Health checks:** By default, `GET /api/v1/health` does **not** require the key (Kubernetes/liveness friendly). Set `web.health_requires_api_key=true` to protect health when the key is configured.
 
-**Storage:** Keys are compared in plain text in **v2.2.1**. Do not commit keys to git; use environment variables or secret managers. **Hashing at rest** ships in **`v2.2.2`** (security patch).
+**Storage (v2.2.2+):** Prefer **`web.api_key_hash`** so the secret is not stored in plain text in properties files. Generate a hash:
 
-Example properties:
+```bash
+logscope-web --hash-api-key 'use-a-long-random-secret'
+```
+
+Copy the printed `sha256:...` value into your config:
 
 ```properties
-web.api_key=use-a-long-random-secret
-# web.health_requires_api_key=true
+web.api_key_hash=sha256:<salt_hex>:<digest_hex>
 ```
+
+**Legacy:** `web.api_key=<plaintext>` still works but logs a startup warning. **`LOGSCOPE_WEB_API_KEY`** (environment) remains plain text for containers and secret managers — that is expected.
+
+Clients always send the **plain** key in `X-LogScope-Api-Key`; only on-disk config uses the hash.
 
 ---
 
@@ -131,3 +138,4 @@ Idle session eviction runs on health when `web.session_ttl_seconds > 0` (amortiz
 |---------|------|-------------|
 | 1.0.0 | 31-07-2026 | Initial M15.4 / v2.2.1 thin auth operator guide |
 | 1.1.0 | 04-08-2026 | API key hashing planned for v2.2.2; RBAC long-term enterprise scope. |
+| 1.2.0 | 04-08-2026 | v2.2.2: `web.api_key_hash`, `--hash-api-key`, migration from plaintext `web.api_key`. |
