@@ -12,6 +12,27 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.3.0] - 2026-08-05
+
+**Story 1** — Create an Investigation (portable container, log + note artifacts, save/reopen).
+
+### Added
+
+- **Investigation** aggregate in `scope_workspace` — manifest v1, artifact type handlers (`log`, `note`)
+- REST `/api/v1/investigations` (+ artifacts, open); `/api/v1/workspaces` alias preserved
+- CLI `logscope investigation` subcommands (`create`, `add`, `add-note`, `list`, `show`, `open`)
+- Web SPA **Investigations** panel; `investigationId` on session save
+- ADR-009-M15.5 Investigation Container
+
+### Changed
+
+- `WorkspaceStore` delegates persistence to `InvestigationStore` (same on-disk root)
+- CI: `dorny/paths-filter@v4` (Node 24 runtime)
+
+See [v2.3.0 release notes](docs/release/v2.3.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.2.2] - 2026-08-04
 
 **Security patch** — API key hashing at rest for `logscope-web`.

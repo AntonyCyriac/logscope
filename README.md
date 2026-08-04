@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.2.2`](CHANGELOG.md) — API key hashing at rest ([securing guide](docs/handbook/SECURING_LOGSCOPE_WEB.md)). **Next:** investigation stories (`v2.3.0`+). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.3.0`](CHANGELOG.md) — Story 1: Create an Investigation ([release notes](docs/release/v2.3.0-RELEASE-NOTES.md)). **Next:** Story 2 (`v2.4.0`+). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
