@@ -179,8 +179,6 @@ foundation::Result<ArtifactRecord> Investigation::addArtifact(ArtifactIngestRequ
         record.metadata["role"] = request.role;
     }
 
-    const bool isFirstArtifact = m_manifest.artifacts.empty();
-
     m_manifest.artifacts.push_back(record);
 
     if (record.type == "log" && m_manifest.primaryArtifactId.empty())
