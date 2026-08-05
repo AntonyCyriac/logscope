@@ -12,6 +12,23 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.4.0] - 2026-08-05
+
+**Story 2** — Understand Everything (multi-artifact investigations, active log switch, `pstack`/`core` storage).
+
+### Added
+
+- **Multi-source investigations** — artifact index with `isEntry`, optional `metadata.role`
+- **Active log switch** — `POST .../open` with `artifactId`; session tracks active artifact; snapshot only on entry open
+- Artifact types **`pstack`** (text) and **`core`** (binary + `sizeBytes` metadata; storage only)
+- CLI `investigation add --type`, `--role`; `investigation open --artifact`
+- Web SPA artifact list, Switch, pstack upload
+- ADR-009-M15.6 Multi-Source Investigation
+
+See [v2.4.0 release notes](docs/release/v2.4.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.3.0] - 2026-08-05
 
 **Story 1** — Create an Investigation (portable container, log + note artifacts, save/reopen).
