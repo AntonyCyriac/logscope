@@ -19,22 +19,23 @@ Pointers for AI assistants — **where code and tests live**. Session bootstrap:
 | Area | Paths |
 |------|--------|
 | Routes | `web_server.cpp` |
-| Investigations (v2.3.0 / M15.5) | `investigation_store.*` — `/api/v1/investigations`, artifacts, manifest |
+| Investigations (v2.3.0+ / M15.5–M15.6) | `investigation_store.*` — `/api/v1/investigations`, artifacts, open/switch |
 | Shared workspaces (v2.2.0 compat) | `workspace_store.*` — delegates to `InvestigationStore`; `/api/v1/workspaces` alias |
 | Async analyze jobs | `analyze_job_queue.*` |
 | Sessions | `session_store.*` |
-| SPA assets | `ui/dist/` (Investigations panel) |
+| SPA assets | `ui/dist/` (Investigations panel — artifact list, switch, pstack) |
 
-## Domain — investigation container (Story 1)
+## Domain — investigation container (Story 1–2)
 
 | Area | Paths |
 |------|--------|
-| Investigation aggregate | `core/workspace/investigation_container.{hpp,cpp}` — manifest, artifacts, `IArtifactHandler` |
+| Investigation aggregate | `core/workspace/investigation_container.{hpp,cpp}` — manifest, artifacts, `IArtifactHandler` (`log`, `note`, `pstack`, `core`) |
+| Artifact handlers | `core/workspace/artifact_handler.{hpp,cpp}` — `artifactTypeSupportsSessionOpen()` |
 | M3 analysis engine | `core/investigation/` — **not** the Story 1 container; avoid `investigation.hpp` name under `workspace/` |
 
-## CLI — investigation commands (v2.3.0)
+## CLI — investigation commands (v2.3.0+)
 
-`logscope investigation create|add|add-note|list|show|open` — dispatch in `apps/cli/cli_parser.cpp`.
+`logscope investigation create|add|add-note|list|show|open` — Story 2: `add --type`, `--role`; `open --artifact` — dispatch in `apps/cli/cli_parser.cpp`.
 
 ## Tests
 
@@ -52,8 +53,9 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md)
 - [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](../planning/M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md)
 - [V230-CREATE-INVESTIGATION-SCENARIOS.md](../planning/V230-CREATE-INVESTIGATION-SCENARIOS.md)
-- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3 amendment](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5 amendment](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md)
-- [openapi-v1.yaml](../api/openapi-v1.yaml) (sketch; see ADR-009-M15.5 for investigations) · [v2.3.0 release notes](../release/v2.3.0-RELEASE-NOTES.md)
+- [V240-UNDERSTAND-EVERYTHING-SCENARIOS.md](../planning/V240-UNDERSTAND-EVERYTHING-SCENARIOS.md)
+- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md)
+- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.4.0 release notes](../release/v2.4.0-RELEASE-NOTES.md)
 
 ## CI
 

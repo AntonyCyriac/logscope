@@ -5,7 +5,7 @@
 | Document | v2.4.0 Understand Everything Scenarios |
 | Category | Project Planning |
 | Version | 0.1.0 |
-| Status | **In progress — `v2.4.0`** |
+| Status | **Shipped — `v2.4.0`** |
 | Design reference | [ADR-009-M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) |
 | Created | 05-08-2026 |
 | Last Updated | 05-08-2026 |
@@ -41,14 +41,14 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| MS.1 | Add second log | `POST .../artifacts` with second log path | Two `log` artifacts; entry unchanged | U+I | 🟡 |
-| MS.2 | Add pstack | `POST .../artifacts` type `pstack` | Text stored; not openable into session | U+I | 🟡 |
-| MS.3 | Add core | `POST .../artifacts` type `core` | Binary stored; `metadata.sizeBytes` set | U | 🟡 |
-| MS.4 | Artifact list | `GET .../investigations/{id}` | `isEntry`, `metadata.role` on artifacts | I | 🟡 |
-| MS.5 | Switch log | `POST .../open` with non-entry `artifactId` | `loadedFromSnapshot: false`; analyze works | I+P | 🟡 |
+| MS.1 | Add second log | `POST .../artifacts` with second log path | Two `log` artifacts; entry unchanged | U+I | ✅ |
+| MS.2 | Add pstack | `POST .../artifacts` type `pstack` | Text stored; not openable into session | U+I | ✅ |
+| MS.3 | Add core | `POST .../artifacts` type `core` | Binary stored; `metadata.sizeBytes` set | U | ✅ |
+| MS.4 | Artifact list | `GET .../investigations/{id}` | `isEntry`, `metadata.role` on artifacts | I | ✅ |
+| MS.5 | Switch log | `POST .../open` with non-entry `artifactId` | `loadedFromSnapshot: false`; analyze works | I+P | ✅ |
 | MS.6 | Reject non-log open | `POST .../open` with pstack id | **409** `ARTIFACT_NOT_OPENABLE` | I | 🟡 |
-| MS.7 | Snapshot discipline | Open entry after save; switch log; reopen entry | Snapshot only on entry/default open | I | 🟡 |
-| MS.8 | Optional role | Add log with `role: system` | `metadata.role` in manifest | U+I | 🟡 |
+| MS.7 | Snapshot discipline | Open entry after save; switch log; reopen entry | Snapshot only on entry/default open | I | ✅ |
+| MS.8 | Optional role | Add log with `role: system` | `metadata.role` in manifest | U+I | ✅ |
 
 ---
 
@@ -56,9 +56,9 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Expected | Test | Status |
 |----|----------|----------|------|--------|
-| CL.5 | `investigation add --type pstack` | Pstack artifact on disk | U | 🟡 |
-| CL.6 | `investigation open --artifact` | Prints non-entry log path | U | 🟡 |
-| CL.7 | Type inference `.core` | Defaults to `core` type | U | 🟡 |
+| CL.5 | `investigation add --type pstack` | Pstack artifact on disk | U | ✅ |
+| CL.6 | `investigation open --artifact` | Prints non-entry log path | U | ✅ |
+| CL.7 | Type inference `.core` | Defaults to `core` type | U | ✅ |
 
 ---
 
@@ -76,7 +76,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | Check | Owner | Status |
 |-------|-------|--------|
-| Five-minute demo path | Implementer | ⬜ |
-| Unit + integration tests green | Tester | ⬜ |
-| ADR-009-M15.6 merged | Architect | 🟡 |
-| OpenAPI updated | Documentation | 🟡 |
+| Five-minute demo path | Implementer | ✅ |
+| Unit + integration tests green | Tester | ✅ |
+| ADR-009-M15.6 merged | Architect | ✅ |
+| OpenAPI updated | Documentation | ✅ |

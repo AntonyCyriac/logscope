@@ -66,9 +66,9 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.3.0`](CHANGELOG.md) — Story 1: Create an Investigation.
+**Current release:** [`v2.4.0`](CHANGELOG.md) — Story 2: Understand Everything.
 
-**Next:** **`v2.4.0`** — Story 2: Understand Everything. See [Project Context](handbook/PROJECT_CONTEXT.md).
+**Next:** **`v2.5.0`** — Story 3: See What Happened (timeline). See [Project Context](handbook/PROJECT_CONTEXT.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
