@@ -173,11 +173,15 @@ foundation::Result<ArtifactRecord> Investigation::addArtifact(ArtifactIngestRequ
     }
 
     ArtifactRecord record = std::move(*ingestResult);
-    const bool isFirstArtifact = m_manifest.artifacts.empty();
+
+    if (!request.role.empty())
+    {
+        record.metadata["role"] = request.role;
+    }
 
     m_manifest.artifacts.push_back(record);
 
-    if (isFirstArtifact)
+    if (record.type == "log" && m_manifest.primaryArtifactId.empty())
     {
         m_manifest.primaryArtifactId = record.id;
     }
@@ -245,6 +249,19 @@ foundation::Result<ArtifactRecord> Investigation::entryArtifact() const
     return foundation::Result<ArtifactRecord>(*artifact);
 }
 
+foundation::Result<ArtifactRecord> Investigation::artifactById(const std::string& artifactId) const
+{
+    const ArtifactRecord* artifact = findArtifactById(m_manifest, artifactId);
+
+    if (artifact == nullptr)
+    {
+        return foundation::Result<ArtifactRecord>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Artifact not found."));
+    }
+
+    return foundation::Result<ArtifactRecord>(*artifact);
+}
+
 foundation::Result<foundation::Path> Investigation::entryArtifactDataPath() const
 {
     const auto artifactResult = entryArtifact();
@@ -252,6 +269,32 @@ foundation::Result<foundation::Path> Investigation::entryArtifactDataPath() cons
     if (!artifactResult)
     {
         return foundation::Result<foundation::Path>(artifactResult.error());
+    }
+
+    const IArtifactHandler* handler = findArtifactHandler(artifactResult->type);
+
+    if (handler == nullptr)
+    {
+        return foundation::Result<foundation::Path>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Unknown artifact type."));
+    }
+
+    return handler->resolveDataPath(m_rootDirectory, *artifactResult);
+}
+
+foundation::Result<foundation::Path> Investigation::logArtifactDataPath(const std::string& artifactId) const
+{
+    const auto artifactResult = artifactById(artifactId);
+
+    if (!artifactResult)
+    {
+        return foundation::Result<foundation::Path>(artifactResult.error());
+    }
+
+    if (artifactResult->type != "log")
+    {
+        return foundation::Result<foundation::Path>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Artifact is not a log."));
     }
 
     const IArtifactHandler* handler = findArtifactHandler(artifactResult->type);
@@ -281,10 +324,18 @@ foundation::Result<foundation::Path> Investigation::snapshotPath() const
 
 foundation::Result<bool> Investigation::setEntryArtifact(const std::string& artifactId)
 {
-    if (findArtifactById(m_manifest, artifactId) == nullptr)
+    const ArtifactRecord* artifact = findArtifactById(m_manifest, artifactId);
+
+    if (artifact == nullptr)
     {
         return foundation::Result<bool>(
             foundation::Error(foundation::ErrorCode::FileNotFound, "Artifact not found."));
+    }
+
+    if (artifact->type != "log")
+    {
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Entry artifact must be a log."));
     }
 
     m_manifest.primaryArtifactId = artifactId;

@@ -7,6 +7,7 @@ info:
     on most routes. Error envelope `{ "error": { "code", "message" } }`; success `{ "data": ... }`.
     v2.2.1: optional `web.health_requires_api_key`; stale sessions return 401 SESSION_EXPIRED.
     v2.3.0: `/api/v1/investigations` (Story 1); `/api/v1/workspaces` remains alias (M15.3 compat).
+    v2.4.0: multi-artifact open (`artifactId`), `pstack`/`core` types, session active artifact (Story 2).
 servers:
   - url: http://127.0.0.1:8080
     description: Default loopback bind
@@ -150,13 +151,35 @@ paths:
   /api/v1/investigations/{id}/artifacts:
     post:
       tags: [investigations]
-      summary: Add log or note artifact
+      summary: Add artifact (log, note, pstack, or core)
+      description: |
+        `log` may omit `sourcePath` to use the session's active source.
+        `pstack` and `core` require `sourcePath`. Optional `role` maps to `metadata.role`.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                type:
+                  type: string
+                  enum: [log, note, pstack, core]
+                sourcePath:
+                  type: string
+                name:
+                  type: string
+                title:
+                  type: string
+                body:
+                  type: string
+                role:
+                  type: string
       responses:
         '200':
           description: Artifact added
@@ -198,19 +221,31 @@ paths:
   /api/v1/investigations/{id}/open:
     post:
       tags: [investigations]
-      summary: Open entry log artifact into caller session
-      description: Entry artifact must be type `log` in v2.3.0; returns 409 otherwise.
+      summary: Open a log artifact into caller session
+      description: |
+        Optional `artifactId` selects a log artifact (default entry).
+        Snapshot restore applies only when opening the entry/default artifact.
+        Non-log artifacts return 409 `ARTIFACT_NOT_OPENABLE`.
       parameters:
         - name: id
           in: path
           required: true
           schema:
             type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                artifactId:
+                  type: string
+                  format: uuid
       responses:
         '200':
           description: Investigation loaded into session
         '409':
-          description: No suitable entry artifact
+          description: Artifact not openable or invalid state
   /api/v1/workspaces:
     get:
       tags: [workspaces]

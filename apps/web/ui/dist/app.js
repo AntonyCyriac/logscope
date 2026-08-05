@@ -5,6 +5,7 @@
     sessionId: null,
     analyzed: false,
     activeInvestigationId: null,
+    activeArtifactId: null,
     tailTimer: null,
   };
 
@@ -14,6 +15,7 @@
   const tableBody = document.querySelector('#resultsTable tbody');
   const extensionsList = document.getElementById('extensionsList');
   const investigationsList = document.getElementById('investigationsList');
+  const artifactList = document.getElementById('artifactList');
   const fileInput = document.getElementById('fileInput');
   const analyzeBtn = document.getElementById('analyzeBtn');
   const investigateBtn = document.getElementById('investigateBtn');
@@ -29,6 +31,8 @@
   const noteTitleInput = document.getElementById('noteTitleInput');
   const noteBodyInput = document.getElementById('noteBodyInput');
   const addNoteBtn = document.getElementById('addNoteBtn');
+  const addPstackBtn = document.getElementById('addPstackBtn');
+  const pstackInput = document.getElementById('pstackInput');
   const tailStartBtn = document.getElementById('tailStartBtn');
   const tailStopBtn = document.getElementById('tailStopBtn');
 
@@ -78,6 +82,50 @@
     saveInvestigationBtn.disabled = !enabled;
     addLogArtifactBtn.disabled = !enabled;
     addNoteBtn.disabled = !enabled;
+    addPstackBtn.disabled = !enabled;
+  }
+
+  async function refreshArtifactList() {
+    artifactList.innerHTML = '';
+
+    if (!state.activeInvestigationId) {
+      return;
+    }
+
+    const response = await api('/api/v1/investigations/' + state.activeInvestigationId);
+    const payload = await response.json();
+    const investigation = (payload.data && payload.data.investigation) || payload.data || payload;
+    const artifacts = investigation.artifacts || [];
+
+    artifacts.forEach(function (artifact) {
+      const item = document.createElement('li');
+      const label = artifact.name + ' (' + artifact.type + ')';
+
+      if (artifact.isEntry) {
+        item.textContent = label + ' [entry] ';
+      } else {
+        item.textContent = label + ' ';
+      }
+
+      if (artifact.metadata && artifact.metadata.role) {
+        item.textContent += '[' + artifact.metadata.role + '] ';
+      }
+
+      if (artifact.type === 'log') {
+        const switchBtn = document.createElement('button');
+        switchBtn.type = 'button';
+        switchBtn.textContent = state.activeArtifactId === artifact.id ? 'Active' : 'Switch';
+        switchBtn.disabled = state.activeArtifactId === artifact.id;
+        switchBtn.addEventListener('click', function () {
+          switchLogArtifact(artifact.id).catch(function (error) {
+            setStatus('Switch error: ' + error.message);
+          });
+        });
+        item.appendChild(switchBtn);
+      }
+
+      artifactList.appendChild(item);
+    });
   }
 
   function renderInvestigation(payload) {
@@ -158,16 +206,28 @@
     });
   }
 
-  async function openInvestigation(investigationId) {
-    const payload = await apiJson('/api/v1/investigations/' + investigationId + '/open', {}, 'POST');
+  async function openInvestigation(investigationId, artifactId) {
+    const body = artifactId ? { artifactId: artifactId } : {};
+    const payload = await apiJson('/api/v1/investigations/' + investigationId + '/open', body, 'POST');
     state.activeInvestigationId = investigationId;
+    state.activeArtifactId = (payload.data && payload.data.artifactId) || artifactId || null;
     state.analyzed = !!(payload.data && payload.data.summary && payload.data.summary.hasModel);
     investigateBtn.disabled = !state.analyzed;
     exportBtn.disabled = !state.analyzed;
     askBtn.disabled = !state.analyzed;
     setInvestigationActionsEnabled(true);
     summaryEl.textContent = JSON.stringify(payload.data || payload, null, 2);
+    await refreshArtifactList();
     setStatus('Opened investigation ' + investigationId);
+  }
+
+  async function switchLogArtifact(artifactId) {
+    if (!state.activeInvestigationId) {
+      throw new Error('No investigation selected');
+    }
+
+    await openInvestigation(state.activeInvestigationId, artifactId);
+    setStatus('Switched to artifact ' + artifactId);
   }
 
   async function createInvestigation() {
@@ -179,6 +239,7 @@
     state.activeInvestigationId = payload.data && payload.data.id;
     setInvestigationActionsEnabled(!!state.activeInvestigationId);
     await refreshInvestigations();
+    await refreshArtifactList();
     setStatus('Created investigation ' + name);
   }
 
@@ -201,6 +262,7 @@
       type: 'log',
     });
     await refreshInvestigations();
+    await refreshArtifactList();
     setStatus('Added log artifact');
   }
 
@@ -222,10 +284,33 @@
       body: body,
     });
     await refreshInvestigations();
+    await refreshArtifactList();
     setStatus('Added note artifact');
   }
 
-  async function uploadFile(file) {
+  async function addPstackArtifact(file) {
+    if (!state.activeInvestigationId) {
+      throw new Error('No investigation selected');
+    }
+
+    const uploadPayload = await uploadFileForPath(file);
+    const sourcePath = uploadPayload.data && uploadPayload.data.sourcePath;
+
+    if (!sourcePath) {
+      throw new Error('Upload did not return sourcePath');
+    }
+
+    await apiJson('/api/v1/investigations/' + state.activeInvestigationId + '/artifacts', {
+      type: 'pstack',
+      sourcePath: sourcePath,
+      name: file.name,
+    });
+    await refreshInvestigations();
+    await refreshArtifactList();
+    setStatus('Added pstack artifact');
+  }
+
+  async function uploadFileForPath(file) {
     const formData = new FormData();
     formData.append('file', file);
     const response = await api('/api/v1/sources/upload', {
@@ -236,7 +321,11 @@
       const text = await response.text();
       throw new Error('Upload failed: ' + text);
     }
-    await response.json();
+    return response.json();
+  }
+
+  async function uploadFile(file) {
+    const payload = await uploadFileForPath(file);
     analyzeBtn.disabled = false;
     tailStartBtn.disabled = false;
     setStatus('Uploaded ' + file.name);
@@ -443,6 +532,21 @@
     addNoteArtifact().catch(function (error) {
       setStatus('Add note error: ' + error.message);
     });
+  });
+
+  addPstackBtn.addEventListener('click', function () {
+    pstackInput.click();
+  });
+
+  pstackInput.addEventListener('change', function () {
+    const file = pstackInput.files && pstackInput.files[0];
+    if (!file) {
+      return;
+    }
+    addPstackArtifact(file).catch(function (error) {
+      setStatus('Add pstack error: ' + error.message);
+    });
+    pstackInput.value = '';
   });
 
   tailStartBtn.addEventListener('click', function () {

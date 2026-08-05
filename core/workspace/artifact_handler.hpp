@@ -33,8 +33,14 @@ struct ArtifactIngestRequest
     std::string name;
     foundation::Path sourceFile;
     std::string noteBody;
+    std::string role;
     ArtifactSource source;
 };
+
+/**
+ * @brief Returns true when artifact type may be opened into an analyze/investigate session.
+ */
+[[nodiscard]] bool artifactTypeSupportsSessionOpen(std::string_view type) noexcept;
 
 /**
  * @brief Handler for a single artifact type string.

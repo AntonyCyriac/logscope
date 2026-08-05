@@ -37,6 +37,15 @@
         <label>Note body <input type="text" id="noteBodyInput" placeholder="Customer reported outage"></label>
         <button type="button" id="addNoteBtn" disabled>Add note</button>
       </div>
+      <div class="row">
+        <label class="file-label">
+          <span>Add pstack</span>
+          <input type="file" id="pstackInput" accept=".txt,.pstack" hidden>
+        </label>
+        <button type="button" id="addPstackBtn" disabled>Add pstack</button>
+      </div>
+      <h3>Artifacts</h3>
+      <ul id="artifactList"></ul>
       <ul id="investigationsList"></ul>
     </section>
 

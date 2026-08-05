@@ -66,6 +66,10 @@ class InvestigationStore
     [[nodiscard]] foundation::Result<scope::workspace::ArtifactRecord> addLogArtifact(
         const std::string& investigationId, const foundation::Path& sourcePath, const std::string& displayName);
 
+    [[nodiscard]] foundation::Result<scope::workspace::ArtifactRecord> addArtifactFile(
+        const std::string& investigationId, const foundation::Path& sourcePath, const std::string& displayName,
+        const std::string& type, const std::string& role = std::string());
+
     [[nodiscard]] foundation::Result<scope::workspace::ArtifactRecord> addNoteArtifact(
         const std::string& investigationId, const std::string& title, const std::string& body);
 
@@ -77,6 +81,9 @@ class InvestigationStore
     [[nodiscard]] foundation::Result<foundation::Path> resolveSnapshotPath(const std::string& investigationId) const;
 
     [[nodiscard]] foundation::Result<foundation::Path> resolveEntryLogPath(const std::string& investigationId) const;
+
+    [[nodiscard]] foundation::Result<foundation::Path> resolveLogArtifactPath(const std::string& investigationId,
+                                                                              const std::string& artifactId) const;
 
     void touchUpdatedAt(const std::string& investigationId);
 

@@ -45,7 +45,11 @@ class Investigation
 
     [[nodiscard]] foundation::Result<ArtifactRecord> entryArtifact() const;
 
+    [[nodiscard]] foundation::Result<ArtifactRecord> artifactById(const std::string& artifactId) const;
+
     [[nodiscard]] foundation::Result<foundation::Path> entryArtifactDataPath() const;
+
+    [[nodiscard]] foundation::Result<foundation::Path> logArtifactDataPath(const std::string& artifactId) const;
 
     [[nodiscard]] foundation::Result<foundation::Path> snapshotPath() const;
 

@@ -374,6 +374,68 @@ TEST_F(WebApiIntegrationTest, InvestigationCreateViaRest)
     EXPECT_NE(std::string::npos, listResult->body.find("rest-investigation"));
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationSwitchLogArtifact)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+    const std::string syslogPath = sourcePath("samples/sample.jsonl");
+
+    ASSERT_TRUE(client->Post("/api/v1/sources/open", headers,
+                             "{\"path\": \"" + appLogPath + "\"}", "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/analyze", headers, "{}", "application/json"));
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"switch-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::size_t idPos = createResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, idPos);
+    const std::size_t idStart = idPos + 7U;
+    const std::size_t idEnd = createResult->body.find('"', idStart);
+    const std::string investigationId = createResult->body.substr(idStart, idEnd - idStart);
+
+    const httplib::Result addAppLogResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath + "\", \"name\": \"app.log\", \"role\": \"application\"}",
+        "application/json");
+    ASSERT_TRUE(addAppLogResult);
+    EXPECT_EQ(200, addAppLogResult->status);
+
+    const std::string addSyslogBody = "{\"type\": \"log\", \"sourcePath\": \"" + syslogPath +
+                                      "\", \"name\": \"syslog\", \"role\": \"system\"}";
+    const httplib::Result addSyslogResult =
+        client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers, addSyslogBody,
+                     "application/json");
+    ASSERT_TRUE(addSyslogResult);
+    EXPECT_EQ(200, addSyslogResult->status);
+
+    const std::size_t artifactPos = addSyslogResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, artifactPos);
+    const std::size_t artifactStart = artifactPos + 7U;
+    const std::size_t artifactEnd = addSyslogResult->body.find('"', artifactStart);
+    const std::string syslogArtifactId = addSyslogResult->body.substr(artifactStart, artifactEnd - artifactStart);
+
+    const std::string switchBody = "{\"artifactId\": \"" + syslogArtifactId + "\"}";
+    const httplib::Result switchResult =
+        client->Post("/api/v1/investigations/" + investigationId + "/open", headers, switchBody, "application/json");
+    ASSERT_TRUE(switchResult);
+    EXPECT_EQ(200, switchResult->status);
+    EXPECT_NE(std::string::npos, switchResult->body.find("\"loadedFromSnapshot\": false"));
+    EXPECT_NE(std::string::npos, switchResult->body.find(syslogArtifactId));
+
+    const httplib::Result analyzeAfterSwitch = client->Post("/api/v1/analyze", headers, "{}", "application/json");
+    ASSERT_TRUE(analyzeAfterSwitch);
+    EXPECT_EQ(200, analyzeAfterSwitch->status);
+
+    const httplib::Result investigateResult =
+        client->Post("/api/v1/investigate", headers, "{\"search\": \"error\"}", "application/json");
+    ASSERT_TRUE(investigateResult);
+    EXPECT_EQ(200, investigateResult->status);
+}
+
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
     const std::string sessionId = createSession();
