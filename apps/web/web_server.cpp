@@ -4,6 +4,7 @@
 
 #include "web_server.hpp"
 
+#include "artifact_handler.hpp"
 #include "investigation_container.hpp"
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
@@ -1590,7 +1591,8 @@ void WebServer::registerRoutes()
                        }
 
                        foundation::Path sourcePath = foundation::Path(artifactRequest->sourcePath);
-                       const bool useSessionSource = sourcePath.string().empty();
+                       const bool useSessionSource =
+                           sourcePath.string().empty() && artifactRequest->type == "log";
 
                        if (useSessionSource)
                        {
@@ -1601,7 +1603,7 @@ void WebServer::registerRoutes()
                        if (sourcePath.string().empty())
                        {
                            setJsonResponse(response, 400,
-                                           errorEnvelope("INVALID_ARGUMENT", "Missing log source path."));
+                                           errorEnvelope("INVALID_ARGUMENT", "Missing artifact source path."));
 
                            return;
                        }
@@ -1618,18 +1620,21 @@ void WebServer::registerRoutes()
                            }
                        }
 
-                       const auto logResult = m_workspaceStore.investigationStore().addLogArtifact(
-                           investigationId, sourcePath,
-                           artifactRequest->displayName.empty() ? artifactRequest->name : artifactRequest->displayName);
+                       const std::string displayName = artifactRequest->displayName.empty()
+                                                           ? artifactRequest->name
+                                                           : artifactRequest->displayName;
 
-                       if (!logResult)
+                       const auto fileResult = m_workspaceStore.investigationStore().addArtifactFile(
+                           investigationId, sourcePath, displayName, artifactRequest->type, artifactRequest->role);
+
+                       if (!fileResult)
                        {
-                           setErrorResponse(response, logResult.error());
+                           setErrorResponse(response, fileResult.error());
 
                            return;
                        }
 
-                       setJsonResponse(response, 200, successEnvelope(formatArtifactRecord(*logResult)));
+                       setJsonResponse(response, 200, successEnvelope(formatArtifactRecord(*fileResult)));
                        response.set_header(kSessionHeader, sessionId);
                    });
 
@@ -1679,7 +1684,8 @@ void WebServer::registerRoutes()
                       }
 
                       std::ostringstream data;
-                      data << "{\n  \"artifact\": " << formatArtifactRecord(*iterator);
+                      data << "{\n  \"artifact\": "
+                           << formatArtifactRecord(*iterator, manifestResult->primaryArtifactId);
 
                       if (iterator->type == "note")
                       {
@@ -1778,16 +1784,64 @@ void WebServer::registerRoutes()
                        }
 
                        const std::string investigationId = request.matches[1];
+                       const InvestigationOpenRequest openRequest = parseInvestigationOpenRequest(request.body);
+                       const auto manifestResult = m_workspaceStore.investigationStore().get(investigationId);
+
+                       if (!manifestResult)
+                       {
+                           setErrorResponse(response, manifestResult.error());
+
+                           return;
+                       }
+
+                       std::string targetArtifactId = openRequest.artifactId;
+
+                       if (targetArtifactId.empty())
+                       {
+                           targetArtifactId = manifestResult->primaryArtifactId;
+                       }
+
+                       const scope::workspace::ArtifactRecord* targetArtifact = nullptr;
+
+                       for (const scope::workspace::ArtifactRecord& artifact : manifestResult->artifacts)
+                       {
+                           if (artifact.id == targetArtifactId)
+                           {
+                               targetArtifact = &artifact;
+                               break;
+                           }
+                       }
+
+                       if (targetArtifact == nullptr || targetArtifactId.empty())
+                       {
+                           setJsonResponse(response, 404,
+                                           errorEnvelope("NOT_FOUND", "Artifact not found in investigation."));
+
+                           return;
+                       }
+
+                       if (!scope::workspace::artifactTypeSupportsSessionOpen(targetArtifact->type))
+                       {
+                           setJsonResponse(response, 409,
+                                           errorEnvelope("ARTIFACT_NOT_OPENABLE",
+                                                           "Only log artifacts can be opened into the session."));
+
+                           return;
+                       }
+
+                       const bool allowSnapshot =
+                           openRequest.artifactId.empty() ||
+                           openRequest.artifactId == manifestResult->primaryArtifactId;
                        const auto snapshotPath =
                            m_workspaceStore.investigationStore().resolveSnapshotPath(investigationId);
-                       const auto entryLogPath =
-                           m_workspaceStore.investigationStore().resolveEntryLogPath(investigationId);
+                       const auto targetLogPath = m_workspaceStore.investigationStore().resolveLogArtifactPath(
+                           investigationId, targetArtifactId);
 
                        std::lock_guard<std::mutex> lock(workspace->mutex);
 
                        bool loadedFromSnapshot = false;
 
-                       if (snapshotPath)
+                       if (allowSnapshot && snapshotPath)
                        {
                            std::error_code errorCode;
 
@@ -1821,14 +1875,14 @@ void WebServer::registerRoutes()
 
                        if (!loadedFromSnapshot)
                        {
-                           if (!entryLogPath)
+                           if (!targetLogPath)
                            {
-                               setErrorResponse(response, entryLogPath.error());
+                               setErrorResponse(response, targetLogPath.error());
 
                                return;
                            }
 
-                           const auto openResult = workspace->service->openSource(*entryLogPath);
+                           const auto openResult = workspace->service->openSource(*targetLogPath);
 
                            if (!openResult)
                            {
@@ -1839,6 +1893,9 @@ void WebServer::registerRoutes()
 
                            removeTempUploadFile(*workspace);
                        }
+
+                       workspace->boundInvestigationId = investigationId;
+                       workspace->activeArtifactId = targetArtifactId;
 
                        m_workspaceStore.investigationStore().touchUpdatedAt(investigationId);
 
@@ -1853,7 +1910,8 @@ void WebServer::registerRoutes()
 
                        setJsonResponse(response, 200,
                                        successEnvelope(formatInvestigationOpenResult(
-                                           investigationId, workspace->service->sourcePath(), summary)));
+                                           investigationId, targetArtifactId, targetArtifact->type,
+                                           workspace->service->sourcePath(), summary, loadedFromSnapshot)));
                        response.set_header(kSessionHeader, sessionId);
                    });
 

@@ -360,7 +360,35 @@ std::string formatWorkspaceOpenResult(const std::string& workspaceId, const foun
     return output.str();
 }
 
-std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact)
+std::string formatStringMapJson(const std::map<std::string, std::string>& values)
+{
+    std::ostringstream output;
+    output << '{';
+    bool first = true;
+
+    for (const auto& entry : values)
+    {
+        if (!first)
+        {
+            output << ',';
+        }
+
+        first = false;
+        output << "\n    \"" << escapeJsonString(entry.first) << "\": \"" << escapeJsonString(entry.second) << '"';
+    }
+
+    if (!first)
+    {
+        output << '\n';
+    }
+
+    output << '}';
+
+    return output.str();
+}
+
+std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact,
+                                 const std::string& primaryArtifactId)
 {
     std::ostringstream output;
     output << "{\n"
@@ -370,7 +398,10 @@ std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifac
            << "  \"relativePath\": \"" << escapeJsonString(artifact.relativePath) << "\",\n"
            << "  \"importedAt\": \"" << escapeJsonString(artifact.importedAt) << "\",\n"
            << "  \"source\": " << formatArtifactSourceJson(artifact.source) << ",\n"
-           << "  \"status\": \"" << escapeJsonString(artifact.status) << "\"\n"
+           << "  \"status\": \"" << escapeJsonString(artifact.status) << "\",\n"
+           << "  \"metadata\": " << formatStringMapJson(artifact.metadata) << ",\n"
+           << "  \"isEntry\": " << ((!primaryArtifactId.empty() && artifact.id == primaryArtifactId) ? "true" : "false")
+           << "\n"
            << '}';
 
     return output.str();
@@ -398,7 +429,7 @@ std::string formatInvestigationManifest(const scope::workspace::InvestigationMan
             output << ',';
         }
 
-        output << "\n    " << formatArtifactRecord(manifest.artifacts[index]);
+        output << "\n    " << formatArtifactRecord(manifest.artifacts[index], manifest.primaryArtifactId);
     }
 
     output << "\n  ]\n}";
@@ -433,14 +464,19 @@ std::string formatInvestigationList(const InvestigationListResult& list)
     return output.str();
 }
 
-std::string formatInvestigationOpenResult(const std::string& investigationId, const foundation::Path& sourcePath,
-                                         const scope::workspace::InvestigationSummary& summary)
+std::string formatInvestigationOpenResult(const std::string& investigationId, const std::string& artifactId,
+                                         const std::string& artifactType, const foundation::Path& sourcePath,
+                                         const scope::workspace::InvestigationSummary& summary,
+                                         const bool loadedFromSnapshot)
 {
     std::ostringstream output;
     output << "{\n"
            << "  \"opened\": true,\n"
            << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"artifactId\": \"" << escapeJsonString(artifactId) << "\",\n"
+           << "  \"artifactType\": \"" << escapeJsonString(artifactType) << "\",\n"
            << "  \"sourcePath\": \"" << escapeJsonString(sourcePath.string()) << "\",\n"
+           << "  \"loadedFromSnapshot\": " << (loadedFromSnapshot ? "true" : "false") << ",\n"
            << "  \"summary\": " << formatInvestigationSummaryJson(summary) << "\n"
            << '}';
 

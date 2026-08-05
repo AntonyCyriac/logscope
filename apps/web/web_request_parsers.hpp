@@ -74,7 +74,18 @@ struct ArtifactAddRequest
     std::string body;
     std::string sourcePath;
     std::string displayName;
+    std::string role;
 };
+
+/**
+ * @brief Parsed body for POST /api/v1/investigations/{id}/open.
+ */
+struct InvestigationOpenRequest
+{
+    std::string artifactId;
+};
+
+[[nodiscard]] InvestigationOpenRequest parseInvestigationOpenRequest(std::string_view body);
 
 [[nodiscard]] foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(std::string_view body);
 

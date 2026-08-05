@@ -1282,6 +1282,18 @@ std::optional<InvestigationAddOptions> parseInvestigationAddArguments(int argc, 
             continue;
         }
 
+        if (argument == "--type" && index + 1 < argc)
+        {
+            options.artifactType = argv[++index];
+            continue;
+        }
+
+        if (argument == "--role" && index + 1 < argc)
+        {
+            options.role = argv[++index];
+            continue;
+        }
+
         if (argument == "--dir" && index + 1 < argc)
         {
             options.rootDirectory = foundation::Path(argv[++index]);
@@ -1454,6 +1466,12 @@ std::optional<InvestigationOpenOptions> parseInvestigationOpenArguments(int argc
             options.showHelp = true;
 
             return options;
+        }
+
+        if (argument == "--artifact" && index + 1 < argc)
+        {
+            options.artifactId = argv[++index];
+            continue;
         }
 
         if (argument == "--dir" && index + 1 < argc)

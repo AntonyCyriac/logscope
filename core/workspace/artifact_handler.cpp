@@ -131,8 +131,108 @@ class NoteArtifactHandler final : public IArtifactHandler
     }
 };
 
+class PstackArtifactHandler final : public IArtifactHandler
+{
+  public:
+    [[nodiscard]] std::string_view type() const override
+    {
+        return "pstack";
+    }
+
+    [[nodiscard]] foundation::Result<ArtifactRecord> ingest(const ArtifactIngestContext& context,
+                                                            const ArtifactIngestRequest& request) const override
+    {
+        if (request.sourceFile.string().empty())
+        {
+            return foundation::Result<ArtifactRecord>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Pstack artifact requires a source file."));
+        }
+
+        const foundation::Path dataPath = foundation::Path(context.artifactDirectory.string() + "/data");
+        const auto copyResult = copyFileTo(request.sourceFile, dataPath);
+
+        if (!copyResult)
+        {
+            return foundation::Result<ArtifactRecord>(copyResult.error());
+        }
+
+        ArtifactRecord record;
+        record.id = context.artifactId.empty() ? foundation::Uuid::generate().toString() : context.artifactId;
+        record.type = std::string(type());
+        record.name = request.name.empty() ? request.sourceFile.filename().string() : request.name;
+        record.relativePath = "artifacts/" + record.id + "/data";
+        record.importedAt = currentTimestampIso();
+        record.source = request.source;
+        record.status = "ready";
+
+        return foundation::Result<ArtifactRecord>(std::move(record));
+    }
+
+    [[nodiscard]] foundation::Result<foundation::Path> resolveDataPath(
+        const foundation::Path& investigationRoot, const ArtifactRecord& artifact) const override
+    {
+        return foundation::Result<foundation::Path>(
+            foundation::Path(investigationRoot.string() + "/" + artifact.relativePath));
+    }
+};
+
+class CoreArtifactHandler final : public IArtifactHandler
+{
+  public:
+    [[nodiscard]] std::string_view type() const override
+    {
+        return "core";
+    }
+
+    [[nodiscard]] foundation::Result<ArtifactRecord> ingest(const ArtifactIngestContext& context,
+                                                            const ArtifactIngestRequest& request) const override
+    {
+        if (request.sourceFile.string().empty())
+        {
+            return foundation::Result<ArtifactRecord>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument, "Core artifact requires a source file."));
+        }
+
+        const foundation::Path dataPath = foundation::Path(context.artifactDirectory.string() + "/data");
+        const auto copyResult = copyFileTo(request.sourceFile, dataPath);
+
+        if (!copyResult)
+        {
+            return foundation::Result<ArtifactRecord>(copyResult.error());
+        }
+
+        std::error_code errorCode;
+        const auto sizeBytes = std::filesystem::file_size(dataPath.string(), errorCode);
+
+        ArtifactRecord record;
+        record.id = context.artifactId.empty() ? foundation::Uuid::generate().toString() : context.artifactId;
+        record.type = std::string(type());
+        record.name = request.name.empty() ? request.sourceFile.filename().string() : request.name;
+        record.relativePath = "artifacts/" + record.id + "/data";
+        record.importedAt = currentTimestampIso();
+        record.source = request.source;
+        record.status = "ready";
+
+        if (!errorCode)
+        {
+            record.metadata["sizeBytes"] = std::to_string(sizeBytes);
+        }
+
+        return foundation::Result<ArtifactRecord>(std::move(record));
+    }
+
+    [[nodiscard]] foundation::Result<foundation::Path> resolveDataPath(
+        const foundation::Path& investigationRoot, const ArtifactRecord& artifact) const override
+    {
+        return foundation::Result<foundation::Path>(
+            foundation::Path(investigationRoot.string() + "/" + artifact.relativePath));
+    }
+};
+
 const LogArtifactHandler kLogHandler;
 const NoteArtifactHandler kNoteHandler;
+const PstackArtifactHandler kPstackHandler;
+const CoreArtifactHandler kCoreHandler;
 
 } // namespace
 
@@ -148,7 +248,22 @@ const IArtifactHandler* findArtifactHandler(const std::string_view type) noexcep
         return &kNoteHandler;
     }
 
+    if (type == "pstack")
+    {
+        return &kPstackHandler;
+    }
+
+    if (type == "core")
+    {
+        return &kCoreHandler;
+    }
+
     return nullptr;
+}
+
+bool artifactTypeSupportsSessionOpen(const std::string_view type) noexcept
+{
+    return type == "log";
 }
 
 } // namespace scope::workspace

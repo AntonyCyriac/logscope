@@ -320,6 +320,47 @@ TEST(CliParserTest, ParsesInvestigationCreateOptions)
     EXPECT_EQ("incident-alpha", parsed->investigationCreate.name);
 }
 
+TEST(CliParserTest, ParsesInvestigationAddTypeAndRole)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string source = "dump.core";
+    std::string typeFlag = "--type";
+    std::string typeValue = "core";
+    std::string roleFlag = "--role";
+    std::string roleValue = "kernel";
+    char* argv[] = {toArgv(program),     toArgv(command),   toArgv(subcommand), toArgv(investigationId),
+                    toArgv(source),      toArgv(typeFlag),  toArgv(typeValue),  toArgv(roleFlag),
+                    toArgv(roleValue)};
+
+    const auto parsed = parseCliArguments(9, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationAdd, parsed->command);
+    EXPECT_EQ("core", parsed->investigationAdd.artifactType);
+    EXPECT_EQ("kernel", parsed->investigationAdd.role);
+}
+
+TEST(CliParserTest, ParsesInvestigationOpenArtifact)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "open";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string artifactFlag = "--artifact";
+    std::string artifactId = "00000000-0000-4000-8000-000000000099";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(artifactFlag), toArgv(artifactId)};
+
+    const auto parsed = parseCliArguments(6, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationOpen, parsed->command);
+    EXPECT_EQ(artifactId, parsed->investigationOpen.artifactId);
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

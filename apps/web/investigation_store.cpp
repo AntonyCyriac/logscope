@@ -327,6 +327,13 @@ foundation::Result<bool> InvestigationStore::remove(const std::string& investiga
 foundation::Result<scope::workspace::ArtifactRecord> InvestigationStore::addLogArtifact(
     const std::string& investigationId, const foundation::Path& sourcePath, const std::string& displayName)
 {
+    return addArtifactFile(investigationId, sourcePath, displayName, "log");
+}
+
+foundation::Result<scope::workspace::ArtifactRecord> InvestigationStore::addArtifactFile(
+    const std::string& investigationId, const foundation::Path& sourcePath, const std::string& displayName,
+    const std::string& type, const std::string& role)
+{
     std::lock_guard<std::mutex> lock(m_mutex);
 
     auto investigationResult = openInvestigation(investigationId);
@@ -339,10 +346,11 @@ foundation::Result<scope::workspace::ArtifactRecord> InvestigationStore::addLogA
     Investigation investigation = std::move(*investigationResult);
 
     ArtifactIngestRequest request;
-    request.type = "log";
+    request.type = type;
     request.name = displayName.empty() ? sourcePath.string() : displayName;
     request.sourceFile = sourcePath;
     request.source = ArtifactSource{"upload", request.name};
+    request.role = role;
 
     const auto artifactResult = investigation.addArtifact(request);
 
@@ -444,7 +452,8 @@ foundation::Result<foundation::Path> InvestigationStore::snapshotPathFor(const s
     return resolveSnapshotPath(investigationId);
 }
 
-foundation::Result<foundation::Path> InvestigationStore::resolveEntryLogPath(const std::string& investigationId) const
+foundation::Result<foundation::Path> InvestigationStore::resolveLogArtifactPath(
+    const std::string& investigationId, const std::string& artifactId) const
 {
     const auto investigationResult = openInvestigation(investigationId);
 
@@ -453,20 +462,17 @@ foundation::Result<foundation::Path> InvestigationStore::resolveEntryLogPath(con
         return foundation::Result<foundation::Path>(investigationResult.error());
     }
 
-    const auto entryArtifactResult = investigationResult->entryArtifact();
-
-    if (!entryArtifactResult)
+    if (artifactId.empty())
     {
-        return foundation::Result<foundation::Path>(entryArtifactResult.error());
+        return investigationResult->entryArtifactDataPath();
     }
 
-    if (entryArtifactResult->type != "log")
-    {
-        return foundation::Result<foundation::Path>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "Entry artifact must be a log in v2.3.0."));
-    }
+    return investigationResult->logArtifactDataPath(artifactId);
+}
 
-    return investigationResult->entryArtifactDataPath();
+foundation::Result<foundation::Path> InvestigationStore::resolveEntryLogPath(const std::string& investigationId) const
+{
+    return resolveLogArtifactPath(investigationId, std::string());
 }
 
 void InvestigationStore::touchUpdatedAt(const std::string& investigationId)

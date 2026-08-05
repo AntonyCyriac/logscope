@@ -58,11 +58,15 @@ namespace scope::web
 
 [[nodiscard]] std::string formatInvestigationList(const InvestigationListResult& list);
 
-[[nodiscard]] std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact);
+[[nodiscard]] std::string formatArtifactRecord(const scope::workspace::ArtifactRecord& artifact,
+                                               const std::string& primaryArtifactId = std::string());
 
 [[nodiscard]] std::string formatInvestigationOpenResult(const std::string& investigationId,
+                                                        const std::string& artifactId,
+                                                        const std::string& artifactType,
                                                         const foundation::Path& sourcePath,
-                                                        const scope::workspace::InvestigationSummary& summary);
+                                                        const scope::workspace::InvestigationSummary& summary,
+                                                        bool loadedFromSnapshot);
 
 [[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
 

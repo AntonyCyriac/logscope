@@ -106,3 +106,88 @@ TEST(InvestigationTest, RoundTripsCreateAddPersistReopen)
     std::remove(logSourceFile.string().c_str());
     removeDirectoryTree(investigationDir);
 }
+
+TEST(InvestigationTest, AddsPstackAndCoreArtifactsAndResolvesLogById)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_investigation_ms"));
+    const Path logSourceFile(logscope::gtest::uniqueTestPath("_app.log"));
+    const Path syslogFile(logscope::gtest::uniqueTestPath("_syslog.log"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack.txt"));
+    const Path coreFile(logscope::gtest::uniqueTestPath("_dump.core"));
+
+    {
+        std::ofstream logStream(logSourceFile.string());
+        logStream << "2026-08-05 ERROR app failed\n";
+        std::ofstream syslogStream(syslogFile.string());
+        syslogStream << "2026-08-05 ERROR kernel oops\n";
+        std::ofstream pstackStream(pstackFile.string());
+        pstackStream << "#0 main ()\n";
+        std::ofstream coreStream(coreFile.string(), std::ios::binary);
+        coreStream << "CORE";
+    }
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "multi-source";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest appLogRequest;
+    appLogRequest.type = "log";
+    appLogRequest.name = "app.log";
+    appLogRequest.sourceFile = logSourceFile;
+    appLogRequest.source = ArtifactSource{"upload", "app.log"};
+    appLogRequest.role = "application";
+
+    const auto appLogResult = investigation.addArtifact(appLogRequest);
+    ASSERT_TRUE(appLogResult.hasValue());
+
+    ArtifactIngestRequest syslogRequest;
+    syslogRequest.type = "log";
+    syslogRequest.name = "syslog";
+    syslogRequest.sourceFile = syslogFile;
+    syslogRequest.source = ArtifactSource{"upload", "syslog"};
+    syslogRequest.role = "system";
+
+    const auto syslogResult = investigation.addArtifact(syslogRequest);
+    ASSERT_TRUE(syslogResult.hasValue());
+    EXPECT_EQ(appLogResult->id, investigation.manifest().primaryArtifactId);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "threads.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "threads.txt"};
+
+    const auto pstackResult = investigation.addArtifact(pstackRequest);
+    ASSERT_TRUE(pstackResult.hasValue());
+    EXPECT_EQ("pstack", pstackResult->type);
+
+    ArtifactIngestRequest coreRequest;
+    coreRequest.type = "core";
+    coreRequest.name = "core.dump";
+    coreRequest.sourceFile = coreFile;
+    coreRequest.source = ArtifactSource{"upload", "core.dump"};
+
+    const auto coreResult = investigation.addArtifact(coreRequest);
+    ASSERT_TRUE(coreResult.hasValue());
+    EXPECT_EQ("core", coreResult->type);
+    EXPECT_FALSE(coreResult->metadata.at("sizeBytes").empty());
+
+    const auto syslogPathResult = investigation.logArtifactDataPath(syslogResult->id);
+    ASSERT_TRUE(syslogPathResult.hasValue());
+    EXPECT_TRUE(std::filesystem::exists(syslogPathResult->string()));
+
+    const auto rejectEntry = investigation.setEntryArtifact(pstackResult->id);
+    EXPECT_FALSE(rejectEntry);
+
+    ASSERT_TRUE(investigation.persist());
+
+    std::remove(logSourceFile.string().c_str());
+    std::remove(syslogFile.string().c_str());
+    std::remove(pstackFile.string().c_str());
+    std::remove(coreFile.string().c_str());
+    removeDirectoryTree(investigationDir);
+}

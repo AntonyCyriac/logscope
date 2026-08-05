@@ -401,10 +401,11 @@ foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(const std::string
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Missing required field: type."));
     }
 
-    if (request.type != "log" && request.type != "note")
+    if (request.type != "log" && request.type != "note" && request.type != "pstack" && request.type != "core")
     {
         return foundation::Result<ArtifactAddRequest>(
-            foundation::Error(foundation::ErrorCode::InvalidArgument, "Artifact type must be log or note."));
+            foundation::Error(foundation::ErrorCode::InvalidArgument,
+                                "Artifact type must be log, note, pstack, or core."));
     }
 
     if (const std::optional<std::string> name = jsonStringField(body, "name"))
@@ -443,6 +444,11 @@ foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(const std::string
         request.displayName = *displayName;
     }
 
+    if (const std::optional<std::string> role = jsonStringField(body, "role"))
+    {
+        request.role = *role;
+    }
+
     if (request.type == "note" && request.name.empty())
     {
         return foundation::Result<ArtifactAddRequest>(
@@ -455,7 +461,25 @@ foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(const std::string
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Log source path is required."));
     }
 
+    if ((request.type == "pstack" || request.type == "core") && request.sourcePath.empty())
+    {
+        return foundation::Result<ArtifactAddRequest>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Source path is required for pstack and core artifacts."));
+    }
+
     return foundation::Result<ArtifactAddRequest>(std::move(request));
+}
+
+InvestigationOpenRequest parseInvestigationOpenRequest(const std::string_view body)
+{
+    InvestigationOpenRequest request;
+
+    if (const std::optional<std::string> artifactId = jsonStringField(body, "artifactId"))
+    {
+        request.artifactId = *artifactId;
+    }
+
+    return request;
 }
 
 InvestigationUpdateRequest parseInvestigationUpdateRequest(const std::string_view body)

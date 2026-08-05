@@ -110,6 +110,61 @@ TEST(InvestigationStoreTest, AddLogAndNoteArtifacts)
     std::filesystem::remove(logSource);
 }
 
+TEST(InvestigationStoreTest, AddPstackArtifactAndResolveSpecificLogPath)
+{
+    const std::filesystem::path root =
+        std::filesystem::temp_directory_path() / "logscope-investigation-store-pstack";
+    std::filesystem::remove_all(root);
+
+    const std::filesystem::path appLog =
+        std::filesystem::temp_directory_path() / "logscope-investigation-app.log";
+    const std::filesystem::path syslog =
+        std::filesystem::temp_directory_path() / "logscope-investigation-syslog.log";
+    const std::filesystem::path pstackSource =
+        std::filesystem::temp_directory_path() / "logscope-investigation-pstack.txt";
+
+    {
+        std::ofstream appStream(appLog);
+        appStream << "2026-08-05 ERROR app failed\n";
+        std::ofstream syslogStream(syslog);
+        syslogStream << "2026-08-05 ERROR kernel oops\n";
+        std::ofstream pstackStream(pstackSource);
+        pstackStream << "#0 main ()\n";
+    }
+
+    scope::web::InvestigationStore store(testConfig(root));
+
+    const auto created = store.create("multi-source", "story2");
+    ASSERT_TRUE(created);
+
+    const auto appArtifact =
+        store.addLogArtifact(created->id, scope::foundation::Path(appLog.string()), "app.log");
+    ASSERT_TRUE(appArtifact);
+
+    const auto syslogArtifact = store.addArtifactFile(created->id, scope::foundation::Path(syslog.string()),
+                                                      "syslog", "log", "system");
+    ASSERT_TRUE(syslogArtifact);
+
+    const auto pstackArtifact = store.addArtifactFile(created->id, scope::foundation::Path(pstackSource.string()),
+                                                      "threads.txt", "pstack");
+    ASSERT_TRUE(pstackArtifact);
+    EXPECT_EQ("pstack", pstackArtifact->type);
+
+    const auto manifest = store.get(created->id);
+    ASSERT_TRUE(manifest);
+    EXPECT_EQ(3U, manifest->artifacts.size());
+    EXPECT_EQ(appArtifact->id, manifest->primaryArtifactId);
+
+    const auto syslogPath = store.resolveLogArtifactPath(created->id, syslogArtifact->id);
+    ASSERT_TRUE(syslogPath);
+    EXPECT_TRUE(std::filesystem::exists(syslogPath->string()));
+
+    std::filesystem::remove_all(root);
+    std::filesystem::remove(appLog);
+    std::filesystem::remove(syslog);
+    std::filesystem::remove(pstackSource);
+}
+
 TEST(InvestigationStoreTest, RejectsInvalidInvestigationId)
 {
     const std::filesystem::path root =

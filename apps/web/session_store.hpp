@@ -26,6 +26,8 @@ struct WorkspaceSession
     std::unique_ptr<application::ApplicationService> service;
     mutable std::mutex mutex;
     std::string tempUploadPath;
+    std::string boundInvestigationId;
+    std::string activeArtifactId;
 };
 
 /**

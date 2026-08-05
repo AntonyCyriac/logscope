@@ -181,6 +181,8 @@ struct InvestigationAddOptions
     std::string investigationId;
     foundation::Path logFile;
     std::string displayName;
+    std::string artifactType;
+    std::string role;
     foundation::Path rootDirectory = foundation::Path("workspaces");
     bool showHelp = false;
 };
@@ -210,6 +212,7 @@ struct InvestigationShowOptions
 struct InvestigationOpenOptions
 {
     std::string investigationId;
+    std::string artifactId;
     foundation::Path rootDirectory = foundation::Path("workspaces");
     bool showHelp = false;
 };

@@ -38,6 +38,34 @@ Path investigationDirectory(const Path& rootDirectory, const std::string& invest
     return Path(rootDirectory.string() + "/" + investigationId);
 }
 
+std::string inferArtifactType(const std::string& explicitType, const Path& sourceFile)
+{
+    if (!explicitType.empty())
+    {
+        return explicitType;
+    }
+
+    const std::string filename = sourceFile.filename().string();
+    const std::size_t dot = filename.rfind('.');
+
+    if (dot != std::string::npos)
+    {
+        const std::string extension = filename.substr(dot);
+
+        if (extension == ".core")
+        {
+            return "core";
+        }
+
+        if (extension == ".pstack")
+        {
+            return "pstack";
+        }
+    }
+
+    return "log";
+}
+
 void printManifestSummary(const scope::workspace::InvestigationManifest& manifest, std::ostream& output)
 {
     output << "id: " << manifest.id << '\n'
@@ -63,10 +91,13 @@ void printInvestigationCreateUsage(std::ostream& output)
 
 void printInvestigationAddUsage(std::ostream& output)
 {
-    output << "Usage: logscope investigation add <investigation-id> <log-source> [--display-name <name>] [--dir <root>]\n"
+    output << "Usage: logscope investigation add <investigation-id> <source> [--type log|pstack|core] "
+              "[--display-name <name>] [--role <string>] [--dir <root>]\n"
            << "\n"
            << "Options:\n"
-           << "  --display-name <name> Display name for the imported log\n"
+           << "  --type <type>         Artifact type (default: infer from extension, else log)\n"
+           << "  --display-name <name> Display name for the imported file\n"
+           << "  --role <string>       Optional metadata role (e.g. application, system)\n"
            << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
            << "  --help, -h            Show this help message\n";
 }
@@ -102,11 +133,12 @@ void printInvestigationShowUsage(std::ostream& output)
 
 void printInvestigationOpenUsage(std::ostream& output)
 {
-    output << "Usage: logscope investigation open <investigation-id> [--dir <root>]\n"
+    output << "Usage: logscope investigation open <investigation-id> [--artifact <id>] [--dir <root>]\n"
            << "\n"
-           << "Prints the entry log artifact path for the investigation.\n"
+           << "Prints the resolved path for a log artifact (entry artifact by default).\n"
            << "\n"
            << "Options:\n"
+           << "  --artifact <id>       Open a specific log artifact instead of the entry artifact\n"
            << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
            << "  --help, -h            Show this help message\n";
 }
@@ -196,11 +228,21 @@ int runInvestigationAddCommand(const InvestigationAddOptions& options,
 
     Investigation investigation = std::move(*investigationResult);
 
+    const std::string artifactType = inferArtifactType(options.artifactType, options.logFile);
+
+    if (artifactType != "log" && artifactType != "pstack" && artifactType != "core")
+    {
+        errorOutput << "Unsupported artifact type: " << artifactType << '\n';
+
+        return 1;
+    }
+
     ArtifactIngestRequest request;
-    request.type = "log";
+    request.type = artifactType;
     request.name = options.displayName.empty() ? options.logFile.string() : options.displayName;
     request.sourceFile = options.logFile;
     request.source = ArtifactSource{"upload", request.name};
+    request.role = options.role;
 
     const auto artifactResult = investigation.addArtifact(request);
 
@@ -368,7 +410,25 @@ int runInvestigationShowCommand(const InvestigationShowOptions& options,
 
     for (const auto& artifact : manifest.artifacts)
     {
-        output << "  - " << artifact.id << " (" << artifact.type << ") " << artifact.name << '\n';
+        const bool isEntry = artifact.id == manifest.primaryArtifactId;
+        output << "  - " << artifact.id << " (" << artifact.type << ")";
+
+        if (isEntry)
+        {
+            output << " [entry]";
+        }
+
+        if (!artifact.metadata.empty())
+        {
+            const auto roleIterator = artifact.metadata.find("role");
+
+            if (roleIterator != artifact.metadata.end())
+            {
+                output << " role=" << roleIterator->second;
+            }
+        }
+
+        output << ' ' << artifact.name << '\n';
     }
 
     return 0;
@@ -402,7 +462,9 @@ int runInvestigationOpenCommand(const InvestigationOpenOptions& options,
         return 1;
     }
 
-    const auto entryArtifactResult = investigationResult->entryArtifact();
+    const auto entryArtifactResult = options.artifactId.empty()
+                                         ? investigationResult->entryArtifact()
+                                         : investigationResult->artifactById(options.artifactId);
 
     if (!entryArtifactResult)
     {
@@ -415,7 +477,9 @@ int runInvestigationOpenCommand(const InvestigationOpenOptions& options,
 
     if (entryArtifactResult->type == "log")
     {
-        const auto dataPathResult = investigationResult->entryArtifactDataPath();
+        const auto dataPathResult = options.artifactId.empty()
+                                        ? investigationResult->entryArtifactDataPath()
+                                        : investigationResult->logArtifactDataPath(options.artifactId);
 
         if (!dataPathResult)
         {
