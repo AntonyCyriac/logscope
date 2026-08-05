@@ -1502,6 +1502,119 @@ std::optional<InvestigationOpenOptions> parseInvestigationOpenArguments(int argc
     return options;
 }
 
+std::optional<InvestigationTimelineFormat> parseInvestigationTimelineFormat(const std::string& value)
+{
+    if (value == "json" || value == "JSON")
+    {
+        return InvestigationTimelineFormat::Json;
+    }
+
+    if (value == "table" || value == "TABLE")
+    {
+        return InvestigationTimelineFormat::Table;
+    }
+
+    return std::nullopt;
+}
+
+std::optional<scope::workspace::TimelineSortOrder> parseTimelineSortOrder(const std::string& value)
+{
+    if (value == "asc" || value == "ASC")
+    {
+        return scope::workspace::TimelineSortOrder::Ascending;
+    }
+
+    if (value == "desc" || value == "DESC")
+    {
+        return scope::workspace::TimelineSortOrder::Descending;
+    }
+
+    return std::nullopt;
+}
+
+std::optional<InvestigationTimelineOptions> parseInvestigationTimelineArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationTimelineOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--format" && index + 1 < argc)
+        {
+            const auto format = parseInvestigationTimelineFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+            continue;
+        }
+
+        if (argument == "--limit" && index + 1 < argc)
+        {
+            try
+            {
+                options.limit = static_cast<std::size_t>(std::stoull(argv[++index]));
+            }
+            catch (...)
+            {
+                return std::nullopt;
+            }
+
+            continue;
+        }
+
+        if (argument == "--order" && index + 1 < argc)
+        {
+            const auto order = parseTimelineSortOrder(argv[++index]);
+
+            if (!order)
+            {
+                return std::nullopt;
+            }
+
+            options.order = *order;
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1631,6 +1744,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::InvestigationOpen;
             parsed.investigationOpen.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "timeline")
+        {
+            parsed.command = CliCommand::InvestigationTimeline;
+            parsed.investigationTimeline.showHelp = true;
 
             return parsed;
         }
@@ -1944,6 +2065,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::InvestigationOpen;
             parsed.investigationOpen = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "timeline")
+        {
+            const auto options = parseInvestigationTimelineArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationTimeline;
+            parsed.investigationTimeline = *options;
 
             return parsed;
         }

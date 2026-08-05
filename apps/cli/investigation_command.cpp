@@ -7,6 +7,7 @@
 
 #include "foundation/uuid.hpp"
 #include "output_format.hpp"
+#include "timeline_event.hpp"
 #include "workspace.hpp"
 
 #include <filesystem>
@@ -25,6 +26,9 @@ using scope::workspace::ArtifactIngestRequest;
 using scope::workspace::ArtifactSource;
 using scope::workspace::Investigation;
 using scope::workspace::InvestigationCreateRequest;
+using scope::workspace::TimelineEvent;
+using scope::workspace::TimelineProjectionOptions;
+using scope::workspace::TimelineProjectionResult;
 
 bool isValidInvestigationId(const std::string& investigationId)
 {
@@ -74,6 +78,197 @@ void printManifestSummary(const scope::workspace::InvestigationManifest& manifes
            << "updatedAt: " << manifest.updatedAt << '\n'
            << "artifacts: " << manifest.artifacts.size() << '\n'
            << "primaryArtifactId: " << manifest.primaryArtifactId << '\n';
+}
+
+std::string escapeJsonString(const std::string& value)
+{
+    std::string escaped;
+    escaped.reserve(value.size());
+
+    for (const char character : value)
+    {
+        switch (character)
+        {
+        case '"':
+            escaped += "\\\"";
+            break;
+        case '\\':
+            escaped += "\\\\";
+            break;
+        case '\n':
+            escaped += "\\n";
+            break;
+        case '\r':
+            escaped += "\\r";
+            break;
+        case '\t':
+            escaped += "\\t";
+            break;
+        default:
+            escaped.push_back(character);
+            break;
+        }
+    }
+
+    return escaped;
+}
+
+std::string formatEventSourceJson(const scope::workspace::EventSource& source)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"artifactId\": \"" << escapeJsonString(source.artifactId) << "\",\n"
+           << "  \"artifactType\": \"" << escapeJsonString(source.artifactType) << "\",\n"
+           << "  \"artifactName\": \"" << escapeJsonString(source.artifactName) << "\"";
+
+    if (source.lineNumber.has_value())
+    {
+        output << ",\n  \"lineNumber\": " << *source.lineNumber;
+    }
+
+    if (source.byteOffset.has_value())
+    {
+        output << ",\n  \"byteOffset\": " << *source.byteOffset;
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatStringMapJson(const std::map<std::string, std::string>& values)
+{
+    std::ostringstream output;
+    output << '{';
+
+    bool first = true;
+
+    for (const auto& [key, value] : values)
+    {
+        if (!first)
+        {
+            output << ',';
+        }
+
+        first = false;
+        output << "\n    \"" << escapeJsonString(key) << "\": \"" << escapeJsonString(value) << '"';
+    }
+
+    if (!values.empty())
+    {
+        output << '\n';
+    }
+
+    output << "  }";
+
+    return output.str();
+}
+
+std::string formatTimelineEventJson(const TimelineEvent& event)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(event.id) << "\",\n"
+           << "  \"timestamp\": \"" << escapeJsonString(event.timestamp) << "\",\n"
+           << "  \"artifactId\": \"" << escapeJsonString(event.artifactId) << "\",\n"
+           << "  \"eventType\": \"" << escapeJsonString(event.eventType) << "\",\n"
+           << "  \"message\": \"" << escapeJsonString(event.message) << "\",\n"
+           << "  \"source\": " << formatEventSourceJson(event.source) << ",\n"
+           << "  \"metadata\": " << formatStringMapJson(event.metadata);
+
+    if (event.severity.has_value())
+    {
+        output << ",\n  \"severity\": \"" << escapeJsonString(*event.severity) << '"';
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatInvestigationTimelineJson(const std::string& investigationId, const TimelineProjectionResult& result)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"events\": [";
+
+    for (std::size_t index = 0U; index < result.events.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    " << formatTimelineEventJson(result.events[index]);
+    }
+
+    output << "\n  ],\n"
+           << "  \"pagination\": {\n"
+           << "    \"truncated\": " << (result.truncated ? "true" : "false");
+
+    if (result.totalMatched.has_value())
+    {
+        output << ",\n    \"totalMatched\": " << *result.totalMatched;
+    }
+
+    output << "\n  },\n"
+           << "  \"warnings\": [";
+
+    for (std::size_t index = 0U; index < result.warnings.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(result.warnings[index]) << '"';
+    }
+
+    output << "\n  ]\n}";
+
+    return output.str();
+}
+
+std::string formatTimelineSourceLabel(const scope::workspace::EventSource& source)
+{
+    std::ostringstream output;
+    output << source.artifactName;
+
+    if (source.lineNumber.has_value())
+    {
+        output << ':' << *source.lineNumber;
+    }
+
+    return output.str();
+}
+
+void printInvestigationTimelineTable(const TimelineProjectionResult& result, std::ostream& output)
+{
+    output << "timestamp\teventType\tsource\tmessage\n";
+
+    for (const TimelineEvent& event : result.events)
+    {
+        output << event.timestamp << '\t' << event.eventType << '\t' << formatTimelineSourceLabel(event.source) << '\t'
+               << event.message << '\n';
+    }
+
+    if (result.truncated)
+    {
+        output << "\n(truncated";
+
+        if (result.totalMatched.has_value())
+        {
+            output << ", total matched: " << *result.totalMatched;
+        }
+
+        output << ")\n";
+    }
+
+    for (const std::string& warning : result.warnings)
+    {
+        output << "warning: " << warning << '\n';
+    }
 }
 
 } // namespace
@@ -139,6 +334,19 @@ void printInvestigationOpenUsage(std::ostream& output)
            << "\n"
            << "Options:\n"
            << "  --artifact <id>       Open a specific log artifact instead of the entry artifact\n"
+           << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
+           << "  --help, -h            Show this help message\n";
+}
+
+void printInvestigationTimelineUsage(std::ostream& output)
+{
+    output << "Usage: logscope investigation timeline <investigation-id> [--format json|table] [--limit N] "
+              "[--order asc|desc] [--dir <root>]\n"
+           << "\n"
+           << "Options:\n"
+           << "  --format <format>     Output format: table or json (default: table)\n"
+           << "  --limit <N>           Maximum number of timeline events to return\n"
+           << "  --order <order>       Sort order: asc or desc (default: asc)\n"
            << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
            << "  --help, -h            Show this help message\n";
 }
@@ -489,6 +697,63 @@ int runInvestigationOpenCommand(const InvestigationOpenOptions& options,
         }
 
         output << dataPathResult->string() << '\n';
+    }
+
+    return 0;
+}
+
+int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
+                                    std::ostream& output,
+                                    std::ostream& errorOutput)
+{
+    if (options.showHelp)
+    {
+        printInvestigationTimelineUsage(output);
+
+        return 0;
+    }
+
+    if (!isValidInvestigationId(options.investigationId))
+    {
+        errorOutput << "Invalid investigation id.\n";
+
+        return 1;
+    }
+
+    const Path investigationDir = investigationDirectory(options.rootDirectory, options.investigationId);
+    const auto investigationResult = Investigation::open(investigationDir);
+
+    if (!investigationResult)
+    {
+        errorOutput << investigationResult.error().message() << '\n';
+
+        return 1;
+    }
+
+    TimelineProjectionOptions projectionOptions;
+    projectionOptions.order = options.order;
+
+    if (options.limit.has_value())
+    {
+        projectionOptions.limit = *options.limit;
+    }
+
+    const auto timelineResult = investigationResult->projectTimeline(projectionOptions);
+
+    if (!timelineResult)
+    {
+        errorOutput << timelineResult.error().message() << '\n';
+
+        return 1;
+    }
+
+    if (options.format == InvestigationTimelineFormat::Json)
+    {
+        output << formatInvestigationTimelineJson(options.investigationId, *timelineResult) << '\n';
+    }
+    else
+    {
+        printInvestigationTimelineTable(*timelineResult, output);
     }
 
     return 0;

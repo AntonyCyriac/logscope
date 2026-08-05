@@ -13,16 +13,22 @@
 #include "investigation_command.hpp"
 #include "workspace.hpp"
 
+using scope::cli::InvestigationAddNoteOptions;
 using scope::cli::InvestigationAddOptions;
 using scope::cli::InvestigationCreateOptions;
 using scope::cli::InvestigationOpenOptions;
 using scope::cli::InvestigationShowOptions;
+using scope::cli::InvestigationTimelineFormat;
+using scope::cli::InvestigationTimelineOptions;
 using scope::cli::runInvestigationAddCommand;
+using scope::cli::runInvestigationAddNoteCommand;
 using scope::cli::runInvestigationCreateCommand;
 using scope::cli::runInvestigationOpenCommand;
 using scope::cli::runInvestigationShowCommand;
+using scope::cli::runInvestigationTimelineCommand;
 using scope::foundation::Path;
 using scope::workspace::Investigation;
+using scope::workspace::TimelineSortOrder;
 
 namespace
 {
@@ -293,6 +299,87 @@ TEST_F(InvestigationCommandTest, ShowMarksEntryAndRole)
     EXPECT_NE(std::string::npos, showOutput.str().find("[entry]"));
     EXPECT_NE(std::string::npos, showOutput.str().find("role=application"));
     EXPECT_NE(std::string::npos, showOutput.str().find("(log)"));
+
+    std::filesystem::remove(appLog.string());
+}
+
+TEST_F(InvestigationCommandTest, TimelineTableOutputIncludesEvents)
+{
+    const Path appLog = writeSourceFile("_app.log", "2026-08-05T09:15:00 ERROR first event\n");
+
+    InvestigationAddOptions addApp;
+    addApp.investigationId = m_investigationId;
+    addApp.logFile = appLog;
+    addApp.displayName = "app.log";
+    addApp.rootDirectory = m_root;
+
+    std::ostringstream addOutput;
+    std::ostringstream addError;
+
+    ASSERT_EQ(0, runInvestigationAddCommand(addApp, addOutput, addError));
+
+    InvestigationAddNoteOptions addNote;
+    addNote.investigationId = m_investigationId;
+    addNote.title = "timeline";
+    addNote.body = "operator note";
+    addNote.rootDirectory = m_root;
+
+    addOutput.str("");
+    addOutput.clear();
+    addError.str("");
+    addError.clear();
+
+    ASSERT_EQ(0, runInvestigationAddNoteCommand(addNote, addOutput, addError));
+
+    InvestigationTimelineOptions timelineOptions;
+    timelineOptions.investigationId = m_investigationId;
+    timelineOptions.rootDirectory = m_root;
+
+    std::ostringstream timelineOutput;
+    std::ostringstream timelineError;
+
+    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, timelineOutput, timelineError));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("timestamp\teventType\tsource\tmessage"));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("log.line"));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("first event"));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("note.created"));
+
+    std::filesystem::remove(appLog.string());
+}
+
+TEST_F(InvestigationCommandTest, TimelineJsonOutputAndLimit)
+{
+    const Path appLog = writeSourceFile("_app.log",
+                                        "2026-08-05T09:15:00 ERROR first event\n"
+                                        "2026-08-05T09:16:00 ERROR second event\n");
+
+    InvestigationAddOptions addApp;
+    addApp.investigationId = m_investigationId;
+    addApp.logFile = appLog;
+    addApp.displayName = "app.log";
+    addApp.rootDirectory = m_root;
+
+    std::ostringstream addOutput;
+    std::ostringstream addError;
+
+    ASSERT_EQ(0, runInvestigationAddCommand(addApp, addOutput, addError));
+
+    InvestigationTimelineOptions timelineOptions;
+    timelineOptions.investigationId = m_investigationId;
+    timelineOptions.rootDirectory = m_root;
+    timelineOptions.format = InvestigationTimelineFormat::Json;
+    timelineOptions.limit = 1U;
+    timelineOptions.order = TimelineSortOrder::Descending;
+
+    std::ostringstream timelineOutput;
+    std::ostringstream timelineError;
+
+    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, timelineOutput, timelineError));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("\"investigationId\": \"" + m_investigationId + '"'));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("\"eventType\": \"log.line\""));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("\"truncated\": true"));
+    EXPECT_NE(std::string::npos, timelineOutput.str().find("second event"));
+    EXPECT_EQ(std::string::npos, timelineOutput.str().find("first event"));
 
     std::filesystem::remove(appLog.string());
 }
