@@ -1,5 +1,6 @@
 add_executable(scope_workspace_tests
     investigation_test.cpp
+    investigation_timeline_test.cpp
     session_store_test.cpp
     session_serializer_malformed_test.cpp
 )

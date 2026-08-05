@@ -10,3 +10,5 @@
 #include "investigation_session.hpp"
 #include "session_serializer.hpp"
 #include "session_store.hpp"
+#include "timeline_event.hpp"
+#include "timeline_projector.hpp"
