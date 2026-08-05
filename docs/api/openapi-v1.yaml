@@ -8,6 +8,7 @@ info:
     v2.2.1: optional `web.health_requires_api_key`; stale sessions return 401 SESSION_EXPIRED.
     v2.3.0: `/api/v1/investigations` (Story 1); `/api/v1/workspaces` remains alias (M15.3 compat).
     v2.4.0: multi-artifact open (`artifactId`), `pstack`/`core` types, session active artifact (Story 2).
+    v2.5.0: investigation timeline projection `GET .../investigations/{id}/timeline` (Story 3).
 servers:
   - url: http://127.0.0.1:8080
     description: Default loopback bind
@@ -246,6 +247,42 @@ paths:
           description: Investigation loaded into session
         '409':
           description: Artifact not openable or invalid state
+  /api/v1/investigations/{id}/timeline:
+    get:
+      tags: [investigations]
+      summary: Project chronological timeline events from investigation artifacts
+      description: |
+        Returns merged timeline events (logs, notes, attached markers) in chronological order.
+        Query `order=desc` for newest-first. Undated log lines are omitted.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+        - name: offset
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+        - name: order
+          in: query
+          required: false
+          schema:
+            type: string
+            enum: [asc, desc]
+      responses:
+        '200':
+          description: Timeline projection with events, pagination, and warnings
+        '404':
+          description: Investigation not found
   /api/v1/workspaces:
     get:
       tags: [workspaces]

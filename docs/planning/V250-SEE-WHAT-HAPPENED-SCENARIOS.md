@@ -43,13 +43,13 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| TL.1 | Multi-artifact events | `GET .../timeline` after app + syslog + note | Events from **all** artifacts | I | ⬜ |
-| TL.2 | Chronological order | `order=asc` | Oldest event first | U+I | ⬜ |
-| TL.3 | Stable event id | Same investigation, two requests | Same `id` for same logical event | U | ⬜ |
-| TL.4 | Log line events | App log with timestamps | `eventType=log.line`, parsed timestamp | U+I | ⬜ |
-| TL.5 | Note event | Note artifact | `note.created` at `importedAt` | U | ⬜ |
-| TL.6 | Core marker | Core artifact | `artifact.attached` marker, no analysis | U | ⬜ |
-| TL.7 | Pagination | Large log + `limit=50` | `truncated: true`, max 50 events | I | ⬜ |
+| TL.1 | Multi-artifact events | `GET .../timeline` after app + syslog + note | Events from **all** artifacts | I | ✅ |
+| TL.2 | Chronological order | `order=asc` | Oldest event first | U+I | ✅ |
+| TL.3 | Stable event id | Same investigation, two requests | Same `id` for same logical event | U | ✅ |
+| TL.4 | Log line events | App log with timestamps | `eventType=log.line`, parsed timestamp | U+I | ✅ |
+| TL.5 | Note event | Note artifact | `note.created` at `importedAt` | U | ✅ |
+| TL.6 | Core marker | Core artifact | `artifact.attached` marker, no analysis | U | ✅ |
+| TL.7 | Pagination | Large log + `limit=50` | `truncated: true`, max 50 events | I | ✅ |
 
 ---
 
@@ -58,7 +58,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
 | NV.1 | Jump to artifact | Click timeline event (web) | Opens source artifact in workbench | B | ⬜ |
-| NV.2 | Line hint | Log line event | `source.lineNumber` present | I | ⬜ |
+| NV.2 | Line hint | Log line event | `source.lineNumber` present | I | ✅ |
 
 ---
 
@@ -66,7 +66,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| IA.1 | Timeline GET | `GET .../investigations/{id}/timeline` | 200, `events[]` domain JSON | I | ⬜ |
+| IA.1 | Timeline GET | `GET .../investigations/{id}/timeline` | 200, `events[]` domain JSON | I | ✅ |
 | IA.2 | Not found | Unknown investigation id | **404** | I | ⬜ |
 | IA.3 | No correlation | Timeline response | No ID-grouping or relationship fields | U | ⬜ |
 
@@ -76,8 +76,8 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| CL.1 | Timeline command | `investigation timeline <id>` | Human table output | U | ⬜ |
-| CL.2 | JSON parity | `--format json` | Matches REST event fields | P | ⬜ |
+| CL.1 | Timeline command | `investigation timeline <id>` | Human table output | U | ✅ |
+| CL.2 | JSON parity | `--format json` | Matches REST event fields | P | 🟡 |
 
 ---
 
