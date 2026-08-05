@@ -4,6 +4,7 @@
 
 #include "investigation_store.hpp"
 
+#include "investigation_manifest_io.hpp"
 #include "timeline_event.hpp"
 #include "timeline_projector.hpp"
 
