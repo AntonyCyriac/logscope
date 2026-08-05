@@ -361,6 +361,92 @@ TEST(CliParserTest, ParsesInvestigationOpenArtifact)
     EXPECT_EQ(artifactId, parsed->investigationOpen.artifactId);
 }
 
+TEST(CliParserTest, ParsesInvestigationAddPstackType)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string source = "threads.pstack";
+    std::string typeFlag = "--type";
+    std::string typeValue = "pstack";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(source), toArgv(typeFlag), toArgv(typeValue)};
+
+    const auto parsed = parseCliArguments(7, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationAdd, parsed->command);
+    EXPECT_EQ("pstack", parsed->investigationAdd.artifactType);
+    EXPECT_EQ("threads.pstack", parsed->investigationAdd.logFile.string());
+}
+
+TEST(CliParserTest, ParsesInvestigationAddDisplayNameAndDir)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string source = "syslog.log";
+    std::string displayFlag = "--display-name";
+    std::string displayValue = "syslog";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/tmp/workspaces";
+    char* argv[] = {toArgv(program),     toArgv(command),   toArgv(subcommand), toArgv(investigationId),
+                    toArgv(source),      toArgv(displayFlag), toArgv(displayValue), toArgv(dirFlag),
+                    toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(9, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ("syslog", parsed->investigationAdd.displayName);
+    EXPECT_EQ("/tmp/workspaces", parsed->investigationAdd.rootDirectory.string());
+}
+
+TEST(CliParserTest, ParsesInvestigationOpenDir)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "open";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/tmp/workspaces";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(dirFlag), toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(6, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationOpen, parsed->command);
+    EXPECT_EQ("/tmp/workspaces", parsed->investigationOpen.rootDirectory.string());
+    EXPECT_TRUE(parsed->investigationOpen.artifactId.empty());
+}
+
+TEST(CliParserTest, RejectsInvestigationAddWithUnknownOption)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    std::string source = "app.log";
+    std::string unknownFlag = "--unknown";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(source), toArgv(unknownFlag)};
+
+    EXPECT_FALSE(parseCliArguments(6, argv));
+}
+
+TEST(CliParserTest, RejectsInvestigationAddMissingSource)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add";
+    std::string investigationId = "00000000-0000-4000-8000-000000000001";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId)};
+
+    EXPECT_FALSE(parseCliArguments(4, argv));
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

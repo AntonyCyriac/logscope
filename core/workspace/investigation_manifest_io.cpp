@@ -33,6 +33,12 @@ std::string_view skipWhitespace(std::string_view value)
     return value;
 }
 
+std::string escapeJsonString(const std::string_view value);
+
+std::map<std::string, std::string> parseStringMap(const std::string& body);
+
+std::string formatStringMapJson(const std::map<std::string, std::string>& values);
+
 std::optional<std::string> jsonStringField(const std::string_view body, const std::string_view key)
 {
     const std::size_t keyPosition = body.find('"' + std::string(key) + '"');
@@ -462,7 +468,107 @@ ArtifactRecord parseArtifactRecord(const std::string& object)
 
     record.tags = extractJsonStringArray(object, "tags");
 
+    const std::optional<std::string> metadataObject = extractJsonObject(object, "metadata");
+
+    if (metadataObject)
+    {
+        record.metadata = parseStringMap(*metadataObject);
+    }
+
     return record;
+}
+
+std::map<std::string, std::string> parseStringMap(const std::string& body)
+{
+    std::map<std::string, std::string> values;
+    std::size_t index = 0U;
+
+    while (index < body.size())
+    {
+        const std::size_t keyQuote = body.find('"', index);
+
+        if (keyQuote == std::string::npos)
+        {
+            break;
+        }
+
+        std::size_t cursor = keyQuote + 1U;
+        std::string key;
+
+        while (cursor < body.size())
+        {
+            const char character = body[cursor];
+
+            if (character == '\\' && cursor + 1U < body.size())
+            {
+                key.push_back(body[cursor + 1U]);
+                cursor += 2U;
+
+                continue;
+            }
+
+            if (character == '"')
+            {
+                ++cursor;
+
+                break;
+            }
+
+            key.push_back(character);
+            ++cursor;
+        }
+
+        cursor = body.find(':', cursor);
+
+        if (cursor == std::string::npos)
+        {
+            break;
+        }
+
+        ++cursor;
+
+        while (cursor < body.size() && std::isspace(static_cast<unsigned char>(body[cursor])) != 0)
+        {
+            ++cursor;
+        }
+
+        if (cursor >= body.size() || body[cursor] != '"')
+        {
+            index = cursor;
+            continue;
+        }
+
+        ++cursor;
+        std::string value;
+
+        while (cursor < body.size())
+        {
+            const char character = body[cursor];
+
+            if (character == '\\' && cursor + 1U < body.size())
+            {
+                value.push_back(body[cursor + 1U]);
+                cursor += 2U;
+
+                continue;
+            }
+
+            if (character == '"')
+            {
+                ++cursor;
+
+                break;
+            }
+
+            value.push_back(character);
+            ++cursor;
+        }
+
+        values.emplace(std::move(key), std::move(value));
+        index = cursor;
+    }
+
+    return values;
 }
 
 std::string escapeJsonString(const std::string_view value)
@@ -493,6 +599,34 @@ std::string escapeJsonString(const std::string_view value)
             break;
         }
     }
+
+    return output.str();
+}
+
+std::string formatStringMapJson(const std::map<std::string, std::string>& values)
+{
+    std::ostringstream output;
+    output << '{';
+    bool first = true;
+
+    for (const auto& entry : values)
+    {
+        if (!first)
+        {
+            output << ',';
+        }
+
+        first = false;
+        output << "\n        \"" << escapeJsonString(entry.first) << "\": \""
+               << escapeJsonString(entry.second) << '"';
+    }
+
+    if (!first)
+    {
+        output << '\n';
+    }
+
+    output << "      }";
 
     return output.str();
 }
@@ -540,7 +674,7 @@ std::string formatArtifactRecordJson(const ArtifactRecord& record)
            << "      \"source\": " << formatArtifactSourceJson(record.source) << ",\n"
            << "      \"status\": \"" << escapeJsonString(record.status) << "\",\n"
            << "      \"tags\": " << formatStringArrayJson(record.tags) << ",\n"
-           << "      \"metadata\": {}\n"
+           << "      \"metadata\": " << formatStringMapJson(record.metadata) << "\n"
            << "    }";
 
     return output.str();
