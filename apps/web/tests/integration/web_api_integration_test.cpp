@@ -436,6 +436,82 @@ TEST_F(WebApiIntegrationTest, InvestigationSwitchLogArtifact)
     EXPECT_EQ(200, investigateResult->status);
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationGetShowsIsEntryAndArtifactRole)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+    const std::string syslogPath = sourcePath("samples/sample.jsonl");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"metadata-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::size_t idPos = createResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, idPos);
+    const std::size_t idStart = idPos + 7U;
+    const std::size_t idEnd = createResult->body.find('"', idStart);
+    const std::string investigationId = createResult->body.substr(idStart, idEnd - idStart);
+
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath +
+                                 "\", \"name\": \"app.log\", \"role\": \"application\"}",
+                             "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"log\", \"sourcePath\": \"" + syslogPath +
+                                 "\", \"name\": \"syslog\", \"role\": \"system\"}",
+                             "application/json"));
+
+    const httplib::Result getResult = client->Get("/api/v1/investigations/" + investigationId, headers);
+    ASSERT_TRUE(getResult);
+    EXPECT_EQ(200, getResult->status);
+    EXPECT_NE(std::string::npos, getResult->body.find("\"role\": \"application\""));
+    EXPECT_NE(std::string::npos, getResult->body.find("\"role\": \"system\""));
+    EXPECT_NE(std::string::npos, getResult->body.find("\"isEntry\": true"));
+    EXPECT_NE(std::string::npos, getResult->body.find("\"isEntry\": false"));
+}
+
+TEST_F(WebApiIntegrationTest, InvestigationOpenPstackArtifactReturns409)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string pstackPath = sourcePath("samples/sample.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"pstack-open-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::size_t idPos = createResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, idPos);
+    const std::size_t idStart = idPos + 7U;
+    const std::size_t idEnd = createResult->body.find('"', idStart);
+    const std::string investigationId = createResult->body.substr(idStart, idEnd - idStart);
+
+    const httplib::Result addPstackResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"pstack\", \"sourcePath\": \"" + pstackPath + "\", \"name\": \"threads.txt\"}",
+        "application/json");
+    ASSERT_TRUE(addPstackResult);
+    EXPECT_EQ(200, addPstackResult->status);
+
+    const std::size_t artifactPos = addPstackResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, artifactPos);
+    const std::size_t artifactStart = artifactPos + 7U;
+    const std::size_t artifactEnd = addPstackResult->body.find('"', artifactStart);
+    const std::string pstackArtifactId = addPstackResult->body.substr(artifactStart, artifactEnd - artifactStart);
+
+    const std::string openBody = "{\"artifactId\": \"" + pstackArtifactId + "\"}";
+    const httplib::Result openResult =
+        client->Post("/api/v1/investigations/" + investigationId + "/open", headers, openBody, "application/json");
+    ASSERT_TRUE(openResult);
+    EXPECT_EQ(409, openResult->status);
+    EXPECT_NE(std::string::npos, openResult->body.find("ARTIFACT_NOT_OPENABLE"));
+}
+
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
     const std::string sessionId = createSession();

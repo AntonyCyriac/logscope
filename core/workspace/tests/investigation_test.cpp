@@ -185,6 +185,14 @@ TEST(InvestigationTest, AddsPstackAndCoreArtifactsAndResolvesLogById)
 
     ASSERT_TRUE(investigation.persist());
 
+    const auto reopenResult = Investigation::open(investigationDir);
+
+    ASSERT_TRUE(reopenResult.hasValue());
+    ASSERT_EQ(4U, reopenResult->manifest().artifacts.size());
+    EXPECT_EQ("application", reopenResult->manifest().artifacts.front().metadata.at("role"));
+    EXPECT_EQ("system", reopenResult->manifest().artifacts[1].metadata.at("role"));
+    EXPECT_FALSE(reopenResult->manifest().artifacts.back().metadata.at("sizeBytes").empty());
+
     std::remove(logSourceFile.string().c_str());
     std::remove(syslogFile.string().c_str());
     std::remove(pstackFile.string().c_str());
