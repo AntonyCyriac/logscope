@@ -320,6 +320,87 @@ TEST(CliParserTest, ParsesInvestigationCreateOptions)
     EXPECT_EQ("incident-alpha", parsed->investigationCreate.name);
 }
 
+TEST(CliParserTest, ParsesInvestigationCreateDescriptionAndDir)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "create";
+    std::string nameFlag = "--name";
+    std::string nameValue = "incident-beta";
+    std::string descriptionFlag = "--description";
+    std::string descriptionValue = "customer outage";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/tmp/workspaces";
+    char* argv[] = {toArgv(program),       toArgv(command),       toArgv(subcommand), toArgv(nameFlag),
+                    toArgv(nameValue),       toArgv(descriptionFlag), toArgv(descriptionValue), toArgv(dirFlag),
+                    toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(9, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationCreate, parsed->command);
+    EXPECT_EQ("incident-beta", parsed->investigationCreate.name);
+    EXPECT_EQ("customer outage", parsed->investigationCreate.description);
+    EXPECT_EQ("/tmp/workspaces", parsed->investigationCreate.rootDirectory.string());
+}
+
+TEST(CliParserTest, ParsesInvestigationAddNoteOptions)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "add-note";
+    std::string investigationId = "00000000-0000-4000-8000-000000000002";
+    std::string titleFlag = "--title";
+    std::string titleValue = "timeline";
+    std::string bodyFlag = "--body";
+    std::string bodyValue = "first failure at 09:15";
+    char* argv[] = {toArgv(program),     toArgv(command),   toArgv(subcommand), toArgv(investigationId),
+                    toArgv(titleFlag),   toArgv(titleValue), toArgv(bodyFlag),   toArgv(bodyValue)};
+
+    const auto parsed = parseCliArguments(8, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationAddNote, parsed->command);
+    EXPECT_EQ(investigationId, parsed->investigationAddNote.investigationId);
+    EXPECT_EQ("timeline", parsed->investigationAddNote.title);
+    EXPECT_EQ("first failure at 09:15", parsed->investigationAddNote.body);
+}
+
+TEST(CliParserTest, ParsesInvestigationListWithDir)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "list";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/var/logscope/workspaces";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(dirFlag), toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationList, parsed->command);
+    EXPECT_EQ("/var/logscope/workspaces", parsed->investigationList.rootDirectory.string());
+}
+
+TEST(CliParserTest, ParsesInvestigationShowWithDir)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "show";
+    std::string investigationId = "00000000-0000-4000-8000-000000000003";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/var/logscope/workspaces";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(dirFlag),   toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(6, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationShow, parsed->command);
+    EXPECT_EQ(investigationId, parsed->investigationShow.investigationId);
+    EXPECT_EQ("/var/logscope/workspaces", parsed->investigationShow.rootDirectory.string());
+}
+
 TEST(CliParserTest, ParsesInvestigationAddTypeAndRole)
 {
     std::string program = "logscope";

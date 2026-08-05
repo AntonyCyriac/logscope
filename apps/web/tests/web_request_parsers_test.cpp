@@ -30,3 +30,58 @@ TEST(WebRequestParsersTest, AcceptsPathUnderConfiguredRoot)
 
     EXPECT_TRUE(result);
 }
+
+TEST(WebRequestParsersTest, ParsesInvestigationCreateRequest)
+{
+    const scope::web::InvestigationCreateBody request =
+        scope::web::parseInvestigationCreateRequest(R"({"name":"incident","description":"outage","captureSession":true})");
+
+    EXPECT_EQ("incident", request.name);
+    EXPECT_EQ("outage", request.description);
+    EXPECT_TRUE(request.captureSession);
+}
+
+TEST(WebRequestParsersTest, ParsesArtifactAddRequestForPstackWithRole)
+{
+    const auto request = scope::web::parseArtifactAddRequest(
+        R"({"type":"pstack","sourcePath":"/tmp/threads.txt","name":"threads","role":"application"})");
+
+    ASSERT_TRUE(request);
+    EXPECT_EQ("pstack", request->type);
+    EXPECT_EQ("/tmp/threads.txt", request->sourcePath);
+    EXPECT_EQ("threads", request->name);
+    EXPECT_EQ("application", request->role);
+}
+
+TEST(WebRequestParsersTest, ParsesArtifactAddRequestForCore)
+{
+    const auto request = scope::web::parseArtifactAddRequest(
+        R"({"type":"core","sourcePath":"/tmp/dump.core","name":"core.dump"})");
+
+    ASSERT_TRUE(request);
+    EXPECT_EQ("core", request->type);
+    EXPECT_EQ("/tmp/dump.core", request->sourcePath);
+}
+
+TEST(WebRequestParsersTest, RejectsArtifactAddRequestWithoutPstackSourcePath)
+{
+    const auto request = scope::web::parseArtifactAddRequest(R"({"type":"pstack","name":"threads"})");
+
+    ASSERT_FALSE(request);
+    EXPECT_EQ(scope::foundation::ErrorCode::InvalidArgument, request.error().code());
+}
+
+TEST(WebRequestParsersTest, ParsesInvestigationOpenRequestWithArtifactId)
+{
+    const scope::web::InvestigationOpenRequest request = scope::web::parseInvestigationOpenRequest(
+        R"({"artifactId":"00000000-0000-4000-8000-000000000099"})");
+
+    EXPECT_EQ("00000000-0000-4000-8000-000000000099", request.artifactId);
+}
+
+TEST(WebRequestParsersTest, ParsesInvestigationOpenRequestEmptyBody)
+{
+    const scope::web::InvestigationOpenRequest request = scope::web::parseInvestigationOpenRequest("{}");
+
+    EXPECT_TRUE(request.artifactId.empty());
+}
