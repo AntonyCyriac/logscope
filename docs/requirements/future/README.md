@@ -4,7 +4,7 @@
 |-------|-------|
 | Category | Requirements (Future) |
 | Status | Vision / not committed for near-term implementation |
-| Last Updated | 30-07-2026 |
+| Last Updated | 05-08-2026 |
 
 ---
 
@@ -35,7 +35,7 @@ Optional extended process docs may live in a private strategy repository (not li
 | **Coding assistant (today)** | Bootstrap for any AI IDE helping contributors | [AGENTS.md](../../AGENTS.md), [PROJECT_CONTEXT.md](../../handbook/PROJECT_CONTEXT.md) |
 | **Product (future)** | Runtime agents invoked by users (`logscope agent …`, investigation AI) | PRD-001; delivery via M13+ |
 
-Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) and [Project Context](../../handbook/PROJECT_CONTEXT.md) (`v2.2.2` security patch, then investigation stories from `v2.3.0`).
+Do not treat PRD-001 as an implementation checklist for the next milestone. Near-term public work is defined in [ROADMAP.md](../../ROADMAP.md) and [Project Context](../../handbook/PROJECT_CONTEXT.md) (**`v2.4.0`** Story 2 Understand Everything).
 
 ---
 
