@@ -46,7 +46,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | MS.3 | Add core | `POST .../artifacts` type `core` | Binary stored; `metadata.sizeBytes` set | U | ✅ |
 | MS.4 | Artifact list | `GET .../investigations/{id}` | `isEntry`, `metadata.role` on artifacts | I | ✅ |
 | MS.5 | Switch log | `POST .../open` with non-entry `artifactId` | `loadedFromSnapshot: false`; analyze works | I+P | ✅ |
-| MS.6 | Reject non-log open | `POST .../open` with pstack id | **409** `ARTIFACT_NOT_OPENABLE` | I | 🟡 |
+| MS.6 | Reject non-log open | `POST .../open` with pstack id | **409** `ARTIFACT_NOT_OPENABLE` | I | ✅ |
 | MS.7 | Snapshot discipline | Open entry after save; switch log; reopen entry | Snapshot only on entry/default open | I | ✅ |
 | MS.8 | Optional role | Add log with `role: system` | `metadata.role` in manifest | U+I | ✅ |
 

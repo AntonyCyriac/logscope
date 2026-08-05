@@ -66,7 +66,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.4.0`](CHANGELOG.md) — Story 2: Understand Everything.
+**Current release:** [`v2.4.1`](CHANGELOG.md) — Story 2 hotfix (artifact metadata). Feature baseline: `v2.4.0` — Understand Everything.
 
 **Next:** **`v2.5.0`** — Story 3: See What Happened (timeline). See [Project Context](handbook/PROJECT_CONTEXT.md).
 

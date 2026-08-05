@@ -29,7 +29,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.4.0` (shipped) — **Story 2: Understand Everything** — multi-artifact investigations, active log switch, `pstack`/`core` storage, REST/CLI/SPA artifact index. Builds on Story 1 (`v2.3.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
+**Current release:** `v2.4.1` (shipped) — **Story 2 hotfix** — artifact metadata persistence ([#119](https://github.com/AntonyCyriac/logscope/issues/119)). Baseline feature release: `v2.4.0` — **Story 2: Understand Everything** — multi-artifact investigations, active log switch, `pstack`/`core` storage, REST/CLI/SPA artifact index. Builds on Story 1 (`v2.3.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
 **Next release:** **`v2.5.0`** — **Story 3: See What Happened** — unified timeline. Broader horizon: [Roadmap](../ROADMAP.md).
 

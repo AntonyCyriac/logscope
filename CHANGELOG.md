@@ -12,6 +12,22 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.4.1] - 2026-08-05
+
+**Hotfix** — artifact metadata persistence regression ([#119](https://github.com/AntonyCyriac/logscope/issues/119)).
+
+### Fixed
+
+- **`manifest.json` metadata** — `artifacts[].metadata` (e.g. `role`, `sizeBytes`) now round-trips on save/load ([#120](https://github.com/AntonyCyriac/logscope/pull/120))
+
+### Added
+
+- Regression tests: manifest metadata I/O, CLI investigation commands, web integration (MS.6 409 on pstack open, GET `isEntry`/`metadata.role`)
+
+See [v2.4.1 release notes](docs/release/v2.4.1-RELEASE-NOTES.md).
+
+---
+
 ## [2.4.0] - 2026-08-05
 
 **Story 2** — Understand Everything (multi-artifact investigations, active log switch, `pstack`/`core` storage).
