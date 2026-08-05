@@ -68,6 +68,9 @@ namespace scope::web
                                                         const scope::workspace::InvestigationSummary& summary,
                                                         bool loadedFromSnapshot);
 
+[[nodiscard]] std::string formatInvestigationTimeline(const std::string& investigationId,
+                                                      const scope::workspace::TimelineProjectionResult& result);
+
 [[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
 
 [[nodiscard]] std::string formatAnalyzeJobAccepted(const AnalyzeJobEnqueueResult& job);

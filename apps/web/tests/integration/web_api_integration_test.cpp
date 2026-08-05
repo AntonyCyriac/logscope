@@ -473,6 +473,39 @@ TEST_F(WebApiIntegrationTest, InvestigationGetShowsIsEntryAndArtifactRole)
     EXPECT_NE(std::string::npos, getResult->body.find("\"isEntry\": false"));
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationTimelineReturnsChronologicalEvents)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"timeline-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::size_t idPos = createResult->body.find("\"id\": \"");
+    ASSERT_NE(std::string::npos, idPos);
+    const std::size_t idStart = idPos + 7U;
+    const std::size_t idEnd = createResult->body.find('"', idStart);
+    const std::string investigationId = createResult->body.substr(idStart, idEnd - idStart);
+
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath +
+                                 "\", \"name\": \"app.log\", \"role\": \"application\"}",
+                             "application/json"));
+
+    const httplib::Result timelineResult =
+        client->Get("/api/v1/investigations/" + investigationId + "/timeline?limit=3", headers);
+    ASSERT_TRUE(timelineResult);
+    EXPECT_EQ(200, timelineResult->status);
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"eventType\": \"log.line\""));
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"lineNumber\":"));
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"pagination\""));
+    EXPECT_NE(std::string::npos, timelineResult->body.find(investigationId));
+}
+
 TEST_F(WebApiIntegrationTest, InvestigationOpenPstackArtifactReturns409)
 {
     const std::string sessionId = createSession();

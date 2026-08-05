@@ -85,3 +85,13 @@ TEST(WebRequestParsersTest, ParsesInvestigationOpenRequestEmptyBody)
 
     EXPECT_TRUE(request.artifactId.empty());
 }
+
+TEST(WebRequestParsersTest, ParsesInvestigationTimelineQueryParameters)
+{
+    const scope::web::InvestigationTimelineQuery query =
+        scope::web::parseInvestigationTimelineQuery("25", "5", "desc");
+
+    EXPECT_EQ(25U, query.options.limit);
+    EXPECT_EQ(5U, query.options.offset);
+    EXPECT_EQ(scope::workspace::TimelineSortOrder::Descending, query.options.order);
+}

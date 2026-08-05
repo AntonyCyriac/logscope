@@ -1467,6 +1467,49 @@ void WebServer::registerRoutes()
                       response.set_header(kSessionHeader, sessionId);
                   });
 
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/timeline)",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const std::string limitValue = request.has_param("limit") ? request.get_param_value("limit") : "";
+                      const std::string offsetValue =
+                          request.has_param("offset") ? request.get_param_value("offset") : "";
+                      const std::string orderValue = request.has_param("order") ? request.get_param_value("order") : "";
+                      const InvestigationTimelineQuery timelineQuery =
+                          parseInvestigationTimelineQuery(limitValue, offsetValue, orderValue);
+                      const auto timelineResult = m_workspaceStore.investigationStore().projectTimeline(
+                          investigationId, timelineQuery.options);
+
+                      if (!timelineResult)
+                      {
+                          setErrorResponse(response, timelineResult.error());
+
+                          return;
+                      }
+
+                      setJsonResponse(response, 200,
+                                      successEnvelope(formatInvestigationTimeline(investigationId, *timelineResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
     m_server->Put(R"(/api/v1/investigations/([^/]+))",
                 [this](const httplib::Request& request, httplib::Response& response) {
                     if (!authorizeApiKey(m_config.apiKey, request, response))

@@ -15,6 +15,7 @@
 #include "foundation/result.hpp"
 #include "investigation_criteria.hpp"
 #include "investigation_store.hpp"
+#include "timeline_event.hpp"
 #include "report_options.hpp"
 #include "web_config.hpp"
 #include "workspace_store.hpp"
@@ -86,6 +87,18 @@ struct InvestigationOpenRequest
 };
 
 [[nodiscard]] InvestigationOpenRequest parseInvestigationOpenRequest(std::string_view body);
+
+/**
+ * @brief Parsed query parameters for GET /api/v1/investigations/{id}/timeline.
+ */
+struct InvestigationTimelineQuery
+{
+    scope::workspace::TimelineProjectionOptions options;
+};
+
+[[nodiscard]] InvestigationTimelineQuery parseInvestigationTimelineQuery(std::string_view limitValue,
+                                                                         std::string_view offsetValue,
+                                                                         std::string_view orderValue);
 
 [[nodiscard]] foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(std::string_view body);
 

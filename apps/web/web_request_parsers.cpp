@@ -482,6 +482,42 @@ InvestigationOpenRequest parseInvestigationOpenRequest(const std::string_view bo
     return request;
 }
 
+InvestigationTimelineQuery parseInvestigationTimelineQuery(const std::string_view limitValue,
+                                                           const std::string_view offsetValue,
+                                                           const std::string_view orderValue)
+{
+    InvestigationTimelineQuery query;
+
+    if (!limitValue.empty())
+    {
+        try
+        {
+            query.options.limit = static_cast<std::size_t>(std::stoull(std::string(limitValue)));
+        }
+        catch (...)
+        {
+        }
+    }
+
+    if (!offsetValue.empty())
+    {
+        try
+        {
+            query.options.offset = static_cast<std::size_t>(std::stoull(std::string(offsetValue)));
+        }
+        catch (...)
+        {
+        }
+    }
+
+    if (orderValue == "desc" || orderValue == "DESC")
+    {
+        query.options.order = scope::workspace::TimelineSortOrder::Descending;
+    }
+
+    return query;
+}
+
 InvestigationUpdateRequest parseInvestigationUpdateRequest(const std::string_view body)
 {
     InvestigationUpdateRequest request;
