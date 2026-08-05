@@ -97,3 +97,33 @@ th {
   margin: 0;
   padding-left: 1.25rem;
 }
+
+.timeline-empty {
+  margin: 0 0 0.75rem;
+  color: #666;
+}
+
+.timeline-warnings {
+  margin: 0 0 0.75rem;
+  color: #a60;
+  font-size: 0.9rem;
+}
+
+.timeline-table tbody tr.timeline-event--clickable {
+  cursor: pointer;
+}
+
+.timeline-table tbody tr.timeline-event--clickable:hover,
+.timeline-table tbody tr.timeline-event--clickable:focus {
+  background: #4488aa33;
+  outline: none;
+}
+
+.timeline-table tbody tr.timeline-event--active {
+  background: #4488aa55;
+}
+
+#resultsTable tbody tr.results-row--highlight {
+  background: #ffeb3b66;
+  font-weight: 600;
+}

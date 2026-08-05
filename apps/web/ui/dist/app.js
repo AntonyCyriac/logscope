@@ -7,7 +7,14 @@
     activeInvestigationId: null,
     activeArtifactId: null,
     tailTimer: null,
+    timelineEvents: [],
+    timelineOffset: 0,
+    timelineTruncated: false,
+    highlightLineNumber: null,
+    activeTimelineEventId: null,
   };
+
+  const TIMELINE_PAGE_SIZE = 100;
 
   const statusEl = document.getElementById('status');
   const summaryEl = document.getElementById('summary');
@@ -35,6 +42,11 @@
   const pstackInput = document.getElementById('pstackInput');
   const tailStartBtn = document.getElementById('tailStartBtn');
   const tailStopBtn = document.getElementById('tailStopBtn');
+  const timelineList = document.getElementById('timelineList');
+  const timelineEmpty = document.getElementById('timelineEmpty');
+  const timelineWarnings = document.getElementById('timelineWarnings');
+  const timelineTable = document.getElementById('timelineTable');
+  const timelineLoadMoreBtn = document.getElementById('timelineLoadMoreBtn');
 
   function setStatus(text) {
     statusEl.textContent = text;
@@ -128,12 +140,141 @@
     });
   }
 
-  function renderInvestigation(payload) {
+  function renderTimelineList(events) {
+    timelineList.innerHTML = '';
+
+    events.forEach(function (event) {
+      const row = document.createElement('tr');
+      row.className = 'timeline-event timeline-event--clickable';
+
+      if (event.id && event.id === state.activeTimelineEventId) {
+        row.classList.add('timeline-event--active');
+      }
+
+      row.innerHTML = '<td>' + escapeHtml(event.timestamp || '') + '</td>'
+        + '<td>' + escapeHtml(event.eventType || '') + '</td>'
+        + '<td>' + escapeHtml((event.source && event.source.artifactName) || '') + '</td>'
+        + '<td>' + escapeHtml(event.message || '') + '</td>';
+
+      row.addEventListener('click', function () {
+        jumpToTimelineEvent(event).catch(function (error) {
+          setStatus('Jump error: ' + error.message);
+        });
+      });
+
+      row.addEventListener('keydown', function (keyEvent) {
+        if (keyEvent.key === 'Enter' || keyEvent.key === ' ') {
+          keyEvent.preventDefault();
+          jumpToTimelineEvent(event).catch(function (error) {
+            setStatus('Jump error: ' + error.message);
+          });
+        }
+      });
+
+      timelineList.appendChild(row);
+    });
+  }
+
+  async function refreshTimeline(append) {
+    timelineList.innerHTML = '';
+    timelineWarnings.textContent = '';
+    timelineWarnings.hidden = true;
+    timelineLoadMoreBtn.hidden = true;
+
+    if (!state.activeInvestigationId) {
+      timelineEmpty.textContent = 'Select an investigation to view its timeline.';
+      timelineEmpty.hidden = false;
+      timelineTable.hidden = true;
+      state.timelineEvents = [];
+      state.timelineOffset = 0;
+      state.timelineTruncated = false;
+      return;
+    }
+
+    const offset = append ? state.timelineOffset : 0;
+    const path = '/api/v1/investigations/' + state.activeInvestigationId
+      + '/timeline?limit=' + TIMELINE_PAGE_SIZE + '&offset=' + offset + '&order=asc';
+
+    const response = await api(path);
+
+    if (!response.ok) {
+      timelineEmpty.textContent = 'Could not load timeline.';
+      timelineEmpty.hidden = false;
+      timelineTable.hidden = true;
+      return;
+    }
+
+    const payload = await response.json();
+    const data = payload.data || payload;
+    const events = data.events || [];
+
+    if (!append) {
+      state.timelineEvents = events;
+      state.timelineOffset = events.length;
+    } else {
+      state.timelineEvents = state.timelineEvents.concat(events);
+      state.timelineOffset += events.length;
+    }
+
+    state.timelineTruncated = !!(data.pagination && data.pagination.truncated);
+    renderTimelineList(state.timelineEvents);
+
+    if (state.timelineEvents.length === 0) {
+      timelineEmpty.textContent = 'No timeline events yet. Add timestamped logs or notes.';
+      timelineEmpty.hidden = false;
+      timelineTable.hidden = true;
+    } else {
+      timelineEmpty.hidden = true;
+      timelineTable.hidden = false;
+    }
+
+    if (data.warnings && data.warnings.length > 0) {
+      timelineWarnings.textContent = data.warnings.join('; ');
+      timelineWarnings.hidden = false;
+    }
+
+    timelineLoadMoreBtn.hidden = !state.timelineTruncated;
+  }
+
+  async function jumpToTimelineEvent(event) {
+    if (!state.activeInvestigationId || !event) {
+      return;
+    }
+
+    state.activeTimelineEventId = event.id || null;
+    renderTimelineList(state.timelineEvents);
+
+    const source = event.source || {};
+    const artifactType = source.artifactType || '';
+    const artifactId = source.artifactId || event.artifactId;
+
+    if (artifactType === 'log' && artifactId) {
+      await openInvestigation(state.activeInvestigationId, artifactId, { skipTimelineRefresh: true });
+      state.highlightLineNumber = source.lineNumber != null ? Number(source.lineNumber) : null;
+
+      if (state.analyzed) {
+        const payload = await apiJson('/api/v1/investigate', {});
+        renderInvestigation(payload, state.highlightLineNumber);
+      }
+
+      setStatus('Opened ' + (source.artifactName || 'log')
+        + (source.lineNumber != null ? ' at line ' + source.lineNumber : ''));
+      return;
+    }
+
+    setStatus((event.message || event.eventType || 'Event')
+      + ' — ' + (source.artifactName || artifactType || 'artifact'));
+  }
+
+  function renderInvestigation(payload, highlightLineNumber) {
     const investigation = payload.investigation || payload.data || payload;
     const lines = investigation.matchingLines || [];
     const count = investigation.matchingLineCount != null
       ? investigation.matchingLineCount
       : lines.length;
+    const lineToHighlight = highlightLineNumber != null
+      ? highlightLineNumber
+      : state.highlightLineNumber;
 
     summaryEl.textContent = JSON.stringify({
       matchingLineCount: count,
@@ -142,13 +283,26 @@
     }, null, 2);
 
     tableBody.innerHTML = '';
+    let highlightedRow = null;
+
     lines.slice(0, 200).forEach(function (line) {
       const row = document.createElement('tr');
+      const lineNumber = line.lineNumber != null ? Number(line.lineNumber) : null;
+
+      if (lineToHighlight != null && lineNumber === Number(lineToHighlight)) {
+        row.classList.add('results-row--highlight');
+        highlightedRow = row;
+      }
+
       row.innerHTML = '<td>' + (line.lineNumber || '') + '</td>'
         + '<td>' + (line.level || '') + '</td>'
         + '<td>' + escapeHtml(line.message || line.content || '') + '</td>';
       tableBody.appendChild(row);
     });
+
+    if (highlightedRow) {
+      highlightedRow.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    }
   }
 
   function escapeHtml(value) {
@@ -206,7 +360,8 @@
     });
   }
 
-  async function openInvestigation(investigationId, artifactId) {
+  async function openInvestigation(investigationId, artifactId, options) {
+    const opts = options || {};
     const body = artifactId ? { artifactId: artifactId } : {};
     const payload = await apiJson('/api/v1/investigations/' + investigationId + '/open', body, 'POST');
     state.activeInvestigationId = investigationId;
@@ -218,6 +373,11 @@
     setInvestigationActionsEnabled(true);
     summaryEl.textContent = JSON.stringify(payload.data || payload, null, 2);
     await refreshArtifactList();
+
+    if (!opts.skipTimelineRefresh) {
+      await refreshTimeline(false);
+    }
+
     setStatus('Opened investigation ' + investigationId);
   }
 
@@ -240,6 +400,7 @@
     setInvestigationActionsEnabled(!!state.activeInvestigationId);
     await refreshInvestigations();
     await refreshArtifactList();
+    await refreshTimeline(false);
     setStatus('Created investigation ' + name);
   }
 
@@ -263,6 +424,7 @@
     });
     await refreshInvestigations();
     await refreshArtifactList();
+    await refreshTimeline(false);
     setStatus('Added log artifact');
   }
 
@@ -285,6 +447,7 @@
     });
     await refreshInvestigations();
     await refreshArtifactList();
+    await refreshTimeline(false);
     setStatus('Added note artifact');
   }
 
@@ -307,6 +470,7 @@
     });
     await refreshInvestigations();
     await refreshArtifactList();
+    await refreshTimeline(false);
     setStatus('Added pstack artifact');
   }
 
@@ -558,6 +722,12 @@
   tailStopBtn.addEventListener('click', function () {
     stopTail().catch(function (error) {
       setStatus('Tail stop error: ' + error.message);
+    });
+  });
+
+  timelineLoadMoreBtn.addEventListener('click', function () {
+    refreshTimeline(true).catch(function (error) {
+      setStatus('Timeline error: ' + error.message);
     });
   });
 
