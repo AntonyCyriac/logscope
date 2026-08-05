@@ -528,6 +528,50 @@ TEST(CliParserTest, RejectsInvestigationAddMissingSource)
     EXPECT_FALSE(parseCliArguments(4, argv));
 }
 
+TEST(CliParserTest, ParsesInvestigationTimelineOptions)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "timeline";
+    std::string investigationId = "00000000-0000-4000-8000-000000000004";
+    std::string formatFlag = "--format";
+    std::string formatValue = "json";
+    std::string limitFlag = "--limit";
+    std::string limitValue = "25";
+    std::string orderFlag = "--order";
+    std::string orderValue = "desc";
+    std::string dirFlag = "--dir";
+    std::string dirValue = "/tmp/workspaces";
+    char* argv[] = {toArgv(program),     toArgv(command),   toArgv(subcommand), toArgv(investigationId),
+                    toArgv(formatFlag),  toArgv(formatValue), toArgv(limitFlag), toArgv(limitValue),
+                    toArgv(orderFlag),   toArgv(orderValue), toArgv(dirFlag), toArgv(dirValue)};
+
+    const auto parsed = parseCliArguments(12, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationTimeline, parsed->command);
+    EXPECT_EQ(investigationId, parsed->investigationTimeline.investigationId);
+    EXPECT_EQ(scope::cli::InvestigationTimelineFormat::Json, parsed->investigationTimeline.format);
+    ASSERT_TRUE(parsed->investigationTimeline.limit.has_value());
+    EXPECT_EQ(25U, *parsed->investigationTimeline.limit);
+    EXPECT_EQ(scope::workspace::TimelineSortOrder::Descending, parsed->investigationTimeline.order);
+    EXPECT_EQ("/tmp/workspaces", parsed->investigationTimeline.rootDirectory.string());
+}
+
+TEST(CliParserTest, RejectsInvestigationTimelineInvalidFormat)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "timeline";
+    std::string investigationId = "00000000-0000-4000-8000-000000000004";
+    std::string formatFlag = "--format";
+    std::string formatValue = "xml";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(investigationId),
+                    toArgv(formatFlag), toArgv(formatValue)};
+
+    EXPECT_FALSE(parseCliArguments(6, argv));
+}
+
 TEST(CliParserTest, RejectsInvalidOption)
 {
     std::string program = "logscope";

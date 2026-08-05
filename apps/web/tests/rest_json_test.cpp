@@ -60,3 +60,33 @@ TEST(RestJsonTest, FormatInvestigationOpenResultIncludesStory2Fields)
     EXPECT_NE(std::string::npos, json.find("\"artifactType\": \"log\""));
     EXPECT_NE(std::string::npos, json.find("\"loadedFromSnapshot\": false"));
 }
+
+TEST(RestJsonTest, FormatInvestigationTimelineIncludesEventsAndPagination)
+{
+    scope::workspace::TimelineEvent event;
+    event.id = "event-1";
+    event.timestamp = "2026-08-01T10:00:00";
+    event.artifactId = "artifact-1";
+    event.eventType = "log.line";
+    event.message = "service started";
+    event.source.artifactId = "artifact-1";
+    event.source.artifactType = "log";
+    event.source.artifactName = "app.log";
+    event.source.lineNumber = 1U;
+
+    scope::workspace::TimelineProjectionResult result;
+    result.events.push_back(std::move(event));
+    result.truncated = true;
+    result.totalMatched = 42U;
+    result.warnings.push_back("artifact cap reached");
+
+    const std::string json =
+        scope::web::formatInvestigationTimeline("investigation-id", result);
+
+    EXPECT_NE(std::string::npos, json.find("\"investigationId\": \"investigation-id\""));
+    EXPECT_NE(std::string::npos, json.find("\"eventType\": \"log.line\""));
+    EXPECT_NE(std::string::npos, json.find("\"lineNumber\": 1"));
+    EXPECT_NE(std::string::npos, json.find("\"truncated\": true"));
+    EXPECT_NE(std::string::npos, json.find("\"totalMatched\": 42"));
+    EXPECT_NE(std::string::npos, json.find("artifact cap reached"));
+}

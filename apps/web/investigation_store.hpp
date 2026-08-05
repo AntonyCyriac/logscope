@@ -85,6 +85,9 @@ class InvestigationStore
     [[nodiscard]] foundation::Result<foundation::Path> resolveLogArtifactPath(const std::string& investigationId,
                                                                               const std::string& artifactId) const;
 
+    [[nodiscard]] foundation::Result<scope::workspace::TimelineProjectionResult> projectTimeline(
+        const std::string& investigationId, scope::workspace::TimelineProjectionOptions options = {}) const;
+
     void touchUpdatedAt(const std::string& investigationId);
 
     void updateSummaryFromService(const std::string& investigationId,

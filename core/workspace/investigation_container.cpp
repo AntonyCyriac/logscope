@@ -7,6 +7,7 @@
 
 #include "artifact_handler.hpp"
 #include "investigation_manifest_io.hpp"
+#include "timeline_projector.hpp"
 
 #include "foundation/clock.hpp"
 #include "foundation/uuid.hpp"
@@ -362,6 +363,11 @@ foundation::Result<bool> Investigation::updateSummary(const InvestigationSummary
 foundation::Result<bool> Investigation::persist()
 {
     return saveManifest(m_rootDirectory, m_manifest);
+}
+
+foundation::Result<TimelineProjectionResult> Investigation::projectTimeline(TimelineProjectionOptions options) const
+{
+    return TimelineProjector::project(m_rootDirectory, m_manifest, options);
 }
 
 foundation::Result<bool> Investigation::ensureArtifactUnderRoot(const foundation::Path& path) const

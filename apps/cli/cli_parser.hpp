@@ -13,6 +13,7 @@
 
 #include "foundation/path.hpp"
 #include "investigation_criteria.hpp"
+#include "timeline_event.hpp"
 #include "log_format.hpp"
 #include "output_format.hpp"
 #include "report_section.hpp"
@@ -45,6 +46,7 @@ enum class CliCommand
     InvestigationList,
     InvestigationShow,
     InvestigationOpen,
+    InvestigationTimeline,
     AgentHelp,
     AgentInvestigate
 };
@@ -217,6 +219,22 @@ struct InvestigationOpenOptions
     bool showHelp = false;
 };
 
+enum class InvestigationTimelineFormat
+{
+    Table,
+    Json
+};
+
+struct InvestigationTimelineOptions
+{
+    std::string investigationId;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    InvestigationTimelineFormat format = InvestigationTimelineFormat::Table;
+    std::optional<std::size_t> limit;
+    scope::workspace::TimelineSortOrder order = scope::workspace::TimelineSortOrder::Ascending;
+    bool showHelp = false;
+};
+
 /**
  * @brief Parsed CLI invocation.
  */
@@ -240,6 +258,7 @@ struct ParsedCli
     InvestigationListOptions investigationList;
     InvestigationShowOptions investigationShow;
     InvestigationOpenOptions investigationOpen;
+    InvestigationTimelineOptions investigationTimeline;
     AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
 };

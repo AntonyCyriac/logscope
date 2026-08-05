@@ -11,6 +11,7 @@
 #include "artifact_record.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
+#include "timeline_event.hpp"
 
 namespace scope::workspace
 {
@@ -60,6 +61,12 @@ class Investigation
     [[nodiscard]] foundation::Result<bool> updateSummary(const InvestigationSummary& summary);
 
     [[nodiscard]] foundation::Result<bool> persist();
+
+    /**
+     * @brief Projects a chronological timeline from all artifacts (Story 3).
+     */
+    [[nodiscard]] foundation::Result<TimelineProjectionResult> projectTimeline(
+        TimelineProjectionOptions options = {}) const;
 
   private:
     Investigation(foundation::Path investigationDir, InvestigationManifest manifest);

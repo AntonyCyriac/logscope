@@ -5,6 +5,8 @@
 #include "investigation_store.hpp"
 
 #include "investigation_manifest_io.hpp"
+#include "timeline_event.hpp"
+#include "timeline_projector.hpp"
 
 #include "foundation/uuid.hpp"
 
@@ -502,6 +504,27 @@ void InvestigationStore::touchUpdatedAt(const std::string& investigationId)
     {
         return;
     }
+}
+
+foundation::Result<scope::workspace::TimelineProjectionResult> InvestigationStore::projectTimeline(
+    const std::string& investigationId, scope::workspace::TimelineProjectionOptions options) const
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<scope::workspace::TimelineProjectionResult>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::TimelineProjectionResult>(investigationResult.error());
+    }
+
+    return investigationResult->projectTimeline(options);
 }
 
 void InvestigationStore::updateSummaryFromService(const std::string& investigationId,

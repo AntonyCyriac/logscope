@@ -179,3 +179,50 @@ TEST(InvestigationStoreTest, RejectsInvalidInvestigationId)
 
     std::filesystem::remove_all(root);
 }
+
+TEST(InvestigationStoreTest, ProjectTimelineReturnsChronologicalLogEvents)
+{
+    const std::filesystem::path root =
+        std::filesystem::temp_directory_path() / "logscope-investigation-store-timeline";
+    std::filesystem::remove_all(root);
+
+    const std::filesystem::path logSource =
+        std::filesystem::temp_directory_path() / "logscope-investigation-timeline.log";
+
+    {
+        std::ofstream stream(logSource);
+        stream << "2026-08-01T10:00:00 first event\n";
+        stream << "2026-08-01T10:00:05 second event\n";
+    }
+
+    scope::web::InvestigationStore store(testConfig(root));
+
+    const auto created = store.create("timeline-test", "timeline");
+    ASSERT_TRUE(created);
+
+    const auto logArtifact =
+        store.addLogArtifact(created->id, scope::foundation::Path(logSource.string()), "app.log");
+    ASSERT_TRUE(logArtifact);
+
+    const auto noteArtifact = store.addNoteArtifact(created->id, "triage", "Customer reported outage.");
+    ASSERT_TRUE(noteArtifact);
+
+    const auto timelineResult = store.projectTimeline(created->id);
+    ASSERT_TRUE(timelineResult);
+    EXPECT_GE(timelineResult->events.size(), 3U);
+    EXPECT_EQ("log.line", timelineResult->events[0].eventType);
+    EXPECT_EQ("first event", timelineResult->events[0].message);
+    EXPECT_EQ(logArtifact->id, timelineResult->events[0].artifactId);
+    EXPECT_EQ("note.created", timelineResult->events.back().eventType);
+
+    scope::workspace::TimelineProjectionOptions options;
+    options.limit = 1U;
+
+    const auto limitedResult = store.projectTimeline(created->id, options);
+    ASSERT_TRUE(limitedResult);
+    ASSERT_EQ(1U, limitedResult->events.size());
+    EXPECT_TRUE(limitedResult->truncated);
+
+    std::filesystem::remove_all(root);
+    std::filesystem::remove(logSource);
+}

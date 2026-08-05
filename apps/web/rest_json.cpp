@@ -483,6 +483,96 @@ std::string formatInvestigationOpenResult(const std::string& investigationId, co
     return output.str();
 }
 
+std::string formatEventSourceJson(const scope::workspace::EventSource& source)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"artifactId\": \"" << escapeJsonString(source.artifactId) << "\",\n"
+           << "  \"artifactType\": \"" << escapeJsonString(source.artifactType) << "\",\n"
+           << "  \"artifactName\": \"" << escapeJsonString(source.artifactName) << "\"";
+
+    if (source.lineNumber.has_value())
+    {
+        output << ",\n  \"lineNumber\": " << *source.lineNumber;
+    }
+
+    if (source.byteOffset.has_value())
+    {
+        output << ",\n  \"byteOffset\": " << *source.byteOffset;
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatTimelineEventJson(const scope::workspace::TimelineEvent& event)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(event.id) << "\",\n"
+           << "  \"timestamp\": \"" << escapeJsonString(event.timestamp) << "\",\n"
+           << "  \"artifactId\": \"" << escapeJsonString(event.artifactId) << "\",\n"
+           << "  \"eventType\": \"" << escapeJsonString(event.eventType) << "\",\n"
+           << "  \"message\": \"" << escapeJsonString(event.message) << "\",\n"
+           << "  \"source\": " << formatEventSourceJson(event.source) << ",\n"
+           << "  \"metadata\": " << formatStringMapJson(event.metadata);
+
+    if (event.severity.has_value())
+    {
+        output << ",\n  \"severity\": \"" << escapeJsonString(*event.severity) << '"';
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatInvestigationTimeline(const std::string& investigationId,
+                                        const scope::workspace::TimelineProjectionResult& result)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"events\": [";
+
+    for (std::size_t index = 0U; index < result.events.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    " << formatTimelineEventJson(result.events[index]);
+    }
+
+    output << "\n  ],\n"
+           << "  \"pagination\": {\n"
+           << "    \"truncated\": " << (result.truncated ? "true" : "false");
+
+    if (result.totalMatched.has_value())
+    {
+        output << ",\n    \"totalMatched\": " << *result.totalMatched;
+    }
+
+    output << "\n  },\n"
+           << "  \"warnings\": [";
+
+    for (std::size_t index = 0U; index < result.warnings.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(result.warnings[index]) << '"';
+    }
+
+    output << "\n  ]\n}";
+
+    return output.str();
+}
+
 std::string formatTailPollResult(const std::vector<std::string>& lines, const bool active)
 {
     std::ostringstream output;
