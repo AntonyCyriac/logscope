@@ -516,6 +516,25 @@ void printInvestigationCrashUsage(std::ostream& output)
            << "  --help, -h            Show this help message\n";
 }
 
+void printInvestigationLinksUsage(std::ostream& output)
+{
+    output << "Usage:\n"
+           << "  logscope investigation links list <investigation-id> [--format json|table] [--dir <root>]\n"
+           << "  logscope investigation links add <investigation-id> --source <event-id> --target <event-id> "
+              "[--type RELATED|PRECEDES|FOLLOWS|SUPPORTS] [--note \"...\"] [--dir <root>]\n"
+           << "  logscope investigation links remove <investigation-id> --link <link-id> [--dir <root>]\n"
+           << "\n"
+           << "Options:\n"
+           << "  --format <format>     Output format for list: table or json (default: table)\n"
+           << "  --source <event-id>   Source timeline event id (add)\n"
+           << "  --target <event-id>   Target timeline event id (add)\n"
+           << "  --type <type>         Link type (default: RELATED)\n"
+           << "  --note <text>         Optional investigator note (add)\n"
+           << "  --link <link-id>      Evidence link id to remove\n"
+           << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
+           << "  --help, -h            Show this help message\n";
+}
+
 int runInvestigationCreateCommand(const InvestigationCreateOptions& options,
                                   std::ostream& output,
                                   std::ostream& errorOutput)
@@ -989,6 +1008,211 @@ int runInvestigationCrashCommand(const InvestigationCrashOptions& options,
     else
     {
         printInvestigationCrashTable(*crashResult, output);
+    }
+
+    return 0;
+}
+
+std::string formatEvidenceLinkRecordJson(const scope::workspace::EvidenceLinkRecord& link)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "        \"id\": \"" << escapeJsonString(link.id) << "\",\n"
+           << "        \"type\": \"" << escapeJsonString(scope::workspace::evidenceLinkTypeToString(link.type))
+           << "\",\n"
+           << "        \"source\": {\n"
+           << "          \"kind\": \"" << escapeJsonString(link.source.kind) << "\",\n"
+           << "          \"eventId\": \"" << escapeJsonString(link.source.eventId) << "\"\n"
+           << "        },\n"
+           << "        \"target\": {\n"
+           << "          \"kind\": \"" << escapeJsonString(link.target.kind) << "\",\n"
+           << "          \"eventId\": \"" << escapeJsonString(link.target.eventId) << "\"\n"
+           << "        },\n"
+           << "        \"createdAt\": \"" << escapeJsonString(link.createdAt) << "\",\n"
+           << "        \"status\": \"" << escapeJsonString(scope::workspace::evidenceLinkStatusToString(link.status))
+           << "\"";
+
+    if (link.note.has_value())
+    {
+        output << ",\n        \"note\": \"" << escapeJsonString(*link.note) << '"';
+    }
+    else
+    {
+        output << ",\n        \"note\": null";
+    }
+
+    output << "\n      }";
+
+    return output.str();
+}
+
+std::string formatEvidenceLinksListJson(const std::string& investigationId,
+                                        const std::vector<scope::workspace::EvidenceLinkRecord>& links)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"links\": [";
+
+    for (std::size_t index = 0U; index < links.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n      " << formatEvidenceLinkRecordJson(links[index]);
+    }
+
+    if (!links.empty())
+    {
+        output << '\n';
+    }
+
+    output << "    ]\n}";
+
+    return output.str();
+}
+
+void printEvidenceLinksTable(const std::vector<scope::workspace::EvidenceLinkRecord>& links, std::ostream& output)
+{
+    output << "id\ttype\tsource\ttarget\tstatus\tnote\n";
+
+    for (const scope::workspace::EvidenceLinkRecord& link : links)
+    {
+        std::string noteColumn;
+
+        if (link.note.has_value())
+        {
+            noteColumn = *link.note;
+
+            if (noteColumn.size() > 60U)
+            {
+                noteColumn.resize(57U);
+                noteColumn += "...";
+            }
+        }
+
+        output << link.id << '\t' << scope::workspace::evidenceLinkTypeToString(link.type) << '\t'
+               << link.source.eventId << '\t' << link.target.eventId << '\t'
+               << scope::workspace::evidenceLinkStatusToString(link.status) << '\t' << noteColumn << '\n';
+    }
+}
+
+int runInvestigationLinksCommand(const InvestigationLinksOptions& options,
+                                 std::ostream& output,
+                                 std::ostream& errorOutput)
+{
+    if (options.showHelp)
+    {
+        printInvestigationLinksUsage(output);
+
+        return 0;
+    }
+
+    if (!isValidInvestigationId(options.investigationId))
+    {
+        errorOutput << "Invalid investigation id.\n";
+
+        return 1;
+    }
+
+    const Path investigationDir = investigationDirectory(options.rootDirectory, options.investigationId);
+    const auto investigationResult = Investigation::open(investigationDir);
+
+    if (!investigationResult)
+    {
+        errorOutput << investigationResult.error().message() << '\n';
+
+        return 2;
+    }
+
+    Investigation investigation = std::move(*investigationResult);
+
+    if (options.subcommand == InvestigationLinksSubcommand::List)
+    {
+        const auto linksResult = investigation.listEvidenceLinks();
+
+        if (!linksResult)
+        {
+            errorOutput << linksResult.error().message() << '\n';
+
+            return 2;
+        }
+
+        if (options.format == InvestigationTimelineFormat::Json)
+        {
+            output << formatEvidenceLinksListJson(options.investigationId, *linksResult) << '\n';
+        }
+        else
+        {
+            printEvidenceLinksTable(*linksResult, output);
+        }
+
+        return 0;
+    }
+
+    if (options.subcommand == InvestigationLinksSubcommand::Add)
+    {
+        if (options.sourceEventId.empty() || options.targetEventId.empty())
+        {
+            errorOutput << "Error: --source and --target are required.\n";
+            printInvestigationLinksUsage(errorOutput);
+
+            return 1;
+        }
+
+        const std::optional<scope::workspace::EvidenceLinkType> parsedType =
+            scope::workspace::parseEvidenceLinkType(options.linkType);
+
+        if (!parsedType)
+        {
+            errorOutput << "Invalid link type.\n";
+
+            return 1;
+        }
+
+        scope::workspace::EvidenceLinkCreateRequest createRequest;
+        createRequest.type = *parsedType;
+        createRequest.source.kind = "timeline_event";
+        createRequest.source.eventId = options.sourceEventId;
+        createRequest.target.kind = "timeline_event";
+        createRequest.target.eventId = options.targetEventId;
+
+        if (!options.note.empty())
+        {
+            createRequest.note = options.note;
+        }
+
+        const auto linkResult = investigation.addEvidenceLink(createRequest);
+
+        if (!linkResult)
+        {
+            errorOutput << linkResult.error().message() << '\n';
+
+            return 2;
+        }
+
+        output << formatEvidenceLinkRecordJson(*linkResult) << '\n';
+
+        return 0;
+    }
+
+    if (options.linkId.empty())
+    {
+        errorOutput << "Error: --link is required.\n";
+        printInvestigationLinksUsage(errorOutput);
+
+        return 1;
+    }
+
+    const auto removeResult = investigation.removeEvidenceLink(options.linkId);
+
+    if (!removeResult)
+    {
+        errorOutput << removeResult.error().message() << '\n';
+
+        return 2;
     }
 
     return 0;

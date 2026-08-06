@@ -1677,6 +1677,115 @@ std::optional<InvestigationCrashOptions> parseInvestigationCrashArguments(int ar
     return options;
 }
 
+std::optional<InvestigationLinksOptions> parseInvestigationLinksArguments(int argc, char* argv[], const int linksVerbIndex)
+{
+    if (linksVerbIndex >= argc)
+    {
+        return std::nullopt;
+    }
+
+    InvestigationLinksOptions options;
+    const std::string linksVerb = argv[linksVerbIndex];
+
+    if (linksVerb == "list")
+    {
+        options.subcommand = InvestigationLinksSubcommand::List;
+    }
+    else if (linksVerb == "add")
+    {
+        options.subcommand = InvestigationLinksSubcommand::Add;
+    }
+    else if (linksVerb == "remove")
+    {
+        options.subcommand = InvestigationLinksSubcommand::Remove;
+    }
+    else
+    {
+        return std::nullopt;
+    }
+
+    for (int index = linksVerbIndex + 1; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--format" && index + 1 < argc)
+        {
+            const auto format = parseInvestigationTimelineFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (argument == "--source" && index + 1 < argc)
+        {
+            options.sourceEventId = argv[++index];
+            continue;
+        }
+
+        if (argument == "--target" && index + 1 < argc)
+        {
+            options.targetEventId = argv[++index];
+            continue;
+        }
+
+        if (argument == "--type" && index + 1 < argc)
+        {
+            options.linkType = argv[++index];
+            continue;
+        }
+
+        if (argument == "--note" && index + 1 < argc)
+        {
+            options.note = argv[++index];
+            continue;
+        }
+
+        if (argument == "--link" && index + 1 < argc)
+        {
+            options.linkId = argv[++index];
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1822,6 +1931,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::InvestigationCrash;
             parsed.investigationCrash.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 5 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "links")
+        {
+            parsed.command = CliCommand::InvestigationLinks;
+            parsed.investigationLinks.showHelp = true;
 
             return parsed;
         }
@@ -2165,6 +2282,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::InvestigationCrash;
             parsed.investigationCrash = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "links")
+        {
+            const auto options = parseInvestigationLinksArguments(argc, argv, 4);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationLinks;
+            parsed.investigationLinks = *options;
 
             return parsed;
         }
