@@ -8,6 +8,8 @@
 | Audience | AI assistants, implementers, testers |
 | Last Updated | 06-08-2026 |
 
+**Architecture:** This document covers **shell layout and visual rules**. For the full **one Investigation UI, two shells** model (view models, modes, parity), read [UI_ARCHITECTURE.md](../architecture/UI_ARCHITECTURE.md) first.
+
 ---
 
 ## One sentence
@@ -156,6 +158,7 @@ Only ship web-only or desktop-only UI if:
 
 ## Related docs
 
+- [UI_ARCHITECTURE.md](../architecture/UI_ARCHITECTURE.md) — one Investigation UI, two shells; view model direction
 - [AGENTS.md](../../AGENTS.md) — assistant bootstrap
 - [CODE_MAP.md](CODE_MAP.md) — file locations
 - [BROWSER_MCP.md](BROWSER_MCP.md) — manual browser demos

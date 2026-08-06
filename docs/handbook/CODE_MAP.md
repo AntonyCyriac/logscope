@@ -54,6 +54,8 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 
 ## Docs for web work
 
+- [UI_ARCHITECTURE.md](../architecture/UI_ARCHITECTURE.md) — one Investigation UI, two shells
+- [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md) — shell layout
 - [M15-WEB-PLATFORM.md](../planning/M15-WEB-PLATFORM.md)
 - [M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md](../planning/M15-V220-SHARED-INVESTIGATIONS-SCENARIOS.md)
 - [V230-CREATE-INVESTIGATION-SCENARIOS.md](../planning/V230-CREATE-INVESTIGATION-SCENARIOS.md)

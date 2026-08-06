@@ -33,7 +33,10 @@ Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI
 
 ## Web & desktop UI (IDE for investigations)
 
-LogScope is an **investigation platform**, not a monitoring dashboard. Before changing web or desktop UI, read [docs/handbook/WEB_UI_DESIGN.md](docs/handbook/WEB_UI_DESIGN.md).
+LogScope is an **investigation platform**, not a monitoring dashboard. Before changing web or desktop UI, read:
+
+1. [docs/architecture/UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md) — **one Investigation UI, two shells** (view models, modes, parity)
+2. [docs/handbook/WEB_UI_DESIGN.md](docs/handbook/WEB_UI_DESIGN.md) — IDE layout and shell guidelines
 
 | Principle | Rule |
 |-----------|------|
@@ -42,7 +45,7 @@ LogScope is an **investigation platform**, not a monitoring dashboard. Before ch
 | Disclosure | One visible panel; story features via tabs, not more vertical panels |
 | Actions | Open / Analyze / Investigate on **artifacts**, not global Investigate sections |
 | Tests | Prefer Playwright [`tests/e2e/web/`](tests/e2e/web/) + `data-testid` hooks |
-| **Web ↔ desktop sync** | **Maximize parity** — ship user-visible UI on **both** web SPA and Qt desktop in the same milestone when feasible; same tabs, actions, and `ApplicationService` flows; test both surfaces. Document + track any intentional gap. |
+| **Web ↔ desktop sync** | **One Investigation UI, two shells** — same modes, terminology, workflows; ship both or track gap. See [UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md). |
 
 Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only until shipped on Qt — tracked gap).
 
