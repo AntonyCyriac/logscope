@@ -240,6 +240,181 @@ std::optional<std::string> extractSwitchingThreadId(const std::string& line)
     return std::nullopt;
 }
 
+std::string toLowerCopy(std::string value)
+{
+    std::transform(value.begin(), value.end(), value.begin(),
+                   [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
+
+    return value;
+}
+
+bool symbolContains(const std::string& symbol, const std::string& needle)
+{
+    return toLowerCopy(symbol).find(toLowerCopy(needle)) != std::string::npos;
+}
+
+bool isIdleWaitSymbol(const std::string& symbol)
+{
+    static constexpr std::array<const char*, 8> kIdleSymbols = {
+        "epoll_wait",
+        "poll",
+        "pthread_cond_wait",
+        "futex",
+        "nanosleep",
+        "select",
+        "sched_yield",
+        "__poll",
+    };
+
+    for (const char* idleSymbol : kIdleSymbols)
+    {
+        if (symbolContains(symbol, idleSymbol))
+        {
+            return true;
+        }
+    }
+
+    const std::string lowered = toLowerCopy(symbol);
+
+    return lowered.rfind("gpr_", 0) == 0U || lowered.rfind("grpc_", 0) == 0U ||
+           symbolContains(symbol, "grpc_core::");
+}
+
+bool isSignalAbortSymbol(const std::string& symbol)
+{
+    static constexpr std::array<const char*, 8> kAbortSymbols = {
+        "raise",
+        "abort",
+        "gsignal",
+        "__verbose_terminate_handler",
+        "__cxxabiv1::__terminate",
+        "std::terminate",
+        "__terminate",
+        "sighdl",
+    };
+
+    for (const char* abortSymbol : kAbortSymbols)
+    {
+        if (symbolContains(symbol, abortSymbol))
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+bool isSystemRuntimeModule(const std::optional<std::string>& module)
+{
+    if (!module.has_value())
+    {
+        return false;
+    }
+
+    const std::string lowered = toLowerCopy(*module);
+
+    return lowered.find("libc") != std::string::npos ||
+           lowered.find("libpthread") != std::string::npos ||
+           lowered.find("libstdc++") != std::string::npos ||
+           lowered.find("libgcc") != std::string::npos ||
+           lowered.find("ld-linux") != std::string::npos;
+}
+
+const CrashFrame* findApplicationFrame(const CrashThread& thread)
+{
+    for (const CrashFrame& frame : thread.frames)
+    {
+        if (!isSystemRuntimeModule(frame.module) && !isIdleWaitSymbol(frame.symbol))
+        {
+            return &frame;
+        }
+    }
+
+    return nullptr;
+}
+
+int scoreThreadForFault(const CrashThread& thread)
+{
+    if (thread.frames.empty())
+    {
+        return -1000;
+    }
+
+    int score = 0;
+    bool hasAbortChain = false;
+    bool hasApplicationFrame = false;
+
+    for (const CrashFrame& frame : thread.frames)
+    {
+        if (isSignalAbortSymbol(frame.symbol))
+        {
+            hasAbortChain = true;
+        }
+
+        if (!isSystemRuntimeModule(frame.module) && !isIdleWaitSymbol(frame.symbol))
+        {
+            hasApplicationFrame = true;
+        }
+    }
+
+    if (hasAbortChain)
+    {
+        score += 100;
+    }
+
+    if (hasApplicationFrame)
+    {
+        score += 30;
+    }
+
+    if (isIdleWaitSymbol(thread.frames.front().symbol))
+    {
+        score -= 80;
+    }
+
+    return score;
+}
+
+std::optional<std::string> selectFaultThreadId(const std::vector<CrashThread>& threads,
+                                               const std::optional<std::string>& switchingThreadId)
+{
+    if (switchingThreadId.has_value())
+    {
+        return switchingThreadId;
+    }
+
+    if (threads.empty())
+    {
+        return std::nullopt;
+    }
+
+    const CrashThread* best = &threads.front();
+    int bestScore = scoreThreadForFault(*best);
+
+    for (const CrashThread& thread : threads)
+    {
+        const int score = scoreThreadForFault(thread);
+
+        if (score > bestScore)
+        {
+            bestScore = score;
+            best = &thread;
+        }
+    }
+
+    return best->id;
+}
+
+const CrashFrame* prominentFaultFrame(const CrashThread& thread)
+{
+    if (const CrashFrame* applicationFrame = findApplicationFrame(thread); applicationFrame != nullptr)
+    {
+        return applicationFrame;
+    }
+
+    return thread.frames.empty() ? nullptr : &thread.frames.front();
+}
+
 CrashReport makeBaseReport(const ArtifactRecord& artifact, const CrashAnalysisContext& context,
                            const std::string& analyzerVersion)
 {
@@ -452,27 +627,12 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
             return foundation::Result<CrashReport>(std::move(report));
         }
 
-        if (switchingThreadId.has_value())
-        {
-            report.faultThreadId = switchingThreadId;
-        }
-        else if (report.signal.has_value())
-        {
-            report.faultThreadId = report.threads.front().id;
-        }
+        report.faultThreadId = selectFaultThreadId(report.threads, switchingThreadId);
 
         for (CrashThread& thread : report.threads)
         {
-            if (report.faultThreadId.has_value() && thread.id == *report.faultThreadId)
-            {
-                thread.isFaultThread = true;
-            }
-        }
-
-        if (!report.faultThreadId.has_value() && !report.threads.empty())
-        {
-            report.threads.front().isFaultThread = true;
-            report.faultThreadId = report.threads.front().id;
+            thread.isFaultThread =
+                report.faultThreadId.has_value() && thread.id == *report.faultThreadId;
         }
 
         const CrashThread* faultThread = nullptr;
@@ -486,18 +646,21 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
             }
         }
 
-        if (faultThread != nullptr && !faultThread->frames.empty())
+        if (faultThread != nullptr)
         {
-            const CrashFrame& topFrame = faultThread->frames.front();
-            std::ostringstream observation;
-            observation << "Fault in " << topFrame.symbol;
-
-            if (topFrame.location.has_value())
+            if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
+                prominentFrame != nullptr)
             {
-                observation << " at " << *topFrame.location;
-            }
+                std::ostringstream observation;
+                observation << "Fault in " << prominentFrame->symbol;
 
-            report.observations.push_back(observation.str());
+                if (prominentFrame->location.has_value())
+                {
+                    observation << " at " << *prominentFrame->location;
+                }
+
+                report.observations.push_back(observation.str());
+            }
         }
 
         if (report.signal.has_value())
@@ -505,18 +668,26 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
             report.observations.push_back("Signal " + *report.signal + " received");
         }
 
-        if (faultThread != nullptr && !faultThread->frames.empty())
+        if (faultThread != nullptr)
         {
-            std::ostringstream summary;
-            summary << faultThread->name;
-
-            if (report.signal.has_value())
+            if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
+                prominentFrame != nullptr)
             {
-                summary << " received " << *report.signal;
-            }
+                std::ostringstream summary;
+                summary << faultThread->name;
 
-            summary << " in " << faultThread->frames.front().symbol;
-            report.summary = summary.str();
+                if (report.signal.has_value())
+                {
+                    summary << " received " << *report.signal;
+                }
+
+                summary << " in " << prominentFrame->symbol;
+                report.summary = summary.str();
+            }
+            else
+            {
+                report.summary = faultThread->name;
+            }
         }
         else
         {
