@@ -1,7 +1,7 @@
 import * as path from 'node:path';
 import { expect, type Page } from '@playwright/test';
 
-const REPO_ROOT = path.resolve(__dirname, '../../..');
+const REPO_ROOT = path.resolve(__dirname, '../../../../');
 
 export const sampleLogPath = path.join(REPO_ROOT, 'samples', 'sample.log');
 export const pstackPath = path.join(REPO_ROOT, 'samples', 'pstack.txt');
