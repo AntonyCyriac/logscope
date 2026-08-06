@@ -32,14 +32,19 @@ Use `LOGSCOPE_WEB_E2E_EXTERNAL=1` if `logscope-web` is already running on port 8
 3. Capture the terminal window (no secrets, no huge scrollback).
 4. Save as `docs/assets/logscope-cli.png`.
 
-## Desktop (manual)
+## Desktop (automated)
 
-1. Build: `cmake --build build --target logscope-desktop`
-2. Open `samples/sample.log`, run **Analyze**, show Results (or Analytics) with data visible.
-3. Capture the window including bottom tab bar.
-4. Save as `docs/assets/logscope-desktop.png`.
+From repo root (Linux CI / headless):
 
-On Linux CI/desktop headless hosts, use `QT_QPA_PLATFORM=offscreen` only for tests — README shots should be from a visible GUI when possible.
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_DESKTOP=ON
+cmake --build build --target logscope_capture_readme_desktop
+QT_QPA_PLATFORM=offscreen ./build/apps/desktop/tests/logscope_capture_readme_desktop
+```
+
+Writes `docs/assets/logscope-desktop.png` with `samples/sample.log` analyzed and bottom tabs **Results · AI · Analytics** visible.
+
+For a manual capture on a visible GUI, build `logscope-desktop`, open `samples/sample.log`, run **Analyze**, and save the window including the bottom tab bar.
 
 ## CI note
 
