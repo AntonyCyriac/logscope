@@ -12,6 +12,26 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.7.0] - 2026-08-06
+
+**Story 5** — Connect the Evidence (manual evidence links P0.1, completes Phase A).
+
+### Added
+
+- **Evidence links** — manifest `schemaVersion: 2`, `evidenceLinks[]`; types `PRECEDES`, `FOLLOWS`, `SUPPORTS`, `RELATED` ([#137](https://github.com/AntonyCyriac/logscope/pull/137))
+- **REST** — `GET/POST/DELETE /api/v1/investigations/{id}/evidence-links`
+- **CLI** — `investigation links list|add|remove`
+- **Web SPA** — Related Evidence panel, timeline connection badges, Story 5 Playwright E2E
+- ADR-010-M15.9 Investigation Evidence Links
+
+### Fixed
+
+- Web UI evidence link create/delete — correct `fetch` method/body (was issuing GET)
+
+See [v2.7.0 release notes](docs/release/v2.7.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.6.2] - 2026-08-06
 
 **Hotfix** — signal-handler fault site and all-idle pstack dumps ([#134](https://github.com/AntonyCyriac/logscope/issues/134)).
