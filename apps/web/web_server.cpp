@@ -1779,7 +1779,7 @@ void WebServer::registerRoutes()
                       data << "{\n  \"artifact\": "
                            << formatArtifactRecord(*iterator, manifestResult->primaryArtifactId);
 
-                      if (iterator->type == "note")
+                      if (iterator->type == "note" || iterator->type == "pstack")
                       {
                           const foundation::Path investigationDir = foundation::Path(
                               m_workspaceStore.investigationStore().rootDirectory().string() + "/" + investigationId);
@@ -1788,7 +1788,7 @@ void WebServer::registerRoutes()
                           if (investigationResult)
                           {
                               const scope::workspace::IArtifactHandler* handler =
-                                  scope::workspace::findArtifactHandler("note");
+                                  scope::workspace::findArtifactHandler(iterator->type);
 
                               if (handler != nullptr)
                               {

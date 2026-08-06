@@ -127,3 +127,152 @@ th {
   background: #ffeb3b66;
   font-weight: 600;
 }
+
+.crash-empty {
+  margin: 0 0 0.75rem;
+  color: #666;
+}
+
+.crash-warnings {
+  margin: 0 0 0.75rem;
+  color: #a60;
+  font-size: 0.9rem;
+}
+
+.crash-content h3 {
+  margin: 1rem 0 0.5rem;
+  font-size: 0.95rem;
+}
+
+.crash-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.crash-status-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.crash-status-badge--ready {
+  background: #2e7d3244;
+  color: #1b5e20;
+}
+
+.crash-status-badge--unavailable,
+.crash-status-badge--failed {
+  background: #ef6c0044;
+  color: #e65100;
+}
+
+.crash-status-badge--not_supported {
+  background: #75757544;
+  color: #424242;
+}
+
+.crash-signal {
+  font-weight: 600;
+  color: #c62828;
+}
+
+.crash-summary-text {
+  margin: 0.25rem 0 0;
+  width: 100%;
+  color: #333;
+}
+
+.crash-thread-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crash-thread {
+  margin-bottom: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+}
+
+.crash-thread--fault {
+  border-color: #c62828;
+  background: #ffebee33;
+}
+
+.crash-thread--clickable {
+  cursor: pointer;
+}
+
+.crash-thread--clickable:hover,
+.crash-thread--clickable:focus {
+  background: #4488aa22;
+  outline: none;
+}
+
+.crash-thread--active {
+  background: #4488aa44;
+}
+
+.crash-thread-header {
+  font-weight: 600;
+  margin-bottom: 0.35rem;
+}
+
+.crash-thread-fault-label {
+  color: #c62828;
+  font-size: 0.85rem;
+  margin-left: 0.5rem;
+}
+
+.crash-frame-list {
+  margin: 0;
+  padding-left: 1.25rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.85rem;
+}
+
+.crash-observations {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.crash-pstack-title {
+  margin-top: 1.25rem;
+}
+
+.crash-pstack-viewer {
+  max-height: 24rem;
+  overflow: auto;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #f8f8f8;
+}
+
+.crash-pstack-thread {
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  font-family: ui-monospace, monospace;
+  font-size: 0.8rem;
+  white-space: pre-wrap;
+  border-bottom: 1px solid #ddd;
+}
+
+.crash-pstack-thread:last-child {
+  border-bottom: none;
+}
+
+.crash-pstack-thread--highlight {
+  background: #ffeb3b66;
+  font-weight: 600;
+}
+
+#artifactList li.crash-artifact-active {
+  font-weight: 600;
+}

@@ -100,9 +100,9 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| UX.1 | Panel title | Open pstack artifact | **Understand Why It Crashed** panel | B | ⬜ |
-| UX.2 | Fault thread jump | Click fault thread | Scroll/highlight in pstack view | B | ⬜ |
-| UX.3 | Core unavailable message | Core without GDB | Shows warning, not error page | B | ⬜ |
+| UX.1 | Panel title | Open pstack artifact | **Understand Why It Crashed** panel | B | ✅ |
+| UX.2 | Fault thread jump | Click fault thread | Scroll/highlight in pstack view | B | ✅ |
+| UX.3 | Core unavailable message | Core without GDB | Shows warning, not error page | B | 🟡 |
 
 ---
 
@@ -121,9 +121,9 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | Step | Status |
 |------|--------|
-| Create investigation | ⬜ |
-| Add app.log | ⬜ |
-| Add pstack.txt | ⬜ |
-| Crash report via REST or CLI | 🟡 |
+| Create investigation | ✅ |
+| Add app.log | ✅ |
+| Add pstack.txt | ✅ |
+| Crash report via REST or CLI | ✅ |
 | Fault thread identified | ✅ |
-| Jump to pstack (web) | ⬜ |
+| Jump to pstack (web) | 🟡 |

@@ -667,6 +667,59 @@ TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisReturnsPstackReport)
     EXPECT_EQ(std::string::npos, crashResult->body.find("rootCause"));
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisStoryGateDemoPath)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+    const std::string pstackPath = sourcePath("samples/pstack.txt");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"story-gate-crash\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::string investigationId = extractJsonStringField(createResult->body, "id");
+    ASSERT_FALSE(investigationId.empty());
+
+    const httplib::Result addLogResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath + "\", \"name\": \"app.log\"}",
+        "application/json");
+    ASSERT_TRUE(addLogResult);
+    EXPECT_EQ(200, addLogResult->status);
+
+    const httplib::Result addPstackResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"pstack\", \"sourcePath\": \"" + pstackPath + "\", \"name\": \"pstack.txt\"}",
+        "application/json");
+    ASSERT_TRUE(addPstackResult);
+    EXPECT_EQ(200, addPstackResult->status);
+
+    const std::string pstackArtifactId = extractJsonStringField(addPstackResult->body, "id");
+    ASSERT_FALSE(pstackArtifactId.empty());
+
+    const httplib::Result crashResult = client->Get(
+        "/api/v1/investigations/" + investigationId + "/artifacts/" + pstackArtifactId + "/crash-analysis",
+        headers);
+    ASSERT_TRUE(crashResult);
+    EXPECT_EQ(200, crashResult->status);
+    EXPECT_NE(std::string::npos, crashResult->body.find("\"status\": \"ready\""));
+    EXPECT_NE(std::string::npos, crashResult->body.find("\"signal\": \"SIGSEGV\""));
+    EXPECT_NE(std::string::npos, crashResult->body.find("\"isFaultThread\": true"));
+    EXPECT_NE(std::string::npos, crashResult->body.find("SessionManager::create"));
+    EXPECT_EQ(std::string::npos, crashResult->body.find("rootCause"));
+
+    const httplib::Result artifactResult = client->Get(
+        "/api/v1/investigations/" + investigationId + "/artifacts/" + pstackArtifactId, headers);
+    ASSERT_TRUE(artifactResult);
+    EXPECT_EQ(200, artifactResult->status);
+    EXPECT_NE(std::string::npos, artifactResult->body.find("\"body\":"));
+    EXPECT_NE(std::string::npos, artifactResult->body.find("Thread 1"));
+    EXPECT_NE(std::string::npos, artifactResult->body.find("SessionManager::create"));
+}
+
 TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisLogArtifactReturns409)
 {
     const std::string sessionId = createSession();
