@@ -976,7 +976,7 @@
         if (!hasModel) {
           await runAnalyze();
         }
-        const payload = await apiJson('/api/v1/investigate', {});
+        const payload = await apiJson('/api/v1/investigate', buildInvestigateBody());
         renderInvestigation(payload, state.highlightLineNumber);
         setBottomTab('results');
       }
@@ -1322,7 +1322,7 @@
     setStatus('Analyzed');
   }
 
-  async function investigate() {
+  function buildInvestigateBody() {
     const body = {};
     const search = searchInput.value.trim();
     const filter = filterInput.value.trim();
@@ -1337,7 +1337,11 @@
       body.filter = filter;
     }
 
-    const payload = await apiJson('/api/v1/investigate', body);
+    return body;
+  }
+
+  async function investigate() {
+    const payload = await apiJson('/api/v1/investigate', buildInvestigateBody());
     renderInvestigation(payload);
     setStatus('Investigate complete');
   }
