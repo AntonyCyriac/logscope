@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Release Process |
 | Category | Release |
-| Version | 1.5.0 |
+| Version | 1.6.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
 | Last Updated | 24-07-2026 |
@@ -79,11 +79,25 @@ git pull origin master
 git checkout -b chore/vX.Y.Z-release
 ```
 
-## 2. Version bump
+## 2. Version bump and README snapshots
 
 - Update `VERSION` in root [`CMakeLists.txt`](../../CMakeLists.txt)
 - Move `[Unreleased]` entries to `[X.Y.Z]` in [`CHANGELOG.md`](../../CHANGELOG.md)
-- Update status references in [`README.md`](../../README.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/PRODUCT.md`](../PRODUCT.md)
+- Add [`docs/release/vX.Y.Z-RELEASE-NOTES.md`](vX.Y.Z-RELEASE-NOTES.md)
+- Update [`AGENTS.md`](../../AGENTS.md) — release-notes link → `vX.Y.Z`
+- Update status references in [`docs/handbook/PROJECT_CONTEXT.md`](../handbook/PROJECT_CONTEXT.md), [`docs/ROADMAP.md`](../ROADMAP.md), [`docs/PRODUCT.md`](../PRODUCT.md) as needed
+
+### README + surface screenshots (required — same PR)
+
+Do **not** split README text and homepage images across PRs when the release changes user-visible CLI, desktop, or web behavior.
+
+1. **[`README.md`](../../README.md)** — current release line (`vX.Y.Z`), feature table, CLI / desktop / web sections for new capabilities.
+2. **[`docs/assets/`](assets/README.md)** — refresh **all three** PNGs together:
+   - `logscope-cli.png` — terminal commands for shipped investigation workflow
+   - `logscope-desktop.png` — analyzed `samples/sample.log`, bottom tabs visible
+   - `logscope-web.png` — IDE SPA with current story UI (Playwright: [`capture-readme-screenshots.spec.ts`](../../tests/e2e/web/tests/capture-readme-screenshots.spec.ts))
+
+See [docs/assets/README.md](assets/README.md) for capture steps. PRs touching only `*.md` and `docs/assets/**` get **Docs only (CI waived)**.
 
 ## 3. Verify locally
 
@@ -202,3 +216,4 @@ logscope analyze samples/sample.log
 | 1.4.3 | 30-07-2026 | Optional macOS signing and notarization via GitHub secrets. |
 | 1.4.4 | 30-07-2026 | Require GitHub issues for release regressions (see #86 / v2.0.3 example). |
 | 1.5.0 | 30-07-2026 | Versioning policy (patch vs minor); versioned release artifact filenames; artifact retention. |
+| 1.6.0 | 06-08-2026 | README + all three `docs/assets` screenshots required in same release PR; Playwright capture spec. |

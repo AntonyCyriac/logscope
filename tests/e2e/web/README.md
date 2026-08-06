@@ -58,6 +58,17 @@ npm test
 | Story 4: crash SIGSEGV + fault thread pstack jump | `story-gate.spec.ts` |
 | Investigate after analyze (default `error` search) | `story-gate.spec.ts` |
 | AI ask `errors` (noop config) | `story-gate.spec.ts` |
+| **README web screenshot** (Related Evidence + badges) | `capture-readme-screenshots.spec.ts` |
+
+### Refresh README screenshots
+
+From `tests/e2e/web` after building `logscope-web`:
+
+```bash
+npx playwright test capture-readme-screenshots.spec.ts --project=chromium
+```
+
+Writes `docs/assets/logscope-web.png`. CLI and desktop PNGs: [docs/assets/README.md](../../../docs/assets/README.md). Ship all three with every README release update.
 
 ## Desktop parity gaps
 
