@@ -13,6 +13,7 @@
 #include <QPushButton>
 #include <QStatusBar>
 #include <QTableView>
+#include <QTabWidget>
 #include <QTextEdit>
 
 #include "application_service.hpp"
@@ -112,6 +113,7 @@ class MainWindow : public QMainWindow
     QCheckBox* m_tailCheck{nullptr};
     QCheckBox* m_persistIndexCheck{nullptr};
     QCheckBox* m_reuseIndexCheck{nullptr};
+    QTabWidget* m_bottomTabs{nullptr};
     AnalyticsPanel* m_analyticsPanel{nullptr};
     AiPanel* m_aiPanel{nullptr};
     TailWorker* m_tailWorker{nullptr};
