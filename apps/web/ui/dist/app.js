@@ -17,6 +17,8 @@
     crashNotSupported: false,
     pstackBody: null,
     activeFaultThreadId: null,
+    tailAutoScroll: true,
+    resultsTab: 'formatted',
   };
 
   const TIMELINE_PAGE_SIZE = 100;
@@ -63,9 +65,121 @@
   const crashObservations = document.getElementById('crashObservations');
   const pstackViewerTitle = document.getElementById('pstackViewerTitle');
   const pstackViewer = document.getElementById('pstackViewer');
+  const crashIssueCards = document.getElementById('crashIssueCards');
+  const crashAnalysisMeta = document.getElementById('crashAnalysisMeta');
+  const artifactCount = document.getElementById('artifactCount');
+  const sourceDropzone = document.getElementById('sourceDropzone');
+  const sourcePathInput = document.getElementById('sourcePathInput');
+  const sourcePathOpenBtn = document.getElementById('sourcePathOpenBtn');
+  const openInvestigationBtn = document.getElementById('openInvestigationBtn');
+  const openInvestigationIdInput = document.getElementById('openInvestigationIdInput');
+  const openInvestigationIdBtn = document.getElementById('openInvestigationIdBtn');
+  const tailAutoScroll = document.getElementById('tailAutoScroll');
+  const tailClearBtn = document.getElementById('tailClearBtn');
+  const resultsFormatted = document.getElementById('resultsFormatted');
 
   function setStatus(text) {
     statusEl.textContent = text;
+    statusEl.hidden = !text;
+  }
+
+  function artifactBadgeClass(type) {
+    if (type === 'log') {
+      return 'artifact-badge--log';
+    }
+    if (type === 'pstack') {
+      return 'artifact-badge--pstack';
+    }
+    if (type === 'core') {
+      return 'artifact-badge--core';
+    }
+    if (type === 'note') {
+      return 'artifact-badge--note';
+    }
+    return 'artifact-badge--config';
+  }
+
+  function severityPillClass(severity) {
+    const value = String(severity || '').toUpperCase();
+    if (value === 'INFO') {
+      return 'severity-pill--info';
+    }
+    if (value === 'WARN' || value === 'WARNING') {
+      return 'severity-pill--warn';
+    }
+    if (value === 'ERROR') {
+      return 'severity-pill--error';
+    }
+    if (value === 'FATAL' || value === 'CRITICAL') {
+      return 'severity-pill--fatal';
+    }
+    return 'severity-pill--default';
+  }
+
+  function inferSeverity(event) {
+    if (event.severity) {
+      return event.severity;
+    }
+    const message = String(event.message || '').toUpperCase();
+    if (message.indexOf('FATAL') >= 0 || message.indexOf('CRASHED') >= 0) {
+      return 'FATAL';
+    }
+    if (message.indexOf('ERROR') >= 0) {
+      return 'ERROR';
+    }
+    if (message.indexOf('WARN') >= 0) {
+      return 'WARN';
+    }
+    if (event.eventType === 'log.line') {
+      return 'INFO';
+    }
+    return '';
+  }
+
+  function setResultsTab(tab) {
+    state.resultsTab = tab;
+    document.querySelectorAll('.results-tab').forEach(function (button) {
+      button.classList.toggle('results-tab--active', button.dataset.resultsTab === tab);
+    });
+    summaryEl.hidden = tab !== 'raw';
+    resultsFormatted.hidden = tab !== 'formatted';
+  }
+
+  function renderCrashIssueCards(report) {
+    crashIssueCards.innerHTML = '';
+
+    if (!report || report.status !== 'ready') {
+      crashAnalysisMeta.hidden = true;
+      return;
+    }
+
+    const artifactLabel = report.artifactType === 'core' ? 'core dump' : 'pstack';
+    const issueCount = report.signal ? 1 : 0;
+    crashAnalysisMeta.textContent = issueCount > 0
+      ? ('Crash Analysis — ' + issueCount + ' issue detected from ' + artifactLabel)
+      : 'Crash Analysis — report ready';
+    crashAnalysisMeta.hidden = false;
+
+    if (!report.signal) {
+      return;
+    }
+
+    const faultThread = (report.threads || []).find(function (thread) {
+      return thread.isFaultThread || String(thread.id) === String(report.faultThreadId);
+    }) || (report.threads || [])[0];
+
+    const topFrame = faultThread && faultThread.frames && faultThread.frames[0];
+    const frameText = topFrame
+      ? ('#' + topFrame.index + ' in ' + (topFrame.symbol || '?')
+        + (topFrame.location ? ' at ' + topFrame.location : ''))
+      : (report.summary || 'See thread list below.');
+
+    const card = document.createElement('div');
+    const signalKey = String(report.signal).toLowerCase().replace(/[^a-z0-9]/g, '');
+    card.className = 'crash-issue-card crash-issue-card--' + signalKey;
+    card.innerHTML = '<p class="crash-issue-card__title">Issue: ' + escapeHtml(report.signal) + '</p>'
+      + '<p class="crash-issue-card__detail">' + escapeHtml(frameText) + '</p>';
+    crashIssueCards.appendChild(card);
   }
 
   function sessionHeaders(extra) {
@@ -366,18 +480,21 @@
     if (!state.activeInvestigationId) {
       crashEmpty.textContent = 'Select an investigation with a pstack or core artifact.';
       crashEmpty.hidden = false;
+      crashAnalysisMeta.hidden = true;
       return;
     }
 
     if (!state.activeCrashArtifactId) {
       crashEmpty.textContent = 'Add a pstack or core artifact to analyze the crash.';
       crashEmpty.hidden = false;
+      crashAnalysisMeta.hidden = true;
       return;
     }
 
     if (state.crashNotSupported) {
       crashEmpty.textContent = 'Crash analysis is not supported for this artifact type.';
       crashEmpty.hidden = false;
+      crashAnalysisMeta.hidden = true;
       renderCrashStatusBadge('not_supported');
       return;
     }
@@ -396,6 +513,7 @@
     renderCrashStatusBadge(report.status);
     crashSignal.textContent = report.signal ? 'Signal: ' + report.signal : '';
     crashSummaryText.textContent = report.summary || '';
+    renderCrashIssueCards(report);
 
     const warnings = (report.warnings || []).slice();
 
@@ -510,6 +628,7 @@
     artifactList.innerHTML = '';
 
     if (!state.activeInvestigationId) {
+      artifactCount.textContent = '0 files';
       return;
     }
 
@@ -517,52 +636,54 @@
     const payload = await response.json();
     const investigation = (payload.data && payload.data.investigation) || payload.data || payload;
     const artifacts = investigation.artifacts || [];
+    artifactCount.textContent = artifacts.length + (artifacts.length === 1 ? ' file' : ' files');
 
     artifacts.forEach(function (artifact) {
       const item = document.createElement('li');
+      item.className = 'artifact-row';
 
       if (artifact.id === state.activeCrashArtifactId && isCrashAnalyzableType(artifact.type)) {
-        item.classList.add('crash-artifact-active');
+        item.classList.add('artifact-row--active');
       }
 
-      const label = artifact.name + ' (' + artifact.type + ')';
+      const drag = document.createElement('span');
+      drag.className = 'artifact-drag';
+      drag.textContent = '⋮⋮';
+      drag.setAttribute('aria-hidden', 'true');
 
-      if (artifact.isEntry) {
-        item.textContent = label + ' [entry] ';
-      } else {
-        item.textContent = label + ' ';
-      }
+      const name = document.createElement('span');
+      name.className = 'artifact-name';
+      name.textContent = artifact.name + (artifact.isEntry ? ' (entry)' : '');
 
-      if (artifact.metadata && artifact.metadata.role) {
-        item.textContent += '[' + artifact.metadata.role + '] ';
-      }
+      const badge = document.createElement('span');
+      badge.className = 'artifact-badge ' + artifactBadgeClass(artifact.type);
+      badge.textContent = artifact.type;
+
+      const openBtn = document.createElement('button');
+      openBtn.type = 'button';
+      openBtn.className = 'btn btn-ghost btn-sm';
+      openBtn.textContent = 'Open';
 
       if (artifact.type === 'log') {
-        const switchBtn = document.createElement('button');
-        switchBtn.type = 'button';
-        switchBtn.textContent = state.activeArtifactId === artifact.id ? 'Active' : 'Switch';
-        switchBtn.disabled = state.activeArtifactId === artifact.id;
-        switchBtn.addEventListener('click', function () {
+        openBtn.addEventListener('click', function () {
           switchLogArtifact(artifact.id).catch(function (error) {
             setStatus('Switch error: ' + error.message);
           });
         });
-        item.appendChild(switchBtn);
-      }
-
-      if (isCrashAnalyzableType(artifact.type)) {
-        const analyzeBtn = document.createElement('button');
-        analyzeBtn.type = 'button';
-        analyzeBtn.textContent = state.activeCrashArtifactId === artifact.id ? 'Analyzing' : 'Analyze crash';
-        analyzeBtn.disabled = state.activeCrashArtifactId === artifact.id;
-        analyzeBtn.addEventListener('click', function () {
+      } else if (isCrashAnalyzableType(artifact.type)) {
+        openBtn.addEventListener('click', function () {
           selectCrashArtifact(artifact.id, artifact.type).catch(function (error) {
             setStatus('Crash analysis error: ' + error.message);
           });
         });
-        item.appendChild(analyzeBtn);
+      } else {
+        openBtn.disabled = true;
       }
 
+      item.appendChild(drag);
+      item.appendChild(name);
+      item.appendChild(badge);
+      item.appendChild(openBtn);
       artifactList.appendChild(item);
     });
   }
@@ -581,7 +702,15 @@
       row.innerHTML = '<td>' + escapeHtml(event.timestamp || '') + '</td>'
         + '<td>' + escapeHtml(event.eventType || '') + '</td>'
         + '<td>' + escapeHtml((event.source && event.source.artifactName) || '') + '</td>'
-        + '<td>' + escapeHtml(event.message || '') + '</td>';
+        + '<td>' + escapeHtml(event.message || '') + '</td>'
+        + '<td>' + (function () {
+          const severity = inferSeverity(event);
+          if (!severity) {
+            return '';
+          }
+          return '<span class="severity-pill ' + severityPillClass(severity) + '">'
+            + escapeHtml(severity) + '</span>';
+        })() + '</td>';
 
       row.addEventListener('click', function () {
         jumpToTimelineEvent(event).catch(function (error) {
@@ -1046,7 +1175,113 @@
 
     if (lines.length > 0) {
       tailOutputEl.textContent += (tailOutputEl.textContent ? '\n' : '') + lines.join('\n');
+      if (state.tailAutoScroll) {
+        tailOutputEl.scrollTop = tailOutputEl.scrollHeight;
+      }
     }
+  }
+
+  async function openSourceFromPath() {
+    const path = sourcePathInput.value.trim();
+    if (!path) {
+      throw new Error('Enter a server path');
+    }
+
+    await apiJson('/api/v1/sources/open', { path: path });
+    analyzeBtn.disabled = false;
+    tailStartBtn.disabled = false;
+    setStatus('Opened ' + path);
+  }
+
+  function wireUiChrome() {
+    document.querySelectorAll('.source-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (tab.disabled) {
+          return;
+        }
+        document.querySelectorAll('.source-tab').forEach(function (item) {
+          item.classList.toggle('source-tab--active', item === tab);
+        });
+        const panel = tab.dataset.sourceTab;
+        document.getElementById('sourcePanelUpload').hidden = panel !== 'upload';
+        document.getElementById('sourcePanelPath').hidden = panel !== 'path';
+      });
+    });
+
+    sourceDropzone.addEventListener('click', function () {
+      fileInput.click();
+    });
+
+    sourceDropzone.addEventListener('keydown', function (event) {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        fileInput.click();
+      }
+    });
+
+    sourceDropzone.addEventListener('dragover', function (event) {
+      event.preventDefault();
+      sourceDropzone.classList.add('source-dropzone--hover');
+    });
+
+    sourceDropzone.addEventListener('dragleave', function () {
+      sourceDropzone.classList.remove('source-dropzone--hover');
+    });
+
+    sourceDropzone.addEventListener('drop', function (event) {
+      event.preventDefault();
+      sourceDropzone.classList.remove('source-dropzone--hover');
+      const file = event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files[0];
+      if (file) {
+        uploadFile(file).catch(function (error) {
+          setStatus('Upload error: ' + error.message);
+        });
+      }
+    });
+
+    sourcePathOpenBtn.addEventListener('click', function () {
+      openSourceFromPath().catch(function (error) {
+        setStatus('Open path error: ' + error.message);
+      });
+    });
+
+    openInvestigationBtn.addEventListener('click', function () {
+      const picker = document.querySelector('.investigations-picker');
+      if (picker) {
+        picker.open = true;
+        picker.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+    });
+
+    openInvestigationIdBtn.addEventListener('click', function () {
+      const id = openInvestigationIdInput.value.trim();
+      if (!id) {
+        setStatus('Enter an investigation ID');
+        return;
+      }
+      openInvestigation(id).catch(function (error) {
+        setStatus('Open error: ' + error.message);
+      });
+    });
+
+    document.querySelectorAll('.results-tab').forEach(function (tab) {
+      tab.addEventListener('click', function () {
+        if (tab.disabled) {
+          return;
+        }
+        setResultsTab(tab.dataset.resultsTab);
+      });
+    });
+
+    tailAutoScroll.addEventListener('change', function () {
+      state.tailAutoScroll = tailAutoScroll.checked;
+    });
+
+    tailClearBtn.addEventListener('click', function () {
+      tailOutputEl.textContent = state.tailTimer ? 'Tail active…\n' : 'Tail inactive.';
+    });
+
+    setResultsTab('formatted');
   }
 
   function stopTailPolling() {
@@ -1182,11 +1417,15 @@
     });
   });
 
+  wireUiChrome();
+
   createWorkspace()
     .then(loadNoopConfig)
     .then(refreshExtensions)
     .then(refreshInvestigations)
     .then(function () {
+      setStatus('Ready');
+    })
       setStatus('Ready — session ' + state.sessionId);
     })
     .catch(function (error) {
