@@ -34,6 +34,7 @@ Thumbs.db
 
 # Temporary
 .tmp-screenshots/
+/workspaces/
 *.tmp
 *.bak
 *.swp
