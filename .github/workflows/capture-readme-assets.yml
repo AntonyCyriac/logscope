@@ -1,0 +1,62 @@
+name: Capture README assets
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_branch:
+        description: Branch to commit updated PNGs to
+        required: true
+        default: chore/readme-v2.7.0-snapshot
+
+permissions:
+  contents: write
+
+jobs:
+  capture:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.target_branch }}
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake ninja-build libsqlite3-dev
+
+      - name: Build logscope-web and CLI
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
+          cmake --build build --target logscope-web logscope
+
+      - name: Setup Node and Playwright
+        working-directory: tests/e2e/web
+        run: |
+          npm ci
+          npx playwright install chromium
+
+      - name: Capture web and CLI screenshots
+        env:
+          LOGSCOPE_WEB_E2E_EXTERNAL: "1"
+        run: |
+          ./build/apps/web/logscope-web --config samples/demo-story-gate.properties &
+          WEB_PID=$!
+          for i in $(seq 1 30); do
+            curl -sf http://127.0.0.1:8080/ >/dev/null && break
+            sleep 1
+          done
+          cd tests/e2e/web
+          npx playwright test capture-readme-screenshots.spec.ts capture-readme-cli.spec.ts --project=chromium
+          kill $WEB_PID || true
+
+      - name: Commit and push assets
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/assets/logscope-web.png docs/assets/logscope-cli.png
+          if git diff --staged --quiet; then
+            echo "No asset changes"
+            exit 0
+          fi
+          git commit -m "docs(assets): refresh README web and CLI screenshots for v2.7.0"
+          git push origin HEAD:${{ inputs.target_branch }}
