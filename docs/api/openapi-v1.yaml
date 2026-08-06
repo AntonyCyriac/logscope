@@ -9,6 +9,7 @@ info:
     v2.3.0: `/api/v1/investigations` (Story 1); `/api/v1/workspaces` remains alias (M15.3 compat).
     v2.4.0: multi-artifact open (`artifactId`), `pstack`/`core` types, session active artifact (Story 2).
     v2.5.0: investigation timeline projection `GET .../investigations/{id}/timeline` (Story 3).
+    v2.6.0: per-artifact crash analysis `GET .../artifacts/{artifactId}/crash-analysis` (Story 4).
 servers:
   - url: http://127.0.0.1:8080
     description: Default loopback bind
@@ -219,6 +220,32 @@ paths:
       responses:
         '200':
           description: Removed
+  /api/v1/investigations/{id}/artifacts/{artifactId}/crash-analysis:
+    get:
+      tags: [investigations]
+      summary: Analyze crash artifact (pstack or core) and return CrashReport projection
+      description: |
+        Returns structured crash evidence for `pstack` or `core` artifacts.
+        `core` analysis is best-effort when GDB is available; returns `status=unavailable` with 200 when not.
+        Log and note artifacts return 409 `ARTIFACT_NOT_ANALYZABLE`.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Crash report projection
+        '404':
+          description: Investigation or artifact not found
+        '409':
+          description: Artifact not analyzable
   /api/v1/investigations/{id}/open:
     post:
       tags: [investigations]
