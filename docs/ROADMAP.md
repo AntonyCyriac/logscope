@@ -4,10 +4,8 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.17.0 |
-| Status | Approved |
-| Created | 15-07-2026 |
-| Last Updated | 05-08-2026 |
+| Version | 3.18.0 |
+| Last Updated | 06-08-2026 |
 
 ---
 
@@ -66,9 +64,9 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.6.1`](CHANGELOG.md) — Story 4 hotfix (pstack fault-thread). Prior: `v2.6.0` Story 4, `v2.5.0` timeline.
+**Current release:** [`v2.6.1`](CHANGELOG.md) - Story 4 hotfix (pstack fault-thread). Stories 1-4 shipped. **Story 5** completes Phase A (investigation methodology).
 
-**Next:** Post–Story 4 investigation enhancements — see [Project Context](handbook/PROJECT_CONTEXT.md) and [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Next:** Story 5 **Connect the Evidence** (completes Phase A) — see [Project Context](handbook/PROJECT_CONTEXT.md) and [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
@@ -488,3 +486,4 @@ The roadmap is considered successful when:
 | 3.14.0 | 04-08-2026 | M15 complete at v2.2.1; next v2.2.2 patch and v2.3.0+ investigation stories. |
 | 3.15.0 | 04-08-2026 | Removed enterprise/cloud horizon from public roadmap (strategy-only). |
 | 3.17.0 | 05-08-2026 | Current release v2.3.0 (Story 1 Create an Investigation); next v2.4.0 Story 2. |
+| 3.18.0 | 06-08-2026 | Current release v2.6.1; Story 5 Connect the Evidence; evidence-centric platform. |

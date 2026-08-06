@@ -4,10 +4,8 @@
 |-------|-------|
 | Document | Product Overview |
 | Category | Vision |
-| Version | 1.1.0 |
-| Status | Approved |
-| Created | 15-07-2026 |
-| Last Updated | 24-07-2026 |
+| Version | 1.2.0 |
+| Last Updated | 06-08-2026 |
 
 ---
 
@@ -23,15 +21,15 @@ This document bridges the Project Charter and the product requirements.
 
 # 2. Product Overview
 
-LogScope is a generic log analysis platform designed to help engineers understand machine-generated log data through a consistent and reusable workflow.
+LogScope is an **Evidence-Centric Investigation Platform** — it helps engineers organize, connect, and understand evidence from production incidents (logs, notes, pstack, core, and derived projections such as timeline and crash reports).
 
-Rather than building separate tools for different technologies or vendors, LogScope provides a common approach to analyzing logs regardless of their origin or structure.
+Rather than building separate tools for different technologies or vendors, LogScope provides a common investigation workflow regardless of artifact origin or structure.
 
-The product focuses on reducing the effort required to extract meaningful insights from logs while remaining simple to use, extensible, and technology-independent.
+The product focuses on reducing the effort required to move through incident evidence while remaining simple to use, extensible, and technology-independent.
 
 LogScope is a **living product** that evolves every day: improvements land on `master` continuously, with semver tags and release notes for users who want a stable pin. See [Roadmap](../ROADMAP.md) and [Changelog](../../CHANGELOG.md).
 
-Long-term, LogScope aims to grow from log analysis into a broader **system investigation** direction: helping engineers answer “what happened?” across the artifacts they already collect. Near-term public milestones remain log-centric (search, reporting, analytics, query); additional investigation themes are published as public planning documents only when implementation starts.
+**Current direction:** Five Phase A stories define a teachable investigation methodology (Create → Understand → See → Crash → Connect). Story 5 (**Connect the Evidence**) completes Phase A. See [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md).
 
 ---
 

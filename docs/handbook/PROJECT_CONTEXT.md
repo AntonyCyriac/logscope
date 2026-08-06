@@ -1,13 +1,13 @@
-﻿# LogScope Project Context
+# LogScope Project Context
 
 | Field | Value |
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.0.0 |
+| Version | 3.2.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 04-08-2026 |
+| Last Updated | 06-08-2026 |
 
 ---
 
@@ -17,7 +17,9 @@
 
 # Overview
 
-You are assisting in the development of **LogScope**, a professional-grade, open-source log analysis framework written in modern C++.
+You are assisting in the development of **LogScope**, a professional-grade, open-source **investigation platform** written in modern C++.
+
+**Vocabulary note:** See [GLOSSARY.md](GLOSSARY.md). User-facing language prefers *investigate incident* and *evidence analysis* over *analyze log* / *log analysis*.
 
 This is **not a demo project**. It is intended to become a production-quality software product built with strong software engineering principles similar to LLVM, Qt, Chromium, Envoy, and other mature open-source projects.
 
@@ -29,9 +31,24 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.6.1` (shipped) — **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1–3 (`v2.3.0`–`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
+**Current release:** `v2.6.1` (shipped) - **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1-3 (`v2.3.0`-`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Story 5: Connect the Evidence** completes Phase A (investigation methodology).
 
-**Next release:** See [Roadmap](../ROADMAP.md) and [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md) for post–Story 4 backlog (timeline crash events, correlation, etc.).
+**North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
+
+**Engineering laws:** Evidence is source of truth (timelines, crash reports, links are projections). Conclusions belong to engineers — never stored as truth.
+
+**Domain glossary:** Investigation, Evidence, Artifact, Timeline Event, Evidence Link, Crash Report, Conclusion — see strategy Product Bible (private).
+
+**Active queue (completes Phase A):**
+
+| Priority | Focus | Status |
+|----------|-------|--------|
+| P0 / Story 5 | Connect the Evidence — completes Phase A | Active — G0 TBD |
+| P0.1 | Timeline decorations + jump to related evidence | Ship first |
+| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
+| P2 | Desktop Timeline/Crash parity | Necessary — don't block P0 |
+| P3 | ADR-010 domain model + events | Emergent after P0–P1 |
+| P4–P5 | IQL · AI Investigation Assistant | Research only |
 
 **Completed milestones:**
 
@@ -55,15 +72,7 @@ The project follows architecture-first development. Every implementation should 
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
 | M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`); thin auth (`v2.2.1`) |
 
-**Next:**
-
-| Release | Target | Focus |
-|---------|--------|-------|
-| Investigation — Story 2 | `v2.4.0` | Understand Everything (multi-source) — **shipped** |
-| Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) — **shipped** |
-| Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed — **shipped** |
-
-See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
+See [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) and [Roadmap](../ROADMAP.md).
 
 The engineering foundation is complete. Future work should **extend** the product rather than redesign the infrastructure.
 
@@ -305,13 +314,13 @@ Quality is more important than speed. Never sacrifice architecture for convenien
 
 # Project Goal
 
-The long-term goal is to make LogScope a professional, extensible, high-performance log analysis platform capable of handling multiple log formats through a plugin architecture, with strong tooling, reporting, and diagnostics.
+The long-term goal is to make LogScope a professional, extensible **Evidence-Centric Investigation Platform** — organizing, connecting, and understanding evidence from production incidents across log formats and artifact types, with strong tooling, reporting, and diagnostics.
 
 The project should be maintainable for many years and welcoming to future contributors through consistent engineering practices.
 
-**Product promise:** *Analyze any log format without writing custom scripts.*
+**Product promise:** *Investigate production incidents without stitching together one-off tools.*
 
-See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vision/PROJECT_CHARTER.md).
+See: [Glossary](GLOSSARY.md) · [Product Overview](../vision/PRODUCT_OVERVIEW.md) · [Project Charter](../vision/PROJECT_CHARTER.md).
 
 ---
 
@@ -336,6 +345,8 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
+| [GLOSSARY.md](GLOSSARY.md) | Domain vocabulary — evidence-centric investigation platform |
+| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — Story 5 completes Phase A |
 | [PRD-001 AI Engineering Agents](../requirements/future/PRD-001-AI-Engineering-Agents.md) | Future product agent vision (not current milestone scope) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |
@@ -368,3 +379,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation. |
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
+| 3.18.0 | 06-08-2026 | Current release `v2.6.1`; Story 5 Connect the Evidence completes Phase A. |

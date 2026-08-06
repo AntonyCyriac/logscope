@@ -1,6 +1,6 @@
 # LogScope
 
-LogScope is a generic log analysis platform designed to help engineers understand machine-generated log data through a consistent and reusable workflow. Over time it aims to support broader **system investigation** (answering “what happened?”), while remaining CLI-first and log-centric in the near term.
+LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents (logs, notes, pstack, core, timeline). CLI-first delivery on **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`).
 
 **Living product:** LogScope evolves every day — continuous delivery on `master`, tagged releases for stability, and public [Roadmap](ROADMAP.md) / [Changelog](../CHANGELOG.md) for traceability.
 
@@ -21,9 +21,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.3.0** ships **Story 1: Create an Investigation** — portable incident containers with log + note artifacts (CLI, REST, web). M15 Web Platform complete through `v2.2.2`. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), and **web** (`logscope-web`).
-
-**Next:** **`v2.4.0`** — Story 2: Understand Everything (multi-source correlation).
+LogScope **v2.6.1** ships **Stories 1–4** (investigation container, multi-source, timeline, crash analysis). **Story 5: Connect the Evidence** completes Phase A — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 ```text
 Source → Analysis → Investigation → Reporting

@@ -23,7 +23,7 @@ See also: [Roadmap](../ROADMAP.md) for milestone tracking and status.
 
 # 2. Executive Summary
 
-LogScope is a professional, extensible log analysis platform. The product promise is:
+LogScope is a professional, extensible **Evidence-Centric Investigation Platform**. The product promise is:
 
 > **Analyze any log format without writing custom scripts.**
 
@@ -39,7 +39,7 @@ With v1.0.0 complete, the engineering foundation is in place. Post-v1 work exten
 
 **Confirmed priority order:** Search → Reporting → Analytics → Query → AI → GUI → Web.
 
-**Current execution (post-M15):** M15 Web Platform is complete through **`v2.2.1`**. **Next:** **`v2.2.2`** — API key hashing (security patch) → **`v2.3.0`–`v2.6.0`** — investigation user stories (Create an Investigation, multi-source, unified timeline, crash analysis). See [Roadmap](../ROADMAP.md) and [Project Context](../handbook/PROJECT_CONTEXT.md).
+**Current execution:** Phase A Stories 1–4 shipped through **`v2.6.1`**. **Active:** Story 5 **Connect the Evidence** (Evidence Links on timeline). Post–Phase A: **Intelligence** era (AI as consumer). See [Roadmap](../ROADMAP.md), [Next Value-Add](../planning/NEXT-VALUE-ADD.md), and [Project Context](../handbook/PROJECT_CONTEXT.md).
 
 ---
 
@@ -334,7 +334,7 @@ v1.5.1  — M13: AI Assistant (released)
 v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.2.x  — M15.3–M15.4 web hardening (released)
-v2.3.0+ — Investigation user stories (planned)
+v2.3.0–v2.6.1 — Investigation stories 1–4 **shipped**; Story 5 **Connect the Evidence** active (see [NEXT-VALUE-ADD.md](NEXT-VALUE-ADD.md))
 ```
 
 ---
