@@ -12,6 +12,22 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.6.2] - 2026-08-06
+
+**Hotfix** — signal-handler fault site and all-idle pstack dumps ([#134](https://github.com/AntonyCyriac/logscope/issues/134)).
+
+### Fixed
+
+- **`PstackCrashAnalyzer`** — choose the application frame below the signal-handler boundary; avoid asserting a fault thread when every thread is idle ([#136](https://github.com/AntonyCyriac/logscope/pull/136))
+
+### Added
+
+- Regression tests for signal-handler boundary and all-idle dumps
+
+See [v2.6.2 release notes](docs/release/v2.6.2-RELEASE-NOTES.md).
+
+---
+
 ## [2.6.1] - 2026-08-06
 
 **Hotfix** — pstack fault-thread misidentification ([#129](https://github.com/AntonyCyriac/logscope/issues/129)).
