@@ -1081,8 +1081,11 @@
 
     const response = await api(
       '/api/v1/investigations/' + state.activeInvestigationId + '/evidence-links',
-      body,
-      'POST'
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      }
     );
 
     if (response.status === 409) {
@@ -1106,8 +1109,7 @@
 
     const response = await api(
       '/api/v1/investigations/' + state.activeInvestigationId + '/evidence-links/' + linkId,
-      null,
-      'DELETE'
+      { method: 'DELETE' }
     );
 
     if (!response.ok && response.status !== 204) {
