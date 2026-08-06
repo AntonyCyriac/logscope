@@ -1615,6 +1615,68 @@ std::optional<InvestigationTimelineOptions> parseInvestigationTimelineArguments(
     return options;
 }
 
+std::optional<InvestigationCrashOptions> parseInvestigationCrashArguments(int argc, char* argv[], int startIndex)
+{
+    InvestigationCrashOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--format" && index + 1 < argc)
+        {
+            const auto format = parseInvestigationTimelineFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+            continue;
+        }
+
+        if (argument == "--artifact" && index + 1 < argc)
+        {
+            options.artifactId = argv[++index];
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1752,6 +1814,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::InvestigationTimeline;
             parsed.investigationTimeline.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "crash")
+        {
+            parsed.command = CliCommand::InvestigationCrash;
+            parsed.investigationCrash.showHelp = true;
 
             return parsed;
         }
@@ -2080,6 +2150,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::InvestigationTimeline;
             parsed.investigationTimeline = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "crash")
+        {
+            const auto options = parseInvestigationCrashArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationCrash;
+            parsed.investigationCrash = *options;
 
             return parsed;
         }

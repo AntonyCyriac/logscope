@@ -527,6 +527,27 @@ foundation::Result<scope::workspace::TimelineProjectionResult> InvestigationStor
     return investigationResult->projectTimeline(options);
 }
 
+foundation::Result<scope::workspace::CrashReport> InvestigationStore::analyzeCrash(
+    const std::string& investigationId, const std::string& artifactId) const
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<scope::workspace::CrashReport>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::CrashReport>(investigationResult.error());
+    }
+
+    return investigationResult->analyzeCrash(artifactId);
+}
+
 void InvestigationStore::updateSummaryFromService(const std::string& investigationId,
                                                   const application::ApplicationService& service)
 {

@@ -5,6 +5,7 @@
 #include "rest_json.hpp"
 
 #include "analytics_output.hpp"
+#include "crash_report.hpp"
 #include "investigation_output.hpp"
 #include "output_format.hpp"
 #include "report_format.hpp"
@@ -571,6 +572,125 @@ std::string formatInvestigationTimeline(const std::string& investigationId,
     output << "\n  ]\n}";
 
     return output.str();
+}
+
+std::string formatCrashFrameJson(const scope::workspace::CrashFrame& frame)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"index\": " << frame.index << ",\n"
+           << "  \"address\": \"" << escapeJsonString(frame.address) << "\",\n"
+           << "  \"symbol\": \"" << escapeJsonString(frame.symbol) << "\"";
+
+    if (frame.module.has_value())
+    {
+        output << ",\n  \"module\": \"" << escapeJsonString(*frame.module) << '"';
+    }
+
+    if (frame.location.has_value())
+    {
+        output << ",\n  \"location\": \"" << escapeJsonString(*frame.location) << '"';
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatCrashThreadJson(const scope::workspace::CrashThread& thread)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(thread.id) << "\",\n"
+           << "  \"name\": \"" << escapeJsonString(thread.name) << "\",\n"
+           << "  \"isFaultThread\": " << (thread.isFaultThread ? "true" : "false") << ",\n"
+           << "  \"frames\": [";
+
+    for (std::size_t index = 0U; index < thread.frames.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    " << formatCrashFrameJson(thread.frames[index]);
+    }
+
+    output << "\n  ]\n}";
+
+    return output.str();
+}
+
+std::string formatStringArrayJson(const std::vector<std::string>& values)
+{
+    std::ostringstream output;
+    output << '[';
+
+    for (std::size_t index = 0U; index < values.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(values[index]) << '"';
+    }
+
+    if (!values.empty())
+    {
+        output << '\n';
+    }
+
+    output << "  ]";
+
+    return output.str();
+}
+
+std::string formatCrashReport(const scope::workspace::CrashReport& report)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(report.id) << "\",\n"
+           << "  \"artifactId\": \"" << escapeJsonString(report.artifactId) << "\",\n"
+           << "  \"artifactType\": \"" << escapeJsonString(report.artifactType) << "\",\n"
+           << "  \"status\": \""
+           << escapeJsonString(scope::workspace::crashAnalysisStatusToString(report.status)) << "\",\n"
+           << "  \"summary\": \"" << escapeJsonString(report.summary) << "\",\n"
+           << "  \"threads\": [";
+
+    for (std::size_t index = 0U; index < report.threads.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    " << formatCrashThreadJson(report.threads[index]);
+    }
+
+    output << "\n  ],\n"
+           << "  \"observations\": " << formatStringArrayJson(report.observations) << ",\n"
+           << "  \"warnings\": " << formatStringArrayJson(report.warnings) << ",\n"
+           << "  \"metadata\": " << formatStringMapJson(report.metadata);
+
+    if (report.signal.has_value())
+    {
+        output << ",\n  \"signal\": \"" << escapeJsonString(*report.signal) << '"';
+    }
+
+    if (report.faultThreadId.has_value())
+    {
+        output << ",\n  \"faultThreadId\": \"" << escapeJsonString(*report.faultThreadId) << '"';
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+std::string formatInvestigationCrashAnalysis(const scope::workspace::CrashReport& report)
+{
+    return std::string("{\n  \"report\": ") + formatCrashReport(report) + "\n}";
 }
 
 std::string formatTailPollResult(const std::vector<std::string>& lines, const bool active)

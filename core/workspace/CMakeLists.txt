@@ -6,6 +6,8 @@
 add_library(scope_workspace
     artifact_handler.cpp
     artifact_projector.cpp
+    crash_analyzer.cpp
+    crash_report.cpp
     investigation_container.cpp
     investigation_manifest_io.cpp
     investigation_session.cpp

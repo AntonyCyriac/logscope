@@ -71,6 +71,10 @@ namespace scope::web
 [[nodiscard]] std::string formatInvestigationTimeline(const std::string& investigationId,
                                                       const scope::workspace::TimelineProjectionResult& result);
 
+[[nodiscard]] std::string formatCrashReport(const scope::workspace::CrashReport& report);
+
+[[nodiscard]] std::string formatInvestigationCrashAnalysis(const scope::workspace::CrashReport& report);
+
 [[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
 
 [[nodiscard]] std::string formatAnalyzeJobAccepted(const AnalyzeJobEnqueueResult& job);

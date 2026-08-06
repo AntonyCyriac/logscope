@@ -47,6 +47,7 @@ enum class CliCommand
     InvestigationShow,
     InvestigationOpen,
     InvestigationTimeline,
+    InvestigationCrash,
     AgentHelp,
     AgentInvestigate
 };
@@ -235,6 +236,15 @@ struct InvestigationTimelineOptions
     bool showHelp = false;
 };
 
+struct InvestigationCrashOptions
+{
+    std::string investigationId;
+    std::string artifactId;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    InvestigationTimelineFormat format = InvestigationTimelineFormat::Table;
+    bool showHelp = false;
+};
+
 /**
  * @brief Parsed CLI invocation.
  */
@@ -259,6 +269,7 @@ struct ParsedCli
     InvestigationShowOptions investigationShow;
     InvestigationOpenOptions investigationOpen;
     InvestigationTimelineOptions investigationTimeline;
+    InvestigationCrashOptions investigationCrash;
     AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
 };

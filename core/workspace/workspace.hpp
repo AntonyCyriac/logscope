@@ -12,3 +12,5 @@
 #include "session_store.hpp"
 #include "timeline_event.hpp"
 #include "timeline_projector.hpp"
+#include "crash_report.hpp"
+#include "crash_analyzer.hpp"

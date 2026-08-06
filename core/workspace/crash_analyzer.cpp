@@ -1,0 +1,671 @@
+/**
+ * @file crash_analyzer.cpp
+ */
+
+#include "crash_analyzer.hpp"
+
+#include "foundation/hash.hpp"
+
+#include <algorithm>
+#include <array>
+#include <cctype>
+#include <cstdio>
+#include <filesystem>
+#include <fstream>
+#include <regex>
+#include <sstream>
+#include <string>
+
+#ifdef _WIN32
+#include <process.h>
+#define crash_popen _popen
+#define crash_pclose _pclose
+#else
+#define crash_popen popen
+#define crash_pclose pclose
+#endif
+
+namespace scope::workspace
+{
+
+namespace
+{
+
+constexpr const char* kPstackAnalyzerVersion = "pstack-v1";
+constexpr const char* kCoreAnalyzerVersion = "core-gdb-v1";
+
+std::string trim(const std::string& value)
+{
+    std::size_t start = 0U;
+
+    while (start < value.size() && std::isspace(static_cast<unsigned char>(value[start])) != 0)
+    {
+        ++start;
+    }
+
+    std::size_t end = value.size();
+
+    while (end > start && std::isspace(static_cast<unsigned char>(value[end - 1U])) != 0)
+    {
+        --end;
+    }
+
+    return value.substr(start, end - start);
+}
+
+std::optional<std::string> extractSignal(const std::string& line)
+{
+    static const std::regex pattern(R"(Program received signal (SIG\w+))");
+    std::smatch match;
+
+    if (std::regex_search(line, match, pattern) && match.size() > 1U)
+    {
+        return match[1].str();
+    }
+
+    return std::nullopt;
+}
+
+std::optional<std::string> extractThreadHeader(const std::string& line, std::string& threadName)
+{
+    static const std::regex pattern(R"(^Thread\s+(\d+)(.*)$)");
+    std::smatch match;
+
+    if (!std::regex_match(line, match, pattern) || match.size() < 2U)
+    {
+        return std::nullopt;
+    }
+
+    threadName = "Thread " + match[1].str();
+
+    if (match.size() > 2U)
+    {
+        const std::string suffix = trim(match[2].str());
+
+        if (!suffix.empty() && suffix != ":")
+        {
+            threadName += ' ' + suffix;
+        }
+    }
+
+    return match[1].str();
+}
+
+std::optional<std::size_t> extractFrameIndex(const std::string& line)
+{
+    if (line.empty() || line[0] != '#')
+    {
+        return std::nullopt;
+    }
+
+    std::size_t position = 1U;
+
+    while (position < line.size() && std::isspace(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    std::size_t end = position;
+
+    while (end < line.size() && std::isdigit(static_cast<unsigned char>(line[end])) != 0)
+    {
+        ++end;
+    }
+
+    if (end == position)
+    {
+        return std::nullopt;
+    }
+
+    return static_cast<std::size_t>(std::stoul(line.substr(position, end - position)));
+}
+
+std::optional<std::string> extractHexAddress(const std::string& line, std::size_t& position)
+{
+    while (position < line.size() && std::isspace(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    if (position + 2U >= line.size() || line[position] != '0' ||
+        (line[position + 1U] != 'x' && line[position + 1U] != 'X'))
+    {
+        return std::nullopt;
+    }
+
+    std::size_t end = position + 2U;
+
+    while (end < line.size() &&
+           (std::isxdigit(static_cast<unsigned char>(line[end])) != 0 || line[end] == '`'))
+    {
+        ++end;
+    }
+
+    if (end == position + 2U)
+    {
+        return std::nullopt;
+    }
+
+    const std::string address = line.substr(position, end - position);
+    position = end;
+
+    return address;
+}
+
+std::optional<CrashFrame> parseFrameLine(const std::string& line)
+{
+    const auto frameIndex = extractFrameIndex(line);
+
+    if (!frameIndex.has_value())
+    {
+        return std::nullopt;
+    }
+
+    std::size_t position = line.find('#') + 1U;
+
+    while (position < line.size() && std::isspace(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    while (position < line.size() && std::isdigit(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    const auto address = extractHexAddress(line, position);
+
+    if (!address.has_value())
+    {
+        return std::nullopt;
+    }
+
+    const std::size_t inPosition = line.find(" in ", position);
+
+    if (inPosition == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    CrashFrame frame;
+    frame.index = *frameIndex;
+    frame.address = *address;
+
+    std::string remainder = trim(line.substr(inPosition + 4U));
+    const std::size_t atPosition = remainder.find(" at ");
+
+    if (atPosition != std::string::npos)
+    {
+        frame.location = trim(remainder.substr(atPosition + 4U));
+        remainder = trim(remainder.substr(0U, atPosition));
+    }
+
+    const std::size_t fromPosition = remainder.find(" from ");
+
+    if (fromPosition != std::string::npos)
+    {
+        frame.module = trim(remainder.substr(fromPosition + 6U));
+        remainder = trim(remainder.substr(0U, fromPosition));
+    }
+
+    const std::size_t parenPosition = remainder.find('(');
+
+    if (parenPosition != std::string::npos)
+    {
+        frame.symbol = trim(remainder.substr(0U, parenPosition));
+    }
+    else
+    {
+        frame.symbol = trim(remainder);
+    }
+
+    if (frame.symbol.empty())
+    {
+        frame.symbol = "<unknown>";
+    }
+
+    return frame;
+}
+
+std::optional<std::string> extractSwitchingThreadId(const std::string& line)
+{
+    static const std::regex pattern(R"(\[Switching to thread (\d+))", std::regex::icase);
+    std::smatch match;
+
+    if (std::regex_search(line, match, pattern) && match.size() > 1U)
+    {
+        return match[1].str();
+    }
+
+    return std::nullopt;
+}
+
+CrashReport makeBaseReport(const ArtifactRecord& artifact, const CrashAnalysisContext& context,
+                           const std::string& analyzerVersion)
+{
+    CrashReport report;
+    report.id = makeCrashReportId(context.investigationId, artifact.id, analyzerVersion);
+    report.artifactId = artifact.id;
+    report.artifactType = artifact.type;
+
+    return report;
+}
+
+std::string runCommandCaptureOutput(const std::string& command)
+{
+    std::string output;
+    FILE* pipe = crash_popen(command.c_str(), "r");
+
+    if (pipe == nullptr)
+    {
+        return output;
+    }
+
+    std::array<char, 4096> buffer{};
+
+    while (std::fgets(buffer.data(), static_cast<int>(buffer.size()), pipe) != nullptr)
+    {
+        output.append(buffer.data());
+    }
+
+    (void)crash_pclose(pipe);
+
+    return output;
+}
+
+bool isGdbAvailable()
+{
+    const std::string output = runCommandCaptureOutput("gdb --version 2>&1");
+
+    return output.find("GNU gdb") != std::string::npos || output.find("gdb") != std::string::npos;
+}
+
+std::string quoteShellPath(const std::string& path)
+{
+#ifdef _WIN32
+    return '"' + path + '"';
+#else
+    std::string quoted = "'";
+    quoted.reserve(path.size() + 2U);
+
+    for (const char character : path)
+    {
+        if (character == '\'')
+        {
+            quoted += "'\\''";
+        }
+        else
+        {
+            quoted.push_back(character);
+        }
+    }
+
+    quoted.push_back('\'');
+    return quoted;
+#endif
+}
+
+void parseGdbBacktrace(const std::string& gdbOutput, CrashReport& report)
+{
+    CrashThread* currentThread = nullptr;
+    std::size_t threadSequence = 0U;
+
+    std::istringstream stream(gdbOutput);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+
+        const std::string trimmed = trim(line);
+
+        if (trimmed.empty())
+        {
+            continue;
+        }
+
+        if (trimmed.rfind("Thread ", 0) == 0)
+        {
+            CrashThread thread;
+            thread.id = std::to_string(++threadSequence);
+            thread.name = trimmed;
+            report.threads.push_back(std::move(thread));
+            currentThread = &report.threads.back();
+            continue;
+        }
+
+        if (currentThread == nullptr)
+        {
+            continue;
+        }
+
+        if (const auto frame = parseFrameLine(trimmed); frame.has_value())
+        {
+            currentThread->frames.push_back(*frame);
+        }
+    }
+}
+
+class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
+{
+  public:
+    [[nodiscard]] std::string_view artifactType() const noexcept override
+    {
+        return "pstack";
+    }
+
+    [[nodiscard]] bool supports(const ArtifactRecord& artifact) const override
+    {
+        return artifact.type == "pstack";
+    }
+
+    [[nodiscard]] bool canAnalyze(const ArtifactRecord& artifact, const foundation::Path& dataPath) const override
+    {
+        (void)artifact;
+
+        std::error_code errorCode;
+
+        return std::filesystem::is_regular_file(dataPath.string(), errorCode) && !errorCode;
+    }
+
+    [[nodiscard]] foundation::Result<CrashReport> analyze(const ArtifactRecord& artifact,
+                                                            const foundation::Path& dataPath,
+                                                            const CrashAnalysisContext& context) const override
+    {
+        CrashReport report = makeBaseReport(artifact, context, kPstackAnalyzerVersion);
+
+        std::ifstream stream(dataPath.string());
+
+        if (!stream)
+        {
+            report.status = CrashAnalysisStatus::Partial;
+            report.summary = "Pstack file could not be read";
+            report.warnings.push_back("Failed to open pstack artifact data file.");
+
+            return foundation::Result<CrashReport>(std::move(report));
+        }
+
+        CrashThread* currentThread = nullptr;
+        std::optional<std::string> switchingThreadId;
+        std::size_t threadSequence = 0U;
+
+        std::string line;
+
+        while (std::getline(stream, line))
+        {
+            if (!line.empty() && line.back() == '\r')
+            {
+                line.pop_back();
+            }
+
+            const std::string trimmed = trim(line);
+
+            if (trimmed.empty())
+            {
+                continue;
+            }
+
+            if (const auto signal = extractSignal(trimmed); signal.has_value())
+            {
+                report.signal = signal;
+                continue;
+            }
+
+            if (const auto threadId = extractSwitchingThreadId(trimmed); threadId.has_value())
+            {
+                switchingThreadId = threadId;
+                continue;
+            }
+
+            std::string threadName;
+
+            if (const auto threadId = extractThreadHeader(trimmed, threadName); threadId.has_value())
+            {
+                CrashThread thread;
+                thread.id = *threadId;
+                thread.name = threadName;
+                report.threads.push_back(std::move(thread));
+                currentThread = &report.threads.back();
+                continue;
+            }
+
+            if (currentThread == nullptr)
+            {
+                continue;
+            }
+
+            if (const auto frame = parseFrameLine(trimmed); frame.has_value())
+            {
+                currentThread->frames.push_back(*frame);
+            }
+        }
+
+        if (report.threads.empty())
+        {
+            report.status = CrashAnalysisStatus::Partial;
+            report.summary = "No threads parsed from pstack";
+            report.warnings.push_back("Pstack format not recognized or file is empty.");
+
+            return foundation::Result<CrashReport>(std::move(report));
+        }
+
+        if (switchingThreadId.has_value())
+        {
+            report.faultThreadId = switchingThreadId;
+        }
+        else if (report.signal.has_value())
+        {
+            report.faultThreadId = report.threads.front().id;
+        }
+
+        for (CrashThread& thread : report.threads)
+        {
+            if (report.faultThreadId.has_value() && thread.id == *report.faultThreadId)
+            {
+                thread.isFaultThread = true;
+            }
+        }
+
+        if (!report.faultThreadId.has_value() && !report.threads.empty())
+        {
+            report.threads.front().isFaultThread = true;
+            report.faultThreadId = report.threads.front().id;
+        }
+
+        const CrashThread* faultThread = nullptr;
+
+        for (const CrashThread& thread : report.threads)
+        {
+            if (thread.isFaultThread)
+            {
+                faultThread = &thread;
+                break;
+            }
+        }
+
+        if (faultThread != nullptr && !faultThread->frames.empty())
+        {
+            const CrashFrame& topFrame = faultThread->frames.front();
+            std::ostringstream observation;
+            observation << "Fault in " << topFrame.symbol;
+
+            if (topFrame.location.has_value())
+            {
+                observation << " at " << *topFrame.location;
+            }
+
+            report.observations.push_back(observation.str());
+        }
+
+        if (report.signal.has_value())
+        {
+            report.observations.push_back("Signal " + *report.signal + " received");
+        }
+
+        if (faultThread != nullptr && !faultThread->frames.empty())
+        {
+            std::ostringstream summary;
+            summary << faultThread->name;
+
+            if (report.signal.has_value())
+            {
+                summary << " received " << *report.signal;
+            }
+
+            summary << " in " << faultThread->frames.front().symbol;
+            report.summary = summary.str();
+        }
+        else
+        {
+            report.summary = "Pstack parsed with " + std::to_string(report.threads.size()) + " thread(s)";
+        }
+
+        report.status = report.threads.empty() ? CrashAnalysisStatus::Partial : CrashAnalysisStatus::Complete;
+        report.metadata["analyzer"] = kPstackAnalyzerVersion;
+        report.metadata["threadCount"] = std::to_string(report.threads.size());
+
+        return foundation::Result<CrashReport>(std::move(report));
+    }
+};
+
+class CoreCrashAnalyzer final : public IArtifactCrashAnalyzer
+{
+  public:
+    [[nodiscard]] std::string_view artifactType() const noexcept override
+    {
+        return "core";
+    }
+
+    [[nodiscard]] bool supports(const ArtifactRecord& artifact) const override
+    {
+        return artifact.type == "core";
+    }
+
+    [[nodiscard]] bool canAnalyze(const ArtifactRecord& artifact, const foundation::Path& dataPath) const override
+    {
+        (void)artifact;
+
+        std::error_code errorCode;
+
+        return std::filesystem::is_regular_file(dataPath.string(), errorCode) && !errorCode;
+    }
+
+    [[nodiscard]] foundation::Result<CrashReport> analyze(const ArtifactRecord& artifact,
+                                                            const foundation::Path& dataPath,
+                                                            const CrashAnalysisContext& context) const override
+    {
+        CrashReport report = makeBaseReport(artifact, context, kCoreAnalyzerVersion);
+
+        if (!isGdbAvailable())
+        {
+            report.status = CrashAnalysisStatus::Unavailable;
+            report.summary = "Core dump analysis unavailable";
+            report.warnings.push_back("GDB not installed");
+            report.metadata["analyzer"] = kCoreAnalyzerVersion;
+
+            return foundation::Result<CrashReport>(std::move(report));
+        }
+
+        const std::string corePath = quoteShellPath(dataPath.string());
+        const std::string command = "gdb --batch -ex \"thread apply all bt\" -ex quit -c " + corePath + " 2>&1";
+        const std::string gdbOutput = runCommandCaptureOutput(command);
+
+        if (gdbOutput.empty())
+        {
+            report.status = CrashAnalysisStatus::Partial;
+            report.summary = "GDB produced no output";
+            report.warnings.push_back("GDB command failed or core file is unreadable.");
+
+            return foundation::Result<CrashReport>(std::move(report));
+        }
+
+        parseGdbBacktrace(gdbOutput, report);
+
+        if (report.threads.empty())
+        {
+            report.status = CrashAnalysisStatus::Partial;
+            report.summary = "No stack frames parsed from core dump";
+            report.warnings.push_back("Debug symbols unavailable or core format not recognized.");
+            report.observations.push_back("GDB ran but no thread backtraces were parsed.");
+
+            return foundation::Result<CrashReport>(std::move(report));
+        }
+
+        if (!report.threads.empty())
+        {
+            report.threads.front().isFaultThread = true;
+            report.faultThreadId = report.threads.front().id;
+        }
+
+        const CrashThread& faultThread = report.threads.front();
+
+        if (!faultThread.frames.empty())
+        {
+            report.summary = faultThread.name + " backtrace from core dump";
+
+            if (faultThread.frames.front().symbol == "<unknown>")
+            {
+                report.observations.push_back("Debug symbols unavailable");
+            }
+            else
+            {
+                report.observations.push_back("Top frame: " + faultThread.frames.front().symbol);
+            }
+        }
+        else
+        {
+            report.summary = "Core dump analyzed with limited frame data";
+        }
+
+        const bool hasUnknownSymbols =
+            std::any_of(report.threads.begin(), report.threads.end(), [](const CrashThread& thread) {
+                return std::any_of(thread.frames.begin(), thread.frames.end(),
+                                   [](const CrashFrame& frame) { return frame.symbol == "<unknown>"; });
+            });
+
+        if (hasUnknownSymbols)
+        {
+            report.status = CrashAnalysisStatus::Partial;
+            report.warnings.push_back("Some frames lack symbol information.");
+        }
+        else
+        {
+            report.status = CrashAnalysisStatus::Complete;
+        }
+
+        report.metadata["analyzer"] = kCoreAnalyzerVersion;
+        report.metadata["threadCount"] = std::to_string(report.threads.size());
+
+        return foundation::Result<CrashReport>(std::move(report));
+    }
+};
+
+const PstackCrashAnalyzer kPstackAnalyzer;
+const CoreCrashAnalyzer kCoreAnalyzer;
+
+} // namespace
+
+const IArtifactCrashAnalyzer* findCrashAnalyzer(const std::string_view type) noexcept
+{
+    if (type == "pstack")
+    {
+        return &kPstackAnalyzer;
+    }
+
+    if (type == "core")
+    {
+        return &kCoreAnalyzer;
+    }
+
+    return nullptr;
+}
+
+bool isCrashAnalyzableArtifactType(const std::string_view type) noexcept
+{
+    return findCrashAnalyzer(type) != nullptr;
+}
+
+} // namespace scope::workspace

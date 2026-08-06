@@ -43,6 +43,7 @@ void CliApplication::printUsage(std::ostream& output)
            << "  investigation show    Show investigation metadata and artifacts\n"
            << "  investigation open    Print resolved log path for an investigation\n"
            << "  investigation timeline Show chronological investigation timeline\n"
+           << "  investigation crash    Analyze crash evidence for an artifact\n"
            << "  agent investigate  AI-assisted log investigation\n"
            << "  help [command]     Show help for a command\n"
            << "\n"
@@ -100,6 +101,8 @@ int CliApplication::run(const ParsedCli& parsed,
         return runInvestigationOpenCommand(parsed.investigationOpen, output, errorOutput);
     case CliCommand::InvestigationTimeline:
         return runInvestigationTimelineCommand(parsed.investigationTimeline, output, errorOutput);
+    case CliCommand::InvestigationCrash:
+        return runInvestigationCrashCommand(parsed.investigationCrash, output, errorOutput);
     case CliCommand::AgentHelp:
         printAgentUsage(output);
 

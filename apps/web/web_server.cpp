@@ -1510,6 +1510,54 @@ void WebServer::registerRoutes()
                       response.set_header(kSessionHeader, sessionId);
                   });
 
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+)/crash-analysis)",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const std::string artifactId = request.matches[2];
+                      const auto crashResult =
+                          m_workspaceStore.investigationStore().analyzeCrash(investigationId, artifactId);
+
+                      if (!crashResult)
+                      {
+                          if (crashResult.error().code() == foundation::ErrorCode::InvalidArgument &&
+                              crashResult.error().message() == "ARTIFACT_NOT_ANALYZABLE")
+                          {
+                              setJsonResponse(response, 409,
+                                              errorEnvelope("ARTIFACT_NOT_ANALYZABLE",
+                                                            "Artifact type does not support crash analysis."));
+
+                              return;
+                          }
+
+                          setErrorResponse(response, crashResult.error());
+
+                          return;
+                      }
+
+                      setJsonResponse(response, 200,
+                                      successEnvelope(formatInvestigationCrashAnalysis(*crashResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
     m_server->Put(R"(/api/v1/investigations/([^/]+))",
                 [this](const httplib::Request& request, httplib::Response& response) {
                     if (!authorizeApiKey(m_config.apiKey, request, response))
