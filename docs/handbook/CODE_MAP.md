@@ -19,7 +19,7 @@ Pointers for AI assistants — **where code and tests live**. Session bootstrap:
 | Area | Paths |
 |------|--------|
 | Routes | `web_server.cpp` |
-| Investigations (v2.3.0+ / M15.5–M15.7) | `investigation_store.*` — `/api/v1/investigations`, artifacts, open/switch, **`GET …/timeline`** |
+| Investigations (v2.3.0+ / M15.5–M15.9) | `investigation_store.*` — `/api/v1/investigations`, artifacts, open/switch, **`GET …/timeline`**, **`GET/POST/DELETE …/evidence-links`** (v2.7.0) |
 | Shared workspaces (v2.2.0 compat) | `workspace_store.*` — delegates to `InvestigationStore`; `/api/v1/workspaces` alias |
 | Async analyze jobs | `analyze_job_queue.*` |
 | Sessions | `session_store.*` |
@@ -64,7 +64,7 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [V250-SEE-WHAT-HAPPENED-SCENARIOS.md](../planning/V250-SEE-WHAT-HAPPENED-SCENARIOS.md) — Story 3 timeline (Story Gate closed)
 - [V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md](../planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) — Story 4 crash (Story Gate closed)
 - [GLOSSARY.md](GLOSSARY.md) — domain vocabulary
-- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
+- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md) · [ADR-010 M15.9](../architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md) (v2.7.0)
 - [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.6.1 release notes](../release/v2.6.1-RELEASE-NOTES.md)
 
 ## CI
