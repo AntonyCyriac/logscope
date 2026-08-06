@@ -1424,8 +1424,6 @@
     .then(refreshExtensions)
     .then(refreshInvestigations)
     .then(function () {
-      setStatus('Ready');
-    })
       setStatus('Ready — session ' + state.sessionId);
     })
     .catch(function (error) {
