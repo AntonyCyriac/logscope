@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.5.0 |
+| Version | 1.6.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.6.1` (Phase A complete). **Next ship:** post–Story 4 backlog — versions TBD at G0 charter (see §5).
+**Current public release:** `v2.6.1` (Phase A complete). **Next flagship:** P0 Evidence Correlation — version TBD at G0 charter (see §5).
 
 ---
 
@@ -29,7 +29,7 @@ v2.4.0  → shipped (Understand Everything)
 v2.5.0  → shipped (See What Happened)
 v2.6.0  → shipped (Understand Why It Crashed)
 v2.6.1  → shipped (hotfix #129)
-Next    → post–Story 4 backlog (§5)
+Next    → P0 Evidence Correlation (§5)
 ```
 
 ---
@@ -55,16 +55,18 @@ Next    → post–Story 4 backlog (§5)
 
 ---
 
-# 5. Post–Story 4 backlog (ordered; versions TBD)
+# 5. Post–Story 4 backlog (P0–P5)
 
-| # | Item | Notes |
-|---|------|-------|
-| 1 | Timeline crash events | `crash.summary` on timeline projection — deferred from v2.6.0 |
-| 2 | Cross-log / multi-artifact correlation | Beyond single-source filters today |
-| 3 | Desktop Timeline/Crash tab parity | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
-| 4 | ADR-010 domain model + events | Emergent after v2.6 — extract when patterns recur |
+| Priority | Item | Type | Notes |
+|----------|------|------|-------|
+| **P0** | Evidence Correlation | **Implementation** — next flagship | Cross-log / multi-artifact correlation beyond single-source filters |
+| **P1** | Crash Timeline | **Implementation** — quick win | `crash.summary` on timeline projection — deferred from v2.6.0; small release |
+| **P2** | Desktop Timeline/Crash parity | **Implementation** | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
+| **P3** | ADR-010 domain model + events | **Emergent** | Extract when patterns recur after P0–P1 |
+| **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
+| **P5** | AI Investigation Assistant | **Research only** | Evidence-based sequence synthesis — don't build yet |
 
-Tactical planning docs are added when each item is chartered for implementation (G0).
+Tactical planning docs are added when each **implementation** item (P0–P2) is chartered for release (G0).
 
 ---
 
@@ -86,6 +88,8 @@ Tactical planning docs are added when each item is chartered for implementation 
 | Hosted multi-tenant SaaS | Out of product scope |
 | Plugin marketplace / `logscope install` | M12/M14 non-goals |
 | CrashScope flagship program, playbooks | Folded into investigation stories where applicable |
+| Investigation Query Language (P4) | Research only — not build queue |
+| AI Investigation Assistant (P5) | Research only — not build queue |
 | SIMD / zero-copy perf | Profile first |
 | Distro packages (DEB/RPM/Homebrew) | GitHub Releases sufficient |
 | PRD-001 lifecycle agents | Future vision |
@@ -102,3 +106,4 @@ Tactical planning docs are added when each item is chartered for implementation 
 | 1.3.0 | 04-08-2026 | M15 complete at v2.2.1; v2.2.2 patch and investigation stories are active queue. |
 | 1.4.0 | 04-08-2026 | Removed enterprise/cloud backlog rows; public horizon ends at investigation stories. |
 | 1.5.0 | 06-08-2026 | Phase A shipped through v2.6.1; post–Story 4 backlog is active queue. |
+| 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; correlation is next flagship; P4/P5 research only. |

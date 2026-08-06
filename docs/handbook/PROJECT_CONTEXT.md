@@ -7,7 +7,7 @@
 | Version | 3.0.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 04-08-2026 |
+| Last Updated | 06-08-2026 |
 
 ---
 
@@ -17,7 +17,9 @@
 
 # Overview
 
-You are assisting in the development of **LogScope**, a professional-grade, open-source log analysis framework written in modern C++.
+You are assisting in the development of **LogScope**, a professional-grade, open-source **investigation platform** written in modern C++.
+
+**Vocabulary note:** User-facing language prefers *investigate incident* and *evidence analysis* over *analyze log* / *log analysis*. Evidence includes logs, notes, pstack, core, and timeline — not just logs. Code identifiers are not mass-renamed for this shift.
 
 This is **not a demo project**. It is intended to become a production-quality software product built with strong software engineering principles similar to LLVM, Qt, Chromium, Envoy, and other mature open-source projects.
 
@@ -31,7 +33,7 @@ The project follows architecture-first development. Every implementation should 
 
 **Current release:** `v2.6.1` (shipped) — **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1–3 (`v2.3.0`–`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Next release:** See [Roadmap](../ROADMAP.md) and [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md) for post–Story 4 backlog (timeline crash events, correlation, etc.).
+**Next release:** See [Roadmap](../ROADMAP.md) and [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md). **P0 Evidence Correlation** is the next flagship; P1 Crash Timeline is a quick win (small release).
 
 **Completed milestones:**
 
@@ -55,15 +57,17 @@ The project follows architecture-first development. Every implementation should 
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
 | M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`); thin auth (`v2.2.1`) |
 
-**Next:**
+**Next (post–Story 4):**
 
-| Release | Target | Focus |
-|---------|--------|-------|
-| Investigation — Story 2 | `v2.4.0` | Understand Everything (multi-source) — **shipped** |
-| Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) — **shipped** |
-| Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed — **shipped** |
+| Priority | Focus | Status |
+|----------|-------|--------|
+| P0 | Evidence Correlation | Next flagship — version TBD at G0 |
+| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
+| P2 | Desktop Timeline/Crash parity | Necessary — don't block P0 |
+| P3 | ADR-010 domain model + events | Emergent after P0–P1 |
+| P4–P5 | IQL · AI Investigation Assistant | Research only |
 
-See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
+See [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) and [Roadmap](../ROADMAP.md).
 
 The engineering foundation is complete. Future work should **extend** the product rather than redesign the infrastructure.
 
