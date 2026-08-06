@@ -1151,9 +1151,6 @@
         state.activeTimelineEventId = event.id || null;
         renderTimelineList(state.timelineEvents);
         renderRelatedEvidencePanel();
-        jumpToTimelineEvent(event).catch(function (error) {
-          setStatus('Jump error: ' + error.message);
-        });
       });
 
       timelineList.appendChild(row);
@@ -1404,11 +1401,11 @@
         return a.id === state.activeArtifactId;
       });
       if (artifact) {
+        await selectArtifactInCenter(artifact);
         if (artifact.type === 'log') {
           analyzeBtn.disabled = false;
           tailStartBtn.disabled = false;
         }
-        await selectArtifactInCenter(artifact);
       }
     }
 

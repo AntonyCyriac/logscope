@@ -4,9 +4,11 @@ import {
   addLogArtifact,
   addPstackArtifact,
   analyzeHeader,
+  createEvidenceLink,
   createInvestigation,
   openFirstArtifact,
   switchBottomTab,
+  syslogPath,
   waitForReady,
 } from './helpers';
 
@@ -37,7 +39,7 @@ test.describe('Story Gate — investigation workflow', () => {
     expect(await timelineRows.count()).toBeGreaterThan(0);
 
     await timelineRows.first().click();
-    await expect(page.getByTestId('status')).toContainText(/Opened|line/);
+    await expect(page.getByTestId('related-evidence-panel')).toBeVisible();
 
     await switchBottomTab(page, 'results');
     await expect(page.getByTestId('results-row').first()).toBeVisible();
@@ -55,6 +57,34 @@ test.describe('Story Gate — investigation workflow', () => {
     await page.getByTestId('crash-fault-thread').click();
     await expect(page.getByTestId('status')).toContainText(/Jumped to pstack thread/);
     await expect(page.locator('[data-testid="pstack-thread"].crash-pstack-thread--highlight')).toBeVisible();
+  });
+
+  test('Story 5: evidence link decoration, Related Evidence panel, and jump', async ({ page }) => {
+    await createInvestigation(page);
+    await addLogArtifact(page);
+    await addLogArtifact(page, syslogPath);
+    await addPstackArtifact(page);
+    await openFirstArtifact(page);
+    await analyzeHeader(page);
+
+    await switchBottomTab(page, 'timeline');
+    const timelineRows = page.getByTestId('timeline-row');
+    await expect(timelineRows.first()).toBeVisible({ timeout: 15_000 });
+    expect(await timelineRows.count()).toBeGreaterThan(1);
+
+    await timelineRows.first().click();
+    await expect(page.getByTestId('related-evidence-panel')).toBeVisible();
+    await expect(page.locator('.subsection-title', { hasText: 'Related Evidence' })).toBeVisible();
+    await expect(page.getByRole('columnheader', { name: 'Connections' })).toBeVisible();
+
+    await createEvidenceLink(page);
+
+    await expect(page.getByTestId('timeline-link-badge').first()).toBeVisible();
+    expect(await page.getByTestId('timeline-link-badge').count()).toBeGreaterThanOrEqual(1);
+
+    await expect(page.getByTestId('related-evidence-row').first()).toBeVisible();
+    await page.getByTestId('related-evidence-row').first().click();
+    await expect(page.getByTestId('status')).toContainText(/Opened|line|Jump/);
   });
 
   test('Investigate: analyze populates results for default error search', async ({ page }) => {

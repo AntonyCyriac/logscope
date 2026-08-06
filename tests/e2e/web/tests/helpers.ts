@@ -4,6 +4,7 @@ import { expect, type Page } from '@playwright/test';
 const REPO_ROOT = path.resolve(__dirname, '../../../../');
 
 export const sampleLogPath = path.join(REPO_ROOT, 'samples', 'sample.log');
+export const syslogPath = path.join(REPO_ROOT, 'samples', 'syslog.log');
 export const pstackPath = path.join(REPO_ROOT, 'samples', 'pstack.txt');
 
 export async function waitForReady(page: Page): Promise<void> {
@@ -23,8 +24,9 @@ export async function addLogArtifact(page: Page, filePath = sampleLogPath): Prom
   await page.getByTestId('add-log-artifact').click();
   const fileChooser = await fileChooserPromise;
   await fileChooser.setFiles(filePath);
+  const artifactName = path.basename(filePath);
   await expect(page.getByTestId('status')).toContainText('Added log artifact');
-  await expect(page.getByTestId('artifact-item')).toHaveCount(1);
+  await expect(page.getByTestId('artifact-item').filter({ hasText: artifactName })).toBeVisible();
 }
 
 export async function addPstackArtifact(page: Page, filePath = pstackPath): Promise<void> {
@@ -37,13 +39,23 @@ export async function addPstackArtifact(page: Page, filePath = pstackPath): Prom
 
 export async function openFirstArtifact(page: Page): Promise<void> {
   await page.getByTestId('artifact-item').first().getByTestId('artifact-action-open').click();
+  await expect(page.getByTestId('status')).toContainText(/Switched to artifact|Opened investigation/);
 }
 
 export async function analyzeHeader(page: Page): Promise<void> {
+  await expect(page.getByTestId('header-analyze')).toBeEnabled();
   await page.getByTestId('header-analyze').click();
   await expect(page.getByTestId('status')).toContainText('Analyzed', { timeout: 30_000 });
 }
 
 export async function switchBottomTab(page: Page, tab: 'timeline' | 'crash' | 'ai' | 'results'): Promise<void> {
   await page.getByTestId(`bottom-tab-${tab}`).click();
+}
+
+export async function createEvidenceLink(page: Page): Promise<void> {
+  await page.getByTestId('link-add-btn').click();
+  await page.locator('#linkTypeSelect').selectOption('RELATED');
+  await page.locator('#linkTargetSelect').selectOption({ index: 0 });
+  await page.getByTestId('link-create-btn').click();
+  await expect(page.getByTestId('status')).toContainText('Connection added');
 }
