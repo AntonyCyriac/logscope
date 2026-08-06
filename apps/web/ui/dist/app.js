@@ -143,13 +143,8 @@
   }
 
   function setBottomTab(tab) {
-    if (state.activeBottomTab === tab && state.bottomDockExpanded) {
-      state.bottomDockExpanded = false;
-      state.activeBottomTab = null;
-    } else {
-      state.activeBottomTab = tab;
-      state.bottomDockExpanded = true;
-    }
+    state.activeBottomTab = tab;
+    state.bottomDockExpanded = true;
     updateBottomDock();
   }
 
@@ -1304,12 +1299,12 @@
     exportBtn.disabled = false;
     askBtn.disabled = false;
     updateBottomTabAvailability();
-    setStatus('Analyzed');
 
     await investigate().catch(function (error) {
       setStatus('Auto-investigate: ' + error.message);
     });
     setBottomTab('results');
+    setStatus('Analyzed');
   }
 
   async function investigate() {
