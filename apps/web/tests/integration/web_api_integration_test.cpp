@@ -10,6 +10,7 @@
 #include <filesystem>
 #include <fstream>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <process.h>
@@ -796,6 +797,115 @@ TEST_F(WebApiIntegrationTest, InvestigationOpenAnalyzeInvestigateReturnsMatches)
     EXPECT_NE(std::string::npos, investigateResult->body.find("\"matchingLineCount\""));
     EXPECT_TRUE(investigateResult->body.find("\"matches\"") != std::string::npos
                 || investigateResult->body.find("\"matchingLines\"") != std::string::npos);
+}
+
+TEST_F(WebApiIntegrationTest, InvestigationEvidenceLinksCrudAndDuplicate409)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+    const std::string syslogPath = sourcePath("samples/sample.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"evidence-links-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::string investigationId = extractJsonStringField(createResult->body, "id");
+    ASSERT_FALSE(investigationId.empty());
+
+    const httplib::Result addAppLog = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath + "\", \"name\": \"app.log\"}",
+        "application/json");
+    ASSERT_TRUE(addAppLog);
+    EXPECT_EQ(200, addAppLog->status);
+
+    const httplib::Result addSyslog = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + syslogPath + "\", \"name\": \"syslog\"}",
+        "application/json");
+    ASSERT_TRUE(addSyslog);
+    EXPECT_EQ(200, addSyslog->status);
+
+    const httplib::Result timelineResult =
+        client->Get("/api/v1/investigations/" + investigationId + "/timeline?limit=10&offset=0&order=asc", headers);
+    ASSERT_TRUE(timelineResult);
+    EXPECT_EQ(200, timelineResult->status);
+
+    const std::size_t eventsPos = timelineResult->body.find("\"events\"");
+    ASSERT_NE(std::string::npos, eventsPos);
+
+    std::vector<std::string> eventIds;
+    std::size_t searchFrom = eventsPos;
+
+    while (eventIds.size() < 2U)
+    {
+        const std::size_t idPos = timelineResult->body.find("\"id\": \"", searchFrom);
+
+        if (idPos == std::string::npos)
+        {
+            break;
+        }
+
+        const std::size_t idStart = idPos + 7U;
+        const std::size_t idEnd = timelineResult->body.find('"', idStart);
+        eventIds.push_back(timelineResult->body.substr(idStart, idEnd - idStart));
+        searchFrom = idEnd + 1U;
+    }
+
+    ASSERT_GE(eventIds.size(), 2U);
+    const std::string& firstEventId = eventIds[0];
+    const std::string& secondEventId = eventIds[1];
+
+    const std::string createBody = std::string("{\"type\": \"RELATED\", \"source\": {\"kind\": \"timeline_event\", "
+                                               "\"eventId\": \"") +
+                                   firstEventId + "\"}, \"target\": {\"kind\": \"timeline_event\", \"eventId\": \"" +
+                                   secondEventId + "\"}, \"note\": \"related events\"}";
+
+    const httplib::Result createLinkResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/evidence-links", headers, createBody, "application/json");
+    ASSERT_TRUE(createLinkResult);
+    EXPECT_EQ(201, createLinkResult->status);
+    EXPECT_NE(std::string::npos, createLinkResult->body.find("\"status\": \"active\""));
+
+    const std::string linkId = extractJsonStringField(createLinkResult->body, "id");
+    ASSERT_FALSE(linkId.empty());
+
+    const httplib::Result duplicateResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/evidence-links", headers, createBody, "application/json");
+    ASSERT_TRUE(duplicateResult);
+    EXPECT_EQ(409, duplicateResult->status);
+    EXPECT_NE(std::string::npos, duplicateResult->body.find("DUPLICATE_EVIDENCE_LINK"));
+
+    const std::string invalidBody = std::string("{\"type\": \"RELATED\", \"source\": {\"kind\": \"timeline_event\", "
+                                                "\"eventId\": \"") +
+                                    firstEventId +
+                                    "\"}, \"target\": {\"kind\": \"timeline_event\", \"eventId\": \"missing\"}}";
+    const httplib::Result invalidResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/evidence-links", headers, invalidBody, "application/json");
+    ASSERT_TRUE(invalidResult);
+    EXPECT_EQ(400, invalidResult->status);
+    EXPECT_NE(std::string::npos, invalidResult->body.find("INVALID_LINK_TARGET"));
+
+    const httplib::Result listResult =
+        client->Get("/api/v1/investigations/" + investigationId + "/evidence-links", headers);
+    ASSERT_TRUE(listResult);
+    EXPECT_EQ(200, listResult->status);
+    EXPECT_NE(std::string::npos, listResult->body.find(linkId));
+    EXPECT_NE(std::string::npos, listResult->body.find("\"status\": \"active\""));
+
+    const httplib::Result deleteResult = client->Delete(
+        "/api/v1/investigations/" + investigationId + "/evidence-links/" + linkId, headers);
+    ASSERT_TRUE(deleteResult);
+    EXPECT_EQ(204, deleteResult->status);
+
+    const httplib::Result listAfterDelete =
+        client->Get("/api/v1/investigations/" + investigationId + "/evidence-links", headers);
+    ASSERT_TRUE(listAfterDelete);
+    EXPECT_EQ(200, listAfterDelete->status);
+    EXPECT_EQ(std::string::npos, listAfterDelete->body.find(linkId));
 }
 
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)

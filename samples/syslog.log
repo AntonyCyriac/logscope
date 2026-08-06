@@ -1,0 +1,4 @@
+2026-07-11 10:00:02 INFO syslog daemon started
+2026-07-11 10:00:06 WARNING connection retry from app
+2026-07-11 10:00:08 ERROR peer connection refused
+2026-07-11 10:00:12 INFO watchdog heartbeat

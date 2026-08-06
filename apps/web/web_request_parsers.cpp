@@ -4,6 +4,7 @@
 
 #include "web_request_parsers.hpp"
 
+#include "evidence_link.hpp"
 #include "json_parse.hpp"
 
 #include "analysis.hpp"
@@ -532,6 +533,116 @@ InvestigationUpdateRequest parseInvestigationUpdateRequest(const std::string_vie
     }
 
     return request;
+}
+
+std::optional<std::string> extractJsonObjectSubstring(const std::string_view body, const std::string_view key)
+{
+    const std::string needle = '"' + std::string(key) + '"';
+    const std::size_t keyPosition = body.find(needle);
+
+    if (keyPosition == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    const std::size_t openBrace = body.find('{', keyPosition);
+
+    if (openBrace == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    std::size_t depth = 0U;
+
+    for (std::size_t index = openBrace; index < body.size(); ++index)
+    {
+        if (body[index] == '{')
+        {
+            ++depth;
+        }
+        else if (body[index] == '}')
+        {
+            --depth;
+
+            if (depth == 0U)
+            {
+                return std::string(body.substr(openBrace, index - openBrace + 1U));
+            }
+        }
+    }
+
+    return std::nullopt;
+}
+
+scope::workspace::LinkEndpoint parseLinkEndpointFromBody(const std::string_view objectBody)
+{
+    scope::workspace::LinkEndpoint endpoint;
+    const std::optional<std::string> kind = jsonStringField(objectBody, "kind");
+    const std::optional<std::string> eventId = jsonStringField(objectBody, "eventId");
+
+    if (kind)
+    {
+        endpoint.kind = *kind;
+    }
+
+    if (eventId)
+    {
+        endpoint.eventId = *eventId;
+    }
+
+    return endpoint;
+}
+
+foundation::Result<scope::workspace::EvidenceLinkCreateRequest> parseEvidenceLinkCreateRequest(
+    const std::string_view body)
+{
+    scope::workspace::EvidenceLinkCreateRequest request;
+
+    const std::optional<std::string> typeValue = jsonStringField(body, "type");
+
+    if (!typeValue)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Evidence link type is required."));
+    }
+
+    const std::optional<scope::workspace::EvidenceLinkType> parsedType =
+        scope::workspace::parseEvidenceLinkType(*typeValue);
+
+    if (!parsedType)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Invalid evidence link type."));
+    }
+
+    request.type = *parsedType;
+
+    const std::optional<std::string> sourceObject = extractJsonObjectSubstring(body, "source");
+
+    if (!sourceObject)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Evidence link source is required."));
+    }
+
+    request.source = parseLinkEndpointFromBody(*sourceObject);
+
+    const std::optional<std::string> targetObject = extractJsonObjectSubstring(body, "target");
+
+    if (!targetObject)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Evidence link target is required."));
+    }
+
+    request.target = parseLinkEndpointFromBody(*targetObject);
+
+    if (const std::optional<std::string> note = jsonStringField(body, "note"))
+    {
+        request.note = *note;
+    }
+
+    return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(std::move(request));
 }
 
 foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path)

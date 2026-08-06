@@ -6,6 +6,7 @@
 
 #include "analytics_output.hpp"
 #include "crash_report.hpp"
+#include "evidence_link.hpp"
 #include "investigation_output.hpp"
 #include "output_format.hpp"
 #include "report_format.hpp"
@@ -32,6 +33,10 @@ std::string errorCodeToken(const foundation::ErrorCode code)
         return "INTERNAL";
     case foundation::ErrorCode::ParseError:
         return "INVALID_ARGUMENT";
+    case foundation::ErrorCode::InvalidLinkTarget:
+        return "INVALID_LINK_TARGET";
+    case foundation::ErrorCode::DuplicateEvidenceLink:
+        return "DUPLICATE_EVIDENCE_LINK";
     case foundation::ErrorCode::Unknown:
         return "INTERNAL";
     case foundation::ErrorCode::None:
@@ -128,7 +133,10 @@ int httpStatusForError(const foundation::Error& error)
     {
     case foundation::ErrorCode::InvalidArgument:
     case foundation::ErrorCode::ParseError:
+    case foundation::ErrorCode::InvalidLinkTarget:
         return 400;
+    case foundation::ErrorCode::DuplicateEvidenceLink:
+        return 409;
     case foundation::ErrorCode::FileNotFound:
         return 404;
     case foundation::ErrorCode::IOError:
@@ -691,6 +699,70 @@ std::string formatCrashReport(const scope::workspace::CrashReport& report)
 std::string formatInvestigationCrashAnalysis(const scope::workspace::CrashReport& report)
 {
     return std::string("{\n  \"report\": ") + formatCrashReport(report) + "\n}";
+}
+
+std::string formatLinkEndpointJson(const scope::workspace::LinkEndpoint& endpoint)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "        \"kind\": \"" << escapeJsonString(endpoint.kind) << "\",\n"
+           << "        \"eventId\": \"" << escapeJsonString(endpoint.eventId) << "\"\n"
+           << "      }";
+
+    return output.str();
+}
+
+std::string formatEvidenceLinkRecord(const scope::workspace::EvidenceLinkRecord& link)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "        \"id\": \"" << escapeJsonString(link.id) << "\",\n"
+           << "        \"type\": \"" << escapeJsonString(evidenceLinkTypeToString(link.type)) << "\",\n"
+           << "        \"source\": " << formatLinkEndpointJson(link.source) << ",\n"
+           << "        \"target\": " << formatLinkEndpointJson(link.target) << ",\n"
+           << "        \"createdAt\": \"" << escapeJsonString(link.createdAt) << "\",\n"
+           << "        \"status\": \"" << escapeJsonString(evidenceLinkStatusToString(link.status)) << "\"";
+
+    if (link.note.has_value())
+    {
+        output << ",\n        \"note\": \"" << escapeJsonString(*link.note) << '"';
+    }
+    else
+    {
+        output << ",\n        \"note\": null";
+    }
+
+    output << "\n      }";
+
+    return output.str();
+}
+
+std::string formatEvidenceLinksList(const std::string& investigationId,
+                                    const std::vector<scope::workspace::EvidenceLinkRecord>& links)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"links\": [";
+
+    for (std::size_t index = 0U; index < links.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n      " << formatEvidenceLinkRecord(links[index]);
+    }
+
+    if (!links.empty())
+    {
+        output << '\n';
+    }
+
+    output << "    ]\n}";
+
+    return output.str();
 }
 
 std::string formatTailPollResult(const std::vector<std::string>& lines, const bool active)

@@ -9,6 +9,7 @@
 
 #include "artifact_handler.hpp"
 #include "artifact_record.hpp"
+#include "evidence_link.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
 #include "crash_analyzer.hpp"
@@ -73,6 +74,21 @@ class Investigation
      * @brief Analyzes crash evidence for one artifact (Story 4).
      */
     [[nodiscard]] foundation::Result<CrashReport> analyzeCrash(const std::string& artifactId) const;
+
+    /**
+     * @brief Lists evidence links with computed status (Story 5).
+     */
+    [[nodiscard]] foundation::Result<std::vector<EvidenceLinkRecord>> listEvidenceLinks() const;
+
+    /**
+     * @brief Creates a manual evidence link between timeline events (Story 5).
+     */
+    [[nodiscard]] foundation::Result<EvidenceLinkRecord> addEvidenceLink(EvidenceLinkCreateRequest request);
+
+    /**
+     * @brief Removes an evidence link by id (Story 5).
+     */
+    [[nodiscard]] foundation::Result<bool> removeEvidenceLink(const std::string& linkId);
 
   private:
     Investigation(foundation::Path investigationDir, InvestigationManifest manifest);

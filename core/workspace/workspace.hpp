@@ -6,6 +6,7 @@
 #pragma once
 
 #include "artifact_record.hpp"
+#include "evidence_link.hpp"
 #include "investigation_container.hpp"
 #include "investigation_session.hpp"
 #include "session_serializer.hpp"

@@ -28,6 +28,8 @@ void printInvestigationTimelineUsage(std::ostream& output);
 
 void printInvestigationCrashUsage(std::ostream& output);
 
+void printInvestigationLinksUsage(std::ostream& output);
+
 [[nodiscard]] int runInvestigationCreateCommand(const InvestigationCreateOptions& options,
                                                 std::ostream& output,
                                                 std::ostream& errorOutput);
@@ -57,6 +59,10 @@ void printInvestigationCrashUsage(std::ostream& output);
                                                   std::ostream& errorOutput);
 
 [[nodiscard]] int runInvestigationCrashCommand(const InvestigationCrashOptions& options,
+                                               std::ostream& output,
+                                               std::ostream& errorOutput);
+
+[[nodiscard]] int runInvestigationLinksCommand(const InvestigationLinksOptions& options,
                                                std::ostream& output,
                                                std::ostream& errorOutput);
 

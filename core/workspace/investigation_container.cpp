@@ -7,6 +7,7 @@
 
 #include "artifact_handler.hpp"
 #include "crash_analyzer.hpp"
+#include "evidence_link.hpp"
 #include "investigation_manifest_io.hpp"
 #include "timeline_projector.hpp"
 
@@ -17,7 +18,7 @@
 #include <filesystem>
 #include <fstream>
 #include <sstream>
-#include <fstream>
+#include <unordered_set>
 
 namespace scope::workspace
 {
@@ -46,6 +47,44 @@ const ArtifactRecord* findArtifactById(const InvestigationManifest& manifest, co
 
     return &(*iterator);
 }
+
+std::unordered_set<std::string> collectTimelineEventIds(const Investigation& investigation)
+{
+    TimelineProjectionOptions options;
+    options.limit = 10'000U;
+    options.offset = 0U;
+    options.order = TimelineSortOrder::Ascending;
+
+    const auto timelineResult = investigation.projectTimeline(options);
+
+    std::unordered_set<std::string> eventIds;
+
+    if (!timelineResult)
+    {
+        return eventIds;
+    }
+
+    for (const TimelineEvent& event : timelineResult->events)
+    {
+        eventIds.insert(event.id);
+    }
+
+    return eventIds;
+}
+
+EvidenceLinkRecord annotateLinkStatus(const EvidenceLink& link, const std::unordered_set<std::string>& eventIds)
+{
+    EvidenceLinkRecord record;
+    static_cast<EvidenceLink&>(record) = link;
+
+    const bool sourceActive = eventIds.count(link.source.eventId) > 0U;
+    const bool targetActive = eventIds.count(link.target.eventId) > 0U;
+    record.status = (sourceActive && targetActive) ? EvidenceLinkStatus::Active : EvidenceLinkStatus::Stale;
+
+    return record;
+}
+
+constexpr std::size_t kMaxEvidenceLinkNoteLength = 2'000U;
 
 } // namespace
 
@@ -427,6 +466,118 @@ foundation::Result<CrashReport> Investigation::analyzeCrash(const std::string& a
     context.investigationRoot = m_rootDirectory;
 
     return analyzer->analyze(*artifactResult, *dataPathResult, context);
+}
+
+foundation::Result<std::vector<EvidenceLinkRecord>> Investigation::listEvidenceLinks() const
+{
+    const std::unordered_set<std::string> eventIds = collectTimelineEventIds(*this);
+    std::vector<EvidenceLinkRecord> records;
+    records.reserve(m_manifest.evidenceLinks.size());
+
+    for (const EvidenceLink& link : m_manifest.evidenceLinks)
+    {
+        records.push_back(annotateLinkStatus(link, eventIds));
+    }
+
+    return foundation::Result<std::vector<EvidenceLinkRecord>>(std::move(records));
+}
+
+foundation::Result<EvidenceLinkRecord> Investigation::addEvidenceLink(EvidenceLinkCreateRequest request)
+{
+    if (request.source.kind != "timeline_event" || request.target.kind != "timeline_event")
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Link endpoints must use kind timeline_event."));
+    }
+
+    if (request.source.eventId.empty() || request.target.eventId.empty())
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidLinkTarget, "Timeline event id is required."));
+    }
+
+    if (request.source.eventId == request.target.eventId)
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidLinkTarget, "source and target must differ"));
+    }
+
+    if (request.note.has_value() && request.note->size() > kMaxEvidenceLinkNoteLength)
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Link note exceeds maximum length of 2000 characters."));
+    }
+
+    const std::unordered_set<std::string> eventIds = collectTimelineEventIds(*this);
+
+    if (eventIds.count(request.source.eventId) == 0U)
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidLinkTarget,
+            "Timeline event not found: " + request.source.eventId));
+    }
+
+    if (eventIds.count(request.target.eventId) == 0U)
+    {
+        return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+            foundation::ErrorCode::InvalidLinkTarget,
+            "Timeline event not found: " + request.target.eventId));
+    }
+
+    for (const EvidenceLink& existing : m_manifest.evidenceLinks)
+    {
+        if (existing.source.eventId == request.source.eventId && existing.target.eventId == request.target.eventId
+            && existing.type == request.type)
+        {
+            return foundation::Result<EvidenceLinkRecord>(foundation::Error(
+                foundation::ErrorCode::DuplicateEvidenceLink, "Evidence link already exists."));
+        }
+    }
+
+    EvidenceLink link;
+    link.id = foundation::Uuid::generate().toString();
+    link.type = request.type;
+    link.source = request.source;
+    link.target = request.target;
+    link.createdAt = currentTimestampIso();
+
+    if (request.note.has_value() && !request.note->empty())
+    {
+        link.note = *request.note;
+    }
+
+    m_manifest.evidenceLinks.push_back(link);
+    m_manifest.schemaVersion = 2;
+    m_manifest.updatedAt = currentTimestampIso();
+
+    const auto persistResult = persist();
+
+    if (!persistResult)
+    {
+        m_manifest.evidenceLinks.pop_back();
+
+        return foundation::Result<EvidenceLinkRecord>(persistResult.error());
+    }
+
+    return foundation::Result<EvidenceLinkRecord>(annotateLinkStatus(link, eventIds));
+}
+
+foundation::Result<bool> Investigation::removeEvidenceLink(const std::string& linkId)
+{
+    const auto iterator = std::find_if(m_manifest.evidenceLinks.begin(), m_manifest.evidenceLinks.end(),
+                                       [&linkId](const EvidenceLink& link) { return link.id == linkId; });
+
+    if (iterator == m_manifest.evidenceLinks.end())
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Evidence link not found."));
+    }
+
+    m_manifest.evidenceLinks.erase(iterator);
+    m_manifest.updatedAt = currentTimestampIso();
+
+    return persist();
 }
 
 foundation::Result<bool> Investigation::ensureArtifactUnderRoot(const foundation::Path& path) const

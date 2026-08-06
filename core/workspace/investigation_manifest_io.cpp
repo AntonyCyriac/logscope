@@ -5,6 +5,7 @@
 
 #include "investigation_manifest_io.hpp"
 
+#include "evidence_link.hpp"
 #include "foundation/clock.hpp"
 #include "foundation/uuid.hpp"
 
@@ -13,6 +14,7 @@
 #include <fstream>
 #include <optional>
 #include <sstream>
+#include <stdexcept>
 
 namespace scope::workspace
 {
@@ -692,6 +694,37 @@ std::string formatSummaryJson(const InvestigationSummary& summary)
     return output.str();
 }
 
+std::string formatLinkEndpointJson(const LinkEndpoint& endpoint)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "        \"kind\": \"" << escapeJsonString(endpoint.kind) << "\",\n"
+           << "        \"eventId\": \"" << escapeJsonString(endpoint.eventId) << "\"\n"
+           << "      }";
+
+    return output.str();
+}
+
+std::string formatEvidenceLinkJson(const EvidenceLink& link)
+{
+    std::ostringstream output;
+    output << "    {\n"
+           << "      \"id\": \"" << escapeJsonString(link.id) << "\",\n"
+           << "      \"type\": \"" << escapeJsonString(evidenceLinkTypeToString(link.type)) << "\",\n"
+           << "      \"source\": " << formatLinkEndpointJson(link.source) << ",\n"
+           << "      \"target\": " << formatLinkEndpointJson(link.target) << ",\n"
+           << "      \"createdAt\": \"" << escapeJsonString(link.createdAt) << "\"";
+
+    if (link.note.has_value() && !link.note->empty())
+    {
+        output << ",\n      \"note\": \"" << escapeJsonString(*link.note) << '"';
+    }
+
+    output << "\n    }";
+
+    return output.str();
+}
+
 std::string formatManifestJson(const InvestigationManifest& manifest)
 {
     std::ostringstream output;
@@ -719,8 +752,31 @@ std::string formatManifestJson(const InvestigationManifest& manifest)
 
     output << "\n  ],\n"
            << "  \"summary\": " << formatSummaryJson(manifest.summary) << ",\n"
-           << "  \"snapshotFile\": \"" << escapeJsonString(manifest.snapshotFile) << "\"\n"
-           << '}';
+           << "  \"snapshotFile\": \"" << escapeJsonString(manifest.snapshotFile) << "\"";
+
+    if (manifest.schemaVersion >= 2 || !manifest.evidenceLinks.empty())
+    {
+        output << ",\n  \"evidenceLinks\": [";
+
+        for (std::size_t index = 0U; index < manifest.evidenceLinks.size(); ++index)
+        {
+            if (index > 0U)
+            {
+                output << ",\n";
+            }
+
+            output << formatEvidenceLinkJson(manifest.evidenceLinks[index]);
+        }
+
+        if (!manifest.evidenceLinks.empty())
+        {
+            output << '\n';
+        }
+
+        output << "  ]";
+    }
+
+    output << "\n}";
 
     return output.str();
 }
@@ -741,6 +797,54 @@ foundation::Result<std::string> readFileContent(const foundation::Path& path)
     return foundation::Result<std::string>(buffer.str());
 }
 
+LinkEndpoint parseLinkEndpoint(const std::string& object)
+{
+    LinkEndpoint endpoint;
+    endpoint.kind = extractJsonString(object, "kind");
+    endpoint.eventId = extractJsonString(object, "eventId");
+
+    return endpoint;
+}
+
+EvidenceLink parseEvidenceLink(const std::string& object)
+{
+    EvidenceLink link;
+    link.id = extractJsonString(object, "id");
+    const std::string typeValue = extractJsonString(object, "type");
+    const std::optional<EvidenceLinkType> parsedType = parseEvidenceLinkType(typeValue);
+
+    if (!parsedType)
+    {
+        throw std::runtime_error("Unknown evidence link type: " + typeValue);
+    }
+
+    link.type = *parsedType;
+
+    const std::optional<std::string> sourceObject = extractJsonObject(object, "source");
+
+    if (sourceObject)
+    {
+        link.source = parseLinkEndpoint(*sourceObject);
+    }
+
+    const std::optional<std::string> targetObject = extractJsonObject(object, "target");
+
+    if (targetObject)
+    {
+        link.target = parseLinkEndpoint(*targetObject);
+    }
+
+    link.createdAt = extractJsonString(object, "createdAt");
+    const std::optional<std::string> noteValue = jsonStringField(object, "note");
+
+    if (noteValue.has_value() && !noteValue->empty())
+    {
+        link.note = *noteValue;
+    }
+
+    return link;
+}
+
 InvestigationManifest parseManifestContent(const std::string& content)
 {
     InvestigationManifest manifest;
@@ -748,6 +852,11 @@ InvestigationManifest parseManifestContent(const std::string& content)
     if (const std::optional<std::int64_t> schemaVersion = jsonIntField(content, "schemaVersion"))
     {
         manifest.schemaVersion = static_cast<int>(*schemaVersion);
+    }
+
+    if (manifest.schemaVersion > 2)
+    {
+        throw std::runtime_error("Unsupported manifest schema version.");
     }
 
     manifest.id = extractJsonString(content, "id");
@@ -773,6 +882,16 @@ InvestigationManifest parseManifestContent(const std::string& content)
         manifest.artifacts.push_back(parseArtifactRecord(artifactObject));
     }
 
+    if (manifest.schemaVersion >= 2)
+    {
+        const std::vector<std::string> linkObjects = extractJsonObjectArray(content, "evidenceLinks");
+
+        for (const std::string& linkObject : linkObjects)
+        {
+            manifest.evidenceLinks.push_back(parseEvidenceLink(linkObject));
+        }
+    }
+
     return manifest;
 }
 
@@ -789,7 +908,15 @@ foundation::Result<InvestigationManifest> loadManifest(const foundation::Path& i
         return foundation::Result<InvestigationManifest>(contentResult.error());
     }
 
-    return foundation::Result<InvestigationManifest>(parseManifestContent(*contentResult));
+    try
+    {
+        return foundation::Result<InvestigationManifest>(parseManifestContent(*contentResult));
+    }
+    catch (const std::exception& exception)
+    {
+        return foundation::Result<InvestigationManifest>(
+            foundation::Error(foundation::ErrorCode::ParseError, exception.what()));
+    }
 }
 
 foundation::Result<bool> saveManifest(const foundation::Path& investigationDir,
