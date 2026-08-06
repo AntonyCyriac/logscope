@@ -1,10 +1,10 @@
-# LogScope Project Context
+﻿# LogScope Project Context
 
 | Field | Value |
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.2.0 |
+| Version | 3.19.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.6.1` (shipped) - **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1-3 (`v2.3.0`-`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Story 5: Connect the Evidence** completes Phase A (investigation methodology).
+**Current release:** `v2.7.0` (shipped) — **Story 5: Connect the Evidence** (manual evidence links P0.1; completes Phase A). Manifest `schemaVersion: 2` with `evidenceLinks[]`, REST `GET/POST/DELETE …/evidence-links`, CLI `investigation links`, web Related Evidence panel + timeline connection badges + Playwright Story Gate E2E. Builds on Stories 1–4 (`v2.3.0`–`v2.6.2`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** P0 Evidence Correlation (Execution Contract v2).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -379,4 +379,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation. |
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
-| 3.18.0 | 06-08-2026 | Current release `v2.6.1`; Story 5 Connect the Evidence completes Phase A. |
+| 3.19.0 | 06-08-2026 | Current release `v2.7.0`; Story 5 Connect the Evidence shipped — Phase A complete. |
