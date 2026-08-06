@@ -533,7 +533,7 @@ TEST_F(WebApiIntegrationTest, InvestigationTimelineStoryGateDemoPath)
     const httplib::Headers headers = sessionHeaders(sessionId);
 
     const std::string appLogPath = sourcePath("samples/sample.log");
-    const std::string syslogPath = sourcePath("samples/sample.jsonl");
+    const std::string syslogPath = sourcePath("samples/large-app.log");
 
     const httplib::Result createResult =
         client->Post("/api/v1/investigations", headers, "{\"name\": \"story-gate-timeline\"}", "application/json");
