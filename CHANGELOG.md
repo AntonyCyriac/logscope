@@ -12,6 +12,22 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.6.1] - 2026-08-06
+
+**Hotfix** — pstack fault-thread misidentification ([#129](https://github.com/AntonyCyriac/logscope/issues/129)).
+
+### Fixed
+
+- **`PstackCrashAnalyzer`** — score threads for fault selection instead of defaulting to `threads.front()` on plain pstack dumps ([#130](https://github.com/AntonyCyriac/logscope/pull/130))
+
+### Added
+
+- Regression tests for crashing thread listed last and all-idle fallback
+
+See [v2.6.1 release notes](docs/release/v2.6.1-RELEASE-NOTES.md).
+
+---
+
 ## [2.6.0] - 2026-08-06
 
 **Story 4** — Understand Why It Crashed (crash analysis projection, REST/CLI/SPA).
