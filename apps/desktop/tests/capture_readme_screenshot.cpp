@@ -5,6 +5,7 @@
 
 #include <QApplication>
 #include <QElapsedTimer>
+#include <QPixmap>
 #include <QThread>
 
 #include "foundation/path.hpp"
