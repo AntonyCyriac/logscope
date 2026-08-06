@@ -12,6 +12,23 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.5.0] - 2026-08-06
+
+**Story 3** — See What Happened (investigation timeline projection, REST/CLI/SPA).
+
+### Added
+
+- **Timeline projection** — `TimelineEvent`, `IArtifactProjector`, merge + chronological sort across artifacts ([#121](https://github.com/AntonyCyriac/logscope/pull/121))
+- **REST** — `GET /api/v1/investigations/{id}/timeline` with pagination and `order`
+- **CLI** — `investigation timeline <id>` (`--format json|table`, `--limit`, `--order`)
+- **Web SPA** — Timeline panel, jump-to-source with Results line highlight ([#122](https://github.com/AntonyCyriac/logscope/pull/122))
+- ADR-009-M15.7 Investigation Timeline
+- Story Gate integration coverage ([#123](https://github.com/AntonyCyriac/logscope/pull/123))
+
+See [v2.5.0 release notes](docs/release/v2.5.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.4.1] - 2026-08-05
 
 **Hotfix** — artifact metadata persistence regression ([#119](https://github.com/AntonyCyriac/logscope/issues/119)).

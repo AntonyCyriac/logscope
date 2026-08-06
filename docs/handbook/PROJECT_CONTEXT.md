@@ -29,9 +29,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.4.1` (shipped) — **Story 2 hotfix** — artifact metadata persistence ([#119](https://github.com/AntonyCyriac/logscope/issues/119)). Baseline feature release: `v2.4.0` — **Story 2: Understand Everything** — multi-artifact investigations, active log switch, `pstack`/`core` storage, REST/CLI/SPA artifact index. Builds on Story 1 (`v2.3.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
+**Current release:** `v2.5.0` (shipped) — **Story 3: See What Happened** — investigation timeline projection (merge events across artifacts), REST `GET .../timeline`, CLI `investigation timeline`, web Timeline panel with jump-to-source. Builds on Story 1–2 (`v2.3.0`–`v2.4.1`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Next release:** **`v2.5.0`** — **Story 3: See What Happened** — unified timeline. Broader horizon: [Roadmap](../ROADMAP.md).
+**Next release:** **`v2.6.0`** — **Story 4: Understand Why It Crashed** — crash analysis on `core`. Broader horizon: [Roadmap](../ROADMAP.md).
 
 **Completed milestones:**
 
@@ -60,7 +60,7 @@ The project follows architecture-first development. Every implementation should 
 | Release | Target | Focus |
 |---------|--------|-------|
 | Investigation — Story 2 | `v2.4.0` | Understand Everything (multi-source) — **shipped** |
-| Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) |
+| Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) — **shipped** |
 | Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
