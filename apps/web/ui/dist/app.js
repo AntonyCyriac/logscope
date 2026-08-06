@@ -960,8 +960,12 @@
     const artifactId = source.artifactId || event.artifactId;
 
     if (artifactType === 'log' && artifactId) {
-      await openInvestigation(state.activeInvestigationId, artifactId, { skipTimelineRefresh: true });
       state.highlightLineNumber = source.lineNumber != null ? Number(source.lineNumber) : null;
+
+      let hasModel = true;
+      if (state.activeArtifactId !== artifactId) {
+        hasModel = await openInvestigation(state.activeInvestigationId, artifactId, { skipTimelineRefresh: true });
+      }
 
       const artifact = state.artifacts.find(function (a) { return a.id === artifactId; });
       if (artifact) {
@@ -969,6 +973,9 @@
       }
 
       if (state.analyzed) {
+        if (!hasModel) {
+          await runAnalyze();
+        }
         const payload = await apiJson('/api/v1/investigate', {});
         renderInvestigation(payload, state.highlightLineNumber);
         setBottomTab('results');
@@ -1121,6 +1128,7 @@
     await refreshCrashAnalysis();
     updateBottomTabAvailability();
     setStatus('Opened investigation ' + investigationId);
+    return hasModel;
   }
 
   async function switchLogArtifact(artifactId) {
@@ -1275,7 +1283,7 @@
     throw new Error('Analyze job timed out');
   }
 
-  async function analyze() {
+  async function runAnalyze() {
     const response = await api('/api/v1/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -1302,6 +1310,10 @@
     exportBtn.disabled = false;
     askBtn.disabled = false;
     updateBottomTabAvailability();
+  }
+
+  async function analyze() {
+    await runAnalyze();
 
     await investigate().catch(function (error) {
       setStatus('Auto-investigate: ' + error.message);
