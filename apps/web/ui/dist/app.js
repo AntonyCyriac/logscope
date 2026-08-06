@@ -1086,11 +1086,14 @@
 
   async function openInvestigation(investigationId, artifactId, options) {
     const opts = options || {};
+    const previousInvestigationId = state.activeInvestigationId;
+    const wasAnalyzed = state.analyzed;
     const body = artifactId ? { artifactId: artifactId } : {};
     const payload = await apiJson('/api/v1/investigations/' + investigationId + '/open', body, 'POST');
     state.activeInvestigationId = investigationId;
     state.activeArtifactId = (payload.data && payload.data.artifactId) || artifactId || null;
-    state.analyzed = !!(payload.data && payload.data.summary && payload.data.summary.hasModel);
+    const hasModel = !!(payload.data && payload.data.summary && payload.data.summary.hasModel);
+    state.analyzed = hasModel || (previousInvestigationId === investigationId && wasAnalyzed);
     investigateBtn.disabled = !state.analyzed;
     exportBtn.disabled = !state.analyzed;
     askBtn.disabled = !state.analyzed;
