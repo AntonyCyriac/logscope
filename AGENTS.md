@@ -30,3 +30,7 @@ Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs
 | **LogScope product AI** | User-facing `logscope agent investigate`, summaries, NL queries (`AiProvider`, M13+) |
 
 Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI-Engineering-Agents.md) (not current milestone scope).
+
+## Web UI browser automation
+
+For Story Gate or SPA demos on `logscope-web`, read [docs/handbook/BROWSER_MCP.md](docs/handbook/BROWSER_MCP.md) **before** using `cursor-ide-browser`. Never create orphan tabs with `browser_tabs new` alone — use `browser_navigate` to `http://127.0.0.1:8080` or lock an existing tab first.
