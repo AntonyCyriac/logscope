@@ -5,7 +5,7 @@
 | Document | v2.6.0 Understand Why It Crashed Scenarios |
 | Category | Project Planning |
 | Version | 0.1.0 |
-| Status | **In progress — `v2.6.0`** |
+| Status | **Story Gate closed — `v2.6.0`** |
 | Design reference | [ADR-009-M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md) |
 | Created | 06-08-2026 |
 | Last Updated | 06-08-2026 |
@@ -127,3 +127,4 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | Crash report via REST or CLI | ✅ |
 | Fault thread identified | ✅ |
 | Jump to pstack (web — Crash tab) | ✅ |
+| Playwright Story Gate (web E2E) | ✅ |

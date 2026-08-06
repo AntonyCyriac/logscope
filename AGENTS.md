@@ -10,7 +10,7 @@ At the beginning of a session, load (attach or reference):
 |-------|----------|---------|
 | 1 | [docs/handbook/PROJECT_CONTEXT.md](docs/handbook/PROJECT_CONTEXT.md) | Engineering mindset, release, milestones, CI rules |
 | 2 | [docs/handbook/CODE_MAP.md](docs/handbook/CODE_MAP.md) | Where CLI, desktop, web, core, and tests live |
-| 3 | [docs/release/v2.5.0-RELEASE-NOTES.md](docs/release/v2.5.0-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
+| 3 | [docs/release/v2.6.0-RELEASE-NOTES.md](docs/release/v2.6.0-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
 
 Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md)
 

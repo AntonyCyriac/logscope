@@ -29,9 +29,9 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.5.0` (shipped) — **Story 3: See What Happened** — investigation timeline projection (merge events across artifacts), REST `GET .../timeline`, CLI `investigation timeline`, web Timeline panel with jump-to-source. Builds on Story 1–2 (`v2.3.0`–`v2.4.1`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
+**Current release:** `v2.6.0` (shipped) — **Story 4: Understand Why It Crashed** — crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1–3 (`v2.3.0`–`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Next release:** **`v2.6.0`** — **Story 4: Understand Why It Crashed** — crash analysis on `core`. Broader horizon: [Roadmap](../ROADMAP.md).
+**Next release:** See [Roadmap](../ROADMAP.md) and [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md) for post–Story 4 backlog (timeline crash events, correlation, etc.).
 
 **Completed milestones:**
 
@@ -61,7 +61,7 @@ The project follows architecture-first development. Every implementation should 
 |---------|--------|-------|
 | Investigation — Story 2 | `v2.4.0` | Understand Everything (multi-source) — **shipped** |
 | Investigation — Story 3 | `v2.5.0` | See What Happened (timeline) — **shipped** |
-| Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed |
+| Investigation — Story 4 | `v2.6.0` | Understand Why It Crashed — **shipped** |
 
 See [Post-v1 Strategic Roadmap](../planning/POST_V1_STRATEGIC_ROADMAP.md), [M11 planning](../planning/M11-STORAGE-LAYER.md), and [Roadmap](../ROADMAP.md).
 

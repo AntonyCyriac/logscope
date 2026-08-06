@@ -12,6 +12,23 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.6.0] - 2026-08-06
+
+**Story 4** — Understand Why It Crashed (crash analysis projection, REST/CLI/SPA).
+
+### Added
+
+- **Crash analysis projection** — `CrashReport`, `PstackCrashAnalyzer`, `CoreCrashAnalyzer` (GDB best effort) ([#126](https://github.com/AntonyCyriac/logscope/pull/126))
+- **REST** — `GET /api/v1/investigations/{id}/artifacts/{artifactId}/crash-analysis`
+- **CLI** — `investigation crash <id>` (`--artifact`, `--format json|table`)
+- **Web SPA** — IDE-style layout, Crash tab, fault-thread jump, Playwright Story Gate E2E
+- **Desktop** — bottom tab bar (Results | AI | Analytics)
+- ADR-009-M15.8 Crash Analysis; UI architecture and web design handbooks
+
+See [v2.6.0 release notes](docs/release/v2.6.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.5.0] - 2026-08-06
 
 **Story 3** — See What Happened (investigation timeline projection, REST/CLI/SPA).
