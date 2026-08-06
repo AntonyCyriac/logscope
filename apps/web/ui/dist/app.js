@@ -13,6 +13,9 @@
     timelineTruncated: false,
     highlightLineNumber: null,
     activeTimelineEventId: null,
+    evidenceLinks: [],
+    linksByEventId: {},
+    linkCreateMode: false,
     activeCrashArtifactId: null,
     crashReport: null,
     crashNotSupported: false,
@@ -68,6 +71,16 @@
   const timelineWarnings = document.getElementById('timelineWarnings');
   const timelineTable = document.getElementById('timelineTable');
   const timelineLoadMoreBtn = document.getElementById('timelineLoadMoreBtn');
+  const relatedEvidencePanel = document.getElementById('relatedEvidencePanel');
+  const relatedEvidenceEmpty = document.getElementById('relatedEvidenceEmpty');
+  const relatedEvidenceList = document.getElementById('relatedEvidenceList');
+  const linkAddBtn = document.getElementById('linkAddBtn');
+  const linkCreateForm = document.getElementById('linkCreateForm');
+  const linkTypeSelect = document.getElementById('linkTypeSelect');
+  const linkTargetSelect = document.getElementById('linkTargetSelect');
+  const linkNoteInput = document.getElementById('linkNoteInput');
+  const linkCreateBtn = document.getElementById('linkCreateBtn');
+  const linkCreateCancelBtn = document.getElementById('linkCreateCancelBtn');
   const crashEmpty = document.getElementById('crashEmpty');
   const crashWarnings = document.getElementById('crashWarnings');
   const crashContent = document.getElementById('crashContent');
@@ -851,6 +864,260 @@
     setBottomTab('results');
   }
 
+  function linkTypeLabel(type) {
+    const labels = {
+      PRECEDES: 'Precedes',
+      FOLLOWS: 'Follows',
+      SUPPORTS: 'Supports',
+      RELATED: 'Related',
+    };
+    return labels[type] || type || 'Related';
+  }
+
+  function rebuildLinksIndex() {
+    const index = {};
+    state.evidenceLinks.forEach(function (link) {
+      const sourceId = link.source && link.source.eventId;
+      const targetId = link.target && link.target.eventId;
+      if (sourceId) {
+        if (!index[sourceId]) index[sourceId] = [];
+        index[sourceId].push(link);
+      }
+      if (targetId) {
+        if (!index[targetId]) index[targetId] = [];
+        index[targetId].push(link);
+      }
+    });
+    state.linksByEventId = index;
+  }
+
+  function getLinksForEvent(eventId) {
+    if (!eventId) return [];
+    return state.linksByEventId[eventId] || [];
+  }
+
+  function findTimelineEventById(eventId) {
+    return state.timelineEvents.find(function (event) {
+      return event.id === eventId;
+    }) || null;
+  }
+
+  async function ensureTimelineEventLoaded(eventId) {
+    if (!eventId || findTimelineEventById(eventId)) {
+      return findTimelineEventById(eventId);
+    }
+
+    while (state.timelineTruncated) {
+      await refreshTimeline(true);
+      const found = findTimelineEventById(eventId);
+      if (found) return found;
+    }
+
+    return findTimelineEventById(eventId);
+  }
+
+  async function refreshEvidenceLinks() {
+    state.evidenceLinks = [];
+    rebuildLinksIndex();
+
+    if (!state.activeInvestigationId) {
+      renderRelatedEvidencePanel();
+      return;
+    }
+
+    const response = await api('/api/v1/investigations/' + state.activeInvestigationId + '/evidence-links');
+    if (!response.ok) {
+      renderRelatedEvidencePanel();
+      return;
+    }
+
+    const payload = await response.json();
+    const data = payload.data || payload;
+    state.evidenceLinks = data.links || [];
+    rebuildLinksIndex();
+    renderTimelineList(state.timelineEvents);
+    renderRelatedEvidencePanel();
+  }
+
+  function peerEventForLink(link, selectedEventId) {
+    if (!link || !selectedEventId) return null;
+    const sourceId = link.source && link.source.eventId;
+    const targetId = link.target && link.target.eventId;
+    const peerId = sourceId === selectedEventId ? targetId : sourceId;
+    return peerId ? findTimelineEventById(peerId) : null;
+  }
+
+  function renderRelatedEvidencePanel() {
+    relatedEvidenceList.innerHTML = '';
+
+    if (!state.activeTimelineEventId) {
+      relatedEvidencePanel.hidden = true;
+      linkAddBtn.hidden = true;
+      linkCreateForm.hidden = true;
+      return;
+    }
+
+    relatedEvidencePanel.hidden = false;
+    const links = getLinksForEvent(state.activeTimelineEventId);
+
+    if (links.length === 0) {
+      relatedEvidenceEmpty.textContent = 'No related evidence';
+      relatedEvidenceEmpty.hidden = false;
+    } else {
+      relatedEvidenceEmpty.hidden = true;
+    }
+
+    links.forEach(function (link) {
+      const peerId = link.source.eventId === state.activeTimelineEventId
+        ? link.target.eventId
+        : link.source.eventId;
+      const peer = findTimelineEventById(peerId);
+      const row = document.createElement('li');
+      row.className = 'related-evidence-row';
+      row.setAttribute('data-testid', 'related-evidence-row');
+
+      if (link.status === 'stale' || !peer) {
+        row.classList.add('related-evidence-row--stale');
+      }
+
+      const typeEl = document.createElement('div');
+      typeEl.className = 'related-evidence-row__type';
+      typeEl.textContent = linkTypeLabel(link.type);
+      row.appendChild(typeEl);
+
+      const metaEl = document.createElement('div');
+      metaEl.className = 'related-evidence-row__meta';
+      if (peer) {
+        metaEl.textContent = (peer.timestamp || '') + ' · '
+          + ((peer.source && peer.source.artifactName) || '') + ' · '
+          + (peer.message || peer.eventType || '');
+      } else {
+        metaEl.textContent = 'Event unavailable';
+      }
+      row.appendChild(metaEl);
+
+      if (link.note) {
+        const noteEl = document.createElement('div');
+        noteEl.className = 'related-evidence-row__note';
+        noteEl.textContent = link.note;
+        row.appendChild(noteEl);
+      }
+
+      const actions = document.createElement('div');
+      actions.className = 'related-evidence-row__actions';
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'btn btn-ghost btn-sm';
+      deleteBtn.textContent = 'Remove';
+      deleteBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        deleteEvidenceLink(link.id).catch(function (error) {
+          setStatus('Remove link error: ' + error.message);
+        });
+      });
+      actions.appendChild(deleteBtn);
+      row.appendChild(actions);
+
+      row.addEventListener('click', function () {
+        if (!peer) return;
+        jumpToTimelineEvent(peer).catch(function (error) {
+          setStatus('Jump error: ' + error.message);
+        });
+      });
+
+      relatedEvidenceList.appendChild(row);
+    });
+
+    linkAddBtn.hidden = state.linkCreateMode || !state.activeTimelineEventId;
+    linkCreateForm.hidden = !state.linkCreateMode;
+
+    if (state.linkCreateMode) {
+      populateLinkTargetSelect();
+    }
+  }
+
+  function populateLinkTargetSelect() {
+    linkTargetSelect.innerHTML = '';
+    state.timelineEvents.forEach(function (event) {
+      if (!event.id || event.id === state.activeTimelineEventId) return;
+      const option = document.createElement('option');
+      option.value = event.id;
+      option.textContent = (event.timestamp || '') + ' · '
+        + ((event.source && event.source.artifactName) || '') + ' · '
+        + (event.message || event.eventType || '');
+      linkTargetSelect.appendChild(option);
+    });
+  }
+
+  function showLinkCreateForm() {
+    state.linkCreateMode = true;
+    linkNoteInput.value = '';
+    linkTypeSelect.value = 'RELATED';
+    renderRelatedEvidencePanel();
+  }
+
+  function hideLinkCreateForm() {
+    state.linkCreateMode = false;
+    renderRelatedEvidencePanel();
+  }
+
+  async function createEvidenceLink() {
+    if (!state.activeInvestigationId || !state.activeTimelineEventId) return;
+
+    const targetEventId = linkTargetSelect.value;
+    if (!targetEventId) {
+      setStatus('Select a target event');
+      return;
+    }
+
+    const body = {
+      type: linkTypeSelect.value || 'RELATED',
+      source: { kind: 'timeline_event', eventId: state.activeTimelineEventId },
+      target: { kind: 'timeline_event', eventId: targetEventId },
+    };
+
+    const note = linkNoteInput.value.trim();
+    if (note) body.note = note;
+
+    const response = await api(
+      '/api/v1/investigations/' + state.activeInvestigationId + '/evidence-links',
+      body,
+      'POST'
+    );
+
+    if (response.status === 409) {
+      setStatus('Connection already exists for this type');
+      return;
+    }
+
+    if (!response.ok) {
+      const err = await response.json().catch(function () { return {}; });
+      const message = (err.error && err.error.message) || 'Could not create connection';
+      throw new Error(message);
+    }
+
+    hideLinkCreateForm();
+    await refreshEvidenceLinks();
+    setStatus('Connection added');
+  }
+
+  async function deleteEvidenceLink(linkId) {
+    if (!state.activeInvestigationId || !linkId) return;
+
+    const response = await api(
+      '/api/v1/investigations/' + state.activeInvestigationId + '/evidence-links/' + linkId,
+      null,
+      'DELETE'
+    );
+
+    if (!response.ok && response.status !== 204) {
+      throw new Error('Could not remove connection');
+    }
+
+    await refreshEvidenceLinks();
+    setStatus('Connection removed');
+  }
+
   function renderTimelineList(events) {
     timelineList.innerHTML = '';
 
@@ -872,9 +1139,18 @@
           if (!severity) return '';
           return '<span class="severity-pill ' + severityPillClass(severity) + '">'
             + escapeHtml(severity) + '</span>';
+        })() + '</td>'
+        + '<td>' + (function () {
+          const count = getLinksForEvent(event.id).length;
+          if (count < 1) return '';
+          return '<span class="timeline-link-badge" data-testid="timeline-link-badge">'
+            + count + '</span>';
         })() + '</td>';
 
       row.addEventListener('click', function () {
+        state.activeTimelineEventId = event.id || null;
+        renderTimelineList(state.timelineEvents);
+        renderRelatedEvidencePanel();
         jumpToTimelineEvent(event).catch(function (error) {
           setStatus('Jump error: ' + error.message);
         });
@@ -897,6 +1173,11 @@
       state.timelineEvents = [];
       state.timelineOffset = 0;
       state.timelineTruncated = false;
+      state.evidenceLinks = [];
+      state.linksByEventId = {};
+      state.activeTimelineEventId = null;
+      state.linkCreateMode = false;
+      renderRelatedEvidencePanel();
       updateBottomTabAvailability();
       return;
     }
@@ -946,18 +1227,28 @@
 
     timelineLoadMoreBtn.hidden = !state.timelineTruncated;
     updateBottomTabAvailability();
+
+    if (!append) {
+      await refreshEvidenceLinks();
+    } else {
+      renderTimelineList(state.timelineEvents);
+    }
   }
 
   async function jumpToTimelineEvent(event) {
     if (!state.activeInvestigationId || !event) return;
 
-    state.activeTimelineEventId = event.id || null;
+    const resolved = event.id ? await ensureTimelineEventLoaded(event.id) : event;
+    const targetEvent = resolved || event;
+
+    state.activeTimelineEventId = targetEvent.id || null;
     renderTimelineList(state.timelineEvents);
+    renderRelatedEvidencePanel();
     setBottomTab('timeline');
 
-    const source = event.source || {};
+    const source = targetEvent.source || {};
     const artifactType = source.artifactType || '';
-    const artifactId = source.artifactId || event.artifactId;
+    const artifactId = source.artifactId || targetEvent.artifactId;
 
     if (artifactType === 'log' && artifactId) {
       state.highlightLineNumber = source.lineNumber != null ? Number(source.lineNumber) : null;
@@ -986,7 +1277,7 @@
       return;
     }
 
-    setStatus((event.message || event.eventType || 'Event')
+    setStatus((targetEvent.message || targetEvent.eventType || 'Event')
       + ' — ' + (source.artifactName || artifactType || 'artifact'));
   }
 
@@ -1479,6 +1770,20 @@
       }).catch(function (error) {
         setStatus('Open error: ' + error.message);
       });
+    });
+
+    linkAddBtn.addEventListener('click', function () {
+      showLinkCreateForm();
+    });
+
+    linkCreateBtn.addEventListener('click', function () {
+      createEvidenceLink().catch(function (error) {
+        setStatus('Create connection error: ' + error.message);
+      });
+    });
+
+    linkCreateCancelBtn.addEventListener('click', function () {
+      hideLinkCreateForm();
     });
 
     document.querySelectorAll('.results-tab').forEach(function (tab) {

@@ -102,17 +102,51 @@
 
       <div class="bottom-dock__panels">
         <section class="bottom-panel" id="panelTimeline" data-bottom-panel="timeline" hidden>
-          <p id="timelineEmpty" class="panel-empty">Select an investigation to view its timeline.</p>
-          <p id="timelineWarnings" class="timeline-warnings" hidden></p>
-          <div class="table-wrap">
-            <table id="timelineTable" class="data-table timeline-table">
-              <thead>
-                <tr><th>Time</th><th>Type</th><th>Source</th><th>Message</th><th>Severity</th></tr>
-              </thead>
-              <tbody id="timelineList" data-testid="timeline-rows"></tbody>
-            </table>
+          <div class="timeline-layout">
+            <div class="timeline-main">
+              <p id="timelineEmpty" class="panel-empty">Select an investigation to view its timeline.</p>
+              <p id="timelineWarnings" class="timeline-warnings" hidden></p>
+              <div class="table-wrap">
+                <table id="timelineTable" class="data-table timeline-table">
+                  <thead>
+                    <tr><th>Time</th><th>Type</th><th>Source</th><th>Message</th><th>Severity</th><th>Connections</th></tr>
+                  </thead>
+                  <tbody id="timelineList" data-testid="timeline-rows"></tbody>
+                </table>
+              </div>
+              <button type="button" id="timelineLoadMoreBtn" class="btn btn-ghost btn-sm" hidden>Load more</button>
+            </div>
+            <aside id="relatedEvidencePanel" class="related-evidence-panel" data-testid="related-evidence-panel" hidden>
+              <h3 class="subsection-title">Related Evidence</h3>
+              <p id="relatedEvidenceEmpty" class="panel-empty panel-empty--compact">Select a timeline event to view connections.</p>
+              <ul id="relatedEvidenceList" class="related-evidence-list"></ul>
+              <div id="linkCreateForm" class="link-create-form" hidden>
+                <p class="link-create-form__hint">Pick a target event and connection type.</p>
+                <label class="field">
+                  <span>Type</span>
+                  <select id="linkTypeSelect">
+                    <option value="RELATED">Related</option>
+                    <option value="PRECEDES">Precedes</option>
+                    <option value="FOLLOWS">Follows</option>
+                    <option value="SUPPORTS">Supports</option>
+                  </select>
+                </label>
+                <label class="field">
+                  <span>Target event</span>
+                  <select id="linkTargetSelect"></select>
+                </label>
+                <label class="field">
+                  <span>Note (optional)</span>
+                  <input type="text" id="linkNoteInput" placeholder="same request id">
+                </label>
+                <div class="link-create-form__actions">
+                  <button type="button" id="linkCreateBtn" class="btn btn-primary btn-sm">Add connection</button>
+                  <button type="button" id="linkCreateCancelBtn" class="btn btn-ghost btn-sm">Cancel</button>
+                </div>
+              </div>
+              <button type="button" id="linkAddBtn" class="btn btn-ghost btn-sm" hidden>Add connection</button>
+            </aside>
           </div>
-          <button type="button" id="timelineLoadMoreBtn" class="btn btn-ghost btn-sm" hidden>Load more</button>
         </section>
 
         <section class="bottom-panel" id="panelCrash" data-bottom-panel="crash" hidden>
