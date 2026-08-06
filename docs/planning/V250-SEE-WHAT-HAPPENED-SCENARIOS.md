@@ -57,7 +57,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| NV.1 | Jump to artifact | Click timeline event (web) | Opens source artifact in workbench | B | ⬜ |
+| NV.1 | Jump to artifact | Click timeline event (web) | Opens source artifact in workbench | B | 🟡 |
 | NV.2 | Line hint | Log line event | `source.lineNumber` present | I | ✅ |
 
 ---
@@ -85,9 +85,9 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| UI.1 | Timeline panel | Select investigation | Timeline view visible | B | ⬜ |
-| UI.2 | Empty state | Investigation with no artifacts | Empty message, not error | B | ⬜ |
-| UI.3 | No visual correlation | Timeline view | No lines/grouping between events | B | ⬜ |
+| UI.1 | Timeline panel | Select investigation | Timeline view visible | B | ✅ |
+| UI.2 | Empty state | Investigation with no artifacts | Empty message, not error | B | ✅ |
+| UI.3 | No visual correlation | Timeline view | No lines/grouping between events | B | ✅ |
 
 ---
 
@@ -97,4 +97,4 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 |----|----------|---------|----------|------|--------|
 | REL.1 | CI web job | `scope_web_tests` + integration | TL/IA rows green | W | ⬜ |
 | REL.2 | Story Gate | Manual demo path | End-to-end narrative + jump | B | ⬜ |
-| REL.3 | ADR accepted | PR merge | ADR-009-M15.7 **Accepted** | — | ⬜ |
+| REL.3 | ADR accepted | PR merge | ADR-009-M15.7 **Accepted** | — | ✅ |
