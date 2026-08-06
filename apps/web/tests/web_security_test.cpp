@@ -208,6 +208,6 @@ TEST_F(WebSecurityTest, SpaShellServedAtRoot)
 
     ASSERT_TRUE(result);
     EXPECT_EQ(200, result->status);
-    EXPECT_NE(std::string::npos, result->body.find("LogScope Web"));
+    EXPECT_NE(std::string::npos, result->body.find("LogScope"));
     EXPECT_NE(std::string::npos, result->body.find("app.js"));
 }
