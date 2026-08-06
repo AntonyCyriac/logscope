@@ -5,7 +5,7 @@
 | Document | v2.5.0 See What Happened Scenarios |
 | Category | Project Planning |
 | Version | 0.1.0 |
-| Status | **Planned — `v2.5.0`** |
+| Status | **Story Gate closed — `v2.5.0`** |
 | Design reference | [ADR-009-M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) |
 | Created | 06-08-2026 |
 | Last Updated | 06-08-2026 |
@@ -57,7 +57,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| NV.1 | Jump to artifact | Click timeline event (web) | Opens source artifact in workbench | B | 🟡 |
+| NV.1 | Jump to artifact | Click timeline event (web) | Opens source artifact in workbench | B | ✅ |
 | NV.2 | Line hint | Log line event | `source.lineNumber` present | I | ✅ |
 
 ---
@@ -67,8 +67,8 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
 | IA.1 | Timeline GET | `GET .../investigations/{id}/timeline` | 200, `events[]` domain JSON | I | ✅ |
-| IA.2 | Not found | Unknown investigation id | **404** | I | ⬜ |
-| IA.3 | No correlation | Timeline response | No ID-grouping or relationship fields | U | ⬜ |
+| IA.2 | Not found | Unknown investigation id | **404** | I | ✅ |
+| IA.3 | No correlation | Timeline response | No ID-grouping or relationship fields | U | ✅ |
 
 ---
 
@@ -95,6 +95,6 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| REL.1 | CI web job | `scope_web_tests` + integration | TL/IA rows green | W | ⬜ |
-| REL.2 | Story Gate | Manual demo path | End-to-end narrative + jump | B | ⬜ |
+| REL.1 | CI web job | `scope_web_tests` + integration | TL/IA rows green | W | ✅ |
+| REL.2 | Story Gate | Manual demo path | End-to-end narrative + jump | B | ✅ |
 | REL.3 | ADR accepted | PR merge | ADR-009-M15.7 **Accepted** | — | ✅ |

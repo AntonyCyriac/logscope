@@ -123,6 +123,27 @@ class WebApiIntegrationTest : public ::testing::Test
         return headers;
     }
 
+    [[nodiscard]] std::string extractJsonStringField(const std::string& body, const std::string& field) const
+    {
+        const std::string needle = "\"" + field + "\": \"";
+        const std::size_t pos = body.find(needle);
+
+        if (pos == std::string::npos)
+        {
+            return {};
+        }
+
+        const std::size_t start = pos + needle.size();
+        const std::size_t end = body.find('"', start);
+
+        if (end == std::string::npos)
+        {
+            return {};
+        }
+
+        return body.substr(start, end - start);
+    }
+
     scope::web::WebConfig config;
     std::unique_ptr<scope::web::WebServer> server;
     std::unique_ptr<httplib::Client> client;
@@ -504,6 +525,69 @@ TEST_F(WebApiIntegrationTest, InvestigationTimelineReturnsChronologicalEvents)
     EXPECT_NE(std::string::npos, timelineResult->body.find("\"lineNumber\":"));
     EXPECT_NE(std::string::npos, timelineResult->body.find("\"pagination\""));
     EXPECT_NE(std::string::npos, timelineResult->body.find(investigationId));
+}
+
+TEST_F(WebApiIntegrationTest, InvestigationTimelineStoryGateDemoPath)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+    const std::string syslogPath = sourcePath("samples/large-app.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"story-gate-timeline\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::string investigationId = extractJsonStringField(createResult->body, "id");
+    ASSERT_FALSE(investigationId.empty());
+
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath +
+                                 "\", \"name\": \"app.log\", \"role\": \"application\"}",
+                             "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"log\", \"sourcePath\": \"" + syslogPath +
+                                 "\", \"name\": \"syslog\", \"role\": \"system\"}",
+                             "application/json"));
+    ASSERT_TRUE(client->Post("/api/v1/investigations/" + investigationId + "/artifacts", headers,
+                             "{\"type\": \"note\", \"title\": \"triage\", \"body\": \"Customer reported outage\"}",
+                             "application/json"));
+
+    const httplib::Result timelineResult =
+        client->Get("/api/v1/investigations/" + investigationId + "/timeline?order=asc", headers);
+    ASSERT_TRUE(timelineResult);
+    EXPECT_EQ(200, timelineResult->status);
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"eventType\": \"log.line\""));
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"eventType\": \"note.created\""));
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"artifactName\": \"app.log\""));
+    EXPECT_NE(std::string::npos, timelineResult->body.find("\"artifactName\": \"syslog\""));
+    EXPECT_EQ(std::string::npos, timelineResult->body.find("correlation"));
+    EXPECT_EQ(std::string::npos, timelineResult->body.find("relatedEvent"));
+
+    const std::size_t artifactPos = timelineResult->body.find("\"artifactId\": \"");
+    ASSERT_NE(std::string::npos, artifactPos);
+    const std::string artifactId = extractJsonStringField(timelineResult->body.substr(artifactPos), "artifactId");
+    ASSERT_FALSE(artifactId.empty());
+
+    const std::string openBody = "{\"artifactId\": \"" + artifactId + "\"}";
+    const httplib::Result openResult =
+        client->Post("/api/v1/investigations/" + investigationId + "/open", headers, openBody, "application/json");
+    ASSERT_TRUE(openResult);
+    EXPECT_EQ(200, openResult->status);
+    EXPECT_NE(std::string::npos, openResult->body.find(artifactId));
+}
+
+TEST_F(WebApiIntegrationTest, InvestigationTimelineNotFoundReturns404)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const httplib::Result timelineResult = client->Get(
+        "/api/v1/investigations/00000000-0000-4000-8000-000000000099/timeline", headers);
+    ASSERT_TRUE(timelineResult);
+    EXPECT_EQ(404, timelineResult->status);
 }
 
 TEST_F(WebApiIntegrationTest, InvestigationOpenPstackArtifactReturns409)
