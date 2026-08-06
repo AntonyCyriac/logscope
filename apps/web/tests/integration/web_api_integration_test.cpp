@@ -660,7 +660,7 @@ TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisReturnsPstackReport)
     ASSERT_TRUE(crashResult);
     EXPECT_EQ(200, crashResult->status);
     EXPECT_NE(std::string::npos, crashResult->body.find("\"artifactType\": \"pstack\""));
-    EXPECT_NE(std::string::npos, crashResult->body.find("\"status\": \"complete\""));
+    EXPECT_NE(std::string::npos, crashResult->body.find("\"status\": \"ready\""));
     EXPECT_NE(std::string::npos, crashResult->body.find("\"signal\": \"SIGSEGV\""));
     EXPECT_NE(std::string::npos, crashResult->body.find("SessionManager::create"));
     EXPECT_NE(std::string::npos, crashResult->body.find("\"isFaultThread\": true"));
@@ -697,7 +697,8 @@ TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisLogArtifactReturns409)
         headers);
     ASSERT_TRUE(crashResult);
     EXPECT_EQ(409, crashResult->status);
-    EXPECT_NE(std::string::npos, crashResult->body.find("ARTIFACT_NOT_ANALYZABLE"));
+    EXPECT_NE(std::string::npos, crashResult->body.find("\"status\": \"not_supported\""));
+    EXPECT_NE(std::string::npos, crashResult->body.find("NOT_SUPPORTED"));
 }
 
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)

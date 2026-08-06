@@ -57,8 +57,8 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
 | CR.1 | GDB absent | `GET .../crash-analysis` on core, no GDB | `status: unavailable`, HTTP **200** | U | 🟡 |
-| CR.2 | GDB present | Core + GDB on PATH | `status: complete` or `partial` | U | ⬜ |
-| CR.3 | No symbols | Core without debug info | `partial`, observation about symbols | U | ⬜ |
+| CR.2 | GDB present | Core + GDB on PATH | `status: ready` | U | ⬜ |
+| CR.3 | No symbols | Core without debug info | `ready` with warnings about symbols | U | ⬜ |
 | CR.4 | Never 500 on missing GDB | Core artifact, CI without GDB | HTTP **200**, not 500 | I | 🟡 |
 
 ---
@@ -69,7 +69,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 |----|----------|---------|----------|------|--------|
 | IA.1 | Crash analysis GET | `GET .../artifacts/{id}/crash-analysis` | 200, `report` domain JSON | I | ✅ |
 | IA.2 | Not found | Unknown investigation id | **404** | I | ⬜ |
-| IA.3 | Not analyzable | Log artifact | **409** `ARTIFACT_NOT_ANALYZABLE` | I | ✅ |
+| IA.3 | Not analyzable | Log artifact | **409** `NOT_SUPPORTED`, `status: not_supported` | I | ✅ |
 | IA.4 | No root cause fields | Report JSON | No `rootCause`, `confidence`, or AI fields | U | ✅ |
 | IA.5 | Unavailable is 200 | Core without GDB | **200** + `status: unavailable` | I | 🟡 |
 
@@ -92,7 +92,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 |----|----------|---------|----------|------|--------|
 | IV.1 | analyzeCrash entry | `Investigation::analyzeCrash(artifactId)` | Routes to correct analyzer | U | ✅ |
 | IV.2 | No manifest persistence | After analyze | `manifest.json` unchanged | U | ⬜ |
-| IV.3 | Registry extensibility | Unknown type (note) | `ARTIFACT_NOT_ANALYZABLE` | U | ⬜ |
+| IV.3 | Registry extensibility | Unknown type (note) | `not_supported` | U | ⬜ |
 
 ---
 

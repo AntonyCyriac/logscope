@@ -5,6 +5,7 @@
 #include "web_server.hpp"
 
 #include "artifact_handler.hpp"
+#include "crash_report.hpp"
 #include "investigation_container.hpp"
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
@@ -1538,17 +1539,17 @@ void WebServer::registerRoutes()
 
                       if (!crashResult)
                       {
-                          if (crashResult.error().code() == foundation::ErrorCode::InvalidArgument &&
-                              crashResult.error().message() == "ARTIFACT_NOT_ANALYZABLE")
-                          {
-                              setJsonResponse(response, 409,
-                                              errorEnvelope("ARTIFACT_NOT_ANALYZABLE",
-                                                            "Artifact type does not support crash analysis."));
-
-                              return;
-                          }
-
                           setErrorResponse(response, crashResult.error());
+
+                          return;
+                      }
+
+                      if (crashResult->status == scope::workspace::CrashAnalysisStatus::NotSupported)
+                      {
+                          setJsonResponse(response, 409,
+                                          errorEnvelope("NOT_SUPPORTED",
+                                                        "Artifact type does not support crash analysis.",
+                                                        formatInvestigationCrashAnalysis(*crashResult)));
 
                           return;
                       }

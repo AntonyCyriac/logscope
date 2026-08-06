@@ -965,13 +965,18 @@ int runInvestigationCrashCommand(const InvestigationCrashOptions& options,
 
     if (!crashResult)
     {
-        if (crashResult.error().message() == "ARTIFACT_NOT_ANALYZABLE")
+        errorOutput << crashResult.error().message() << '\n';
+
+        return 1;
+    }
+
+    if (crashResult->status == scope::workspace::CrashAnalysisStatus::NotSupported)
+    {
+        errorOutput << "Artifact does not support crash analysis.\n";
+
+        if (options.format == InvestigationTimelineFormat::Json)
         {
-            errorOutput << "Artifact does not support crash analysis.\n";
-        }
-        else
-        {
-            errorOutput << crashResult.error().message() << '\n';
+            output << formatCrashReportJson(*crashResult) << '\n';
         }
 
         return 1;

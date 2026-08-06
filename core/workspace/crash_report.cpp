@@ -29,15 +29,17 @@ std::string crashAnalysisStatusToString(const CrashAnalysisStatus status) noexce
 {
     switch (status)
     {
-    case CrashAnalysisStatus::Complete:
-        return "complete";
-    case CrashAnalysisStatus::Partial:
-        return "partial";
+    case CrashAnalysisStatus::Ready:
+        return "ready";
     case CrashAnalysisStatus::Unavailable:
         return "unavailable";
+    case CrashAnalysisStatus::NotSupported:
+        return "not_supported";
+    case CrashAnalysisStatus::Failed:
+        return "failed";
     }
 
-    return "unavailable";
+    return "failed";
 }
 
 std::string makeCrashReportId(const std::string& investigationId, const std::string& artifactId,

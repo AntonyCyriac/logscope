@@ -44,9 +44,10 @@ struct CrashThread
  */
 enum class CrashAnalysisStatus
 {
-    Complete,
-    Partial,
-    Unavailable
+    Ready,
+    Unavailable,
+    NotSupported,
+    Failed
 };
 
 /**

@@ -384,8 +384,14 @@ foundation::Result<CrashReport> Investigation::analyzeCrash(const std::string& a
 
     if (analyzer == nullptr || !analyzer->supports(*artifactResult))
     {
-        return foundation::Result<CrashReport>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "ARTIFACT_NOT_ANALYZABLE"));
+        CrashReport report;
+        report.id = makeCrashReportId(m_manifest.id, artifactResult->id, "unsupported");
+        report.artifactId = artifactResult->id;
+        report.artifactType = artifactResult->type;
+        report.status = CrashAnalysisStatus::NotSupported;
+        report.summary = "Artifact type does not support crash analysis";
+
+        return foundation::Result<CrashReport>(std::move(report));
     }
 
     const IArtifactHandler* handler = findArtifactHandler(artifactResult->type);
@@ -405,8 +411,15 @@ foundation::Result<CrashReport> Investigation::analyzeCrash(const std::string& a
 
     if (!analyzer->canAnalyze(*artifactResult, *dataPathResult))
     {
-        return foundation::Result<CrashReport>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "Artifact data is not readable."));
+        CrashReport report;
+        report.id = makeCrashReportId(m_manifest.id, artifactResult->id, std::string(analyzer->artifactType()) + "-unreadable");
+        report.artifactId = artifactResult->id;
+        report.artifactType = artifactResult->type;
+        report.status = CrashAnalysisStatus::Failed;
+        report.summary = "Artifact data is not readable";
+        report.warnings.push_back("Artifact data file is missing or not readable.");
+
+        return foundation::Result<CrashReport>(std::move(report));
     }
 
     CrashAnalysisContext context;

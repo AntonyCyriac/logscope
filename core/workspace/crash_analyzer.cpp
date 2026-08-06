@@ -381,7 +381,7 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
 
         if (!stream)
         {
-            report.status = CrashAnalysisStatus::Partial;
+            report.status = CrashAnalysisStatus::Failed;
             report.summary = "Pstack file could not be read";
             report.warnings.push_back("Failed to open pstack artifact data file.");
 
@@ -445,7 +445,7 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
 
         if (report.threads.empty())
         {
-            report.status = CrashAnalysisStatus::Partial;
+            report.status = CrashAnalysisStatus::Failed;
             report.summary = "No threads parsed from pstack";
             report.warnings.push_back("Pstack format not recognized or file is empty.");
 
@@ -523,7 +523,7 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
             report.summary = "Pstack parsed with " + std::to_string(report.threads.size()) + " thread(s)";
         }
 
-        report.status = report.threads.empty() ? CrashAnalysisStatus::Partial : CrashAnalysisStatus::Complete;
+        report.status = CrashAnalysisStatus::Ready;
         report.metadata["analyzer"] = kPstackAnalyzerVersion;
         report.metadata["threadCount"] = std::to_string(report.threads.size());
 
@@ -575,7 +575,7 @@ class CoreCrashAnalyzer final : public IArtifactCrashAnalyzer
 
         if (gdbOutput.empty())
         {
-            report.status = CrashAnalysisStatus::Partial;
+            report.status = CrashAnalysisStatus::Failed;
             report.summary = "GDB produced no output";
             report.warnings.push_back("GDB command failed or core file is unreadable.");
 
@@ -586,7 +586,7 @@ class CoreCrashAnalyzer final : public IArtifactCrashAnalyzer
 
         if (report.threads.empty())
         {
-            report.status = CrashAnalysisStatus::Partial;
+            report.status = CrashAnalysisStatus::Failed;
             report.summary = "No stack frames parsed from core dump";
             report.warnings.push_back("Debug symbols unavailable or core format not recognized.");
             report.observations.push_back("GDB ran but no thread backtraces were parsed.");
@@ -626,14 +626,11 @@ class CoreCrashAnalyzer final : public IArtifactCrashAnalyzer
                                    [](const CrashFrame& frame) { return frame.symbol == "<unknown>"; });
             });
 
+        report.status = CrashAnalysisStatus::Ready;
+
         if (hasUnknownSymbols)
         {
-            report.status = CrashAnalysisStatus::Partial;
             report.warnings.push_back("Some frames lack symbol information.");
-        }
-        else
-        {
-            report.status = CrashAnalysisStatus::Complete;
         }
 
         report.metadata["analyzer"] = kCoreAnalyzerVersion;

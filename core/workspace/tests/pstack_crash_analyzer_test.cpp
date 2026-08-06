@@ -64,7 +64,7 @@ Program received signal SIGSEGV, Segmentation fault.
     const auto crashResult = investigation.analyzeCrash(artifactResult->id);
 
     ASSERT_TRUE(crashResult.hasValue());
-    EXPECT_EQ(CrashAnalysisStatus::Complete, crashResult->status);
+    EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
     EXPECT_EQ("pstack", crashResult->artifactType);
     EXPECT_EQ(artifactResult->id, crashResult->artifactId);
     EXPECT_TRUE(crashResult->signal.has_value());
@@ -118,6 +118,7 @@ TEST(PstackCrashAnalyzerTest, LogArtifactIsNotAnalyzable)
 
     const auto crashResult = investigation.analyzeCrash(artifactResult->id);
 
-    ASSERT_FALSE(crashResult.hasValue());
-    EXPECT_EQ("ARTIFACT_NOT_ANALYZABLE", crashResult.error().message());
+    ASSERT_TRUE(crashResult.hasValue());
+    EXPECT_EQ(CrashAnalysisStatus::NotSupported, crashResult->status);
+    EXPECT_EQ("log", crashResult->artifactType);
 }
