@@ -7,11 +7,12 @@ import {
   createEvidenceLink,
   createInvestigation,
   openFirstArtifact,
-  sampleLogPath,
   switchBottomTab,
   syslogPath,
   waitForReady,
 } from './helpers';
+
+/** Regenerates docs/assets/logscope-web.png for README. Run on every release with README update. */
 
 const REPO_ROOT = path.resolve(__dirname, '../../../../');
 const ASSETS = path.join(REPO_ROOT, 'docs', 'assets');

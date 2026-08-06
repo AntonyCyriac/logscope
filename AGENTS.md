@@ -23,6 +23,21 @@ Optional: [docs/planning/NEXT-VALUE-ADD.md](docs/planning/NEXT-VALUE-ADD.md) · 
 - **No tool branding in git** — do not add vendor footers (e.g. “Made with …”) to commit messages, PR descriptions, or release notes.
 - **Shipped-tag regressions** — user-visible bugs in a released `vX.Y.Z` need a [GitHub issue](https://github.com/AntonyCyriac/logscope/issues) before or with the fix (label `bug`). See [Release process — regression issues](docs/release/RELEASE.md#release-regression-issues-required).
 
+## Release ship (README + snapshots)
+
+On **every** `vX.Y.Z` release (feature, story, or hotfix with user-visible UI/CLI changes), ship in **one PR** before tagging:
+
+| Artifact | Update |
+|----------|--------|
+| Version | `CMakeLists.txt`, `CHANGELOG.md`, `docs/release/vX.Y.Z-RELEASE-NOTES.md` |
+| Agent bootstrap | This file → link `docs/release/vX.Y.Z-RELEASE-NOTES.md`; `docs/handbook/PROJECT_CONTEXT.md` current-release line |
+| **README** | Release line, feature table, CLI / desktop / web quick-start for new capabilities |
+| **Screenshots** | **All three** `docs/assets/logscope-{cli,desktop,web}.png` — same PR as README; see [docs/assets/README.md](docs/assets/README.md) |
+
+Web capture: `tests/e2e/web/tests/capture-readme-screenshots.spec.ts`. Do not tag while README still references an older release or stale PNGs after UI changes.
+
+Full checklist: [docs/release/RELEASE.md](docs/release/RELEASE.md). Cursor rule: `.cursor/rules/release-readme-snapshots.mdc`.
+
 ## Product vs assistant (do not conflate)
 
 | Layer | Meaning |
