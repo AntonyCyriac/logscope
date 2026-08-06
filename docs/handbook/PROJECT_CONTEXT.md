@@ -1,4 +1,4 @@
-﻿# LogScope Project Context
+# LogScope Project Context
 
 | Field | Value |
 |-------|-------|
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.6.1` (shipped) — Stories 1–4 complete. **Story 5: Connect the Evidence** completes Phase A (investigation methodology).
+**Current release:** `v2.6.1` (shipped) - **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1-3 (`v2.3.0`-`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Story 5: Connect the Evidence** completes Phase A (investigation methodology).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 

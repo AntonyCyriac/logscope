@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Document Map |
 | Category | Documentation |
-| Version | 3.19.0 |
+| Version | 3.20.0 |
 | Status | Approved |
 | Created | 15-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -113,6 +113,8 @@ docs/
 â”œâ”€â”€ release/
 â”‚   â”œâ”€â”€ RELEASE.md
 â”‚   â”œâ”€â”€ V1_VALIDATION.md
+â”‚   â”œâ”€â”€ v1.5.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v1.5.1-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v1.5.2-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.0-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.1-RELEASE-NOTES.md
@@ -120,7 +122,17 @@ docs/
 â”‚   â”œâ”€â”€ v2.0.3-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.4-RELEASE-NOTES.md
 â”‚   â”œâ”€â”€ v2.0.5-RELEASE-NOTES.md
-â”‚   â””â”€â”€ v2.0.6-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.0.6-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.1.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.2.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.2.1-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.2.2-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.3.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.4.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.4.1-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.5.0-RELEASE-NOTES.md
+â”‚   â”œâ”€â”€ v2.6.0-RELEASE-NOTES.md
+â”‚   â””â”€â”€ v2.6.1-RELEASE-NOTES.md
 â”‚
 â”œâ”€â”€ handbook/
 â”‚   â”œâ”€â”€ PROJECT_CONTEXT.md
@@ -395,3 +407,4 @@ These categories should be added only when they provide clear value and support 
 | 3.17.0 | 30-07-2026 | v2.0.5 release notes; versioning policy in RELEASE.md. |
 | 3.18.0 | 30-07-2026 | v2.0.6 release notes. |
 | 3.19.0 | 06-08-2026 | GLOSSARY.md; evidence-centric platform sync; v2.6.1 current release pointer. |
+| 3.20.0 | 06-08-2026 | Extended `docs/release/` structure tree through v2.6.1 release notes. |

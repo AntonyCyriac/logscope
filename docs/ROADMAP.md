@@ -64,7 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.6.1`](CHANGELOG.md) — Stories 1–4 shipped. **Story 5** completes Phase A (investigation methodology).
+**Current release:** [`v2.6.1`](CHANGELOG.md) - Story 4 hotfix (pstack fault-thread). Stories 1-4 shipped. **Story 5** completes Phase A (investigation methodology).
 
 **Next:** Story 5 **Connect the Evidence** (completes Phase A) — see [Project Context](handbook/PROJECT_CONTEXT.md) and [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
