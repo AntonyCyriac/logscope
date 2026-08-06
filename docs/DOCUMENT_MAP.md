@@ -124,6 +124,9 @@ docs/
 â”‚
 â”œâ”€â”€ handbook/
 â”‚   â”œâ”€â”€ PROJECT_CONTEXT.md
+â”‚   â”œâ”€â”€ CODE_MAP.md
+â”‚   â”œâ”€â”€ WEB_UI_DESIGN.md
+â”‚   â”œâ”€â”€ BROWSER_MCP.md
 â”‚   â”œâ”€â”€ CODE_REVIEW_CHECKLIST.md
 â”‚   â”œâ”€â”€ CONFIGURATION_GUIDE.md
 â”‚   â”œâ”€â”€ DEVELOPER_GUIDE.md
@@ -164,6 +167,7 @@ docs/
 â”‚
 â”œâ”€â”€ architecture/
 â”‚   â”œâ”€â”€ ARCHITECTURE_OVERVIEW.md
+â”‚   â”œâ”€â”€ UI_ARCHITECTURE.md
 â”‚   â”œâ”€â”€ ARCHITECTURE_PRINCIPLES.md
 â”‚   â”œâ”€â”€ COMPONENT_CATALOG.md
 â”‚   â”œâ”€â”€ DOMAIN_MODEL.md

@@ -83,12 +83,14 @@ Use `samples/demo-story-gate.properties` (`allow_server_paths=true`, `samples/` 
 
 ## Story Gate browser checks
 
+Prefer Playwright [`tests/e2e/web/`](../../tests/e2e/web/README.md) for regression. Manual MCP steps below:
+
 1. `browser_tabs list` → pick `127.0.0.1:8080` tab or `browser_navigate` once
 2. Create investigation → **Add log** (file picker, e.g. `samples/sample.log`) → **Add pstack** (`samples/pstack.txt`)
-3. `browser_lock` → open investigation
-4. Verify **Understand Why It Crashed** panel (UX.1)
-5. Click fault thread (`.crash-thread--fault`; use `browser_cdp` `Runtime.evaluate` if snapshot ref is ambiguous)
-6. Confirm `.crash-pstack-thread--highlight` and status `Jumped to pstack thread`
+3. `browser_lock` → open investigation → **Analyze**
+4. Open **Crash** bottom tab (UX.1) — verify SIGSEGV + fault thread
+5. Click fault thread (`[data-testid="crash-thread-fault"]` or `.crash-thread--fault`; use `browser_cdp` if snapshot ref is ambiguous)
+6. Confirm pstack highlight in center viewer and status `Jumped to pstack thread`
 
 ## Cleanup
 

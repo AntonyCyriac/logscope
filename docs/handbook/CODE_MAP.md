@@ -61,7 +61,8 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [V230-CREATE-INVESTIGATION-SCENARIOS.md](../planning/V230-CREATE-INVESTIGATION-SCENARIOS.md)
 - [V240-UNDERSTAND-EVERYTHING-SCENARIOS.md](../planning/V240-UNDERSTAND-EVERYTHING-SCENARIOS.md)
 - [V250-SEE-WHAT-HAPPENED-SCENARIOS.md](../planning/V250-SEE-WHAT-HAPPENED-SCENARIOS.md) — Story 3 timeline (Story Gate closed)
-- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md)
+- [V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md](../planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) — Story 4 crash (in progress)
+- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
 - [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.5.0 release notes](../release/v2.5.0-RELEASE-NOTES.md)
 
 ## CI

@@ -20,7 +20,7 @@ Acceptance scenarios for **v2.6.0** — Story 4: **crash evidence projection** f
 
 ```text
 Create investigation → Add app.log → Add pstack.txt
-  → Understand Why It Crashed → Crash Report
+  → Crash tab → Crash report
   → Click fault thread → Jump to pstack
 ```
 
@@ -96,11 +96,11 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 ---
 
-# 8. Web UX (UX) — deferred unless quick
+# 8. Web UX (UX)
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| UX.1 | Panel title | Open pstack artifact | **Understand Why It Crashed** panel | E2E | ✅ |
+| UX.1 | Crash tab | Open investigation with pstack | **Crash** bottom tab shows signal + fault thread | E2E | ✅ |
 | UX.2 | Fault thread jump | Click fault thread | Scroll/highlight in pstack view | E2E | ✅ |
 | UX.3 | Core unavailable message | Core without GDB | Shows warning, not error page | E2E | 🟡 (browser: `failed`+warnings on dummy core, no error page; `unavailable` on CI without GDB) |
 
@@ -126,4 +126,4 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | Add pstack.txt | ✅ |
 | Crash report via REST or CLI | ✅ |
 | Fault thread identified | ✅ |
-| Jump to pstack (web) | ✅ |
+| Jump to pstack (web — Crash tab) | ✅ |
