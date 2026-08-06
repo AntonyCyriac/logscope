@@ -754,6 +754,50 @@ TEST_F(WebApiIntegrationTest, InvestigationCrashAnalysisLogArtifactReturns409)
     EXPECT_NE(std::string::npos, crashResult->body.find("NOT_SUPPORTED"));
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationOpenAnalyzeInvestigateReturnsMatches)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/sample.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"investigate-matches-test\"}", "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::string investigationId = extractJsonStringField(createResult->body, "id");
+    ASSERT_FALSE(investigationId.empty());
+
+    const httplib::Result addLogResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath + "\", \"name\": \"app.log\"}",
+        "application/json");
+    ASSERT_TRUE(addLogResult);
+    EXPECT_EQ(200, addLogResult->status);
+
+    const std::string logArtifactId = extractJsonStringField(addLogResult->body, "id");
+    ASSERT_FALSE(logArtifactId.empty());
+
+    const std::string openBody = "{\"artifactId\": \"" + logArtifactId + "\"}";
+    const httplib::Result openResult =
+        client->Post("/api/v1/investigations/" + investigationId + "/open", headers, openBody, "application/json");
+    ASSERT_TRUE(openResult);
+    EXPECT_EQ(200, openResult->status);
+
+    const httplib::Result analyzeResult = client->Post("/api/v1/analyze", headers, "{}", "application/json");
+    ASSERT_TRUE(analyzeResult);
+    EXPECT_EQ(200, analyzeResult->status);
+
+    const httplib::Result investigateResult =
+        client->Post("/api/v1/investigate", headers, "{\"search\": \"error\"}", "application/json");
+    ASSERT_TRUE(investigateResult);
+    EXPECT_EQ(200, investigateResult->status);
+    EXPECT_NE(std::string::npos, investigateResult->body.find("\"matchingLineCount\""));
+    EXPECT_TRUE(investigateResult->body.find("\"matches\"") != std::string::npos
+                || investigateResult->body.find("\"matchingLines\"") != std::string::npos);
+}
+
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
     const std::string sessionId = createSession();

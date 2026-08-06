@@ -35,7 +35,7 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 | Column | Meaning |
 |--------|---------|
 | **Parity** | REST/CLI report JSON shape matches |
-| **Test** | U = unit, I = integration, P = parity, W = web smoke, B = browser (manual) |
+| **Test** | U = unit, I = integration, P = parity, W = web smoke, B = browser (manual), E2E = Playwright |
 
 ---
 
@@ -100,9 +100,9 @@ Status: ⬜ planned · 🟡 partial / manual · ✅ complete
 
 | ID | Scenario | Trigger | Expected | Test | Status |
 |----|----------|---------|----------|------|--------|
-| UX.1 | Panel title | Open pstack artifact | **Understand Why It Crashed** panel | B | ✅ |
-| UX.2 | Fault thread jump | Click fault thread | Scroll/highlight in pstack view | B | ✅ |
-| UX.3 | Core unavailable message | Core without GDB | Shows warning, not error page | B | 🟡 (browser: `failed`+warnings on dummy core, no error page; `unavailable` on CI without GDB) |
+| UX.1 | Panel title | Open pstack artifact | **Understand Why It Crashed** panel | E2E | ✅ |
+| UX.2 | Fault thread jump | Click fault thread | Scroll/highlight in pstack view | E2E | ✅ |
+| UX.3 | Core unavailable message | Core without GDB | Shows warning, not error page | E2E | 🟡 (browser: `failed`+warnings on dummy core, no error page; `unavailable` on CI without GDB) |
 
 ---
 

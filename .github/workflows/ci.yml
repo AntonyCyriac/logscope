@@ -371,3 +371,22 @@ jobs:
       - name: Run Web Integration Tests
         timeout-minutes: 15
         run: ctest --test-dir build --output-on-failure --build-config Release -L logscope_web_integration_tests
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install Playwright dependencies
+        working-directory: tests/e2e/web
+        run: npm install
+
+      - name: Install Playwright Chromium
+        working-directory: tests/e2e/web
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright E2E tests
+        working-directory: tests/e2e/web
+        env:
+          LOGSCOPE_WEB_BIN: ${{ github.workspace }}/build/apps/web/logscope-web
+        run: npm test

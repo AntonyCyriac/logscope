@@ -77,6 +77,26 @@ Headless desktop GUI tests use `QT_QPA_PLATFORM=offscreen` (set automatically by
 
 ---
 
+# Playwright Web E2E
+
+Browser automation for the web SPA Story Gate paths (investigation, timeline, crash, investigate, AI):
+
+```bash
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
+cmake --build build --target logscope-web
+
+cd tests/e2e/web
+npm ci
+npx playwright install chromium
+npm test
+```
+
+The test harness starts `logscope-web` with `samples/demo-story-gate.properties` and `LOGSCOPE_WEB_UI_DIR=apps/web/ui/dist`. See [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md).
+
+CI runs Playwright in the `web` job on Ubuntu after web integration tests.
+
+---
+
 # Integration and End-to-End Tests
 
 ```bash
@@ -221,3 +241,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.15.0 | 30-07-2026 | Current release baseline `v2.0.3`; `logscope_desktop_tests` (529 tests). |
 | 1.16.0 | 30-07-2026 | Current release baseline `v2.0.5`; directory e2e isolation, versioned release artifacts. |
 | 1.17.0 | 04-08-2026 | Baseline through `v2.2.1`; M15 web integration tests noted. |
+| 1.18.0 | 06-08-2026 | Playwright web E2E (Story Gate); CI `web` job runs browser tests. |
