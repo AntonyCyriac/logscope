@@ -94,7 +94,38 @@ Desktop (`apps/desktop/main_window.cpp`) follows the same philosophy where featu
 
 Use **QTabWidget** for bottom area (Results | AI | Analytics), not side-by-side split panels.
 
-When adding a web bottom-tab feature, consider desktop tab parity in the same milestone or document the gap in `tests/e2e/web/README.md`.
+---
+
+## Web ↔ desktop sync (mandatory for future work)
+
+**Maximize parity.** Web SPA and Qt desktop are two views of the same investigation product — not independent UIs.
+
+### Default rule
+
+When a change is **user-visible** (new tab, artifact action, navigation, analyze/investigate flow, labels, keyboard path):
+
+1. **Implement on both surfaces** in the same milestone/PR when feasible (`apps/web/ui/dist/` **and** `apps/desktop/`).
+2. **Reuse the same orchestration** — `ApplicationService` and domain APIs; no duplicate business logic in SPA or Qt.
+3. **Match structure** — same tab names, same artifact actions (Open / Analyze / Investigate), same progressive disclosure (bottom tabs, not extra panels).
+4. **Test both** — extend Playwright (`tests/e2e/web/`) **and** headless desktop tests (`logscope_desktop_tests`) for the shared flow.
+
+### When one surface must lag
+
+Only ship web-only or desktop-only UI if:
+
+- Platform constraint is documented (e.g. GDB/core crash tooling on web server vs desktop packaging), **and**
+- Gap is recorded in `tests/e2e/web/README.md` (desktop parity) or Story scenario matrix, **and**
+- A follow-up task exists (issue or next story) — **never silent drift**.
+
+### Agent PR checklist (presentation changes)
+
+- [ ] Updated **web** SPA (`apps/web/ui/dist/`)?
+- [ ] Updated **desktop** (`apps/desktop/main_window.cpp`, panels) with equivalent tab/action?
+- [ ] Same user-facing names and workflow order on both?
+- [ ] Playwright + desktop GUI tests extended (or N/A justified in PR)?
+- [ ] Parity gap documented if intentionally deferred?
+
+**Anti-pattern:** Adding Timeline/Crash/Results behavior on web only while desktop keeps an old toolbar layout “for later” without a tracked gap.
 
 ---
 
@@ -118,6 +149,7 @@ When adding a web bottom-tab feature, consider desktop tab parity in the same mi
 - [ ] Are new controls reachable without scrolling past unrelated sections?
 - [ ] Did you add `data-testid` for new buttons, tabs, and dynamic rows?
 - [ ] Did you run or extend `tests/e2e/web/` for user-visible flows?
+- [ ] **Web ↔ desktop:** Did you update **both** SPA and Qt for the same user-visible behavior (or document a tracked parity gap)?
 - [ ] Desktop: if overlapping feature, update bottom tabs — don't add a fourth always-visible column.
 
 ---

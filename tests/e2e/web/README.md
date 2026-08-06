@@ -61,7 +61,9 @@ npm test
 
 ## Desktop parity gaps
 
-Web bottom dock tabs **Timeline** and **Crash** are not yet available on desktop. Desktop uses bottom tabs **Results** (log table + filters), **AI**, and **Analytics** to align where features overlap.
+Web bottom dock tabs **Timeline** and **Crash** are not yet on desktop. Desktop uses bottom tabs **Results**, **AI**, and **Analytics**.
+
+**Agent rule:** For new user-visible features, implement on **both** web and desktop in the same milestone when feasible. If one surface lags, document the gap here and in the scenario matrix — do not let UIs drift silently. See [`docs/handbook/WEB_UI_DESIGN.md`](../../../docs/handbook/WEB_UI_DESIGN.md) § Web ↔ desktop sync.
 
 ## CI
 

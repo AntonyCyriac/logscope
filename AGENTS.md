@@ -42,8 +42,9 @@ LogScope is an **investigation platform**, not a monitoring dashboard. Before ch
 | Disclosure | One visible panel; story features via tabs, not more vertical panels |
 | Actions | Open / Analyze / Investigate on **artifacts**, not global Investigate sections |
 | Tests | Prefer Playwright [`tests/e2e/web/`](tests/e2e/web/) + `data-testid` hooks |
+| **Web ↔ desktop sync** | **Maximize parity** — ship user-visible UI on **both** web SPA and Qt desktop in the same milestone when feasible; same tabs, actions, and `ApplicationService` flows; test both surfaces. Document + track any intentional gap. |
 
-Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only until shipped on Qt).
+Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only until shipped on Qt — tracked gap).
 
 ## Web UI browser automation
 
