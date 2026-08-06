@@ -30,10 +30,15 @@ jobs:
           cmake --build build --target logscope-web logscope
 
       - name: Setup Node and Playwright
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install Playwright dependencies
         working-directory: tests/e2e/web
         run: |
-          npm ci
-          npx playwright install chromium
+          npm install
+          npx playwright install --with-deps chromium
 
       - name: Capture web and CLI screenshots
         env:
