@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.6.0 |
+| Version | 1.7.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.6.1` (Phase A complete). **Next flagship:** P0 Evidence Correlation — version TBD at G0 charter (see §5).
+**Current public release:** `v2.6.1` (Phase A complete). **Next flagship:** Story 5 **Connect the Evidence** — P0.1 Evidence Links on timeline (see §5).
 
 ---
 
@@ -29,7 +29,7 @@ v2.4.0  → shipped (Understand Everything)
 v2.5.0  → shipped (See What Happened)
 v2.6.0  → shipped (Understand Why It Crashed)
 v2.6.1  → shipped (hotfix #129)
-Next    → P0 Evidence Correlation (§5)
+Next    → Story 5 Connect the Evidence — P0.1 Evidence Links (§5)
 ```
 
 ---
@@ -59,7 +59,10 @@ Next    → P0 Evidence Correlation (§5)
 
 | Priority | Item | Type | Notes |
 |----------|------|------|-------|
-| **P0** | Evidence Correlation | **Implementation** — next flagship | Cross-log / multi-artifact correlation beyond single-source filters |
+| **P0** | **Connect the Evidence** (Story 5) | **Implementation** — next flagship | Timeline-first Evidence Links — "Related Evidence" on timeline; not a Correlation view in v1 |
+| **P0.1** | Evidence Links + timeline decorations | **Implementation** — ship first | `PRECEDES`, `FOLLOWS`, `SUPPORTS`, `RELATED`; jump to linked events |
+| **P0.2** | Evidence Groups | **Implementation** | Named clusters of related events |
+| **P0.3** | Correlation View | **Deferred** | When links are rich |
 | **P1** | Crash Timeline | **Implementation** — quick win | `crash.summary` on timeline projection — deferred from v2.6.0; small release |
 | **P2** | Desktop Timeline/Crash parity | **Implementation** | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
 | **P3** | ADR-010 domain model + events | **Emergent** | Extract when patterns recur after P0–P1 |
@@ -107,3 +110,4 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.4.0 | 04-08-2026 | Removed enterprise/cloud backlog rows; public horizon ends at investigation stories. |
 | 1.5.0 | 06-08-2026 | Phase A shipped through v2.6.1; post–Story 4 backlog is active queue. |
 | 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; correlation is next flagship; P4/P5 research only. |
+| 1.7.0 | 06-08-2026 | Story 5 **Connect the Evidence** — timeline-first Evidence Links; Correlation view deferred (P0.3). |

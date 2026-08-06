@@ -33,7 +33,20 @@ The project follows architecture-first development. Every implementation should 
 
 **Current release:** `v2.6.1` (shipped) — **Story 4: Understand Why It Crashed** (+ hotfix [#129](https://github.com/AntonyCyriac/logscope/issues/129) pstack fault-thread selection). Crash analysis projection from `pstack`/`core` artifacts (`CrashReport`), REST `GET .../crash-analysis`, CLI `investigation crash`, web Crash tab with fault-thread jump and Playwright Story Gate E2E. Builds on Stories 1–3 (`v2.3.0`–`v2.5.0`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`).
 
-**Next release:** See [Roadmap](../ROADMAP.md) and [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md). **P0 Evidence Correlation** is the next flagship; P1 Crash Timeline is a quick win (small release).
+**Next release:** See [Roadmap](../ROADMAP.md) and [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md). **Story 5: Connect the Evidence** is the next flagship — P0.1 Evidence Links on the timeline (not a Correlation view). P1 Crash Timeline is a quick win (small release).
+
+**Vocabulary:** LogScope is an **investigation platform** — **evidence** (logs, notes, pstack, core, timeline), not just logs. User-facing: **Related Evidence** / **Connections**.
+
+**Next (post–Story 4):**
+
+| Priority | Focus | Status |
+|----------|-------|--------|
+| P0 / Story 5 | Connect the Evidence — Evidence Links on timeline | Next flagship — G0 TBD |
+| P0.1 | Timeline decorations + jump to related evidence | Ship first |
+| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
+| P2 | Desktop Timeline/Crash parity | Necessary — don't block P0 |
+| P3 | ADR-010 domain model + events | Emergent after P0–P1 |
+| P4–P5 | IQL · AI Investigation Assistant | Research only |
 
 **Completed milestones:**
 
@@ -56,16 +69,6 @@ The project follows architecture-first development. Every implementation should 
 | Phase 1 – Stabilize v1.x | Tutorials, regression, `--stats`, fuzz, license CI (`v1.5.2`) |
 | M14 – Desktop Application | Qt Widgets GUI, `logscope-desktop`, live tail (`v2.0.0`) |
 | M15 – Web Platform | REST API, `logscope-web`, browser MVP (`v2.1.0`); shared workspaces, tail, async analyze (`v2.2.0`); thin auth (`v2.2.1`) |
-
-**Next (post–Story 4):**
-
-| Priority | Focus | Status |
-|----------|-------|--------|
-| P0 | Evidence Correlation | Next flagship — version TBD at G0 |
-| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
-| P2 | Desktop Timeline/Crash parity | Necessary — don't block P0 |
-| P3 | ADR-010 domain model + events | Emergent after P0–P1 |
-| P4–P5 | IQL · AI Investigation Assistant | Research only |
 
 See [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) and [Roadmap](../ROADMAP.md).
 
