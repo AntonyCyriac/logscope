@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.3.0`](CHANGELOG.md) — Story 1: Create an Investigation ([release notes](docs/release/v2.3.0-RELEASE-NOTES.md)). **Next:** Story 2 (`v2.4.0`+). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.6.1`](CHANGELOG.md) — Stories 1–4 shipped. **Active:** Story 5 **Connect the Evidence** ([release notes](docs/release/v2.6.1-RELEASE-NOTES.md)). [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 

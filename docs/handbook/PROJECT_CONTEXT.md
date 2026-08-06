@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.0.0 |
+| Version | 3.2.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -39,7 +39,7 @@ The project follows architecture-first development. Every implementation should 
 
 **Domain glossary:** Investigation, Evidence, Artifact, Timeline Event, Evidence Link, Crash Report, Conclusion — see strategy Product Bible (private).
 
-**Next (post–Story 4):**
+**Active queue (completes Phase A):**
 
 | Priority | Focus | Status |
 |----------|-------|--------|
@@ -377,3 +377,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.8.0 | 04-08-2026 | Next: `v2.2.2` security patch, `v2.3.0` Create an Investigation. |
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
+| 3.18.0 | 06-08-2026 | Current release `v2.6.1`; Story 5 Connect the Evidence completes Phase A. |

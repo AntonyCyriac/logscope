@@ -55,7 +55,7 @@ Next    → Story 5 Connect the Evidence — P0.1 Evidence Links (§5)
 
 ---
 
-# 5. Post–Story 4 backlog (P0–P5)
+# 5. Active queue — Story 5 completes Phase A (P0–P5)
 
 | Priority | Item | Type | Notes |
 |----------|------|------|-------|
@@ -109,6 +109,6 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.3.0 | 04-08-2026 | M15 complete at v2.2.1; v2.2.2 patch and investigation stories are active queue. |
 | 1.4.0 | 04-08-2026 | Removed enterprise/cloud backlog rows; public horizon ends at investigation stories. |
 | 1.5.0 | 06-08-2026 | Phase A shipped through v2.6.1; post–Story 4 backlog is active queue. |
-| 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; correlation is next flagship; P4/P5 research only. |
+| 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; Connect the Evidence is next flagship; P4/P5 research only. |
 | 1.7.0 | 06-08-2026 | Story 5 **Connect the Evidence** — timeline-first Evidence Links; Correlation view deferred (P0.3). |
 | 1.8.0 | 06-08-2026 | Phase A = five stories; Story 5 completes investigation methodology; relationships are evidence not conclusions. |

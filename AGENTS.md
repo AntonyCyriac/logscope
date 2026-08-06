@@ -33,9 +33,7 @@ Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI
 
 ## Web & desktop UI (IDE for investigations)
 
-LogScope is an **investigation platform**, not a monitoring dashboard. Before changing web or desktop UI, read:
-
-1. [docs/architecture/UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md) — **one Investigation UI, two shells** (view models, modes, parity)
+LogScope is an **Evidence-Centric Investigation Platform** — not a monitoring dashboard. Evidence (logs, notes, pstack, core) is source of truth; timeline, crash reports, and links are projections. Before changing web or desktop UI, read: — **one Investigation UI, two shells** (view models, modes, parity)
 2. [docs/handbook/WEB_UI_DESIGN.md](docs/handbook/WEB_UI_DESIGN.md) — IDE layout and shell guidelines
 
 | Principle | Rule |

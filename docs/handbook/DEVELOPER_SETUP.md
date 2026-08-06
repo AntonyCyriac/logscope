@@ -4,10 +4,8 @@
 |-------|-------|
 | Document | Developer Setup |
 | Category | Handbook |
-| Version | 2.15.0 |
-| Status | Approved |
-| Created | 15-07-2026 |
-| Last Updated | 05-08-2026 |
+| Version | 2.16.0 |
+| Last Updated | 06-08-2026 |
 
 ---
 
@@ -25,9 +23,9 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.3.0`](../../CHANGELOG.md) — Story 1 Create an Investigation (CLI, desktop, web). See [CHANGELOG](../../CHANGELOG.md) for test baseline.
+**Current release:** [`v2.6.1`](../../CHANGELOG.md) — Stories 1–4 (CLI, desktop, web). **Active:** Story 5 Connect the Evidence. See [CHANGELOG](../../CHANGELOG.md) for test baseline.
 
-**Next release:** **`v2.4.0`** — Story 2 Understand Everything. Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md) and [M12 planning](../planning/M12-DYNAMIC-PLUGINS.md).
+**Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 
 ---
 
@@ -442,3 +440,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.12.0 | 30-07-2026 | Current release baseline (`v2.0.3`); desktop regression hotfix + `logscope_desktop_tests`. |
 | 2.13.0 | 30-07-2026 | Current release baseline (`v2.0.5`); CI/build hotfix, versioned release artifacts. |
 | 2.15.0 | 05-08-2026 | Current release baseline (`v2.3.0`); Story 1 investigations; next `v2.4.0`. |
+| 2.16.0 | 06-08-2026 | Current release baseline (`v2.6.1`); Story 5 Connect the Evidence active. |
