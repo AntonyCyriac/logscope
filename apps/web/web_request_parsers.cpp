@@ -455,12 +455,6 @@ foundation::Result<ArtifactAddRequest> parseArtifactAddRequest(const std::string
             foundation::Error(foundation::ErrorCode::InvalidArgument, "Note title is required."));
     }
 
-    if (request.type == "log" && request.sourcePath.empty())
-    {
-        return foundation::Result<ArtifactAddRequest>(
-            foundation::Error(foundation::ErrorCode::InvalidArgument, "Log source path is required."));
-    }
-
     if ((request.type == "pstack" || request.type == "core") && request.sourcePath.empty())
     {
         return foundation::Result<ArtifactAddRequest>(foundation::Error(

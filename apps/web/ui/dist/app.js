@@ -40,6 +40,7 @@
   const createInvestigationBtn = document.getElementById('createInvestigationBtn');
   const saveInvestigationBtn = document.getElementById('saveInvestigationBtn');
   const addLogArtifactBtn = document.getElementById('addLogArtifactBtn');
+  const logArtifactInput = document.getElementById('logArtifactInput');
   const noteTitleInput = document.getElementById('noteTitleInput');
   const noteBodyInput = document.getElementById('noteBodyInput');
   const addNoteBtn = document.getElementById('addNoteBtn');
@@ -843,13 +844,22 @@
     setStatus('Saved investigation snapshot');
   }
 
-  async function addLogArtifact() {
+  async function addLogArtifact(file) {
     if (!state.activeInvestigationId) {
       throw new Error('No investigation selected');
     }
 
+    const uploadPayload = await uploadFileForPath(file);
+    const sourcePath = uploadPayload.data && uploadPayload.data.sourcePath;
+
+    if (!sourcePath) {
+      throw new Error('Upload did not return sourcePath');
+    }
+
     await apiJson('/api/v1/investigations/' + state.activeInvestigationId + '/artifacts', {
       type: 'log',
+      sourcePath: sourcePath,
+      name: file.name,
     });
     await refreshInvestigations();
     await refreshArtifactList();
@@ -1119,9 +1129,18 @@
   });
 
   addLogArtifactBtn.addEventListener('click', function () {
-    addLogArtifact().catch(function (error) {
+    logArtifactInput.click();
+  });
+
+  logArtifactInput.addEventListener('change', function () {
+    const file = logArtifactInput.files && logArtifactInput.files[0];
+    if (!file) {
+      return;
+    }
+    addLogArtifact(file).catch(function (error) {
       setStatus('Add log error: ' + error.message);
     });
+    logArtifactInput.value = '';
   });
 
   addNoteBtn.addEventListener('click', function () {
