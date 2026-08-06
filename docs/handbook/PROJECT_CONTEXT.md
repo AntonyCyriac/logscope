@@ -33,9 +33,11 @@ The project follows architecture-first development. Every implementation should 
 
 **Current release:** `v2.6.1` (shipped) — Stories 1–4 complete. **Story 5: Connect the Evidence** completes Phase A (investigation methodology).
 
-**North star (public):** LogScope helps engineers **organize, connect, and understand** evidence from production incidents.
+**North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
-**Vocabulary:** Investigation platform — **evidence** (logs, notes, pstack, core, timeline). User-facing: **Related Evidence** / **Connections**. Relationships are **evidence, not conclusions**.
+**Engineering laws:** Evidence is source of truth (timelines, crash reports, links are projections). Conclusions belong to engineers — never stored as truth.
+
+**Domain glossary:** Investigation, Evidence, Artifact, Timeline Event, Evidence Link, Crash Report, Conclusion — see strategy Product Bible (private).
 
 **Next (post–Story 4):**
 
