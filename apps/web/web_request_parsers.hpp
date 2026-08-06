@@ -106,4 +106,8 @@ struct InvestigationTimelineQuery
 
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 
+/** Allows web.allowed_path_roots paths and staged multipart uploads under web.upload_temp_dir. */
+[[nodiscard]] foundation::Result<bool> validateArtifactSourcePath(const WebConfig& config,
+                                                                  const foundation::Path& path);
+
 } // namespace scope::web

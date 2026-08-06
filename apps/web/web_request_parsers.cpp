@@ -590,4 +590,60 @@ foundation::Result<bool> validateServerPath(const WebConfig& config, const found
         foundation::ErrorCode::InvalidArgument, "Path is outside allowed roots (web.allowed_path_roots)."));
 }
 
+namespace
+{
+
+foundation::Path effectiveUploadTempDir(const WebConfig& config)
+{
+    if (!config.uploadTempDir.string().empty())
+    {
+        return config.uploadTempDir;
+    }
+
+    return foundation::Path(std::filesystem::temp_directory_path().string());
+}
+
+bool isPathUnderRoot(const foundation::Path& path, const foundation::Path& root)
+{
+    std::error_code pathError;
+    const std::filesystem::path absolutePath = std::filesystem::weakly_canonical(path.string(), pathError);
+
+    if (pathError)
+    {
+        return false;
+    }
+
+    std::error_code rootError;
+    const std::filesystem::path absoluteRoot = std::filesystem::weakly_canonical(root.string(), rootError);
+
+    if (rootError)
+    {
+        return false;
+    }
+
+    const std::string absoluteString = absolutePath.string();
+    const std::string rootString = absoluteRoot.string();
+
+    return absoluteString.rfind(rootString, 0) == 0;
+}
+
+} // namespace
+
+foundation::Result<bool> validateArtifactSourcePath(const WebConfig& config, const foundation::Path& path)
+{
+    const auto allowedRootResult = validateServerPath(config, path);
+
+    if (allowedRootResult)
+    {
+        return allowedRootResult;
+    }
+
+    if (isPathUnderRoot(path, effectiveUploadTempDir(config)))
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    return allowedRootResult;
+}
+
 } // namespace scope::web

@@ -1702,7 +1702,7 @@ void WebServer::registerRoutes()
 
                        if (!useSessionSource)
                        {
-                           const auto pathValidation = validateServerPath(m_config, sourcePath);
+                           const auto pathValidation = validateArtifactSourcePath(m_config, sourcePath);
 
                            if (!pathValidation)
                            {
