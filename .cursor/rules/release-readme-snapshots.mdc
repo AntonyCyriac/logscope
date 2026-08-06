@@ -1,0 +1,34 @@
+---
+description: On release prep, update README and CLI/desktop/web screenshots together in one PR
+globs: README.md,CHANGELOG.md,CMakeLists.txt,docs/release/**,docs/assets/**,AGENTS.md
+alwaysApply: false
+---
+
+# Release README + surface snapshots (required)
+
+When preparing **any** public release (`chore/vX.Y.Z-release` or follow-up docs PR before/after tag):
+
+## Ship together (one PR — do not split)
+
+1. **Version docs** — `CMakeLists.txt` VERSION, `CHANGELOG.md` `[X.Y.Z]`, `docs/release/vX.Y.Z-RELEASE-NOTES.md`, `AGENTS.md` release-notes link, `docs/handbook/PROJECT_CONTEXT.md` current-release line.
+2. **`README.md`** — current release line, feature table, CLI / desktop / web quick-start bullets for **new** user-visible capabilities in this tag.
+3. **`docs/assets/` screenshots** — refresh **all three** homepage images in the **same** PR as the README text:
+   - `logscope-cli.png`
+   - `logscope-desktop.png`
+   - `logscope-web.png`
+
+Captions under each image must name the tag (e.g. `v2.7.0`) and the surfaces shown (CLI commands, desktop tabs, web bottom tabs / Story features).
+
+## How to capture
+
+Follow [docs/assets/README.md](docs/assets/README.md). Web: `tests/e2e/web/tests/capture-readme-screenshots.spec.ts` (Playwright). CLI/desktop: real binaries + manual or scripted capture — no stale placeholders.
+
+## Do not
+
+- Tag `vX.Y.Z` with README still pointing at an older release.
+- Merge README text without updating PNGs when UI changed (investigations, timeline, crash, evidence links, layout).
+- Defer screenshots to a “follow-up” unless the release is docs-only with **zero** UI delta.
+
+## Private sync (G6)
+
+Strategy `documentation_delta` and Release checklist must list README + `docs/assets/*` when user-visible surfaces changed.

@@ -18,6 +18,8 @@ Makefile
 # IDE
 .vs/
 .cursor/
+!.cursor/rules/
+!.cursor/rules/**
 
 # User-specific VS Code files
 .vscode/*.log
