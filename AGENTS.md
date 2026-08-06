@@ -31,6 +31,20 @@ Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs
 
 Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI-Engineering-Agents.md) (not current milestone scope).
 
+## Web & desktop UI (IDE for investigations)
+
+LogScope is an **investigation platform**, not a monitoring dashboard. Before changing web or desktop UI, read [docs/handbook/WEB_UI_DESIGN.md](docs/handbook/WEB_UI_DESIGN.md).
+
+| Principle | Rule |
+|-----------|------|
+| Identity | IDE-like (VS Code / Cursor) — calm, one focus area |
+| Layout | Left artifacts · center work area · bottom tabs (Timeline \| Crash \| AI \| Results) |
+| Disclosure | One visible panel; story features via tabs, not more vertical panels |
+| Actions | Open / Analyze / Investigate on **artifacts**, not global Investigate sections |
+| Tests | Prefer Playwright [`tests/e2e/web/`](tests/e2e/web/) + `data-testid` hooks |
+
+Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only until shipped on Qt).
+
 ## Web UI browser automation
 
-For Story Gate or SPA demos on `logscope-web`, read [docs/handbook/BROWSER_MCP.md](docs/handbook/BROWSER_MCP.md) **before** using `cursor-ide-browser`. Never create orphan tabs with `browser_tabs new` alone — use `browser_navigate` to `http://127.0.0.1:8080` or lock an existing tab first.
+For Story Gate or SPA demos on `logscope-web`, prefer **Playwright** ([`tests/e2e/web/README.md`](tests/e2e/web/README.md)). For manual checks, read [docs/handbook/BROWSER_MCP.md](docs/handbook/BROWSER_MCP.md) **before** using `cursor-ide-browser`. Never create orphan tabs with `browser_tabs new` alone — use `browser_navigate` to `http://127.0.0.1:8080` or lock an existing tab first.

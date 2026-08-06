@@ -2,6 +2,10 @@
 
 Guide for agents using `cursor-ide-browser` to verify the LogScope SPA (`logscope-web` on `http://127.0.0.1:8080`).
 
+**Prefer automated tests:** For regression and Story Gate sign-off, run Playwright [`tests/e2e/web/`](../../tests/e2e/web/README.md) first. Use browser MCP for exploratory UX or when Playwright is unavailable.
+
+**UI model:** IDE three-pane layout — see [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md). Selectors: `data-testid` attributes on header, artifacts, bottom tabs, and dynamic rows.
+
 ## Root cause (known failure mode)
 
 `browser_tabs` with `action: "new"` **without** `position: "active"` creates `about:blank` tabs that often have **no Browser view**. Navigating or snapshotting those `viewId`s returns:

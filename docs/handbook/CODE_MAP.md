@@ -7,7 +7,7 @@ Pointers for AI assistants — **where code and tests live**. Session bootstrap:
 | Path | Role |
 |------|------|
 | `apps/cli/` | CLI binary |
-| `apps/desktop/` | Qt desktop (`LOGSCOPE_DESKTOP=ON`) |
+| `apps/desktop/` | Qt desktop (`LOGSCOPE_DESKTOP=ON`) — IDE-aligned bottom tabs: Results \| AI \| Analytics — see [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md) |
 | `apps/web/` | REST server + SPA (`LOGSCOPE_WEB=ON`) |
 | `apps/common/application_service.*` | Shared orchestration (C10) |
 | `core/` | Domain libraries (analysis, investigation engine, workspace container, …) |
@@ -23,7 +23,8 @@ Pointers for AI assistants — **where code and tests live**. Session bootstrap:
 | Shared workspaces (v2.2.0 compat) | `workspace_store.*` — delegates to `InvestigationStore`; `/api/v1/workspaces` alias |
 | Async analyze jobs | `analyze_job_queue.*` |
 | Sessions | `session_store.*` |
-| SPA assets | `ui/dist/` — Investigations panel (artifact list, switch, pstack); **Timeline** panel (Story 3) |
+| SPA assets | `ui/dist/` — IDE three-pane layout: left artifacts, center viewer, bottom dock (Timeline \| Crash \| AI \| Results) — see [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md) |
+| Web E2E (Playwright) | `tests/e2e/web/` — Story Gate browser automation (CI `web` job) |
 
 ## Domain — investigation container (Story 1–3)
 

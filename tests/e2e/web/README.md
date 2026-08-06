@@ -2,6 +2,8 @@
 
 Browser end-to-end tests for the LogScope web SPA (Story Gate demo paths).
 
+**UI principles:** Tests assume the IDE three-pane layout documented in [`docs/handbook/WEB_UI_DESIGN.md`](../../../docs/handbook/WEB_UI_DESIGN.md). Use `data-testid` selectors in specs.
+
 ## Prerequisites
 
 1. Build `logscope-web`:
