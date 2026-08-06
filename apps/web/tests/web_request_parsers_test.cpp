@@ -2,6 +2,9 @@
  * @file web_request_parsers_test.cpp
  */
 
+#include <fstream>
+
+#include <filesystem>
 #include <gtest/gtest.h>
 
 #include "foundation/path.hpp"
@@ -20,6 +23,8 @@ TEST(WebRequestParsersTest, RejectsServerPathWhenAllowlistEmpty)
     EXPECT_EQ(scope::foundation::ErrorCode::InvalidArgument, result.error().code());
 }
 
+#include <fstream>
+
 TEST(WebRequestParsersTest, AcceptsPathUnderConfiguredRoot)
 {
     scope::web::WebConfig config = scope::web::WebConfig::defaults();
@@ -29,6 +34,28 @@ TEST(WebRequestParsersTest, AcceptsPathUnderConfiguredRoot)
     const auto result = scope::web::validateServerPath(config, scope::foundation::Path("samples/sample.log"));
 
     EXPECT_TRUE(result);
+}
+
+TEST(WebRequestParsersTest, AcceptsStagedUploadPathOutsideAllowedRoots)
+{
+    scope::web::WebConfig config = scope::web::WebConfig::defaults();
+    config.allowServerPaths = true;
+    config.allowedPathRoots = {scope::foundation::Path("samples")};
+    config.uploadTempDir = scope::foundation::Path("build/web_upload_test_staging");
+
+    std::filesystem::create_directories(config.uploadTempDir.string());
+    const scope::foundation::Path stagedFile =
+        scope::foundation::Path(config.uploadTempDir.string() + "/logscope-upload-test.log");
+    std::ofstream(stagedFile.string()).put('x');
+
+    const auto stagedResult = scope::web::validateArtifactSourcePath(config, stagedFile);
+
+    EXPECT_TRUE(stagedResult);
+
+    const auto outsideResult =
+        scope::web::validateArtifactSourcePath(config, scope::foundation::Path("build/outside-staging.log"));
+
+    EXPECT_FALSE(outsideResult);
 }
 
 TEST(WebRequestParsersTest, ParsesInvestigationCreateRequest)

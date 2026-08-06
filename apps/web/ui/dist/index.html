@@ -3,106 +3,213 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>LogScope Web</title>
+  <title>LogScope</title>
   <link rel="stylesheet" href="/styles.css">
 </head>
 <body>
-  <header>
-    <h1>LogScope Web</h1>
-    <p id="status">Initializing…</p>
+  <header class="app-header">
+    <div class="app-header__left">
+      <h1 class="app-header__brand">LogScope</h1>
+      <div class="app-header__investigation">
+        <label class="investigation-label" for="investigationNameInput">Investigation</label>
+        <input type="text" id="investigationNameInput" class="investigation-name-input" placeholder="Untitled investigation" spellcheck="false">
+        <button type="button" id="saveInvestigationBtn" class="btn btn-ghost btn-sm" disabled title="Save snapshot">Save</button>
+      </div>
+    </div>
+    <div class="app-header__actions">
+      <button type="button" id="openInvestigationBtn" class="btn btn-ghost">Open Investigation</button>
+      <button type="button" id="createInvestigationBtn" class="btn btn-ghost" data-testid="header-new-investigation">New Investigation</button>
+      <button type="button" id="analyzeBtn" class="btn btn-primary" disabled data-testid="header-analyze">Analyze</button>
+    </div>
+    <p id="status" class="app-status" hidden data-testid="status"></p>
   </header>
 
-  <main>
-    <section class="panel">
-      <h2>Source</h2>
-      <label class="file-label">
-        <span>Upload log file</span>
-        <input type="file" id="fileInput" accept=".log,.txt,.jsonl">
+  <div class="workspace">
+    <aside class="sidebar" aria-label="Artifacts">
+      <div class="sidebar__section">
+        <div class="sidebar__section-header">
+          <h2 class="sidebar__title">Artifacts</h2>
+          <span id="artifactCount" class="artifact-count">0</span>
+        </div>
+        <div class="sidebar__add-row">
+          <button type="button" id="addLogArtifactBtn" class="btn btn-ghost btn-sm" disabled title="Add log file" data-testid="add-log-artifact">+ Log</button>
+          <button type="button" id="addPstackBtn" class="btn btn-ghost btn-sm" disabled title="Add pstack" data-testid="add-pstack-artifact">+ Pstack</button>
+          <button type="button" id="addNoteBtn" class="btn btn-ghost btn-sm" disabled title="Add note">+ Note</button>
+        </div>
+        <ul id="artifactList" class="artifact-list" data-testid="artifact-list"></ul>
+      </div>
+
+      <details class="sidebar__section sidebar__section--collapsible source-panel-details">
+        <summary class="sidebar__title">Session source</summary>
+        <div class="source-tabs" role="tablist">
+          <button type="button" class="source-tab source-tab--active" data-source-tab="upload">Upload</button>
+          <button type="button" class="source-tab" data-source-tab="path">Path</button>
+        </div>
+        <div id="sourcePanelUpload" class="source-panel">
+          <div id="sourceDropzone" class="source-dropzone" tabindex="0">
+            <p class="source-dropzone__title">Drop log file or click to browse</p>
+            <p class="source-dropzone__hint">.log, .txt, .jsonl</p>
+            <input type="file" id="fileInput" accept=".log,.txt,.jsonl" hidden>
+          </div>
+          <div class="source-actions">
+            <button type="button" id="tailStartBtn" class="btn btn-ghost btn-sm" disabled>Start tail</button>
+            <button type="button" id="tailStopBtn" class="btn btn-ghost btn-sm" disabled>Stop tail</button>
+          </div>
+        </div>
+        <div id="sourcePanelPath" class="source-panel" hidden>
+          <label class="field">
+            <span>Server path</span>
+            <input type="text" id="sourcePathInput" placeholder="samples/sample.log">
+          </label>
+          <button type="button" id="sourcePathOpenBtn" class="btn btn-ghost btn-sm">Open path</button>
+        </div>
+      </details>
+
+      <input type="file" id="logArtifactInput" accept=".log,.txt,.jsonl" hidden>
+      <input type="file" id="pstackInput" accept=".txt,.pstack" hidden>
+    </aside>
+
+    <main class="center-pane" aria-label="Work area">
+      <div class="center-toolbar">
+        <div class="center-toolbar__left">
+          <span id="centerArtifactIcon" class="center-artifact-icon" aria-hidden="true">📄</span>
+          <span id="centerArtifactTitle" class="center-artifact-title" data-testid="center-artifact-title">No artifact selected</span>
+        </div>
+        <div class="center-toolbar__right">
+          <label class="tail-autoscroll" id="tailControls" hidden>
+            <input type="checkbox" id="tailAutoScroll" checked>
+            Auto-scroll
+          </label>
+          <button type="button" id="tailClearBtn" class="btn btn-ghost btn-sm" hidden>Clear tail</button>
+        </div>
+      </div>
+      <div id="centerEmpty" class="center-empty">
+        <p class="center-empty__title">Select an artifact to begin</p>
+        <p class="center-empty__hint">Open a log or pstack from the sidebar, or upload a session source and analyze.</p>
+      </div>
+      <pre id="artifactViewer" class="artifact-viewer" hidden data-testid="artifact-viewer"></pre>
+      <pre id="tailOutput" class="tail-output tail-output--inline" hidden>Tail inactive.</pre>
+    </main>
+
+    <div class="bottom-dock" id="bottomDock">
+      <div class="bottom-dock__bar" role="tablist" aria-label="Investigation panels">
+        <button type="button" class="bottom-tab" data-bottom-tab="timeline" data-testid="bottom-tab-timeline" role="tab" aria-selected="false">Timeline</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="crash" data-testid="bottom-tab-crash" role="tab" aria-selected="false">Crash</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="ai" data-testid="bottom-tab-ai" role="tab" aria-selected="false">AI</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="results" data-testid="bottom-tab-results" role="tab" aria-selected="false">Results</button>
+        <button type="button" id="bottomDockToggle" class="bottom-dock__toggle btn btn-ghost btn-sm" title="Collapse panel" aria-label="Collapse panel">▾</button>
+      </div>
+
+      <div class="bottom-dock__panels">
+        <section class="bottom-panel" id="panelTimeline" data-bottom-panel="timeline" hidden>
+          <p id="timelineEmpty" class="panel-empty">Select an investigation to view its timeline.</p>
+          <p id="timelineWarnings" class="timeline-warnings" hidden></p>
+          <div class="table-wrap">
+            <table id="timelineTable" class="data-table timeline-table">
+              <thead>
+                <tr><th>Time</th><th>Type</th><th>Source</th><th>Message</th><th>Severity</th></tr>
+              </thead>
+              <tbody id="timelineList" data-testid="timeline-rows"></tbody>
+            </table>
+          </div>
+          <button type="button" id="timelineLoadMoreBtn" class="btn btn-ghost btn-sm" hidden>Load more</button>
+        </section>
+
+        <section class="bottom-panel" id="panelCrash" data-bottom-panel="crash" hidden>
+          <p id="crashEmpty" class="panel-empty">Add a pstack or core artifact to analyze the crash.</p>
+          <p id="crashAnalysisMeta" class="crash-analysis-meta" hidden></p>
+          <p id="crashWarnings" class="crash-warnings" hidden></p>
+          <div id="crashContent" class="crash-content" hidden>
+            <div class="crash-summary">
+              <span id="crashStatusBadge" class="crash-status-badge"></span>
+              <span id="crashSignal" class="crash-signal" data-testid="crash-signal"></span>
+              <p id="crashSummaryText" class="crash-summary-text"></p>
+            </div>
+            <div id="crashIssueCards" class="crash-issue-cards"></div>
+            <h3 class="subsection-title">Observations</h3>
+            <ul id="crashObservations" class="crash-observations"></ul>
+            <h3 class="subsection-title">Threads</h3>
+            <ul id="crashThreadList" class="crash-thread-list" data-testid="crash-thread-list"></ul>
+            <h3 id="pstackViewerTitle" class="subsection-title crash-pstack-title" hidden>Stack preview</h3>
+            <div id="pstackViewer" class="crash-pstack-viewer" hidden data-testid="pstack-viewer"></div>
+          </div>
+        </section>
+
+        <section class="bottom-panel" id="panelAi" data-bottom-panel="ai" hidden>
+          <div class="ask-row">
+            <input type="text" id="askInput" class="ask-input" placeholder="Ask about this investigation…" data-testid="ask-input">
+            <button type="button" id="askBtn" class="btn btn-primary" disabled data-testid="ask-btn">Ask</button>
+          </div>
+        </section>
+
+        <section class="bottom-panel" id="panelResults" data-bottom-panel="results" hidden>
+          <div class="results-toolbar">
+            <label class="field field--inline">
+              <span>Search</span>
+              <input type="text" id="searchInput" placeholder="error">
+            </label>
+            <label class="field field--inline field--grow">
+              <span>Filter</span>
+              <input type="text" id="filterInput" placeholder="level == ERROR">
+            </label>
+            <button type="button" id="investigateBtn" class="btn btn-primary btn-sm" disabled data-testid="investigate-btn">Investigate</button>
+            <button type="button" id="exportBtn" class="btn btn-ghost btn-sm" disabled>Export HTML</button>
+          </div>
+          <div class="results-tabs" role="tablist">
+            <button type="button" class="results-tab" data-results-tab="raw">Raw</button>
+            <button type="button" class="results-tab results-tab--active" data-results-tab="formatted">Formatted</button>
+          </div>
+          <pre id="summary" class="results-raw" hidden>No data yet.</pre>
+          <div id="resultsFormatted" class="results-formatted">
+            <table id="resultsTable" class="data-table" data-testid="results-table">
+              <thead>
+                <tr><th>Line</th><th>Level</th><th>Message</th></tr>
+              </thead>
+              <tbody data-testid="results-rows"></tbody>
+            </table>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+
+  <dialog id="openInvestigationDialog" class="investigation-dialog">
+    <form method="dialog" class="investigation-dialog__form">
+      <h2 class="investigation-dialog__title">Open Investigation</h2>
+      <label class="field">
+        <span>Investigation ID</span>
+        <input type="text" id="openInvestigationIdInput" placeholder="investigation-uuid">
       </label>
-      <button type="button" id="analyzeBtn" disabled>Analyze</button>
-      <button type="button" id="tailStartBtn" disabled>Start tail</button>
-      <button type="button" id="tailStopBtn" disabled>Stop tail</button>
-    </section>
-
-    <section class="panel">
-      <h2>Investigations</h2>
-      <div class="row">
-        <label>Name <input type="text" id="investigationNameInput" placeholder="incident-2026"></label>
-        <button type="button" id="createInvestigationBtn">Create</button>
-        <button type="button" id="saveInvestigationBtn" disabled>Save</button>
-        <button type="button" id="addLogArtifactBtn" disabled>Add log</button>
+      <div class="investigation-dialog__actions">
+        <button type="button" id="openInvestigationIdBtn" class="btn btn-primary">Open by ID</button>
+        <button type="submit" value="cancel" class="btn btn-ghost">Close</button>
       </div>
-      <div class="row">
-        <label>Note title <input type="text" id="noteTitleInput" placeholder="triage"></label>
-        <label>Note body <input type="text" id="noteBodyInput" placeholder="Customer reported outage"></label>
-        <button type="button" id="addNoteBtn" disabled>Add note</button>
+      <h3 class="subsection-title">Recent investigations</h3>
+      <ul id="investigationsList" class="investigations-list"></ul>
+    </form>
+  </dialog>
+
+  <dialog id="addNoteDialog" class="investigation-dialog">
+    <form method="dialog" class="investigation-dialog__form">
+      <h2 class="investigation-dialog__title">Add note</h2>
+      <label class="field">
+        <span>Title</span>
+        <input type="text" id="noteTitleInput" placeholder="triage">
+      </label>
+      <label class="field">
+        <span>Body</span>
+        <input type="text" id="noteBodyInput" placeholder="Customer reported outage">
+      </label>
+      <div class="investigation-dialog__actions">
+        <button type="button" id="confirmAddNoteBtn" class="btn btn-primary">Add note</button>
+        <button type="submit" value="cancel" class="btn btn-ghost">Cancel</button>
       </div>
-      <div class="row">
-        <label class="file-label">
-          <span>Add pstack</span>
-          <input type="file" id="pstackInput" accept=".txt,.pstack" hidden>
-        </label>
-        <button type="button" id="addPstackBtn" disabled>Add pstack</button>
-      </div>
-      <h3>Artifacts</h3>
-      <ul id="artifactList"></ul>
-      <ul id="investigationsList"></ul>
-    </section>
+    </form>
+  </dialog>
 
-    <section class="panel" id="timelinePanel">
-      <h2>Timeline</h2>
-      <p id="timelineEmpty" class="timeline-empty">Select an investigation to view its timeline.</p>
-      <p id="timelineWarnings" class="timeline-warnings" hidden></p>
-      <table id="timelineTable" class="timeline-table">
-        <thead>
-          <tr><th>Time</th><th>Type</th><th>Source</th><th>Message</th></tr>
-        </thead>
-        <tbody id="timelineList"></tbody>
-      </table>
-      <button type="button" id="timelineLoadMoreBtn" hidden>Load more</button>
-    </section>
-
-    <section class="panel">
-      <h2>Investigate</h2>
-      <div class="row">
-        <label>Search <input type="text" id="searchInput" placeholder="error"></label>
-        <label>Filter DSL <input type="text" id="filterInput" placeholder="level == ERROR"></label>
-      </div>
-      <div class="row">
-        <button type="button" id="investigateBtn" disabled>Investigate</button>
-        <button type="button" id="exportBtn" disabled>Export HTML</button>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>AI Ask</h2>
-      <div class="row">
-        <label>Ask <input type="text" id="askInput" placeholder="errors"></label>
-        <button type="button" id="askBtn" disabled>Ask</button>
-      </div>
-    </section>
-
-    <section class="panel">
-      <h2>Results</h2>
-      <pre id="summary">No data yet.</pre>
-      <table id="resultsTable">
-        <thead>
-          <tr><th>Line</th><th>Level</th><th>Message</th></tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section class="panel">
-      <h2>Tail output</h2>
-      <pre id="tailOutput">Tail inactive.</pre>
-    </section>
-
-    <section class="panel">
-      <h2>Extensions</h2>
-      <ul id="extensionsList"></ul>
-    </section>
-  </main>
+  <section class="panel panel--extensions" hidden>
+    <ul id="extensionsList"></ul>
+  </section>
 
   <script src="/app.js"></script>
 </body>

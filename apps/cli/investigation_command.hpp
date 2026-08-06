@@ -26,6 +26,8 @@ void printInvestigationOpenUsage(std::ostream& output);
 
 void printInvestigationTimelineUsage(std::ostream& output);
 
+void printInvestigationCrashUsage(std::ostream& output);
+
 [[nodiscard]] int runInvestigationCreateCommand(const InvestigationCreateOptions& options,
                                                 std::ostream& output,
                                                 std::ostream& errorOutput);
@@ -53,5 +55,9 @@ void printInvestigationTimelineUsage(std::ostream& output);
 [[nodiscard]] int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
                                                   std::ostream& output,
                                                   std::ostream& errorOutput);
+
+[[nodiscard]] int runInvestigationCrashCommand(const InvestigationCrashOptions& options,
+                                               std::ostream& output,
+                                               std::ostream& errorOutput);
 
 } // namespace scope::cli

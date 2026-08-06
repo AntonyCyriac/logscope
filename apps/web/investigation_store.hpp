@@ -88,6 +88,9 @@ class InvestigationStore
     [[nodiscard]] foundation::Result<scope::workspace::TimelineProjectionResult> projectTimeline(
         const std::string& investigationId, scope::workspace::TimelineProjectionOptions options = {}) const;
 
+    [[nodiscard]] foundation::Result<scope::workspace::CrashReport> analyzeCrash(const std::string& investigationId,
+                                                                                 const std::string& artifactId) const;
+
     void touchUpdatedAt(const std::string& investigationId);
 
     void updateSummaryFromService(const std::string& investigationId,

@@ -15,6 +15,7 @@
 #include <QMenuBar>
 #include <QMessageBox>
 #include <QSplitter>
+#include <QTabWidget>
 #include <QStandardPaths>
 #include <QVBoxLayout>
 #include <sstream>
@@ -119,7 +120,7 @@ void MainWindow::createLayout()
     m_extensionDetails->setReadOnly(true);
     m_extensionDetails->setPlaceholderText(QStringLiteral("Select an extension"));
     m_extensionDetails->setMaximumHeight(120);
-    navLayout->addWidget(new QLabel(QStringLiteral("Sessions"), navigator));
+    navLayout->addWidget(new QLabel(QStringLiteral("Workspace"), navigator));
     navLayout->addWidget(m_sessionList);
     navLayout->addWidget(new QLabel(QStringLiteral("Extensions"), navigator));
     navLayout->addWidget(m_extensionList);
@@ -135,7 +136,6 @@ void MainWindow::createLayout()
     m_reuseIndexCheck = new QCheckBox(QStringLiteral("Reuse index"), workArea);
     auto* analyzeButton = new QPushButton(QStringLiteral("Analyze"), workArea);
     auto* investigateButton = new QPushButton(QStringLiteral("Investigate"), workArea);
-    auto* analyticsButton = new QPushButton(QStringLiteral("Analytics"), workArea);
 
     toolbar->addWidget(openButton);
     toolbar->addWidget(m_tailCheck);
@@ -143,7 +143,6 @@ void MainWindow::createLayout()
     toolbar->addWidget(m_reuseIndexCheck);
     toolbar->addWidget(analyzeButton);
     toolbar->addWidget(investigateButton);
-    toolbar->addWidget(analyticsButton);
 
     auto* filterRow = new QHBoxLayout();
     m_searchEdit = new QLineEdit(workArea);
@@ -176,16 +175,21 @@ void MainWindow::createLayout()
     m_logView->setSelectionBehavior(QAbstractItemView::SelectRows);
     m_logView->horizontalHeader()->setStretchLastSection(true);
 
-    auto* bottomSplitter = new QSplitter(Qt::Horizontal, workArea);
-    m_analyticsPanel = new AnalyticsPanel(bottomSplitter);
-    m_aiPanel = new AiPanel(&m_service, bottomSplitter);
-    bottomSplitter->addWidget(m_analyticsPanel);
-    bottomSplitter->addWidget(m_aiPanel);
+    auto* resultsTab = new QWidget(workArea);
+    auto* resultsLayout = new QVBoxLayout(resultsTab);
+    resultsLayout->setContentsMargins(0, 0, 0, 0);
+    resultsLayout->addLayout(filterRow);
+    resultsLayout->addWidget(m_logView, 1);
+
+    m_bottomTabs = new QTabWidget(workArea);
+    m_bottomTabs->addTab(resultsTab, QStringLiteral("Results"));
+    m_analyticsPanel = new AnalyticsPanel(m_bottomTabs);
+    m_aiPanel = new AiPanel(&m_service, m_bottomTabs);
+    m_bottomTabs->addTab(m_aiPanel, QStringLiteral("AI"));
+    m_bottomTabs->addTab(m_analyticsPanel, QStringLiteral("Analytics"));
 
     workLayout->addLayout(toolbar);
-    workLayout->addLayout(filterRow);
-    workLayout->addWidget(m_logView, 3);
-    workLayout->addWidget(bottomSplitter, 1);
+    workLayout->addWidget(m_bottomTabs, 1);
 
     splitter->addWidget(navigator);
     splitter->addWidget(workArea);
@@ -194,7 +198,17 @@ void MainWindow::createLayout()
     connect(openButton, &QPushButton::clicked, this, &MainWindow::openFile);
     connect(analyzeButton, &QPushButton::clicked, this, &MainWindow::runAnalyze);
     connect(investigateButton, &QPushButton::clicked, this, &MainWindow::runInvestigate);
-    connect(analyticsButton, &QPushButton::clicked, this, &MainWindow::runAnalytics);
+    connect(m_bottomTabs, &QTabWidget::currentChanged, this, [this](const int index) {
+        if (m_bottomTabs == nullptr)
+        {
+            return;
+        }
+
+        if (m_bottomTabs->widget(index) == m_analyticsPanel && m_service.hasModel())
+        {
+            runAnalytics();
+        }
+    });
     connect(m_aiPanel, &AiPanel::investigationReady, this, &MainWindow::populateTableFromInvestigation);
     connect(m_tailCheck, &QCheckBox::toggled, this, &MainWindow::toggleTail);
     connect(m_extensionList, &QListWidget::currentItemChanged, this,

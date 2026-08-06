@@ -7,6 +7,8 @@
 
 #include "foundation/uuid.hpp"
 #include "output_format.hpp"
+#include "crash_analyzer.hpp"
+#include "crash_report.hpp"
 #include "timeline_event.hpp"
 #include "workspace.hpp"
 
@@ -26,6 +28,8 @@ using scope::workspace::ArtifactIngestRequest;
 using scope::workspace::ArtifactSource;
 using scope::workspace::Investigation;
 using scope::workspace::InvestigationCreateRequest;
+using scope::workspace::CrashReport;
+using scope::workspace::CrashThread;
 using scope::workspace::TimelineEvent;
 using scope::workspace::TimelineProjectionOptions;
 using scope::workspace::TimelineProjectionResult;
@@ -271,6 +275,155 @@ void printInvestigationTimelineTable(const TimelineProjectionResult& result, std
     }
 }
 
+std::string formatCrashReportJson(const CrashReport& report)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"id\": \"" << escapeJsonString(report.id) << "\",\n"
+           << "  \"artifactId\": \"" << escapeJsonString(report.artifactId) << "\",\n"
+           << "  \"artifactType\": \"" << escapeJsonString(report.artifactType) << "\",\n"
+           << "  \"status\": \""
+           << escapeJsonString(scope::workspace::crashAnalysisStatusToString(report.status)) << "\",\n"
+           << "  \"summary\": \"" << escapeJsonString(report.summary) << "\",\n"
+           << "  \"threads\": [";
+
+    for (std::size_t threadIndex = 0U; threadIndex < report.threads.size(); ++threadIndex)
+    {
+        if (threadIndex > 0U)
+        {
+            output << ',';
+        }
+
+        const CrashThread& thread = report.threads[threadIndex];
+        output << "\n    {\n"
+               << "      \"id\": \"" << escapeJsonString(thread.id) << "\",\n"
+               << "      \"name\": \"" << escapeJsonString(thread.name) << "\",\n"
+               << "      \"isFaultThread\": " << (thread.isFaultThread ? "true" : "false") << ",\n"
+               << "      \"frames\": [";
+
+        for (std::size_t frameIndex = 0U; frameIndex < thread.frames.size(); ++frameIndex)
+        {
+            if (frameIndex > 0U)
+            {
+                output << ',';
+            }
+
+            const auto& frame = thread.frames[frameIndex];
+            output << "\n        {\n"
+                   << "          \"index\": " << frame.index << ",\n"
+                   << "          \"address\": \"" << escapeJsonString(frame.address) << "\",\n"
+                   << "          \"symbol\": \"" << escapeJsonString(frame.symbol) << "\"";
+
+            if (frame.location.has_value())
+            {
+                output << ",\n          \"location\": \"" << escapeJsonString(*frame.location) << '"';
+            }
+
+            output << "\n        }";
+        }
+
+        output << "\n      ]\n    }";
+    }
+
+    output << "\n  ],\n"
+           << "  \"observations\": [";
+
+    for (std::size_t index = 0U; index < report.observations.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(report.observations[index]) << '"';
+    }
+
+    output << "\n  ],\n"
+           << "  \"warnings\": [";
+
+    for (std::size_t index = 0U; index < report.warnings.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n    \"" << escapeJsonString(report.warnings[index]) << '"';
+    }
+
+    output << "\n  ]";
+
+    if (report.signal.has_value())
+    {
+        output << ",\n  \"signal\": \"" << escapeJsonString(*report.signal) << '"';
+    }
+
+    if (report.faultThreadId.has_value())
+    {
+        output << ",\n  \"faultThreadId\": \"" << escapeJsonString(*report.faultThreadId) << '"';
+    }
+
+    output << "\n}";
+
+    return output.str();
+}
+
+void printInvestigationCrashTable(const CrashReport& report, std::ostream& output)
+{
+    output << "status\tsummary\n" << scope::workspace::crashAnalysisStatusToString(report.status) << '\t'
+           << report.summary << '\n';
+
+    if (report.signal.has_value())
+    {
+        output << "signal: " << *report.signal << '\n';
+    }
+
+    for (const CrashThread& thread : report.threads)
+    {
+        output << "\n[" << thread.name << (thread.isFaultThread ? " *fault*" : "") << "]\n";
+
+        for (const auto& frame : thread.frames)
+        {
+            output << "  #" << frame.index << ' ' << frame.address << ' ' << frame.symbol;
+
+            if (frame.location.has_value())
+            {
+                output << " at " << *frame.location;
+            }
+
+            output << '\n';
+        }
+    }
+
+    for (const std::string& observation : report.observations)
+    {
+        output << "observation: " << observation << '\n';
+    }
+
+    for (const std::string& warning : report.warnings)
+    {
+        output << "warning: " << warning << '\n';
+    }
+}
+
+std::optional<std::string> resolveCrashArtifactId(const Investigation& investigation, const std::string& explicitId)
+{
+    if (!explicitId.empty())
+    {
+        return explicitId;
+    }
+
+    for (const auto& artifact : investigation.manifest().artifacts)
+    {
+        if (scope::workspace::isCrashAnalyzableArtifactType(artifact.type))
+        {
+            return artifact.id;
+        }
+    }
+
+    return std::nullopt;
+}
+
 } // namespace
 
 void printInvestigationCreateUsage(std::ostream& output)
@@ -347,6 +500,18 @@ void printInvestigationTimelineUsage(std::ostream& output)
            << "  --format <format>     Output format: table or json (default: table)\n"
            << "  --limit <N>           Maximum number of timeline events to return\n"
            << "  --order <order>       Sort order: asc or desc (default: asc)\n"
+           << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
+           << "  --help, -h            Show this help message\n";
+}
+
+void printInvestigationCrashUsage(std::ostream& output)
+{
+    output << "Usage: logscope investigation crash <investigation-id> [--artifact <artifact-id>] "
+              "[--format json|table] [--dir <root>]\n"
+           << "\n"
+           << "Options:\n"
+           << "  --artifact <id>       Artifact to analyze (default: first pstack or core)\n"
+           << "  --format <format>     Output format: table or json (default: table)\n"
            << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
            << "  --help, -h            Show this help message\n";
 }
@@ -754,6 +919,76 @@ int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
     else
     {
         printInvestigationTimelineTable(*timelineResult, output);
+    }
+
+    return 0;
+}
+
+int runInvestigationCrashCommand(const InvestigationCrashOptions& options,
+                                 std::ostream& output,
+                                 std::ostream& errorOutput)
+{
+    if (options.showHelp)
+    {
+        printInvestigationCrashUsage(output);
+
+        return 0;
+    }
+
+    if (!isValidInvestigationId(options.investigationId))
+    {
+        errorOutput << "Invalid investigation id.\n";
+
+        return 1;
+    }
+
+    const Path investigationDir = investigationDirectory(options.rootDirectory, options.investigationId);
+    const auto investigationResult = Investigation::open(investigationDir);
+
+    if (!investigationResult)
+    {
+        errorOutput << investigationResult.error().message() << '\n';
+
+        return 1;
+    }
+
+    const auto artifactId = resolveCrashArtifactId(*investigationResult, options.artifactId);
+
+    if (!artifactId.has_value())
+    {
+        errorOutput << "No analyzable crash artifact found. Add a pstack or core artifact.\n";
+
+        return 1;
+    }
+
+    const auto crashResult = investigationResult->analyzeCrash(*artifactId);
+
+    if (!crashResult)
+    {
+        errorOutput << crashResult.error().message() << '\n';
+
+        return 1;
+    }
+
+    if (crashResult->status == scope::workspace::CrashAnalysisStatus::NotSupported)
+    {
+        errorOutput << "Artifact does not support crash analysis.\n";
+
+        if (options.format == InvestigationTimelineFormat::Json)
+        {
+            output << formatCrashReportJson(*crashResult) << '\n';
+        }
+
+        return 1;
+    }
+
+    if (options.format == InvestigationTimelineFormat::Json)
+    {
+        output << formatCrashReportJson(*crashResult) << '\n';
+    }
+    else
+    {
+        printInvestigationCrashTable(*crashResult, output);
     }
 
     return 0;

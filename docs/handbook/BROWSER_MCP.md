@@ -1,0 +1,101 @@
+# Browser MCP tab handling (LogScope web demos)
+
+Guide for agents using `cursor-ide-browser` to verify the LogScope SPA (`logscope-web` on `http://127.0.0.1:8080`).
+
+**Prefer automated tests:** For regression and Story Gate sign-off, run Playwright [`tests/e2e/web/`](../../tests/e2e/web/README.md) first. Use browser MCP for exploratory UX or when Playwright is unavailable.
+
+**UI model:** IDE three-pane layout — see [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md). Selectors: `data-testid` attributes on header, artifacts, bottom tabs, and dynamic rows.
+
+## Root cause (known failure mode)
+
+`browser_tabs` with `action: "new"` **without** `position: "active"` creates `about:blank` tabs that often have **no Browser view**. Navigating or snapshotting those `viewId`s returns:
+
+- `No browser tab available`
+- `Browser view not found`
+
+**Do not** create a tab with `browser_tabs new` and then call `browser_navigate` / `browser_snapshot` on that blank `viewId`.
+
+## Correct workflow
+
+### 1. List tabs first
+
+```
+browser_tabs { action: "list" }
+```
+
+Prefer a tab already on `http://127.0.0.1:8080`.
+
+### 2. Attach to a real tab
+
+**Option A — reuse existing tab (preferred)**
+
+```
+browser_lock { action: "lock", viewId: "<id-from-list>" }
+browser_navigate { url: "http://127.0.0.1:8080/", viewId: "<id>" }
+browser_snapshot { viewId: "<id>" }
+```
+
+**Option B — no suitable tab**
+
+```
+browser_navigate { url: "http://127.0.0.1:8080/" }
+```
+
+Omit `newTab`. Reuses or creates a tab with a proper view. Capture `viewId` from response metadata.
+
+**Option C — user must see the browser**
+
+```
+browser_navigate { url: "http://127.0.0.1:8080/", position: "active" }
+```
+
+### 3. Always pass `viewId`
+
+After the first successful navigation/snapshot, pass the same `viewId` on every browser tool call.
+
+### 4. Unlock when done
+
+```
+browser_lock { action: "unlock", viewId: "<id>" }
+```
+
+## Anti-patterns
+
+| Bad | Why |
+|-----|-----|
+| `browser_tabs { action: "new" }` then navigate blank tab | Orphan tab, no Browser view |
+| `browser_navigate { newTab: true }` repeatedly | Tab sprawl, stale viewIds |
+| `browser_snapshot` without `viewId` after multiple tabs | Targets wrong / blank tab |
+| Retry navigate >1× on same error without `browser_tabs list` | Gather new evidence first |
+
+## Web demo server prep
+
+```powershell
+cd build
+cmake --build . --config Release --target logscope-web
+$env:LOGSCOPE_WEB_UI_DIR = "..\apps\web\ui\dist"
+Start-Process -FilePath ".\apps\web\logscope-web.exe" `
+  -ArgumentList "--config","..\samples\demo-story-gate.properties" `
+  -WorkingDirectory ".." -WindowStyle Hidden
+```
+
+Use `samples/demo-story-gate.properties` (`allow_server_paths=true`, `samples/` roots) for Story Gate API + UI demos.
+
+## Story Gate browser checks
+
+Prefer Playwright [`tests/e2e/web/`](../../tests/e2e/web/README.md) for regression. Manual MCP steps below:
+
+1. `browser_tabs list` → pick `127.0.0.1:8080` tab or `browser_navigate` once
+2. Create investigation → **Add log** (file picker, e.g. `samples/sample.log`) → **Add pstack** (`samples/pstack.txt`)
+3. `browser_lock` → open investigation → **Analyze**
+4. Open **Crash** bottom tab (UX.1) — verify SIGSEGV + fault thread
+5. Click fault thread (`[data-testid="crash-thread-fault"]` or `.crash-thread--fault`; use `browser_cdp` if snapshot ref is ambiguous)
+6. Confirm pstack highlight in center viewer and status `Jumped to pstack thread`
+
+## Cleanup
+
+Close orphan `about:blank` tabs via `browser_tabs { action: "close", index: N }`.
+
+## Fallback
+
+If browser MCP fails after one correct workflow attempt, use API/integration tests and report the blocker — do not spawn more blank tabs.

@@ -6,6 +6,7 @@
 #include "investigation_container.hpp"
 
 #include "artifact_handler.hpp"
+#include "crash_analyzer.hpp"
 #include "investigation_manifest_io.hpp"
 #include "timeline_projector.hpp"
 
@@ -368,6 +369,64 @@ foundation::Result<bool> Investigation::persist()
 foundation::Result<TimelineProjectionResult> Investigation::projectTimeline(TimelineProjectionOptions options) const
 {
     return TimelineProjector::project(m_rootDirectory, m_manifest, options);
+}
+
+foundation::Result<CrashReport> Investigation::analyzeCrash(const std::string& artifactId) const
+{
+    const auto artifactResult = artifactById(artifactId);
+
+    if (!artifactResult)
+    {
+        return foundation::Result<CrashReport>(artifactResult.error());
+    }
+
+    const IArtifactCrashAnalyzer* analyzer = findCrashAnalyzer(artifactResult->type);
+
+    if (analyzer == nullptr || !analyzer->supports(*artifactResult))
+    {
+        CrashReport report;
+        report.id = makeCrashReportId(m_manifest.id, artifactResult->id, "unsupported");
+        report.artifactId = artifactResult->id;
+        report.artifactType = artifactResult->type;
+        report.status = CrashAnalysisStatus::NotSupported;
+        report.summary = "Artifact type does not support crash analysis";
+
+        return foundation::Result<CrashReport>(std::move(report));
+    }
+
+    const IArtifactHandler* handler = findArtifactHandler(artifactResult->type);
+
+    if (handler == nullptr)
+    {
+        return foundation::Result<CrashReport>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Unknown artifact type."));
+    }
+
+    const auto dataPathResult = handler->resolveDataPath(m_rootDirectory, *artifactResult);
+
+    if (!dataPathResult)
+    {
+        return foundation::Result<CrashReport>(dataPathResult.error());
+    }
+
+    if (!analyzer->canAnalyze(*artifactResult, *dataPathResult))
+    {
+        CrashReport report;
+        report.id = makeCrashReportId(m_manifest.id, artifactResult->id, std::string(analyzer->artifactType()) + "-unreadable");
+        report.artifactId = artifactResult->id;
+        report.artifactType = artifactResult->type;
+        report.status = CrashAnalysisStatus::Failed;
+        report.summary = "Artifact data is not readable";
+        report.warnings.push_back("Artifact data file is missing or not readable.");
+
+        return foundation::Result<CrashReport>(std::move(report));
+    }
+
+    CrashAnalysisContext context;
+    context.investigationId = m_manifest.id;
+    context.investigationRoot = m_rootDirectory;
+
+    return analyzer->analyze(*artifactResult, *dataPathResult, context);
 }
 
 foundation::Result<bool> Investigation::ensureArtifactUnderRoot(const foundation::Path& path) const

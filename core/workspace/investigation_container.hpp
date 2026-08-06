@@ -11,6 +11,7 @@
 #include "artifact_record.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
+#include "crash_analyzer.hpp"
 #include "timeline_event.hpp"
 
 namespace scope::workspace
@@ -67,6 +68,11 @@ class Investigation
      */
     [[nodiscard]] foundation::Result<TimelineProjectionResult> projectTimeline(
         TimelineProjectionOptions options = {}) const;
+
+    /**
+     * @brief Analyzes crash evidence for one artifact (Story 4).
+     */
+    [[nodiscard]] foundation::Result<CrashReport> analyzeCrash(const std::string& artifactId) const;
 
   private:
     Investigation(foundation::Path investigationDir, InvestigationManifest manifest);

@@ -5,6 +5,7 @@
 #include "web_server.hpp"
 
 #include "artifact_handler.hpp"
+#include "crash_report.hpp"
 #include "investigation_container.hpp"
 #include "json_parse.hpp"
 #include "middleware/api_key.hpp"
@@ -1510,6 +1511,54 @@ void WebServer::registerRoutes()
                       response.set_header(kSessionHeader, sessionId);
                   });
 
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+)/crash-analysis)",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const std::string artifactId = request.matches[2];
+                      const auto crashResult =
+                          m_workspaceStore.investigationStore().analyzeCrash(investigationId, artifactId);
+
+                      if (!crashResult)
+                      {
+                          setErrorResponse(response, crashResult.error());
+
+                          return;
+                      }
+
+                      if (crashResult->status == scope::workspace::CrashAnalysisStatus::NotSupported)
+                      {
+                          setJsonResponse(response, 409,
+                                          errorEnvelope("NOT_SUPPORTED",
+                                                        "Artifact type does not support crash analysis.",
+                                                        formatInvestigationCrashAnalysis(*crashResult)));
+
+                          return;
+                      }
+
+                      setJsonResponse(response, 200,
+                                      successEnvelope(formatInvestigationCrashAnalysis(*crashResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
     m_server->Put(R"(/api/v1/investigations/([^/]+))",
                 [this](const httplib::Request& request, httplib::Response& response) {
                     if (!authorizeApiKey(m_config.apiKey, request, response))
@@ -1653,7 +1702,7 @@ void WebServer::registerRoutes()
 
                        if (!useSessionSource)
                        {
-                           const auto pathValidation = validateServerPath(m_config, sourcePath);
+                           const auto pathValidation = validateArtifactSourcePath(m_config, sourcePath);
 
                            if (!pathValidation)
                            {
@@ -1730,7 +1779,7 @@ void WebServer::registerRoutes()
                       data << "{\n  \"artifact\": "
                            << formatArtifactRecord(*iterator, manifestResult->primaryArtifactId);
 
-                      if (iterator->type == "note")
+                      if (iterator->type == "note" || iterator->type == "pstack" || iterator->type == "log")
                       {
                           const foundation::Path investigationDir = foundation::Path(
                               m_workspaceStore.investigationStore().rootDirectory().string() + "/" + investigationId);
@@ -1739,7 +1788,7 @@ void WebServer::registerRoutes()
                           if (investigationResult)
                           {
                               const scope::workspace::IArtifactHandler* handler =
-                                  scope::workspace::findArtifactHandler("note");
+                                  scope::workspace::findArtifactHandler(iterator->type);
 
                               if (handler != nullptr)
                               {

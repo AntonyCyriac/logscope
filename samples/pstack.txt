@@ -1,0 +1,14 @@
+Thread 2 (LWP 12346):
+#0  0x00007ffff7f58d17 in pthread_cond_wait@@GLIBC_2.3.2 () from /lib64/libpthread.so.0
+#1  0x00005555555b1040 in WorkerPool::run () at worker_pool.cpp:88
+#2  0x00007ffff7f51609 in start_thread () from /lib64/libpthread.so.0
+
+Thread 1 (LWP 12345):
+#0  0x00007ffff7a3f387 in raise () from /lib64/libc.so.6
+#1  0x00007ffff7a248c8 in abort () from /lib64/libc.so.6
+#2  0x00005555555a2b10 in SessionManager::create (this=0x0) at session_manager.cpp:42
+#3  0x00005555555a1c01 in main (argc=1, argv=0x7fffffffe5a8) at app.cpp:18
+
+Program received signal SIGSEGV, Segmentation fault.
+[Switching to thread 1 (LWP 12345)]
+#0  0x00005555555a2b10 in SessionManager::create (this=0x0) at session_manager.cpp:42

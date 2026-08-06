@@ -322,6 +322,7 @@ Two layers apply to AI-assisted LogScope work. Do not conflate them.
 | Layer | Scope | Where |
 |-------|--------|-------|
 | **Coding assistant (any tool)** | Instructions for contributors building LogScope in an IDE | [AGENTS.md](../../AGENTS.md), this file, [CODE_MAP.md](CODE_MAP.md) |
+| **Web/desktop UI work** | One Investigation UI, two shells | [UI_ARCHITECTURE.md](../architecture/UI_ARCHITECTURE.md), [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md) |
 | **Product (shipped)** | User-facing AI: NL queries, summaries, anomaly hints, `logscope agent investigate` | M13 (`v1.5.1`); pluggable `AiProvider` |
 
 **Bootstrap:** Start with [AGENTS.md](../../AGENTS.md) — works for Cursor, Copilot, Claude Code, and other assistants. Keep contributions in the **public** repo only.
