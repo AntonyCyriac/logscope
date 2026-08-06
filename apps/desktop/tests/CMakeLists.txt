@@ -46,3 +46,36 @@ set_tests_properties(logscope_desktop_tests PROPERTIES
     LABELS "logscope_desktop_tests"
     ENVIRONMENT "QT_QPA_PLATFORM=offscreen"
 )
+
+# ==========================================================
+# README desktop screenshot capture (headless, offscreen)
+# ==========================================================
+
+add_executable(logscope_capture_readme_desktop
+    capture_readme_screenshot.cpp
+    ../main_window.cpp
+    ../log_table_model.cpp
+    ../theme_manager.cpp
+    ../tail_worker.cpp
+    ../analytics_panel.cpp
+    ../ai_panel.cpp
+    ../export_report_dialog.cpp
+    ../configuration_editor_dialog.cpp
+    ../open_log_dialog.cpp
+    ../save_session_dialog.cpp
+    ../run_stats_dialog.cpp
+    ../../cli/report_writer.cpp
+    ../../cli/stats_output.cpp
+)
+
+target_link_libraries(logscope_capture_readme_desktop
+    PRIVATE
+        Qt6::Widgets
+        scope_application
+)
+
+target_include_directories(logscope_capture_readme_desktop
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/..
+        ${CMAKE_CURRENT_SOURCE_DIR}/../../cli
+)

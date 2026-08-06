@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  pull-requests: write
 
 jobs:
   capture:
@@ -22,12 +23,16 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y cmake ninja-build libsqlite3-dev
+          sudo apt-get install -y cmake ninja-build libsqlite3-dev qt6-base-dev
 
-      - name: Build logscope-web and CLI
+      - name: Build logscope-web, CLI, and desktop capture
         run: |
-          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON
-          cmake --build build --target logscope-web logscope
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DLOGSCOPE_WEB=ON -DLOGSCOPE_DESKTOP=ON
+          cmake --build build --target logscope-web logscope logscope-desktop logscope_capture_readme_desktop
+
+      - name: Capture desktop screenshot
+        run: |
+          QT_QPA_PLATFORM=offscreen ./build/apps/desktop/tests/logscope_capture_readme_desktop
 
       - name: Setup Node and Playwright
         uses: actions/setup-node@v4
@@ -62,13 +67,13 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           BRANCH="chore/readme-assets-${{ github.run_id }}"
           git checkout -b "$BRANCH"
-          git add docs/assets/logscope-web.png docs/assets/logscope-cli.png
+          git add docs/assets/logscope-web.png docs/assets/logscope-cli.png docs/assets/logscope-desktop.png
           if git diff --staged --quiet; then
             echo "No asset changes"
             exit 0
           fi
-          git commit -m "docs(assets): refresh README web and CLI screenshots for v2.7.0"
+          git commit -m "docs(assets): refresh README web, CLI, and desktop screenshots for v2.7.0"
           git push origin "$BRANCH"
           gh pr create --base master --head "$BRANCH" \
             --title "docs(assets): refresh README screenshots for v2.7.0" \
-            --body "Automated capture from Capture README assets workflow (web Story 5 + CLI)."
+            --body "Automated capture from Capture README assets workflow (web Story 5, CLI, and desktop)."
