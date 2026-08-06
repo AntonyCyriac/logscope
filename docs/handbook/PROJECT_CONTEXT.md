@@ -19,7 +19,7 @@
 
 You are assisting in the development of **LogScope**, a professional-grade, open-source **investigation platform** written in modern C++.
 
-**Vocabulary note:** User-facing language prefers *investigate incident* and *evidence analysis* over *analyze log* / *log analysis*. Evidence includes logs, notes, pstack, core, and timeline — not just logs. Code identifiers are not mass-renamed for this shift.
+**Vocabulary note:** See [GLOSSARY.md](GLOSSARY.md). User-facing language prefers *investigate incident* and *evidence analysis* over *analyze log* / *log analysis*.
 
 This is **not a demo project**. It is intended to become a production-quality software product built with strong software engineering principles similar to LLVM, Qt, Chromium, Envoy, and other mature open-source projects.
 
@@ -314,13 +314,13 @@ Quality is more important than speed. Never sacrifice architecture for convenien
 
 # Project Goal
 
-The long-term goal is to make LogScope a professional, extensible, high-performance log analysis platform capable of handling multiple log formats through a plugin architecture, with strong tooling, reporting, and diagnostics.
+The long-term goal is to make LogScope a professional, extensible **Evidence-Centric Investigation Platform** — organizing, connecting, and understanding evidence from production incidents across log formats and artifact types, with strong tooling, reporting, and diagnostics.
 
 The project should be maintainable for many years and welcoming to future contributors through consistent engineering practices.
 
-**Product promise:** *Analyze any log format without writing custom scripts.*
+**Product promise:** *Investigate production incidents without stitching together one-off tools.*
 
-See: [Product Overview](../vision/PRODUCT_OVERVIEW.md), [Project Charter](../vision/PROJECT_CHARTER.md).
+See: [Glossary](GLOSSARY.md) · [Product Overview](../vision/PRODUCT_OVERVIEW.md) · [Project Charter](../vision/PROJECT_CHARTER.md).
 
 ---
 
@@ -345,6 +345,8 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | Document | Purpose |
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
+| [GLOSSARY.md](GLOSSARY.md) | Domain vocabulary — evidence-centric investigation platform |
+| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — Story 5 completes Phase A |
 | [PRD-001 AI Engineering Agents](../requirements/future/PRD-001-AI-Engineering-Agents.md) | Future product agent vision (not current milestone scope) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |

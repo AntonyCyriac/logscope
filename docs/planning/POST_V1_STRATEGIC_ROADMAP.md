@@ -23,7 +23,7 @@ See also: [Roadmap](../ROADMAP.md) for milestone tracking and status.
 
 # 2. Executive Summary
 
-LogScope is a professional, extensible log analysis platform. The product promise is:
+LogScope is a professional, extensible **Evidence-Centric Investigation Platform**. The product promise is:
 
 > **Analyze any log format without writing custom scripts.**
 
@@ -334,7 +334,7 @@ v1.5.1  — M13: AI Assistant (released)
 v1.5.2  — Phase 1: stabilize v1.x (released)
 v2.0.0  — M14 GUI + M15 Web + major API evolution
 v2.2.x  — M15.3–M15.4 web hardening (released)
-v2.3.0+ — Investigation user stories (planned)
+v2.3.0–v2.6.1 — Investigation stories 1–4 **shipped**; Story 5 **Connect the Evidence** active (see [NEXT-VALUE-ADD.md](NEXT-VALUE-ADD.md))
 ```
 
 ---

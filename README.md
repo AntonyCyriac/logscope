@@ -5,7 +5,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Platforms](https://img.shields.io/badge/platforms-Windows%20%7C%20macOS%20%7C%20Linux-lightgrey)](#install)
 
-**Investigate any log format — CLI, desktop, or browser.** Parse, search, report, and persist indexes without one-off scripts.
+**Evidence-centric investigation platform** — organize, connect, and understand evidence from production incidents. **CLI**, **desktop**, or **browser**.
 
 > **Living product** — LogScope evolves every day. We ship on `master` continuously (features, fixes, docs, and releases). Pin a [release tag](https://github.com/AntonyCyriac/logscope/releases) for stability; follow the [Changelog](CHANGELOG.md) and [Roadmap](docs/ROADMAP.md) for what changed.
 
@@ -25,7 +25,7 @@
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
-**Web** — real `logscope-web` SPA (v2.2.2, session ready):
+**Web** — `logscope-web` IDE-style investigation UI (`v2.6.x`, Timeline + Crash tabs):
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
@@ -35,19 +35,20 @@
 
 ## Why LogScope
 
-Engineers still grep giant files, stitch together format-specific tools, and re-run the same investigation steps by hand. LogScope gives you **one pipeline** for plain-text and JSONL logs:
+Engineers still grep giant files, stitch together format-specific tools, and manually reconstruct incidents across logs, syslog, stack traces, and cores. LogScope gives you **one investigation workflow** across evidence types:
 
 ```text
-Source → Analysis → Investigation → Reporting
-         ↑__________________________|
-              CLI · Desktop · Web
+Investigation → Artifacts → Timeline → Crash → Evidence Links (Story 5)
+         ↑__________________________________________|
+                    CLI · Desktop · Web
 ```
 
+- **Evidence-centric** — investigations hold logs, notes, pstack, core; timeline and crash reports are projections
 - **Format-agnostic** — auto-detect formats, extract fields, investigate content
 - **Fast at scale** — optional SQLite persistent indexes (`--persist-index`) for large logs
 - **Three surfaces, one core** — same analysis engine in terminal, Qt GUI, and browser
 - **Extensible** — dynamic plugins for parsers, search, reports, and storage
-- **AI-assisted** — natural-language queries and summaries (pluggable providers)
+- **AI-assisted** — natural-language queries and summaries (consumer of evidence model; M13+)
 - **Production-minded** — multi-OS CI, benchmarks, fuzz tests, MIT license
 
 ---
@@ -62,9 +63,10 @@ Source → Analysis → Investigation → Reporting
 | **Storage** | SQLite hybrid index, compression, incremental append, query cache |
 | **Desktop** | Live tail, session save/load, export dialogs, AI panel |
 | **Web** | REST API, SPA, shared workspaces, async analyze, tail poll, API key auth |
+| **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis (`v2.3.0`–`v2.6.1`) |
 | **Plugins** | Runtime `.so`/`.dll` loading — parser, report, search, storage providers |
 
----
+**Active:** Story 5 — [Connect the Evidence](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
 
 ## Install
 
@@ -138,7 +140,7 @@ Open `http://127.0.0.1:8080` (or HTTPS with TLS). REST API: [ADR-009](docs/archi
 | Audience | Start here |
 |----------|------------|
 | **Users** | [User Manual](docs/handbook/USER_MANUAL.md) · [CLI Reference](docs/handbook/CLI_REFERENCE.md) · [Configuration](docs/handbook/CONFIGURATION_GUIDE.md) |
-| **Contributors** | [AGENTS.md](AGENTS.md) · [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Tutorials](docs/tutorials/README.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
+| **Contributors** | [AGENTS.md](AGENTS.md) · [Glossary](docs/handbook/GLOSSARY.md) · [Developer Setup](docs/handbook/DEVELOPER_SETUP.md) · [Tutorials](docs/tutorials/README.md) · [Developer Guide](docs/handbook/DEVELOPER_GUIDE.md) · [Testing](docs/testing/TESTING.md) |
 | **Architecture** | [Overview](docs/architecture/ARCHITECTURE_OVERVIEW.md) · [Component Catalog](docs/architecture/COMPONENT_CATALOG.md) · [Product](docs/PRODUCT.md) |
 
 Full index: [Document Map](docs/DOCUMENT_MAP.md)

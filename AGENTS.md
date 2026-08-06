@@ -9,10 +9,11 @@ At the beginning of a session, load (attach or reference):
 | Order | Document | Purpose |
 |-------|----------|---------|
 | 1 | [docs/handbook/PROJECT_CONTEXT.md](docs/handbook/PROJECT_CONTEXT.md) | Engineering mindset, release, milestones, CI rules |
-| 2 | [docs/handbook/CODE_MAP.md](docs/handbook/CODE_MAP.md) | Where CLI, desktop, web, core, and tests live |
-| 3 | [docs/release/v2.6.1-RELEASE-NOTES.md](docs/release/v2.6.1-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
+| 2 | [docs/handbook/GLOSSARY.md](docs/handbook/GLOSSARY.md) | Domain vocabulary (evidence-centric platform) |
+| 3 | [docs/handbook/CODE_MAP.md](docs/handbook/CODE_MAP.md) | Where CLI, desktop, web, core, and tests live |
+| 4 | [docs/release/v2.6.1-RELEASE-NOTES.md](docs/release/v2.6.1-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
 
-Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md) · [V260 scenarios](docs/planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) · [ADR-009-M15.8 Crash Analysis](docs/architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
+Optional: [docs/planning/NEXT-VALUE-ADD.md](docs/planning/NEXT-VALUE-ADD.md) · [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md) · [V260 scenarios](docs/planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) · [ADR-009-M15.8 Crash Analysis](docs/architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
 
 ## Principles
 
@@ -33,8 +34,13 @@ Future multi-agent product vision: [PRD-001](docs/requirements/future/PRD-001-AI
 
 ## Web & desktop UI (IDE for investigations)
 
-LogScope is an **Evidence-Centric Investigation Platform** — not a monitoring dashboard. Evidence (logs, notes, pstack, core) is source of truth; timeline, crash reports, and links are projections. Before changing web or desktop UI, read: — **one Investigation UI, two shells** (view models, modes, parity)
+LogScope is an **Evidence-Centric Investigation Platform** — not a monitoring dashboard. Evidence (logs, notes, pstack, core) is source of truth; timeline, crash reports, and links are projections.
+
+Before changing web or desktop UI, read:
+
+1. [docs/architecture/UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md) — **one Investigation UI, two shells** (view models, modes, parity)
 2. [docs/handbook/WEB_UI_DESIGN.md](docs/handbook/WEB_UI_DESIGN.md) — IDE layout and shell guidelines
+3. [docs/handbook/GLOSSARY.md](docs/handbook/GLOSSARY.md) — domain vocabulary
 
 | Principle | Rule |
 |-----------|------|
