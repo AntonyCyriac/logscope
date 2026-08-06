@@ -18,10 +18,10 @@
     </div>
     <div class="app-header__actions">
       <button type="button" id="openInvestigationBtn" class="btn btn-ghost">Open Investigation</button>
-      <button type="button" id="createInvestigationBtn" class="btn btn-ghost">New Investigation</button>
-      <button type="button" id="analyzeBtn" class="btn btn-primary" disabled>Analyze</button>
+      <button type="button" id="createInvestigationBtn" class="btn btn-ghost" data-testid="header-new-investigation">New Investigation</button>
+      <button type="button" id="analyzeBtn" class="btn btn-primary" disabled data-testid="header-analyze">Analyze</button>
     </div>
-    <p id="status" class="app-status" hidden></p>
+    <p id="status" class="app-status" hidden data-testid="status"></p>
   </header>
 
   <div class="workspace">
@@ -32,11 +32,11 @@
           <span id="artifactCount" class="artifact-count">0</span>
         </div>
         <div class="sidebar__add-row">
-          <button type="button" id="addLogArtifactBtn" class="btn btn-ghost btn-sm" disabled title="Add log file">+ Log</button>
-          <button type="button" id="addPstackBtn" class="btn btn-ghost btn-sm" disabled title="Add pstack">+ Pstack</button>
+          <button type="button" id="addLogArtifactBtn" class="btn btn-ghost btn-sm" disabled title="Add log file" data-testid="add-log-artifact">+ Log</button>
+          <button type="button" id="addPstackBtn" class="btn btn-ghost btn-sm" disabled title="Add pstack" data-testid="add-pstack-artifact">+ Pstack</button>
           <button type="button" id="addNoteBtn" class="btn btn-ghost btn-sm" disabled title="Add note">+ Note</button>
         </div>
-        <ul id="artifactList" class="artifact-list"></ul>
+        <ul id="artifactList" class="artifact-list" data-testid="artifact-list"></ul>
       </div>
 
       <details class="sidebar__section sidebar__section--collapsible source-panel-details">
@@ -73,7 +73,7 @@
       <div class="center-toolbar">
         <div class="center-toolbar__left">
           <span id="centerArtifactIcon" class="center-artifact-icon" aria-hidden="true">📄</span>
-          <span id="centerArtifactTitle" class="center-artifact-title">No artifact selected</span>
+          <span id="centerArtifactTitle" class="center-artifact-title" data-testid="center-artifact-title">No artifact selected</span>
         </div>
         <div class="center-toolbar__right">
           <label class="tail-autoscroll" id="tailControls" hidden>
@@ -87,16 +87,16 @@
         <p class="center-empty__title">Select an artifact to begin</p>
         <p class="center-empty__hint">Open a log or pstack from the sidebar, or upload a session source and analyze.</p>
       </div>
-      <pre id="artifactViewer" class="artifact-viewer" hidden></pre>
+      <pre id="artifactViewer" class="artifact-viewer" hidden data-testid="artifact-viewer"></pre>
       <pre id="tailOutput" class="tail-output tail-output--inline" hidden>Tail inactive.</pre>
     </main>
 
     <div class="bottom-dock" id="bottomDock">
       <div class="bottom-dock__bar" role="tablist" aria-label="Investigation panels">
-        <button type="button" class="bottom-tab" data-bottom-tab="timeline" role="tab" aria-selected="false">Timeline</button>
-        <button type="button" class="bottom-tab" data-bottom-tab="crash" role="tab" aria-selected="false">Crash</button>
-        <button type="button" class="bottom-tab" data-bottom-tab="ai" role="tab" aria-selected="false">AI</button>
-        <button type="button" class="bottom-tab" data-bottom-tab="results" role="tab" aria-selected="false">Results</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="timeline" data-testid="bottom-tab-timeline" role="tab" aria-selected="false">Timeline</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="crash" data-testid="bottom-tab-crash" role="tab" aria-selected="false">Crash</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="ai" data-testid="bottom-tab-ai" role="tab" aria-selected="false">AI</button>
+        <button type="button" class="bottom-tab" data-bottom-tab="results" data-testid="bottom-tab-results" role="tab" aria-selected="false">Results</button>
         <button type="button" id="bottomDockToggle" class="bottom-dock__toggle btn btn-ghost btn-sm" title="Collapse panel" aria-label="Collapse panel">▾</button>
       </div>
 
@@ -109,7 +109,7 @@
               <thead>
                 <tr><th>Time</th><th>Type</th><th>Source</th><th>Message</th><th>Severity</th></tr>
               </thead>
-              <tbody id="timelineList"></tbody>
+              <tbody id="timelineList" data-testid="timeline-rows"></tbody>
             </table>
           </div>
           <button type="button" id="timelineLoadMoreBtn" class="btn btn-ghost btn-sm" hidden>Load more</button>
@@ -122,23 +122,23 @@
           <div id="crashContent" class="crash-content" hidden>
             <div class="crash-summary">
               <span id="crashStatusBadge" class="crash-status-badge"></span>
-              <span id="crashSignal" class="crash-signal"></span>
+              <span id="crashSignal" class="crash-signal" data-testid="crash-signal"></span>
               <p id="crashSummaryText" class="crash-summary-text"></p>
             </div>
             <div id="crashIssueCards" class="crash-issue-cards"></div>
             <h3 class="subsection-title">Observations</h3>
             <ul id="crashObservations" class="crash-observations"></ul>
             <h3 class="subsection-title">Threads</h3>
-            <ul id="crashThreadList" class="crash-thread-list"></ul>
+            <ul id="crashThreadList" class="crash-thread-list" data-testid="crash-thread-list"></ul>
             <h3 id="pstackViewerTitle" class="subsection-title crash-pstack-title" hidden>Stack preview</h3>
-            <div id="pstackViewer" class="crash-pstack-viewer" hidden></div>
+            <div id="pstackViewer" class="crash-pstack-viewer" hidden data-testid="pstack-viewer"></div>
           </div>
         </section>
 
         <section class="bottom-panel" id="panelAi" data-bottom-panel="ai" hidden>
           <div class="ask-row">
-            <input type="text" id="askInput" class="ask-input" placeholder="Ask about this investigation…">
-            <button type="button" id="askBtn" class="btn btn-primary" disabled>Ask</button>
+            <input type="text" id="askInput" class="ask-input" placeholder="Ask about this investigation…" data-testid="ask-input">
+            <button type="button" id="askBtn" class="btn btn-primary" disabled data-testid="ask-btn">Ask</button>
           </div>
         </section>
 
@@ -152,7 +152,7 @@
               <span>Filter</span>
               <input type="text" id="filterInput" placeholder="level == ERROR">
             </label>
-            <button type="button" id="investigateBtn" class="btn btn-primary btn-sm" disabled>Investigate</button>
+            <button type="button" id="investigateBtn" class="btn btn-primary btn-sm" disabled data-testid="investigate-btn">Investigate</button>
             <button type="button" id="exportBtn" class="btn btn-ghost btn-sm" disabled>Export HTML</button>
           </div>
           <div class="results-tabs" role="tablist">
@@ -161,11 +161,11 @@
           </div>
           <pre id="summary" class="results-raw" hidden>No data yet.</pre>
           <div id="resultsFormatted" class="results-formatted">
-            <table id="resultsTable" class="data-table">
+            <table id="resultsTable" class="data-table" data-testid="results-table">
               <thead>
                 <tr><th>Line</th><th>Level</th><th>Message</th></tr>
               </thead>
-              <tbody></tbody>
+              <tbody data-testid="results-rows"></tbody>
             </table>
           </div>
         </section>

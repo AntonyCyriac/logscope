@@ -37,7 +37,7 @@
   const centerArtifactTitle = document.getElementById('centerArtifactTitle');
   const tailControls = document.getElementById('tailControls');
   const bottomDock = document.getElementById('bottomDock');
-  const tableBody = document.querySelector('#resultsTable tbody');
+  const tableBody = document.querySelector('[data-testid="results-rows"]');
   const extensionsList = document.getElementById('extensionsList');
   const investigationsList = document.getElementById('investigationsList');
   const artifactList = document.getElementById('artifactList');
@@ -407,6 +407,7 @@
       const isFault = thread.isFaultThread
         || (faultThreadId != null && String(thread.id) === String(faultThreadId));
       item.className = 'crash-thread' + (isFault ? ' crash-thread--fault' : '');
+      item.setAttribute('data-testid', isFault ? 'crash-fault-thread' : 'crash-thread');
 
       if (canJump) {
         item.classList.add('crash-thread--clickable');
@@ -510,6 +511,7 @@
       const pre = document.createElement('pre');
       pre.className = 'crash-pstack-thread';
       pre.dataset.threadId = block.id;
+      pre.setAttribute('data-testid', 'pstack-thread');
       pre.textContent = block.text;
 
       if (highlightThreadId != null && String(block.id) === String(highlightThreadId)) {
@@ -723,6 +725,7 @@
     btn.type = 'button';
     btn.className = 'btn btn-ghost btn-sm';
     btn.textContent = label;
+    btn.setAttribute('data-testid', 'artifact-action-' + label.toLowerCase());
     btn.addEventListener('click', function (event) {
       event.stopPropagation();
       onClick();
@@ -756,6 +759,7 @@
       const item = document.createElement('li');
       item.className = 'artifact-row';
       item.dataset.artifactId = artifact.id;
+      item.setAttribute('data-testid', 'artifact-item');
 
       if (artifact.id === state.selectedArtifactId) {
         item.classList.add('artifact-row--selected');
@@ -858,6 +862,7 @@
     events.forEach(function (event) {
       const row = document.createElement('tr');
       row.className = 'timeline-event timeline-event--clickable';
+      row.setAttribute('data-testid', 'timeline-row');
 
       if (event.id && event.id === state.activeTimelineEventId) {
         row.classList.add('timeline-event--active');
@@ -1004,6 +1009,7 @@
 
     lines.slice(0, 200).forEach(function (line) {
       const row = document.createElement('tr');
+      row.setAttribute('data-testid', 'results-row');
       const lineNumber = line.lineNumber != null ? Number(line.lineNumber) : null;
 
       if (lineToHighlight != null && lineNumber === Number(lineToHighlight)) {
@@ -1102,6 +1108,10 @@
         return a.id === state.activeArtifactId;
       });
       if (artifact) {
+        if (artifact.type === 'log') {
+          analyzeBtn.disabled = false;
+          tailStartBtn.disabled = false;
+        }
         await selectArtifactInCenter(artifact);
       }
     }

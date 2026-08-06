@@ -1779,7 +1779,7 @@ void WebServer::registerRoutes()
                       data << "{\n  \"artifact\": "
                            << formatArtifactRecord(*iterator, manifestResult->primaryArtifactId);
 
-                      if (iterator->type == "note" || iterator->type == "pstack")
+                      if (iterator->type == "note" || iterator->type == "pstack" || iterator->type == "log")
                       {
                           const foundation::Path investigationDir = foundation::Path(
                               m_workspaceStore.investigationStore().rootDirectory().string() + "/" + investigationId);
