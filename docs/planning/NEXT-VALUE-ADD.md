@@ -4,7 +4,7 @@
 |-------|-------|
 | Document | Next Value-Add Backlog |
 | Category | Project Planning |
-| Version | 1.7.0 |
+| Version | 1.8.0 |
 | Status | Approved |
 | Created | 30-07-2026 |
 | Last Updated | 06-08-2026 |
@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.6.1` (Phase A complete). **Next flagship:** Story 5 **Connect the Evidence** — P0.1 Evidence Links on timeline (see §5).
+**Current public release:** `v2.6.1` (Stories 1–4 shipped). **Story 5 completes Phase A** — Connect the Evidence (see §5).
 
 ---
 
@@ -111,3 +111,4 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.5.0 | 06-08-2026 | Phase A shipped through v2.6.1; post–Story 4 backlog is active queue. |
 | 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; correlation is next flagship; P4/P5 research only. |
 | 1.7.0 | 06-08-2026 | Story 5 **Connect the Evidence** — timeline-first Evidence Links; Correlation view deferred (P0.3). |
+| 1.8.0 | 06-08-2026 | Phase A = five stories; Story 5 completes investigation methodology; relationships are evidence not conclusions. |
