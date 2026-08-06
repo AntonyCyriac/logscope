@@ -1511,6 +1511,124 @@ void WebServer::registerRoutes()
                       response.set_header(kSessionHeader, sessionId);
                   });
 
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/evidence-links)",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      if (requireSession(*this, sessionId, response) == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const auto linksResult = m_workspaceStore.investigationStore().listEvidenceLinks(investigationId);
+
+                      if (!linksResult)
+                      {
+                          setErrorResponse(response, linksResult.error());
+
+                          return;
+                      }
+
+                      setJsonResponse(response, 200,
+                                      successEnvelope(formatEvidenceLinksList(investigationId, *linksResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
+    m_server->Post(R"(/api/v1/investigations/([^/]+)/evidence-links)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
+                       if (requireSession(*this, sessionId, response) == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string investigationId = request.matches[1];
+                       const auto createRequest = parseEvidenceLinkCreateRequest(request.body);
+
+                       if (!createRequest)
+                       {
+                           setErrorResponse(response, createRequest.error());
+
+                           return;
+                       }
+
+                       const auto linkResult =
+                           m_workspaceStore.investigationStore().addEvidenceLink(investigationId, *createRequest);
+
+                       if (!linkResult)
+                       {
+                           setErrorResponse(response, linkResult.error());
+
+                           return;
+                       }
+
+                       setJsonResponse(response, 201, successEnvelope(formatEvidenceLinkRecord(*linkResult)));
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
+    m_server->Delete(R"(/api/v1/investigations/([^/]+)/evidence-links/([^/]+))",
+                     [this](const httplib::Request& request, httplib::Response& response) {
+                         if (!authorizeApiKey(m_config.apiKey, request, response))
+                         {
+                             return;
+                         }
+
+                         applyCors(m_config, request, response);
+
+                         const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                         if (rejectStaleSessionHeader(request, sessionId, response))
+                         {
+                             return;
+                         }
+
+                         if (requireSession(*this, sessionId, response) == nullptr)
+                         {
+                             return;
+                         }
+
+                         const std::string investigationId = request.matches[1];
+                         const std::string linkId = request.matches[2];
+                         const auto removeResult =
+                             m_workspaceStore.investigationStore().removeEvidenceLink(investigationId, linkId);
+
+                         if (!removeResult)
+                         {
+                             setErrorResponse(response, removeResult.error());
+
+                             return;
+                         }
+
+                         response.status = 204;
+                         response.set_header(kSessionHeader, sessionId);
+                     });
+
     m_server->Get(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+)/crash-analysis)",
                   [this](const httplib::Request& request, httplib::Response& response) {
                       if (!authorizeApiKey(m_config.apiKey, request, response))

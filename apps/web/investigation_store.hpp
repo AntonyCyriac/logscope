@@ -91,6 +91,15 @@ class InvestigationStore
     [[nodiscard]] foundation::Result<scope::workspace::CrashReport> analyzeCrash(const std::string& investigationId,
                                                                                  const std::string& artifactId) const;
 
+    [[nodiscard]] foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>> listEvidenceLinks(
+        const std::string& investigationId) const;
+
+    [[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkRecord> addEvidenceLink(
+        const std::string& investigationId, scope::workspace::EvidenceLinkCreateRequest request);
+
+    [[nodiscard]] foundation::Result<bool> removeEvidenceLink(const std::string& investigationId,
+                                                              const std::string& linkId);
+
     void touchUpdatedAt(const std::string& investigationId);
 
     void updateSummaryFromService(const std::string& investigationId,

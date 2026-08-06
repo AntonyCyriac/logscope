@@ -548,6 +548,73 @@ foundation::Result<scope::workspace::CrashReport> InvestigationStore::analyzeCra
     return investigationResult->analyzeCrash(artifactId);
 }
 
+foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>> InvestigationStore::listEvidenceLinks(
+    const std::string& investigationId) const
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>>(investigationResult.error());
+    }
+
+    return investigationResult->listEvidenceLinks();
+}
+
+foundation::Result<scope::workspace::EvidenceLinkRecord> InvestigationStore::addEvidenceLink(
+    const std::string& investigationId, scope::workspace::EvidenceLinkCreateRequest request)
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(investigationResult.error());
+    }
+
+    Investigation investigation = std::move(*investigationResult);
+
+    return investigation.addEvidenceLink(std::move(request));
+}
+
+foundation::Result<bool> InvestigationStore::removeEvidenceLink(const std::string& investigationId,
+                                                                const std::string& linkId)
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<bool>(investigationResult.error());
+    }
+
+    Investigation investigation = std::move(*investigationResult);
+
+    return investigation.removeEvidenceLink(linkId);
+}
+
 void InvestigationStore::updateSummaryFromService(const std::string& investigationId,
                                                   const application::ApplicationService& service)
 {

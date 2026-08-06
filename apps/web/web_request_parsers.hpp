@@ -104,6 +104,9 @@ struct InvestigationTimelineQuery
 
 [[nodiscard]] InvestigationUpdateRequest parseInvestigationUpdateRequest(std::string_view body);
 
+[[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkCreateRequest> parseEvidenceLinkCreateRequest(
+    std::string_view body);
+
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 
 /** Allows web.allowed_path_roots paths and staged multipart uploads under web.upload_temp_dir. */
