@@ -3,6 +3,7 @@
  * @brief Unit tests for pstack crash analysis (Story 4).
  */
 
+#include <algorithm>
 #include <fstream>
 
 #include <gtest/gtest.h>
@@ -77,6 +78,106 @@ Program received signal SIGSEGV, Segmentation fault.
     EXPECT_EQ("SessionManager::create", crashResult->threads.front().frames.front().symbol);
     EXPECT_NE(std::string::npos, crashResult->summary.find("SessionManager::create"));
     EXPECT_FALSE(crashResult->observations.empty());
+}
+
+TEST(PstackCrashAnalyzerTest, SelectsAbortThreadWhenNotListedFirstWithoutSignalLine)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_crash_abort_last"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_abort_last.txt"));
+
+    writeFile(pstackFile, R"(Thread 7 (Thread 0x7f2a1c0d1700 (LWP 1849)):
+#0  0x00007f2a2b9c1e2b in epoll_wait () from /lib64/libc.so.6
+#1  0x00007f2a2c114a70 in evl::EventLoop::run() () from /opt/ims/lib/libims_common.so
+#2  0x00007f2a2b9f2ea5 in start_thread () from /lib64/libpthread.so.0
+
+Thread 3 (Thread 0x7f2a1b8c0700 (LWP 1845)):
+#0  0x00007f2a2b9c8f4a in pthread_cond_wait () from /lib64/libpthread.so.0
+#1  0x00007f2a2c0aa311 in grpc_core::Executor::ThreadMain() () from /opt/ims/lib/libgrpc.so
+#2  0x00007f2a2b9f2ea5 in start_thread () from /lib64/libpthread.so.0
+
+Thread 1 (Thread 0x7f2a2d4f8880 (LWP 1842)):
+#0  0x00007f2a2b93a37f in raise () from /lib64/libc.so.6
+#1  0x00007f2a2b924db5 in abort () from /lib64/libc.so.6
+#2  0x00007f2a2bf1c09b in __gnu_cxx::__verbose_terminate_handler () from /lib64/libstdc++.so.6
+#3  0x00007f2a2bf2a53c in __cxxabiv1::__terminate () from /lib64/libstdc++.so.6
+#4  0x00007f2a2bf2a5a7 in std::terminate () from /lib64/libstdc++.so.6
+#5  0x00007f2a2c3311d4 in AppHandler::isAllowed(std::string const&) () from /opt/app/lib/libapp.so
+#6  0x0000000000403c21 in main () from /opt/app/bin/app
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "crash-abort-last";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "pstack.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "pstack.txt"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+
+    const auto crashResult = investigation.analyzeCrash(artifactResult->id);
+
+    ASSERT_TRUE(crashResult.hasValue());
+    EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
+    ASSERT_TRUE(crashResult->faultThreadId.has_value());
+    EXPECT_EQ("1", *crashResult->faultThreadId);
+
+    const auto faultThread = std::find_if(crashResult->threads.begin(), crashResult->threads.end(),
+                                          [](const auto& thread) { return thread.isFaultThread; });
+
+    ASSERT_NE(crashResult->threads.end(), faultThread);
+    EXPECT_NE(std::string::npos, crashResult->summary.find("AppHandler::isAllowed"));
+    ASSERT_FALSE(crashResult->observations.empty());
+    EXPECT_NE(std::string::npos, crashResult->observations.front().find("AppHandler::isAllowed"));
+    EXPECT_EQ(std::string::npos, crashResult->observations.front().find("epoll_wait"));
+}
+
+TEST(PstackCrashAnalyzerTest, FallsBackToFirstThreadWhenAllIdle)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_crash_idle"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_idle.txt"));
+
+    writeFile(pstackFile, R"(Thread 2 (LWP 2002):
+#0  0x00007ffff7f58d17 in pthread_cond_wait () from /lib64/libpthread.so.0
+
+Thread 1 (LWP 2001):
+#0  0x00007ffff7a3f387 in epoll_wait () from /lib64/libc.so.6
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "crash-idle";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "pstack.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "pstack.txt"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+
+    const auto crashResult = investigation.analyzeCrash(artifactResult->id);
+
+    ASSERT_TRUE(crashResult.hasValue());
+    EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
+    ASSERT_TRUE(crashResult->faultThreadId.has_value());
+    EXPECT_EQ("2", *crashResult->faultThreadId);
 }
 
 TEST(PstackCrashAnalyzerTest, StableCrashReportIdIsDeterministic)
