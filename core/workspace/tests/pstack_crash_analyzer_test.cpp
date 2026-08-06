@@ -141,16 +141,22 @@ Thread 1 (Thread 0x7f2a2d4f8880 (LWP 1842)):
     EXPECT_EQ(std::string::npos, crashResult->observations.front().find("epoll_wait"));
 }
 
-TEST(PstackCrashAnalyzerTest, FallsBackToFirstThreadWhenAllIdle)
+TEST(PstackCrashAnalyzerTest, NoFaultThreadWhenAllIdle)
 {
     const Path investigationDir(logscope::gtest::uniqueTestPath("_crash_idle"));
     const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_idle.txt"));
 
-    writeFile(pstackFile, R"(Thread 2 (LWP 2002):
-#0  0x00007ffff7f58d17 in pthread_cond_wait () from /lib64/libpthread.so.0
+    writeFile(pstackFile, R"(Thread 4 (Thread 0x7f2a1c0d1700 (LWP 2001)):
+#0  0x00007f2a2b9c1e2b in epoll_wait () from /lib64/libc.so.6
+#1  0x00007f2a2c114a70 in evl::EventLoop::run() () from /opt/ims/lib/libims_common.so
 
-Thread 1 (LWP 2001):
-#0  0x00007ffff7a3f387 in epoll_wait () from /lib64/libc.so.6
+Thread 2 (Thread 0x7f2a1b8c0700 (LWP 2002)):
+#0  0x00007f2a2b9c8f4a in pthread_cond_wait () from /lib64/libpthread.so.0
+#1  0x00007f2a2c0aa311 in grpc_core::Executor::ThreadMain() () from /opt/ims/lib/libgrpc.so
+
+Thread 1 (Thread 0x7f2a2d4f8880 (LWP 2000)):
+#0  0x00007f2a2b9c1f00 in futex_wait () from /lib64/libc.so.6
+#1  0x0000000000403c21 in main () from /opt/app/bin/app
 )");
 
     InvestigationCreateRequest createRequest;
@@ -176,8 +182,67 @@ Thread 1 (LWP 2001):
 
     ASSERT_TRUE(crashResult.hasValue());
     EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
+    EXPECT_FALSE(crashResult->faultThreadId.has_value());
+    ASSERT_FALSE(crashResult->observations.empty());
+    EXPECT_NE(std::string::npos,
+              crashResult->observations.front().find("No fault thread identified"));
+
+    for (const auto& thread : crashResult->threads)
+    {
+        EXPECT_FALSE(thread.isFaultThread);
+    }
+}
+
+TEST(PstackCrashAnalyzerTest, NamesFrameBelowSignalHandlerNotHandler)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_crash_sig"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_sig.txt"));
+
+    writeFile(pstackFile, R"(Thread 9 (Thread 0x7f2a1c0d1700 (LWP 3101)):
+#0  0x00007f2a2b9c1e2b in epoll_wait () from /lib64/libc.so.6
+#1  0x00007f2a2c114a70 in evl::EventLoop::run() () from /opt/ims/lib/libims_common.so
+
+Thread 6 (Thread 0x7f2a1b8c0700 (LWP 3105)):
+#0  0x00007f2a2b93a37f in gsignal () from /lib64/libc.so.6
+#1  0x00007f2a2c220aa1 in sighdlHandler(int) () from /opt/ims/lib/libims_common.so
+#2  <signal handler called>
+#3  0x00007f2a2c3319ff in DBL_Access_read::readImpiAccessType(std::string const&) () from /opt/ims/lib/libims_hss1_dbl.so
+#4  0x00007f2a2c33a8e1 in SLM_CxManagerSAR::storeAccessType() () from /opt/ims/lib/libims_hss1_slm.so
+#5  0x00007f2a2b9f2ea5 in start_thread () from /lib64/libpthread.so.0
+
+Thread 2 (Thread 0x7f2a1a2b0700 (LWP 3109)):
+#0  0x00007f2a2b9c8f4a in pthread_cond_wait () from /lib64/libpthread.so.0
+#1  0x00007f2a2c0aa311 in grpc_core::Executor::ThreadMain() () from /opt/ims/lib/libgrpc.so
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "crash-sig";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "pstack.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "pstack.txt"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+
+    const auto crashResult = investigation.analyzeCrash(artifactResult->id);
+
+    ASSERT_TRUE(crashResult.hasValue());
+    EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
     ASSERT_TRUE(crashResult->faultThreadId.has_value());
-    EXPECT_EQ("2", *crashResult->faultThreadId);
+    EXPECT_EQ("6", *crashResult->faultThreadId);
+    ASSERT_FALSE(crashResult->observations.empty());
+    EXPECT_NE(std::string::npos, crashResult->observations.front().find("DBL_Access_read::readImpiAccessType"));
+    EXPECT_EQ(std::string::npos, crashResult->observations.front().find("sighdlHandler"));
 }
 
 TEST(PstackCrashAnalyzerTest, StableCrashReportIdIsDeterministic)
