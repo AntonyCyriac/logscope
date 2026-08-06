@@ -10,6 +10,8 @@
 #include <string>
 #include <vector>
 
+#include "evidence_link.hpp"
+
 namespace scope::workspace
 {
 
@@ -49,7 +51,7 @@ struct InvestigationSummary
 };
 
 /**
- * @brief On-disk investigation manifest (schema version 1).
+ * @brief On-disk investigation manifest (schema version 1 or 2).
  */
 struct InvestigationManifest
 {
@@ -65,6 +67,7 @@ struct InvestigationManifest
     std::vector<ArtifactRecord> artifacts;
     InvestigationSummary summary;
     std::string snapshotFile = "snapshot.session";
+    std::vector<EvidenceLink> evidenceLinks;
 };
 
 } // namespace scope::workspace

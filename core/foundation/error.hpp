@@ -24,7 +24,9 @@ enum class ErrorCode
     InvalidArgument, ///< An invalid argument was supplied.
     FileNotFound,    ///< A requested file could not be found.
     IOError,         ///< An input/output operation failed.
-    ParseError       ///< Data parsing failed.
+    ParseError,              ///< Data parsing failed.
+    InvalidLinkTarget,       ///< Timeline event anchor missing or invalid for a link.
+    DuplicateEvidenceLink    ///< Duplicate (source, target, type) evidence link.
 };
 
 /**
