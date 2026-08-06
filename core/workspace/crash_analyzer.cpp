@@ -227,6 +227,33 @@ std::optional<CrashFrame> parseFrameLine(const std::string& line)
     return frame;
 }
 
+std::optional<CrashFrame> parseSignalHandlerMarker(const std::string& line)
+{
+    if (line.find("<signal handler called>") == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    const auto frameIndex = extractFrameIndex(line);
+
+    if (!frameIndex.has_value())
+    {
+        return std::nullopt;
+    }
+
+    CrashFrame frame;
+    frame.index = *frameIndex;
+    frame.address = "0x0";
+    frame.symbol = "<signal handler called>";
+
+    return frame;
+}
+
+bool isSignalHandlerBoundaryFrame(const CrashFrame& frame)
+{
+    return frame.symbol == "<signal handler called>";
+}
+
 std::optional<std::string> extractSwitchingThreadId(const std::string& line)
 {
     static const std::regex pattern(R"(\[Switching to thread (\d+))", std::regex::icase);
@@ -322,8 +349,26 @@ bool isSystemRuntimeModule(const std::optional<std::string>& module)
 
 const CrashFrame* findApplicationFrame(const CrashThread& thread)
 {
-    for (const CrashFrame& frame : thread.frames)
+    std::size_t startIndex = 0U;
+
+    for (std::size_t index = 0U; index < thread.frames.size(); ++index)
     {
+        if (isSignalHandlerBoundaryFrame(thread.frames[index]))
+        {
+            startIndex = index + 1U;
+            break;
+        }
+    }
+
+    for (std::size_t index = startIndex; index < thread.frames.size(); ++index)
+    {
+        const CrashFrame& frame = thread.frames[index];
+
+        if (isSignalHandlerBoundaryFrame(frame) || isSignalAbortSymbol(frame.symbol))
+        {
+            continue;
+        }
+
         if (!isSystemRuntimeModule(frame.module) && !isIdleWaitSymbol(frame.symbol))
         {
             return &frame;
@@ -400,6 +445,11 @@ std::optional<std::string> selectFaultThreadId(const std::vector<CrashThread>& t
             bestScore = score;
             best = &thread;
         }
+    }
+
+    if (bestScore <= 0)
+    {
+        return std::nullopt;
     }
 
     return best->id;
@@ -612,6 +662,12 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
                 continue;
             }
 
+            if (const auto frame = parseSignalHandlerMarker(trimmed); frame.has_value())
+            {
+                currentThread->frames.push_back(*frame);
+                continue;
+            }
+
             if (const auto frame = parseFrameLine(trimmed); frame.has_value())
             {
                 currentThread->frames.push_back(*frame);
@@ -661,6 +717,11 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
 
                 report.observations.push_back(observation.str());
             }
+        }
+        else if (report.faultThreadId.has_value() == false)
+        {
+            report.observations.push_back(
+                "No fault thread identified (no abort chain or signal handler found)");
         }
 
         if (report.signal.has_value())
