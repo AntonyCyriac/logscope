@@ -12,7 +12,7 @@ At the beginning of a session, load (attach or reference):
 | 2 | [docs/handbook/CODE_MAP.md](docs/handbook/CODE_MAP.md) | Where CLI, desktop, web, core, and tests live |
 | 3 | [docs/release/v2.6.0-RELEASE-NOTES.md](docs/release/v2.6.0-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
 
-Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md)
+Optional: [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md) · [V260 scenarios](docs/planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) · [ADR-009-M15.8 Crash Analysis](docs/architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
 
 ## Principles
 
@@ -51,4 +51,4 @@ Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only unt
 
 ## Web UI browser automation
 
-For Story Gate or SPA demos on `logscope-web`, prefer **Playwright** ([`tests/e2e/web/README.md`](tests/e2e/web/README.md)). For manual checks, read [docs/handbook/BROWSER_MCP.md](docs/handbook/BROWSER_MCP.md) **before** using `cursor-ide-browser`. Never create orphan tabs with `browser_tabs new` alone — use `browser_navigate` to `http://127.0.0.1:8080` or lock an existing tab first.
+For Story Gate or SPA demos on `logscope-web`, prefer **Playwright** ([`tests/e2e/web/README.md`](tests/e2e/web/README.md)). For manual checks, read [docs/handbook/BROWSER_MCP.md](docs/handbook/BROWSER_MCP.md) **before** using `cursor-ide-browser`. Start the server with [`samples/demo-story-gate.properties`](samples/demo-story-gate.properties) and `LOGSCOPE_WEB_UI_DIR=apps/web/ui/dist`. Never create orphan tabs with `browser_tabs new` alone — use `browser_navigate` to `http://127.0.0.1:8080` or lock an existing tab first.
