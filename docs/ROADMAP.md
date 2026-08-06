@@ -66,7 +66,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.6.0`](CHANGELOG.md) — Story 4: Understand Why It Crashed (crash analysis projection). Prior: `v2.5.0` timeline, `v2.4.1` hotfix.
+**Current release:** [`v2.6.1`](CHANGELOG.md) — Story 4 hotfix (pstack fault-thread). Prior: `v2.6.0` Story 4, `v2.5.0` timeline.
 
 **Next:** Post–Story 4 investigation enhancements — see [Project Context](handbook/PROJECT_CONTEXT.md) and [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
