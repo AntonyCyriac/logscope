@@ -14,6 +14,7 @@
 #include "index_store_options.hpp"
 #include "source_snapshot.hpp"
 #include "sqlite_index_store.hpp"
+#include "sqlite_connection.hpp"
 
 namespace scope::storage
 {
@@ -110,6 +111,8 @@ openIncrementalStore(const StorageConfig& config, const foundation::Path& databa
 
         return false;
     }
+
+    (void)configureSqliteConnection(database);
 
     const auto snapshot = readStoredSourceSnapshot(database);
     sqlite3_close(database);

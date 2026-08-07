@@ -9,6 +9,7 @@ add_executable(scope_storage_tests
     index_store_factory_test.cpp
     query_planner_test.cpp
     source_snapshot_test.cpp
+    sqlite_connection_test.cpp
     sqlite_index_store_compression_test.cpp
     sqlite_index_store_fts_test.cpp
     sqlite_index_store_incremental_append_test.cpp
