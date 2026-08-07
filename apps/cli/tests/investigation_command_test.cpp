@@ -16,6 +16,7 @@
 using scope::cli::InvestigationAddNoteOptions;
 using scope::cli::InvestigationAddOptions;
 using scope::cli::InvestigationCreateOptions;
+using scope::cli::InvestigationLinksOptions;
 using scope::cli::InvestigationOpenOptions;
 using scope::cli::InvestigationShowOptions;
 using scope::cli::InvestigationTimelineFormat;
@@ -23,6 +24,7 @@ using scope::cli::InvestigationTimelineOptions;
 using scope::cli::runInvestigationAddCommand;
 using scope::cli::runInvestigationAddNoteCommand;
 using scope::cli::runInvestigationCreateCommand;
+using scope::cli::runInvestigationLinksCommand;
 using scope::cli::runInvestigationOpenCommand;
 using scope::cli::runInvestigationShowCommand;
 using scope::cli::runInvestigationTimelineCommand;
@@ -301,6 +303,33 @@ TEST_F(InvestigationCommandTest, ShowMarksEntryAndRole)
     EXPECT_NE(std::string::npos, showOutput.str().find("(log)"));
 
     std::filesystem::remove(appLog.string());
+}
+
+TEST_F(InvestigationCommandTest, LinksListTableOutputIncludesHeader)
+{
+    InvestigationLinksOptions options;
+    options.investigationId = m_investigationId;
+    options.rootDirectory = m_root;
+
+    std::ostringstream output;
+    std::ostringstream errorOutput;
+
+    ASSERT_EQ(0, runInvestigationLinksCommand(options, output, errorOutput));
+    EXPECT_NE(std::string::npos, output.str().find("id\ttype\tsource\ttarget\tstatus\tnote"));
+}
+
+TEST_F(InvestigationCommandTest, LinksListJsonOutputIncludesLinksArray)
+{
+    InvestigationLinksOptions options;
+    options.investigationId = m_investigationId;
+    options.rootDirectory = m_root;
+    options.format = InvestigationTimelineFormat::Json;
+
+    std::ostringstream output;
+    std::ostringstream errorOutput;
+
+    ASSERT_EQ(0, runInvestigationLinksCommand(options, output, errorOutput));
+    EXPECT_NE(std::string::npos, output.str().find("\"links\""));
 }
 
 TEST_F(InvestigationCommandTest, TimelineTableOutputIncludesEvents)

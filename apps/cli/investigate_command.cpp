@@ -5,7 +5,10 @@
 
 #include "investigate_command.hpp"
 
+#include <charconv>
+
 #include "analysis.hpp"
+#include "analysis_config.hpp"
 #include "cli_analysis_config.hpp"
 #include "cli_config.hpp"
 #include "cli_extension_runtime.hpp"
@@ -77,7 +80,35 @@ int runInvestigateCommand(const InvestigateOptions& options,
         return 1;
     }
 
+    std::size_t requestedMaxIndexedLines = scope::analysis::defaultIndexedLineCapacity;
+
+    if (configurationManager.configuration().has("investigation.max_indexed_lines"))
+    {
+        const auto limitValue = configurationManager.configuration().get("investigation.max_indexed_lines");
+
+        if (limitValue && !limitValue->empty())
+        {
+            std::uint64_t parsed = 0U;
+            const auto parseResult =
+                std::from_chars(limitValue->data(), limitValue->data() + limitValue->size(), parsed);
+
+            if (parseResult.ec == std::errc{} && parseResult.ptr == limitValue->data() + limitValue->size() &&
+                parsed > 0U)
+            {
+                requestedMaxIndexedLines = static_cast<std::size_t>(parsed);
+            }
+        }
+    }
+
     const scope::analysis::AnalysisConfig analysisConfig = buildAnalysisConfig(options, configurationManager);
+
+    if (requestedMaxIndexedLines > scope::analysis::maxConfigurableIndexedLines)
+    {
+        errorOutput << "WARNING: investigation.max_indexed_lines=" << requestedMaxIndexedLines
+                    << " exceeds maximum " << scope::analysis::maxConfigurableIndexedLines << "; using "
+                    << analysisConfig.maxIndexedLines << '\n';
+    }
+
     scope::analysis::AnalysisStats analysisStats;
     const auto modelResult =
         scope::analysis::AnalysisEngine{}.analyze(*datasetResult,

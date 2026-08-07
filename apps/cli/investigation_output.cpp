@@ -52,10 +52,11 @@ std::string formatTextInvestigation(const investigation::InvestigationResult& re
     output << "Truncated lines : " << result.truncatedLineCount << '\n';
     output << "Matching lines  : " << result.matchingLines.size() << '\n';
 
-    if (result.truncatedLineCount > 0U)
+    if (result.truncatedLineCount > 0U && result.searchOrFilterApplied)
     {
-        output << "\nWARNING: " << result.truncatedLineCount
-               << " lines were not indexed; search results may be incomplete.\n";
+        const std::uint64_t totalLines = result.indexedLineCount + result.truncatedLineCount;
+        output << "\nWARNING: results computed from the first " << result.indexedLineCount << " of " << totalLines
+               << " lines; use --persist-index for a complete result\n";
     }
 
     if (!result.matchingLines.empty())
