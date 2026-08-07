@@ -24,6 +24,7 @@ struct InvestigationResult
     CorrelationSummary correlations;
     std::uint64_t indexedLineCount{0U};
     std::uint64_t truncatedLineCount{0U};
+    bool searchOrFilterApplied{false};
     std::string searchQuerySummary;
     search::SearchMode searchMode{search::SearchMode::Text};
 };

@@ -330,6 +330,56 @@ TEST(CliE2eTest, InvestigatePersistIndexFindsLinesBeyondMemoryCap)
     std::remove(indexFile.c_str());
 
     EXPECT_NE(std::string::npos, output.find("PERSIST_INDEX_MARKER"));
+    EXPECT_NE(std::string::npos, output.find("Truncated lines : 0"));
+}
+
+TEST(CliE2eTest, InvestigatePartialIndexWarnsWhenFilterApplied)
+{
+    const std::string logFile = logscope::gtest::uniqueTestPath("_partial_index.log");
+
+    {
+        std::ofstream stream(logFile);
+
+        for (int lineNumber = 1; lineNumber <= 10001; ++lineNumber)
+        {
+            stream << "2026-07-11 10:00:00 INFO line " << lineNumber << '\n';
+        }
+    }
+
+    const std::string output =
+        runLogscope("investigate --filter \"level == INFO\" " + scope::test_support::quoteArgument(logFile));
+
+    std::remove(logFile.c_str());
+
+    EXPECT_NE(std::string::npos,
+              output.find("WARNING: results computed from the first 10000 of 10001 lines; use --persist-index for a "
+                          "complete result"));
+}
+
+TEST(CliE2eTest, InvestigateWarnsWhenMaxIndexedLinesClamped)
+{
+    const std::string configFile = logscope::gtest::uniqueTestPath("_clamp_max_indexed.properties");
+    const std::string logFile = logscope::gtest::uniqueTestPath("_clamp_max_indexed.log");
+
+    {
+        std::ofstream configStream(configFile);
+        configStream << "investigation.max_indexed_lines=2000000\n";
+    }
+
+    {
+        std::ofstream logStream(logFile);
+        logStream << "2026-07-11 10:00:00 INFO line\n";
+    }
+
+    const std::string output =
+        runLogscope("investigate --config " + scope::test_support::quoteArgument(configFile) + " " +
+                    scope::test_support::quoteArgument(logFile));
+
+    std::remove(configFile.c_str());
+    std::remove(logFile.c_str());
+
+    EXPECT_NE(std::string::npos,
+              output.find("WARNING: investigation.max_indexed_lines=2000000 exceeds maximum 1000000; using 1000000"));
 }
 
 TEST(CliE2eTest, QueryPersistedJsonFieldFilter)

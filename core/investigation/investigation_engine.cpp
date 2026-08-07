@@ -160,6 +160,7 @@ InvestigationResult InvestigationEngine::investigate(const analysis::AnalysisMod
     }
 
     const query::QueryEvaluator filterEvaluator(activeFilter);
+    result.searchOrFilterApplied = activeQuery.isActive() || activeFilter.isActive();
 
     if (criteria.searchProviderId.has_value())
     {

@@ -616,3 +616,34 @@ TEST(CliParserTest, ParsesAgentInvestigateOptions)
     EXPECT_TRUE(parsed->agentInvestigate.hints);
     EXPECT_EQ("sample.log", parsed->agentInvestigate.investigate.logFile.string());
 }
+
+TEST(CliParserTest, ParsesInvestigationLinksListOptions)
+{
+    std::string program = "logscope";
+    std::string command = "investigation";
+    std::string subcommand = "links";
+    std::string verb = "list";
+    std::string investigationId = "00000000-0000-4000-8000-000000000005";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(verb), toArgv(investigationId)};
+
+    const auto parsed = parseCliArguments(5, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationLinks, parsed->command);
+    EXPECT_EQ(investigationId, parsed->investigationLinks.investigationId);
+}
+
+TEST(CliParserTest, ParsesHelpInvestigationLinks)
+{
+    std::string program = "logscope";
+    std::string command = "help";
+    std::string subcommand = "investigation";
+    std::string verb = "links";
+    char* argv[] = {toArgv(program), toArgv(command), toArgv(subcommand), toArgv(verb)};
+
+    const auto parsed = parseCliArguments(4, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(CliCommand::InvestigationLinks, parsed->command);
+    EXPECT_TRUE(parsed->investigationLinks.showHelp);
+}

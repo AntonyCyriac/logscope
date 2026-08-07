@@ -1935,7 +1935,7 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
             return parsed;
         }
 
-        if (argc >= 5 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "links")
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "links")
         {
             parsed.command = CliCommand::InvestigationLinks;
             parsed.investigationLinks.showHelp = true;
@@ -2288,7 +2288,7 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
         if (subcommand == "links")
         {
-            const auto options = parseInvestigationLinksArguments(argc, argv, 4);
+            const auto options = parseInvestigationLinksArguments(argc, argv, 3);
 
             if (!options)
             {

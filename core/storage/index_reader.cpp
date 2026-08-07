@@ -108,9 +108,17 @@ std::uint64_t IndexReader::truncatedLineCount() const noexcept
 {
     if (m_persistentStore != nullptr && m_persistentStore->storedLineCount() > 0U)
     {
-        if (m_memoryIndex != nullptr && m_persistentStore->storedLineCount() > m_memoryIndex->indexedLineCount())
+        const std::uint64_t stored = m_persistentStore->storedLineCount();
+        const std::uint64_t total = m_persistentStore->metadata().totalLines;
+
+        if (total > 0U && stored >= total)
         {
-            return m_persistentStore->storedLineCount() - m_memoryIndex->indexedLineCount();
+            return 0U;
+        }
+
+        if (total > stored)
+        {
+            return total - stored;
         }
 
         return 0U;
