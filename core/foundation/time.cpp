@@ -130,6 +130,21 @@ std::string Time::toString() const
     stream << std::setfill('0') << std::setw(2) << m_hour << ':' << std::setw(2) << m_minute
            << ':' << std::setw(2) << m_second;
 
+    if (m_nanosecond != 0)
+    {
+        std::ostringstream fraction;
+        fraction << std::setfill('0') << std::setw(9) << m_nanosecond;
+
+        std::string fractionText = fraction.str();
+
+        while (!fractionText.empty() && fractionText.back() == '0')
+        {
+            fractionText.pop_back();
+        }
+
+        stream << '.' << fractionText;
+    }
+
     return stream.str();
 }
 

@@ -130,7 +130,7 @@ std::string Timestamp::toString() const
         return "invalid-timestamp";
     }
 
-    return dateTimeResult->toString();
+    return dateTimeResult->toString() + 'Z';
 }
 
 Result<Duration> Timestamp::difference(const Timestamp& later, const Timestamp& earlier)

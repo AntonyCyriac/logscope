@@ -80,3 +80,10 @@ TEST(TimeTest, Ordering)
     EXPECT_LT(Time(10, 0, 0), Time(11, 0, 0));
     EXPECT_LT(Time(10, 0, 0), Time(10, 1, 0));
 }
+
+TEST(TimeTest, ToStringIncludesFractionalSeconds)
+{
+    const Time time(14, 30, 45, 101000000);
+
+    EXPECT_EQ("14:30:45.101", time.toString());
+}

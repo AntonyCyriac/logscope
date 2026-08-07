@@ -198,3 +198,42 @@ TEST(InvestigationTimelineTest, DescendingOrderReversesChronology)
     EXPECT_EQ("second", timelineResult->events[0].message);
     EXPECT_EQ("first", timelineResult->events[1].message);
 }
+
+TEST(InvestigationTimelineTest, PreservesSubSecondPrecisionAndMessageBoundaries)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_subsecond"));
+    const Path appLog(logscope::gtest::uniqueTestPath("_subsecond.log"));
+
+    writeFile(appLog,
+              "2026-07-28T09:15:01.101Z FE01 INFO ManagerA started\n"
+              "2026-07-28T09:15:01.842Z FE01 INFO ManagerB finished\n");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "timeline-subsecond";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest appRequest;
+    appRequest.type = "log";
+    appRequest.name = "app.log";
+    appRequest.sourceFile = appLog;
+    appRequest.source = ArtifactSource{"upload", "app.log"};
+
+    ASSERT_TRUE(investigation.addArtifact(appRequest));
+
+    const auto timelineResult = investigation.projectTimeline();
+
+    ASSERT_TRUE(timelineResult.hasValue());
+    ASSERT_EQ(2U, timelineResult->events.size());
+    EXPECT_EQ("2026-07-28T09:15:01.101Z", timelineResult->events[0].timestamp);
+    EXPECT_EQ("2026-07-28T09:15:01.842Z", timelineResult->events[1].timestamp);
+    EXPECT_EQ("FE01 INFO ManagerA started", timelineResult->events[0].message);
+    EXPECT_EQ("FE01 INFO ManagerB finished", timelineResult->events[1].message);
+    EXPECT_NE(timelineResult->events[0].timestamp, timelineResult->events[1].timestamp);
+    EXPECT_FALSE(timelineResult->events[0].message.empty());
+    EXPECT_NE('.', timelineResult->events[0].message.front());
+}
