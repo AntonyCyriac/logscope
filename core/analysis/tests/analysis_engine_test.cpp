@@ -4,15 +4,19 @@
  */
 
 #include <fstream>
+#include <sstream>
 
 #include <gtest/gtest.h>
 
 #include "analysis.hpp"
 #include "gtest_temp_path.hpp"
+#include "runtime.hpp"
 #include "source.hpp"
 
 using scope::analysis::AnalysisEngine;
 using scope::foundation::Path;
+using scope::runtime::Diagnostics;
+using scope::runtime::LogLevel;
 using scope::source::SourceDataset;
 using scope::source::SourceManager;
 
@@ -187,6 +191,48 @@ TEST_F(AnalysisEngineTest, RejectsBinaryInput)
     EXPECT_NE(std::string::npos, modelResult.error().message().find("binary"));
 
     std::remove(binaryFile.string().c_str());
+}
+
+TEST_F(AnalysisEngineTest, AnalyzesLogWithEmbeddedNullByte)
+{
+    const Path nulFile(logscope::gtest::uniqueTestPath("_nul.log"));
+
+    {
+        std::ofstream stream(nulFile.string(), std::ios::binary);
+        stream << "2026-01-01 00:00:00 INFO intact line one\n";
+
+        std::string affectedLine = "2026-01-01 00:00:01 INFO before";
+        affectedLine.push_back('\0');
+        affectedLine.append("NULBYTE after\n");
+        stream << affectedLine;
+
+        stream << "2026-01-01 00:00:02 INFO intact line three\n";
+    }
+
+    std::ostringstream diagnosticsOutput;
+    Diagnostics& diagnostics = Diagnostics::instance();
+    diagnostics.setOutputStream(&diagnosticsOutput);
+    diagnostics.setMinLevel(LogLevel::Info);
+
+    SourceManager sourceManager;
+
+    auto datasetResult = sourceManager.open(nulFile);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    const auto modelResult = AnalysisEngine{}.analyze(*datasetResult);
+
+    diagnostics.setOutputStream(nullptr);
+
+    ASSERT_TRUE(modelResult.hasValue());
+    EXPECT_EQ(3U, modelResult->totalLines());
+    EXPECT_EQ(scope::analysis::LogFormat::PlainText, modelResult->format());
+    EXPECT_EQ(3U, modelResult->levelCounts().infoLines());
+    EXPECT_NE(std::string::npos, diagnosticsOutput.str().find("[WARN]"));
+    EXPECT_NE(std::string::npos, diagnosticsOutput.str().find("non-text bytes"));
+    EXPECT_NE(std::string::npos, diagnosticsOutput.str().find("1 log line"));
+
+    std::remove(nulFile.string().c_str());
 }
 
 TEST_F(AnalysisEngineTest, HonorsPlainFormatOverride)

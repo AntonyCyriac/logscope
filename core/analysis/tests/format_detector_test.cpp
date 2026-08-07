@@ -61,16 +61,47 @@ TEST(FormatDetectorTest, DetectsJsonLines)
     EXPECT_EQ(LogFormat::JsonLines, result.format);
 }
 
-TEST(FormatDetectorTest, DetectsBinaryNullByte)
+TEST(FormatDetectorTest, DoesNotRejectIsolatedNullByteInTextLog)
 {
-    std::string binaryLine = "hello";
-    binaryLine.push_back('\0');
-    binaryLine.append("world");
+    const std::vector<std::string> lines = {
+        "2026-01-01 00:00:00 INFO before",
+    };
+
+    std::string affectedLine = lines.front();
+    affectedLine.push_back('\0');
+    affectedLine.append("NULBYTE after");
+
+    const auto result = FormatDetector::detect(std::vector<std::string>{affectedLine});
+
+    EXPECT_FALSE(result.looksBinary);
+    EXPECT_EQ(LogFormat::PlainText, result.format);
+}
+
+TEST(FormatDetectorTest, DetectsHighRatioBinaryContent)
+{
+    std::string binaryLine;
+    binaryLine.reserve(32U);
+
+    for (int index = 0; index < 16; ++index)
+    {
+        binaryLine.push_back(static_cast<char>(index));
+    }
 
     const auto result = FormatDetector::detect(std::vector<std::string>{binaryLine});
 
     EXPECT_TRUE(result.looksBinary);
     EXPECT_EQ(LogFormat::Unknown, result.format);
+}
+
+TEST(FormatDetectorTest, SanitizeLogLineRemovesNullBytes)
+{
+    std::string line = "before";
+    line.push_back('\0');
+    line.append("after");
+
+    EXPECT_TRUE(FormatDetector::sanitizeLogLine(line));
+    EXPECT_EQ("beforeafter", line);
+    EXPECT_FALSE(FormatDetector::sanitizeLogLine(line));
 }
 
 TEST(FormatDetectorTest, EmptySampleIsPlainText)

@@ -5,6 +5,7 @@
 
 #include "format_detector.hpp"
 
+#include <algorithm>
 #include <cctype>
 
 namespace scope::analysis
@@ -105,23 +106,18 @@ namespace
 
     for (const unsigned char character : text)
     {
-        if (character == '\0')
-        {
-            return true;
-        }
-
         if (character == '\n' || character == '\r' || character == '\t')
         {
             continue;
         }
 
-        if (character < 0x20U || character == 0x7FU)
+        if (character == '\0' || character < 0x20U || character == 0x7FU)
         {
             ++nonPrintable;
         }
     }
 
-    // Reject samples with a high density of control characters.
+    // Reject samples with a high density of control characters (including NUL).
     return nonPrintable * 10U >= text.size();
 }
 
@@ -220,6 +216,14 @@ FormatDetectionResult FormatDetector::detect(const std::string_view sampleText)
     }
 
     return detect(lines);
+}
+
+bool FormatDetector::sanitizeLogLine(std::string& line) noexcept
+{
+    const std::size_t originalSize = line.size();
+    line.erase(std::remove(line.begin(), line.end(), '\0'), line.end());
+
+    return line.size() != originalSize;
 }
 
 } // namespace scope::analysis

@@ -268,6 +268,26 @@ void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const 
     analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer);
 }
 
+void trackSanitizedLine(std::string& line, std::size_t& sanitizedLineCount) noexcept
+{
+    if (FormatDetector::sanitizeLogLine(line))
+    {
+        ++sanitizedLineCount;
+    }
+}
+
+void warnSanitizedLines(const std::size_t sanitizedLineCount) noexcept
+{
+    if (sanitizedLineCount == 0U)
+    {
+        return;
+    }
+
+    SCOPE_LOG_WARN("analysis",
+                   "Removed non-text bytes from " + std::to_string(sanitizedLineCount) +
+                       " log line(s); affected content was sanitized.");
+}
+
 [[nodiscard]] foundation::Result<LogFormat> resolveFormat(const FormatDetectionResult& detection,
                                                           const LogFormat formatHint)
 {
@@ -393,6 +413,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     source::LogSource& logSource = dataset.source();
     LogFormat resolvedFormat{LogFormat::PlainText};
     storage::IndexStorePtr persistentStore;
+    std::size_t sanitizedLineCount = 0U;
 
     if (appendReuse.has_value())
     {
@@ -497,7 +518,7 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
         JsonLinesSummary* jsonSummaryPointer = jsonLinesSummary.has_value() ? &*jsonLinesSummary : nullptr;
 
-        for (const std::string& sampleLine : sampleLines)
+        for (std::string& sampleLine : sampleLines)
         {
             ++totalLines;
 
@@ -505,6 +526,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             {
                 byteCount += sampleLine.size() + 1U;
             }
+
+            trackSanitizedLine(sampleLine, sanitizedLineCount);
 
             analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
                         indexWriter, config.jsonFieldMapping, pluginParser);
@@ -526,6 +549,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 break;
             }
 
+            trackSanitizedLine(line, sanitizedLineCount);
+
             ++totalLines;
 
             if (accumulateReadBytes)
@@ -545,6 +570,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         }
 
         SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
+
+        warnSanitizedLines(sanitizedLineCount);
 
         recordStats(totalLines, byteCount, false);
 
@@ -587,6 +614,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             break;
         }
 
+        trackSanitizedLine(line, sanitizedLineCount);
+
         ++totalLines;
 
         if (accumulateReadBytes)
@@ -606,6 +635,8 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines after append");
+
+    warnSanitizedLines(sanitizedLineCount);
 
     recordStats(totalLines, byteCount, false);
 
