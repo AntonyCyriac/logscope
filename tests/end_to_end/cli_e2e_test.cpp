@@ -544,3 +544,22 @@ TEST(CliE2eTest, AgentInvestigateRejectsInvalidAsk)
     EXPECT_EQ(std::string::npos, output.find("========== INVESTIGATION RESULT =========="));
     EXPECT_NE(std::string::npos, output.find("Noop provider"));
 }
+
+TEST(CliE2eTest, UnknownCommandReportsHelpfulError)
+{
+    const std::string output = runLogscope("frobnicate");
+
+    EXPECT_NE(std::string::npos, output.find("Unknown command 'frobnicate'"));
+    EXPECT_NE(std::string::npos, output.find("logscope --help"));
+    EXPECT_EQ(std::string::npos, output.find("Log source not found"));
+}
+
+TEST(CliE2eTest, MisspelledCommandSuggestsNearestMatch)
+{
+    const std::string output = runLogscope("investigatte " +
+                                           scope::test_support::quoteArgument(sourcePath("samples/sample.log")));
+
+    EXPECT_NE(std::string::npos, output.find("Unknown command 'investigatte'"));
+    EXPECT_NE(std::string::npos, output.find("Did you mean 'investigate'?"));
+    EXPECT_EQ(std::string::npos, output.find("Log source not found"));
+}

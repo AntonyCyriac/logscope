@@ -5,6 +5,12 @@
 
 #include "cli_application.hpp"
 
+#include <algorithm>
+#include <cstddef>
+#include <optional>
+#include <string_view>
+#include <vector>
+
 #include "agent_command.hpp"
 #include "analyze_command.hpp"
 #include "analytics_command.hpp"
@@ -18,6 +24,67 @@
 
 namespace scope::cli
 {
+
+namespace
+{
+
+constexpr std::string_view knownCommands[] = {
+    "analyze",      "investigate", "search",    "query",       "analytics", "config",
+    "extensions",   "session",     "investigation", "agent",     "help",
+};
+
+std::size_t editDistance(std::string_view left, std::string_view right)
+{
+    const std::size_t leftSize = left.size();
+    const std::size_t rightSize = right.size();
+
+    std::vector<std::size_t> previous(rightSize + 1U);
+    std::vector<std::size_t> current(rightSize + 1U);
+
+    for (std::size_t index = 0; index <= rightSize; ++index)
+    {
+        previous[index] = index;
+    }
+
+    for (std::size_t leftIndex = 1; leftIndex <= leftSize; ++leftIndex)
+    {
+        current[0] = leftIndex;
+
+        for (std::size_t rightIndex = 1; rightIndex <= rightSize; ++rightIndex)
+        {
+            const std::size_t substitutionCost =
+                left[leftIndex - 1U] == right[rightIndex - 1U] ? 0U : 1U;
+
+            current[rightIndex] = std::min({previous[rightIndex] + 1U, current[rightIndex - 1U] + 1U,
+                                            previous[rightIndex - 1U] + substitutionCost});
+        }
+
+        previous.swap(current);
+    }
+
+    return previous[rightSize];
+}
+
+std::optional<std::string_view> suggestNearestCommand(std::string_view command)
+{
+    std::optional<std::string_view> bestMatch;
+    std::size_t bestDistance = 3U;
+
+    for (const std::string_view candidate : knownCommands)
+    {
+        const std::size_t distance = editDistance(command, candidate);
+
+        if (distance < bestDistance)
+        {
+            bestDistance = distance;
+            bestMatch = candidate;
+        }
+    }
+
+    return bestMatch;
+}
+
+} // namespace
 
 void CliApplication::printUsage(std::ostream& output)
 {
@@ -50,6 +117,18 @@ void CliApplication::printUsage(std::ostream& output)
            << "\n"
            << "Global options:\n"
            << "  --help, -h         Show this help message\n";
+}
+
+void CliApplication::printUnknownCommandError(std::ostream& errorOutput, const std::string& command)
+{
+    errorOutput << "Unknown command '" << command << "'.";
+
+    if (const auto suggestion = suggestNearestCommand(command))
+    {
+        errorOutput << " Did you mean '" << *suggestion << "'?";
+    }
+
+    errorOutput << " Run 'logscope --help' for available commands.\n";
 }
 
 int CliApplication::run(const ParsedCli& parsed,

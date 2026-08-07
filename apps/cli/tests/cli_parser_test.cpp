@@ -581,6 +581,31 @@ TEST(CliParserTest, RejectsInvalidOption)
     EXPECT_FALSE(parseCliArguments(2, argv));
 }
 
+TEST(CliParserTest, RejectsUnknownCommandWhenLogSourceMissing)
+{
+    std::string program = "logscope";
+    std::string unknownCommand = "frobnicate";
+    char* argv[] = {toArgv(program), toArgv(unknownCommand)};
+
+    const auto parsed = parseCliArguments(2, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(unknownCommand, parsed->unknownCommand);
+}
+
+TEST(CliParserTest, RejectsMisspelledCommandWhenLogSourceMissing)
+{
+    std::string program = "logscope";
+    std::string misspelledCommand = "investigatte";
+    std::string logFile = "sample.log";
+    char* argv[] = {toArgv(program), toArgv(misspelledCommand), toArgv(logFile)};
+
+    const auto parsed = parseCliArguments(3, argv);
+
+    ASSERT_TRUE(parsed);
+    EXPECT_EQ(misspelledCommand, parsed->unknownCommand);
+}
+
 TEST(CliParserTest, ParsesAgentHelp)
 {
     std::string program = "logscope";

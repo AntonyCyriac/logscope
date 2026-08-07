@@ -31,6 +31,11 @@ class CliApplication
      * @brief Prints top-level CLI usage.
      */
     static void printUsage(std::ostream& output);
+
+    /**
+     * @brief Prints an unknown-command error with an optional suggestion.
+     */
+    static void printUnknownCommandError(std::ostream& errorOutput, const std::string& command);
 };
 
 } // namespace scope::cli

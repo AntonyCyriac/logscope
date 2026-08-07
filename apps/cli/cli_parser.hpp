@@ -295,6 +295,7 @@ struct ParsedCli
     InvestigationLinksOptions investigationLinks;
     AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
+    std::string unknownCommand;
 };
 
 /**
