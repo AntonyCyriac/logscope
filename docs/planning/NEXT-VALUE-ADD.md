@@ -64,6 +64,7 @@ Next    → Story 5 Connect the Evidence — P0.1 Evidence Links (§5)
 | **P0.2** | Evidence Groups | **Implementation** | Named clusters of related events |
 | **P0.3** | Correlation View | **Deferred** | When links are rich |
 | **P1** | Crash Timeline | **Implementation** — quick win | `crash.summary` on timeline projection — deferred from v2.6.0; small release |
+| **P1.1** | Alternate pstack dialects / pluggable crash analyzer | **Backlog** — [#144](https://github.com/AntonyCyriac/logscope/issues/144) | Non-GDB `TID n:` / `symbol - /path` dumps; optional `register_crash_analyzer` plugin hook — post-`v2.7.1`, not v2.7.x patch |
 | **P2** | Desktop Timeline/Crash parity | **Implementation** | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
 | **P3** | ADR-010 domain model + events | **Emergent** | Extract when patterns recur after P0–P1 |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
@@ -112,3 +113,4 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.6.0 | 06-08-2026 | Execution Contract v2 reassessment — P0–P5 queue; Connect the Evidence is next flagship; P4/P5 research only. |
 | 1.7.0 | 06-08-2026 | Story 5 **Connect the Evidence** — timeline-first Evidence Links; Correlation view deferred (P0.3). |
 | 1.8.0 | 06-08-2026 | Phase A = five stories; Story 5 completes investigation methodology; relationships are evidence not conclusions. |
+| 1.9.0 | 07-08-2026 | `v2.7.1` shipped; [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects backlogged as P1.1. |
