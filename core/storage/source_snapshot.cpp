@@ -9,6 +9,7 @@
 
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
+#include "sqlite_connection.hpp"
 #include "sqlite3.h"
 
 namespace scope::storage
@@ -24,8 +25,7 @@ namespace
 
     if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
     {
-        return foundation::Result<std::string>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+        return foundation::Result<std::string>(makeSqliteError(database));
     }
 
     sqlite3_bind_text(statement, 1, key.c_str(), -1, SQLITE_TRANSIENT);

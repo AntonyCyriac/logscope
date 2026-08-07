@@ -50,6 +50,7 @@ add_library(scope_storage
     query_cache_key.cpp
     schema_version.cpp
     source_snapshot.cpp
+    sqlite_connection.cpp
     sqlite_index_store.cpp
     storage_config.cpp
     workspace_paths.cpp

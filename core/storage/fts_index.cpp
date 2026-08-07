@@ -9,6 +9,7 @@
 
 #include "content_codec.hpp"
 #include "foundation/error.hpp"
+#include "sqlite_connection.hpp"
 
 namespace scope::storage
 {
@@ -23,14 +24,12 @@ namespace
 
     if (result != SQLITE_OK)
     {
-        const std::string message = errorMessage != nullptr ? errorMessage : sqlite3_errmsg(database);
-
         if (errorMessage != nullptr)
         {
             sqlite3_free(errorMessage);
         }
 
-        return foundation::Result<bool>(foundation::Error(foundation::ErrorCode::IOError, message));
+        return foundation::Result<bool>(makeSqliteError(database, result));
     }
 
     return foundation::Result<bool>(true);
@@ -83,7 +82,7 @@ namespace
     if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     sqlite3_stmt* insertStatement = nullptr;
@@ -233,7 +232,7 @@ foundation::Result<bool> insertFtsLine(sqlite3* database, sqlite3_stmt*& insertS
         if (sqlite3_prepare_v2(database, sql, -1, &insertStatement, nullptr) != SQLITE_OK)
         {
             return foundation::Result<bool>(
-                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+                makeSqliteError(database));
         }
     }
 
@@ -249,7 +248,7 @@ foundation::Result<bool> insertFtsLine(sqlite3* database, sqlite3_stmt*& insertS
     if (stepResult != SQLITE_DONE)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     return foundation::Result<bool>(true);

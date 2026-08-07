@@ -23,6 +23,7 @@
 #include "query_cache_codec.hpp"
 #include "query_cache_key.hpp"
 #include "schema_version.hpp"
+#include "sqlite_connection.hpp"
 
 namespace scope::storage
 {
@@ -56,14 +57,12 @@ namespace
 
     if (result != SQLITE_OK)
     {
-        const std::string message = errorMessage != nullptr ? errorMessage : sqlite3_errmsg(database);
-
         if (errorMessage != nullptr)
         {
             sqlite3_free(errorMessage);
         }
 
-        return foundation::Result<bool>(foundation::Error(foundation::ErrorCode::IOError, message));
+        return foundation::Result<bool>(makeSqliteError(database, result));
     }
 
     return foundation::Result<bool>(true);
@@ -162,7 +161,7 @@ namespace
     if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     sqlite3_bind_text(statement, 1, key.c_str(), -1, SQLITE_TRANSIENT);
@@ -174,7 +173,7 @@ namespace
     if (stepResult != SQLITE_DONE)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database, stepResult));
     }
 
     return foundation::Result<bool>(true);
@@ -188,7 +187,7 @@ namespace
     if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<std::string>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     sqlite3_bind_text(statement, 1, key.c_str(), -1, SQLITE_TRANSIENT);
@@ -392,7 +391,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
         if (sqlite3_prepare_v2(database, sql, -1, &insertStatement, nullptr) != SQLITE_OK)
         {
             return foundation::Result<bool>(
-                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+                makeSqliteError(database));
         }
     }
 
@@ -410,7 +409,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
         if (stepResult != SQLITE_DONE)
         {
             return foundation::Result<bool>(
-                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+                makeSqliteError(database, stepResult));
         }
     }
 
@@ -555,7 +554,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     if (sqlite3_prepare_v2(database, "SELECT COUNT(*) FROM query_cache;", -1, &countStatement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     std::size_t entryCount = 0U;
@@ -581,7 +580,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     if (sqlite3_prepare_v2(database, deleteSql, -1, &deleteStatement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     sqlite3_bind_int64(deleteStatement, 1, static_cast<sqlite3_int64>(deleteCount));
@@ -591,7 +590,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     if (stepResult != SQLITE_DONE)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database, stepResult));
     }
 
     return foundation::Result<bool>(true);
@@ -619,7 +618,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     if (sqlite3_prepare_v2(database, sql, -1, &statement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     sqlite3_bind_text(statement, 1, cacheKey.c_str(), -1, SQLITE_TRANSIENT);
@@ -632,7 +631,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     if (stepResult != SQLITE_DONE)
     {
         return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database, stepResult));
     }
 
     return foundation::Result<bool>(true);
@@ -667,7 +666,7 @@ fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lin
     if (sqlite3_prepare_v2(database, sql.c_str(), -1, &statement, nullptr) != SQLITE_OK)
     {
         return foundation::Result<std::vector<analysis::IndexedLine>>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(database)));
+            makeSqliteError(database));
     }
 
     std::vector<analysis::IndexedLine> lines;
@@ -795,8 +794,7 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
 
         if (sqlite3_prepare_v2(m_impl->database, sql, -1, &m_impl->insertStatement, nullptr) != SQLITE_OK)
         {
-            return foundation::Result<bool>(
-                foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+            return foundation::Result<bool>(makeSqliteError(m_impl->database));
         }
     }
 
@@ -844,8 +842,7 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
 
     if (stepResult != SQLITE_DONE)
     {
-        return foundation::Result<bool>(
-            foundation::Error(foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+        return foundation::Result<bool>(makeSqliteError(m_impl->database, stepResult));
     }
 
     const sqlite3_int64 lineId = sqlite3_last_insert_rowid(m_impl->database);
@@ -906,17 +903,29 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
     if (sqlite3* database = nullptr;
         sqlite3_open(databasePath.string().c_str(), &database) != SQLITE_OK)
     {
-        const std::string message = database != nullptr ? sqlite3_errmsg(database) : "Unable to open database.";
+        const foundation::Error error = database != nullptr
+                                            ? makeSqliteError(database)
+                                            : foundation::Error(foundation::ErrorCode::IOError,
+                                                                "Unable to open database.");
 
         if (database != nullptr)
         {
             sqlite3_close(database);
         }
 
-        return foundation::Result<IndexStorePtr>(foundation::Error(foundation::ErrorCode::IOError, message));
+        return foundation::Result<IndexStorePtr>(error);
     }
     else
     {
+        const auto connectionResult = configureSqliteConnection(database);
+
+        if (!connectionResult)
+        {
+            sqlite3_close(database);
+
+            return foundation::Result<IndexStorePtr>(connectionResult.error());
+        }
+
         auto impl = std::make_unique<Impl>();
         impl->database = database;
         impl->databasePath = databasePath;
@@ -1001,14 +1010,26 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path&
 
     if (sqlite3_open(databasePath.string().c_str(), &database) != SQLITE_OK)
     {
-        const std::string message = database != nullptr ? sqlite3_errmsg(database) : "Unable to open database.";
+        const foundation::Error error = database != nullptr
+                                            ? makeSqliteError(database)
+                                            : foundation::Error(foundation::ErrorCode::IOError,
+                                                                "Unable to open database.");
 
         if (database != nullptr)
         {
             sqlite3_close(database);
         }
 
-        return foundation::Result<IndexStorePtr>(foundation::Error(foundation::ErrorCode::IOError, message));
+        return foundation::Result<IndexStorePtr>(error);
+    }
+
+    const auto connectionResult = configureSqliteConnection(database);
+
+    if (!connectionResult)
+    {
+        sqlite3_close(database);
+
+        return foundation::Result<IndexStorePtr>(connectionResult.error());
     }
 
     auto impl = std::make_unique<Impl>();
@@ -1239,8 +1260,8 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLi
 
     if (sqlite3_prepare_v2(m_impl->database, sql.c_str(), -1, &statement, nullptr) != SQLITE_OK)
     {
-        return foundation::Result<std::vector<analysis::IndexedLine>>(foundation::Error(
-            foundation::ErrorCode::IOError, sqlite3_errmsg(m_impl->database)));
+        return foundation::Result<std::vector<analysis::IndexedLine>>(
+            makeSqliteError(m_impl->database));
     }
 
     std::vector<analysis::IndexedLine> lines;
