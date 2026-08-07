@@ -9,6 +9,7 @@
 #include <string_view>
 
 #include "analytics_command.hpp"
+#include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
 #include "foundation/timestamp.hpp"
 #include "log_format.hpp"
@@ -26,6 +27,18 @@ std::optional<std::uint64_t> parseUnsignedArgument(const char* value);
 bool isOption(const std::string& argument) noexcept
 {
     return argument.size() > 1 && argument.front() == '-';
+}
+
+bool canTreatAsLegacyLogSource(const std::string& token)
+{
+    if (token == "-" || isOption(token))
+    {
+        return true;
+    }
+
+    const auto existsResult = foundation::FileSystem::exists(foundation::Path(token));
+
+    return existsResult.hasValue() && existsResult.value();
 }
 
 std::vector<std::string> splitRequiredKeys(std::string_view value)
@@ -2336,6 +2349,13 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         }
 
         return std::nullopt;
+    }
+
+    if (!canTreatAsLegacyLogSource(firstArgument))
+    {
+        parsed.unknownCommand = firstArgument;
+
+        return parsed;
     }
 
     const auto legacyOptions = parseAnalyzeArguments(argc, argv, 1);

@@ -20,6 +20,13 @@ int main(int argc, char* argv[])
         return 1;
     }
 
+    if (!parsed->unknownCommand.empty())
+    {
+        scope::cli::CliApplication::printUnknownCommandError(std::cerr, parsed->unknownCommand);
+
+        return 1;
+    }
+
     scope::configuration::ConfigurationManager configurationManager;
 
     const scope::cli::CliApplication application;
