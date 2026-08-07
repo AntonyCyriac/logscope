@@ -12,6 +12,11 @@ namespace scope::foundation
 
 Result<DateTime> DateTime::parse(std::string_view value)
 {
+    if (!value.empty() && (value.back() == 'Z' || value.back() == 'z'))
+    {
+        value.remove_suffix(1U);
+    }
+
     const std::size_t separator = value.find('T');
 
     if (separator == std::string_view::npos)

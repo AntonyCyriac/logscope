@@ -33,3 +33,27 @@ TEST(PlainTextFieldExtractorTest, ParsesZuluTimestampSuffix)
 
     ASSERT_TRUE(timestamp.hasValue());
 }
+
+TEST(PlainTextFieldExtractorTest, ExtractsFractionalSecondTimestampWithoutLeakingIntoMessage)
+{
+    const auto fields = PlainTextFieldExtractor::extract(
+        "2026-07-28T09:15:01.101Z FE01 INFO ManagerA started");
+
+    ASSERT_TRUE(fields.timestamp.has_value());
+    EXPECT_EQ("2026-07-28T09:15:01.101Z", fields.timestamp->toString());
+    EXPECT_EQ("FE01 INFO ManagerA started", fields.messageExcerpt);
+    EXPECT_NE('.', fields.messageExcerpt.empty() ? ' ' : fields.messageExcerpt.front());
+}
+
+TEST(PlainTextFieldExtractorTest, DistinguishesSubSecondTimestamps)
+{
+    const auto first =
+        PlainTextFieldExtractor::extract("2026-07-28T09:15:01.101Z FE01 INFO ManagerA started");
+    const auto second =
+        PlainTextFieldExtractor::extract("2026-07-28T09:15:01.842Z FE01 INFO ManagerB finished");
+
+    ASSERT_TRUE(first.timestamp.has_value());
+    ASSERT_TRUE(second.timestamp.has_value());
+    EXPECT_NE(first.timestamp->toString(), second.timestamp->toString());
+    EXPECT_LT(*first.timestamp, *second.timestamp);
+}

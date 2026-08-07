@@ -20,7 +20,7 @@ TEST(TimestampTest, DefaultConstruction)
 
     EXPECT_EQ(0, timestamp.unixNanoseconds());
     EXPECT_EQ(0, timestamp.unixSeconds());
-    EXPECT_EQ("1970-01-01T00:00:00", timestamp.toString());
+    EXPECT_EQ("1970-01-01T00:00:00Z", timestamp.toString());
 }
 
 TEST(TimestampTest, FromUnixSeconds)
@@ -45,7 +45,15 @@ TEST(TimestampTest, ParseValid)
     auto result = Timestamp::parse("2024-06-15T14:30:45");
 
     ASSERT_TRUE(result.hasValue());
-    EXPECT_EQ("2024-06-15T14:30:45", result->toString());
+    EXPECT_EQ("2024-06-15T14:30:45Z", result->toString());
+}
+
+TEST(TimestampTest, ParseWithFractionalSeconds)
+{
+    auto result = Timestamp::parse("2024-06-15T14:30:45.101");
+
+    ASSERT_TRUE(result.hasValue());
+    EXPECT_EQ("2024-06-15T14:30:45.101Z", result->toString());
 }
 
 TEST(TimestampTest, ParseInvalid)

@@ -34,6 +34,33 @@ bool hasPlainDateTimePrefix(const std::string_view value) noexcept
            value[16] == ':' && isDigitAt(value, 0U) && isDigitAt(value, 18U);
 }
 
+std::size_t findPlainTimestampEnd(const std::string_view value) noexcept
+{
+    if (!hasPlainDateTimePrefix(value))
+    {
+        return 0U;
+    }
+
+    std::size_t index = 19U;
+
+    if (index < value.size() && value[index] == '.')
+    {
+        ++index;
+
+        while (index < value.size() && isDigitAt(value, index))
+        {
+            ++index;
+        }
+    }
+
+    if (index < value.size() && (value[index] == 'Z' || value[index] == 'z'))
+    {
+        ++index;
+    }
+
+    return index;
+}
+
 std::string normalizeTimestampText(std::string_view value) noexcept
 {
     if (value.size() >= 19U && value[10] == ' ')
@@ -126,14 +153,15 @@ PlainTextFields PlainTextFieldExtractor::extract(const std::string_view line) no
         return fields;
     }
 
-    const auto timestampResult = parseLogTimestamp(line.substr(0U, 19U));
+    const std::size_t timestampEnd = findPlainTimestampEnd(line);
+    const auto timestampResult = parseLogTimestamp(line.substr(0U, timestampEnd));
 
     if (timestampResult.hasValue())
     {
         fields.timestamp = *timestampResult;
     }
 
-    std::string_view remainder = line.substr(19U);
+    std::string_view remainder = line.substr(timestampEnd);
     remainder = stripLeadingLevelToken(remainder);
     fields.messageExcerpt = normalizeMessageExcerpt(remainder);
 

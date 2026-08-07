@@ -54,3 +54,11 @@ TEST(DateTimeTest, Ordering)
     EXPECT_LT(DateTime(Date(2026, 1, 1), Time(0, 0, 0)),
               DateTime(Date(2026, 1, 2), Time(0, 0, 0)));
 }
+
+TEST(DateTimeTest, ParseValidWithZuluSuffix)
+{
+    auto result = DateTime::parse("2026-07-18T14:30:45.101Z");
+
+    ASSERT_TRUE(result.hasValue());
+    EXPECT_EQ("2026-07-18T14:30:45.101", result->toString());
+}
