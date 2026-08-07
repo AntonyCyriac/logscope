@@ -7,6 +7,7 @@
 #include <QElapsedTimer>
 #include <QPixmap>
 #include <QThread>
+#include <QWindow>
 
 #include "foundation/path.hpp"
 #include "main_window.hpp"
