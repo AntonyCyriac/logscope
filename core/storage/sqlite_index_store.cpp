@@ -826,8 +826,16 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
             return foundation::Result<bool>(compressed.error());
         }
 
-        sqlite3_bind_blob(statement, 5, compressed->data(), static_cast<int>(compressed->size()),
-                          SQLITE_TRANSIENT);
+        if (compressed->size() < fullContent.size())
+        {
+            sqlite3_bind_blob(statement, 5, compressed->data(), static_cast<int>(compressed->size()),
+                              SQLITE_TRANSIENT);
+        }
+        else
+        {
+            sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()),
+                              SQLITE_TRANSIENT);
+        }
     }
     else
     {

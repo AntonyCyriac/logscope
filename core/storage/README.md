@@ -8,7 +8,9 @@
 |---------|--------------|
 | **v1.4.1** | `IndexStore`, `SqliteIndexStore`, `HybridIndexWriter`, `IndexReader`, `QueryPlanner`, session index reuse |
 | **v1.4.2** | Batched writes (WAL, 5k commits), progress every 10k lines, `BM_IndexStoreAppend/100000` |
-| **v1.4.3** | Schema v2 migration, zlib `content` compression, `line_json_fields` + DSL pushdown, `query_cache`, incremental append, FTS5 |
+| **v1.4.3** | Schema v2 migration, zlib `content` compression (store only when smaller), `line_json_fields` + DSL pushdown, `query_cache`, incremental append, FTS5 |
+
+Persisted indexes are typically ~5–6× source log size (FTS5 dominates). `storage.compress_content` helps long repetitive lines only; default `compress_threshold_bytes=256` skips typical short plain-text lines.
 
 Acceptance scenarios: [M11-V143-STORAGE-SCENARIOS.md](../../docs/planning/M11-V143-STORAGE-SCENARIOS.md)
 

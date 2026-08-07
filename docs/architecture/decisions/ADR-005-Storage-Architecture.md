@@ -101,7 +101,7 @@ CREATE VIRTUAL TABLE lines_fts USING fts5(
 
 ### Compression (v1.4.3 — M11.8 shipped)
 
-When `storage.compress_content=true`, lines at or above `storage.compress_threshold_bytes` store zlib-compressed `content` BLOBs. Reads decompress transparently. Toggling compression on an existing index requires rebuild.
+When `storage.compress_content=true`, lines at or above `storage.compress_threshold_bytes` attempt zlib compression; the compressed BLOB is stored only when smaller than the original text (otherwise plain TEXT is kept). Reads decompress transparently. Persisted indexes are typically ~5–6× source log size because FTS5 and auxiliary structures dominate, not the `content` column. Toggling compression on an existing index requires rebuild.
 
 ### JSON field predicates (v1.4.3 — M11.9 shipped)
 

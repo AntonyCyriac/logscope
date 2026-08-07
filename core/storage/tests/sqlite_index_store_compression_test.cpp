@@ -12,6 +12,7 @@
 
 #include "index_fingerprint.hpp"
 #include "index_store_options.hpp"
+#include "content_codec.hpp"
 #include "sqlite_index_store.hpp"
 
 using scope::analysis::DetectedLogLevel;
@@ -179,6 +180,26 @@ std::string repeatCharacter(const char character, const std::size_t count)
     return std::string(count, character);
 }
 
+std::string zlibExpandedContent()
+{
+    const std::string repetitive = repeatCharacter('x', 400U);
+    const auto compressed = scope::storage::compressZlib(repetitive);
+    EXPECT_TRUE(compressed);
+
+    return *compressed;
+}
+
+std::uintmax_t databaseFileSize(const Path& databasePath)
+{
+    return std::filesystem::file_size(databasePath.string());
+}
+
+std::string typicalShortLogLine(const std::uint64_t sequence)
+{
+    return "2024-01-15T10:00:00.000 INFO [service] request_id=" + std::to_string(sequence) +
+           " completed in 42ms";
+}
+
 } // namespace
 
 TEST(SqliteIndexStoreCompressionTest, StoresCompressedContentWhenEnabled)
@@ -251,6 +272,84 @@ TEST(SqliteIndexStoreCompressionTest, SkipsCompressionBelowThreshold)
     EXPECT_EQ("zlib", readMetaValue(databasePath, "content_compression"));
     ASSERT_TRUE(contentStorageType(databasePath, 1U).has_value());
     EXPECT_EQ("text", *contentStorageType(databasePath, 1U));
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(SqliteIndexStoreCompressionTest, SkipsCompressionWhenCompressedBlobWouldBeLarger)
+{
+    const Path workspace = testWorkspace();
+    const Path databasePath = uniqueDatabasePath(workspace, "skip_expansion");
+    const Path sourcePath = writeTempSource(uniqueSourcePath(workspace, "source"), "sample\n");
+    const auto metadata = makeMetadata(sourcePath);
+
+    const std::string line = zlibExpandedContent();
+    const auto compressed = scope::storage::compressZlib(line);
+    ASSERT_TRUE(compressed);
+    ASSERT_GT(compressed->size(), line.size());
+
+    IndexStoreOptions options;
+    options.compressContent = true;
+    options.compressThresholdBytes = 16U;
+
+    const auto created = SqliteIndexStore::create(databasePath, metadata, options);
+    ASSERT_TRUE(created);
+    ASSERT_TRUE((*created)->appendLine(makeLine(1U, DetectedLogLevel::Info, line), line));
+    ASSERT_TRUE((*created)->finalize(1U));
+
+    EXPECT_EQ("zlib", readMetaValue(databasePath, "content_compression"));
+    ASSERT_TRUE(contentStorageType(databasePath, 1U).has_value());
+    EXPECT_EQ("text", *contentStorageType(databasePath, 1U));
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(SqliteIndexStoreCompressionTest, CompressedIndexNotLargerThanPlainForTypicalShortLines)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = uniqueSourcePath(workspace, "short_lines");
+    std::string sourceContent;
+
+    for (std::uint64_t lineNumber = 1U; lineNumber <= 500U; ++lineNumber)
+    {
+        sourceContent += typicalShortLogLine(lineNumber) + '\n';
+    }
+
+    writeTempSource(sourcePath, sourceContent);
+    const auto metadata = makeMetadata(sourcePath);
+
+    const Path plainDatabasePath = uniqueDatabasePath(workspace, "plain_short");
+    IndexStoreOptions plainOptions;
+    plainOptions.compressContent = false;
+
+    const auto plainStore = SqliteIndexStore::create(plainDatabasePath, metadata, plainOptions);
+    ASSERT_TRUE(plainStore);
+
+    for (std::uint64_t lineNumber = 1U; lineNumber <= 500U; ++lineNumber)
+    {
+        const std::string line = typicalShortLogLine(lineNumber);
+        ASSERT_TRUE((*plainStore)->appendLine(makeLine(lineNumber, DetectedLogLevel::Info, line), line));
+    }
+
+    ASSERT_TRUE((*plainStore)->finalize(500U));
+
+    const Path compressedDatabasePath = uniqueDatabasePath(workspace, "compressed_short");
+    IndexStoreOptions compressedOptions;
+    compressedOptions.compressContent = true;
+    compressedOptions.compressThresholdBytes = 16U;
+
+    const auto compressedStore = SqliteIndexStore::create(compressedDatabasePath, metadata, compressedOptions);
+    ASSERT_TRUE(compressedStore);
+
+    for (std::uint64_t lineNumber = 1U; lineNumber <= 500U; ++lineNumber)
+    {
+        const std::string line = typicalShortLogLine(lineNumber);
+        ASSERT_TRUE((*compressedStore)->appendLine(makeLine(lineNumber, DetectedLogLevel::Info, line), line));
+    }
+
+    ASSERT_TRUE((*compressedStore)->finalize(500U));
+
+    EXPECT_LE(databaseFileSize(compressedDatabasePath), databaseFileSize(plainDatabasePath));
 
     cleanupWorkspace(workspace);
 }

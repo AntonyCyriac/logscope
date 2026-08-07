@@ -178,8 +178,10 @@ CLI flags `--persist-index`, `--reuse-index`, and `--index-path` override storag
 
 | Key | Values | Default | Description |
 |-----|--------|---------|-------------|
-| `storage.compress_content` | boolean | `false` | zlib-compress persisted `content` column |
-| `storage.compress_threshold_bytes` | integer | `256` | Minimum line length to compress |
+| `storage.compress_content` | boolean | `false` | zlib-compress persisted `content` column when smaller than plain text |
+| `storage.compress_threshold_bytes` | integer | `256` | Minimum line length before compression is attempted |
+
+**Index size:** a persisted index is typically **~5–6×** the source log file size. FTS5 inverted indexes and auxiliary SQLite structures dominate; the `content` column is a small fraction. `compress_content` only reduces total index size for **long, repetitive lines** (JSON payloads, stack traces). The default threshold of 256 bytes means typical short plain-text log lines (~50–80 bytes) are never compressed. When compression is attempted, zlib header overhead on short or incompressible lines can exceed the original size — the store keeps plain text in that case.
 
 **Compression toggle:** enabling compression on an existing plain index requires a full rebuild (see USER_MANUAL §8).
 
