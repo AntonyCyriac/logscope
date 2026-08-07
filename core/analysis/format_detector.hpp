@@ -45,6 +45,14 @@ class FormatDetector
      * @brief Detects format from a single contiguous text sample.
      */
     [[nodiscard]] static FormatDetectionResult detect(std::string_view sampleText);
+
+    /**
+     * @brief Removes embedded NUL bytes from a log line.
+     *
+     * @param line Line content to sanitize in place.
+     * @return True when one or more NUL bytes were removed.
+     */
+    [[nodiscard]] static bool sanitizeLogLine(std::string& line) noexcept;
 };
 
 } // namespace scope::analysis
