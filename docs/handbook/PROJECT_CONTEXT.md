@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.7.0` (shipped) — **Story 5: Connect the Evidence** (manual evidence links P0.1; completes Phase A). Manifest `schemaVersion: 2` with `evidenceLinks[]`, REST `GET/POST/DELETE …/evidence-links`, CLI `investigation links`, web Related Evidence panel + timeline connection badges + Playwright Story Gate E2E. Builds on Stories 1–4 (`v2.3.0`–`v2.6.2`). Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** P0 Evidence Correlation (Execution Contract v2).
+**Current release:** `v2.7.1` (shipped) — post-Story 5 hotfix bundle (investigation links CLI argv, truncated index lines, partial warnings, timeline sub-second, SQLite busy timeout, unknown CLI subcommands, NUL bytes, compress-only-when-smaller). Story 5 (**Connect the Evidence**) shipped in `v2.7.0` — Phase A complete. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** P0 Evidence Correlation (Execution Contract v2).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 

@@ -12,6 +12,29 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.7.1] - 2026-08-07
+
+**Hotfix** — post-Story 5 bugfix bundle ([#145](https://github.com/AntonyCyriac/logscope/issues/145)–[#152](https://github.com/AntonyCyriac/logscope/issues/152)).
+
+### Fixed
+
+- **`investigation links`** — correct argv index for `list|add|remove` ([#145](https://github.com/AntonyCyriac/logscope/issues/145), [#154](https://github.com/AntonyCyriac/logscope/pull/154))
+- **Index persistence** — truncated line content in stored indexes ([#146](https://github.com/AntonyCyriac/logscope/issues/146), [#154](https://github.com/AntonyCyriac/logscope/pull/154))
+- **Index warnings** — surface partial-index warnings when reuse detects truncation ([#148](https://github.com/AntonyCyriac/logscope/issues/148), [#154](https://github.com/AntonyCyriac/logscope/pull/154))
+- **Timeline** — preserve sub-second timestamp precision ([#149](https://github.com/AntonyCyriac/logscope/issues/149), [#155](https://github.com/AntonyCyriac/logscope/pull/155))
+- **SQLite index store** — busy timeout for concurrent index writes ([#147](https://github.com/AntonyCyriac/logscope/issues/147), [#157](https://github.com/AntonyCyriac/logscope/pull/157))
+- **CLI** — unknown subcommands report error instead of missing log source ([#151](https://github.com/AntonyCyriac/logscope/issues/151), [#158](https://github.com/AntonyCyriac/logscope/pull/158))
+- **Log source** — NUL byte handling in log lines ([#152](https://github.com/AntonyCyriac/logscope/issues/152), [#159](https://github.com/AntonyCyriac/logscope/pull/159))
+- **Storage compression** — store compressed content only when smaller than plain ([#150](https://github.com/AntonyCyriac/logscope/issues/150), [#160](https://github.com/AntonyCyriac/logscope/pull/160))
+
+### Changed
+
+- README desktop screenshot refreshed ([#156](https://github.com/AntonyCyriac/logscope/pull/156))
+
+See [v2.7.1 release notes](docs/release/v2.7.1-RELEASE-NOTES.md).
+
+---
+
 ## [2.7.0] - 2026-08-06
 
 **Story 5** — Connect the Evidence (manual evidence links P0.1, completes Phase A).
