@@ -82,6 +82,11 @@ namespace scope::web
 [[nodiscard]] std::string formatEvidenceLinksList(const std::string& investigationId,
                                                   const std::vector<scope::workspace::EvidenceLinkRecord>& links);
 
+[[nodiscard]] std::string formatCorrelationSuggestion(const scope::workspace::CorrelationSuggestion& suggestion);
+
+[[nodiscard]] std::string formatCorrelationSuggestionsList(
+    const std::string& investigationId, const scope::workspace::CorrelationSuggestionListResult& result);
+
 [[nodiscard]] std::string formatTailPollResult(const std::vector<std::string>& lines, bool active);
 
 [[nodiscard]] std::string formatAnalyzeJobAccepted(const AnalyzeJobEnqueueResult& job);

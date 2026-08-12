@@ -49,6 +49,7 @@ enum class CliCommand
     InvestigationTimeline,
     InvestigationCrash,
     InvestigationLinks,
+    InvestigationSuggestions,
     AgentHelp,
     AgentInvestigate
 };
@@ -267,6 +268,28 @@ struct InvestigationLinksOptions
     bool showHelp = false;
 };
 
+enum class InvestigationSuggestionsSubcommand
+{
+    List,
+    Accept,
+    Dismiss
+};
+
+struct InvestigationSuggestionsOptions
+{
+    InvestigationSuggestionsSubcommand subcommand = InvestigationSuggestionsSubcommand::List;
+    std::string investigationId;
+    std::string suggestionId;
+    std::string eventId;
+    std::string linkType = "RELATED";
+    std::string note;
+    int limit = 50;
+    int offset = 0;
+    foundation::Path rootDirectory = foundation::Path("workspaces");
+    InvestigationTimelineFormat format = InvestigationTimelineFormat::Table;
+    bool showHelp = false;
+};
+
 /**
  * @brief Parsed CLI invocation.
  */
@@ -293,6 +316,7 @@ struct ParsedCli
     InvestigationTimelineOptions investigationTimeline;
     InvestigationCrashOptions investigationCrash;
     InvestigationLinksOptions investigationLinks;
+    InvestigationSuggestionsOptions investigationSuggestions;
     AgentInvestigateOptions agentInvestigate;
     bool showGlobalHelp = false;
     std::string unknownCommand;

@@ -908,6 +908,88 @@ TEST_F(WebApiIntegrationTest, InvestigationEvidenceLinksCrudAndDuplicate409)
     EXPECT_EQ(std::string::npos, listAfterDelete->body.find(linkId));
 }
 
+TEST_F(WebApiIntegrationTest, InvestigationCorrelationSuggestionsListAcceptAndDismiss)
+{
+    const std::string sessionId = createSession();
+    const httplib::Headers headers = sessionHeaders(sessionId);
+
+    const std::string appLogPath = sourcePath("samples/story6-app.log");
+    const std::string syslogPath = sourcePath("samples/story6-syslog.log");
+
+    const httplib::Result createResult =
+        client->Post("/api/v1/investigations", headers, "{\"name\": \"correlation-suggestions-test\"}",
+                     "application/json");
+    ASSERT_TRUE(createResult);
+    EXPECT_EQ(200, createResult->status);
+
+    const std::string investigationId = extractJsonStringField(createResult->body, "id");
+    ASSERT_FALSE(investigationId.empty());
+
+    const httplib::Result addAppLog = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + appLogPath + "\", \"name\": \"app.log\"}",
+        "application/json");
+    ASSERT_TRUE(addAppLog);
+    EXPECT_EQ(200, addAppLog->status);
+
+    const httplib::Result addSyslog = client->Post(
+        "/api/v1/investigations/" + investigationId + "/artifacts", headers,
+        "{\"type\": \"log\", \"sourcePath\": \"" + syslogPath + "\", \"name\": \"syslog\"}",
+        "application/json");
+    ASSERT_TRUE(addSyslog);
+    EXPECT_EQ(200, addSyslog->status);
+
+    const httplib::Result listResult = client->Get(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions", headers);
+    ASSERT_TRUE(listResult);
+    EXPECT_EQ(200, listResult->status);
+    EXPECT_NE(std::string::npos, listResult->body.find("\"matchedKey\": \"request_id\""));
+    EXPECT_NE(std::string::npos, listResult->body.find("\"matchedValue\": \"abc-123\""));
+    EXPECT_NE(std::string::npos, listResult->body.find("\"ruleId\": \"exact_key_match\""));
+
+    const std::string suggestionId = extractJsonStringField(listResult->body, "id");
+    ASSERT_FALSE(suggestionId.empty());
+
+    const httplib::Result dismissResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions/" + suggestionId + "/dismiss",
+        headers, "", "application/json");
+    ASSERT_TRUE(dismissResult);
+    EXPECT_EQ(204, dismissResult->status);
+
+    const httplib::Result listAfterDismiss = client->Get(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions", headers);
+    ASSERT_TRUE(listAfterDismiss);
+    EXPECT_EQ(200, listAfterDismiss->status);
+    EXPECT_EQ(std::string::npos, listAfterDismiss->body.find(suggestionId));
+
+    const httplib::Result listFresh = client->Get(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions", headers);
+    ASSERT_TRUE(listFresh);
+
+    const std::string freshSessionId = createSession();
+    const httplib::Headers freshHeaders = sessionHeaders(freshSessionId);
+    const httplib::Result listNewSession = client->Get(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions", freshHeaders);
+    ASSERT_TRUE(listNewSession);
+    EXPECT_NE(std::string::npos, listNewSession->body.find(suggestionId));
+
+    const std::string acceptSuggestionId = extractJsonStringField(listNewSession->body, "id");
+    ASSERT_FALSE(acceptSuggestionId.empty());
+
+    const httplib::Result acceptResult = client->Post(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions/" + acceptSuggestionId + "/accept",
+        freshHeaders, "{}", "application/json");
+    ASSERT_TRUE(acceptResult);
+    EXPECT_EQ(201, acceptResult->status);
+    EXPECT_NE(std::string::npos, acceptResult->body.find("\"type\": \"RELATED\""));
+
+    const httplib::Result listAfterAccept = client->Get(
+        "/api/v1/investigations/" + investigationId + "/correlation-suggestions", freshHeaders);
+    ASSERT_TRUE(listAfterAccept);
+    EXPECT_EQ(200, listAfterAccept->status);
+    EXPECT_EQ(std::string::npos, listAfterAccept->body.find(acceptSuggestionId));
+}
+
 TEST_F(AsyncWebApiIntegrationTest, AsyncAnalyzeReturnsAcceptedAndCompletes)
 {
     const std::string sessionId = createSession();

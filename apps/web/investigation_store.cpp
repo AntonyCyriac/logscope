@@ -615,6 +615,53 @@ foundation::Result<bool> InvestigationStore::removeEvidenceLink(const std::strin
     return investigation.removeEvidenceLink(linkId);
 }
 
+foundation::Result<scope::workspace::CorrelationSuggestionListResult> InvestigationStore::listCorrelationSuggestions(
+    const std::string& investigationId, scope::workspace::CorrelationSuggestionQuery query,
+    const std::unordered_set<std::string>& dismissedSuggestionIds) const
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<scope::workspace::CorrelationSuggestionListResult>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    const auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::CorrelationSuggestionListResult>(investigationResult.error());
+    }
+
+    return investigationResult->listCorrelationSuggestions(std::move(query), dismissedSuggestionIds);
+}
+
+foundation::Result<scope::workspace::EvidenceLinkRecord> InvestigationStore::acceptCorrelationSuggestion(
+    const std::string& investigationId, const std::string& suggestionId,
+    const std::optional<scope::workspace::EvidenceLinkType> type, const std::optional<std::string> note,
+    const std::unordered_set<std::string>& dismissedSuggestionIds)
+{
+    if (!isValidInvestigationId(investigationId))
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Investigation not found."));
+    }
+
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    auto investigationResult = openInvestigation(investigationId);
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(investigationResult.error());
+    }
+
+    Investigation investigation = std::move(*investigationResult);
+
+    return investigation.acceptCorrelationSuggestion(suggestionId, type, note, dismissedSuggestionIds);
+}
+
 void InvestigationStore::updateSummaryFromService(const std::string& investigationId,
                                                   const application::ApplicationService& service)
 {

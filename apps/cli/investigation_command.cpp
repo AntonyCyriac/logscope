@@ -535,6 +535,28 @@ void printInvestigationLinksUsage(std::ostream& output)
            << "  --help, -h            Show this help message\n";
 }
 
+void printInvestigationSuggestionsUsage(std::ostream& output)
+{
+    output << "Usage:\n"
+           << "  logscope investigation suggestions list <investigation-id> [--event <event-id>] [--limit 50] "
+              "[--offset 0] [--format json|table] [--dir <root>]\n"
+           << "  logscope investigation suggestions accept <investigation-id> --suggestion <suggestion-id> "
+              "[--type RELATED] [--note \"...\"] [--dir <root>]\n"
+           << "  logscope investigation suggestions dismiss <investigation-id> --suggestion <suggestion-id> "
+              "[--dir <root>]\n"
+           << "\n"
+           << "Options:\n"
+           << "  --event <event-id>    Filter suggestions involving this timeline event (list)\n"
+           << "  --limit <N>           Page size (default: 50, max: 50)\n"
+           << "  --offset <N>          Pagination offset (list)\n"
+           << "  --suggestion <id>     Correlation suggestion id (accept/dismiss)\n"
+           << "  --type <type>         Evidence link type on accept (default: RELATED)\n"
+           << "  --note <text>         Optional note on accept\n"
+           << "  --format <format>     Output format for list: table or json (default: table)\n"
+           << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
+           << "  --help, -h            Show this help message\n";
+}
+
 int runInvestigationCreateCommand(const InvestigationCreateOptions& options,
                                   std::ostream& output,
                                   std::ostream& errorOutput)
@@ -1211,6 +1233,229 @@ int runInvestigationLinksCommand(const InvestigationLinksOptions& options,
     if (!removeResult)
     {
         errorOutput << removeResult.error().message() << '\n';
+
+        return 2;
+    }
+
+    return 0;
+}
+
+std::string formatCorrelationSuggestionsListJson(const std::string& investigationId,
+                                                 const scope::workspace::CorrelationSuggestionListResult& result)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"suggestions\": [";
+
+    for (std::size_t index = 0U; index < result.suggestions.size(); ++index)
+    {
+        const scope::workspace::CorrelationSuggestion& suggestion = result.suggestions[index];
+
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n      {\n"
+               << "        \"id\": \"" << escapeJsonString(suggestion.id) << "\",\n"
+               << "        \"sourceEventId\": \"" << escapeJsonString(suggestion.sourceEventId) << "\",\n"
+               << "        \"targetEventId\": \"" << escapeJsonString(suggestion.targetEventId) << "\",\n"
+               << "        \"matchedKey\": \""
+               << escapeJsonString(scope::workspace::correlationKeyToString(suggestion.matchedKey)) << "\",\n"
+               << "        \"matchedValue\": \"" << escapeJsonString(suggestion.matchedValue) << "\",\n"
+               << "        \"sourceArtifactName\": \"" << escapeJsonString(suggestion.sourceArtifactName) << "\",\n"
+               << "        \"targetArtifactName\": \"" << escapeJsonString(suggestion.targetArtifactName) << "\",\n"
+               << "        \"sourceLineRef\": "
+               << (suggestion.sourceLineRef.has_value() ? std::to_string(*suggestion.sourceLineRef) : "null")
+               << ",\n"
+               << "        \"targetLineRef\": "
+               << (suggestion.targetLineRef.has_value() ? std::to_string(*suggestion.targetLineRef) : "null") << ",\n"
+               << "        \"timeDeltaMs\": "
+               << (suggestion.timeDeltaMs.has_value() ? std::to_string(*suggestion.timeDeltaMs) : "null") << ",\n"
+               << "        \"ruleId\": \"" << escapeJsonString(suggestion.ruleId) << "\",\n"
+               << "        \"summary\": \"" << escapeJsonString(suggestion.summary) << "\"\n"
+               << "      }";
+    }
+
+    if (!result.suggestions.empty())
+    {
+        output << '\n';
+    }
+
+    output << "    ],\n"
+           << "  \"total\": " << result.total << ",\n"
+           << "  \"limit\": " << result.limit << ",\n"
+           << "  \"offset\": " << result.offset << ",\n"
+           << "  \"truncated\": " << (result.truncated ? "true" : "false") << "\n}";
+
+    return output.str();
+}
+
+void printCorrelationSuggestionsTable(const scope::workspace::CorrelationSuggestionListResult& result,
+                                      std::ostream& output)
+{
+    output << "id\tsummary\tmatchedKey\tmatchedValue\ttimeDeltaMs\tsourceEventId\ttargetEventId\n";
+
+    for (const scope::workspace::CorrelationSuggestion& suggestion : result.suggestions)
+    {
+        const std::string deltaColumn =
+            suggestion.timeDeltaMs.has_value() ? std::to_string(*suggestion.timeDeltaMs) : "";
+        output << suggestion.id << '\t' << suggestion.summary << '\t'
+               << scope::workspace::correlationKeyToString(suggestion.matchedKey) << '\t' << suggestion.matchedValue
+               << '\t' << deltaColumn << '\t' << suggestion.sourceEventId << '\t' << suggestion.targetEventId << '\n';
+    }
+}
+
+bool findSuggestionById(const Investigation& investigation, const std::string& suggestionId,
+                        scope::workspace::CorrelationSuggestion& outSuggestion)
+{
+    for (int offset = 0;; offset += 50)
+    {
+        scope::workspace::CorrelationSuggestionQuery query;
+        query.limit = 50;
+        query.offset = offset;
+
+        const auto suggestionsResult = investigation.listCorrelationSuggestions(query);
+
+        if (!suggestionsResult)
+        {
+            return false;
+        }
+
+        for (const scope::workspace::CorrelationSuggestion& suggestion : suggestionsResult->suggestions)
+        {
+            if (suggestion.id == suggestionId)
+            {
+                outSuggestion = suggestion;
+                return true;
+            }
+        }
+
+        if (offset + 50 >= suggestionsResult->total)
+        {
+            break;
+        }
+    }
+
+    return false;
+}
+
+int runInvestigationSuggestionsCommand(const InvestigationSuggestionsOptions& options, std::ostream& output,
+                                       std::ostream& errorOutput)
+{
+    if (options.showHelp)
+    {
+        printInvestigationSuggestionsUsage(output);
+
+        return 0;
+    }
+
+    if (!isValidInvestigationId(options.investigationId))
+    {
+        errorOutput << "Invalid investigation id.\n";
+
+        return 1;
+    }
+
+    const Path investigationDir = investigationDirectory(options.rootDirectory, options.investigationId);
+    const auto investigationResult = Investigation::open(investigationDir);
+
+    if (!investigationResult)
+    {
+        errorOutput << investigationResult.error().message() << '\n';
+
+        return 2;
+    }
+
+    Investigation investigation = std::move(*investigationResult);
+
+    if (options.subcommand == InvestigationSuggestionsSubcommand::List)
+    {
+        scope::workspace::CorrelationSuggestionQuery query;
+        query.limit = options.limit;
+        query.offset = options.offset;
+
+        if (!options.eventId.empty())
+        {
+            query.eventId = options.eventId;
+        }
+
+        const auto suggestionsResult = investigation.listCorrelationSuggestions(query);
+
+        if (!suggestionsResult)
+        {
+            errorOutput << suggestionsResult.error().message() << '\n';
+
+            return 2;
+        }
+
+        if (options.format == InvestigationTimelineFormat::Json)
+        {
+            output << formatCorrelationSuggestionsListJson(options.investigationId, *suggestionsResult) << '\n';
+        }
+        else
+        {
+            printCorrelationSuggestionsTable(*suggestionsResult, output);
+        }
+
+        return 0;
+    }
+
+    if (options.suggestionId.empty())
+    {
+        errorOutput << "Error: --suggestion is required.\n";
+        printInvestigationSuggestionsUsage(errorOutput);
+
+        return 1;
+    }
+
+    if (options.subcommand == InvestigationSuggestionsSubcommand::Accept)
+    {
+        const std::optional<scope::workspace::EvidenceLinkType> parsedType =
+            scope::workspace::parseEvidenceLinkType(options.linkType);
+
+        if (!parsedType)
+        {
+            errorOutput << "Invalid link type.\n";
+
+            return 1;
+        }
+
+        std::optional<std::string> note;
+
+        if (!options.note.empty())
+        {
+            note = options.note;
+        }
+
+        const auto linkResult =
+            investigation.acceptCorrelationSuggestion(options.suggestionId, *parsedType, note);
+
+        if (!linkResult)
+        {
+            errorOutput << linkResult.error().message() << '\n';
+
+            return 2;
+        }
+
+        if (options.format == InvestigationTimelineFormat::Json)
+        {
+            output << formatEvidenceLinkRecordJson(*linkResult) << '\n';
+        }
+        else
+        {
+            output << linkResult->id << '\n';
+        }
+
+        return 0;
+    }
+
+    scope::workspace::CorrelationSuggestion ignored;
+
+    if (!findSuggestionById(investigation, options.suggestionId, ignored))
+    {
+        errorOutput << "Correlation suggestion not found.\n";
 
         return 2;
     }

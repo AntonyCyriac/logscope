@@ -107,6 +107,14 @@ struct InvestigationTimelineQuery
 [[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkCreateRequest> parseEvidenceLinkCreateRequest(
     std::string_view body);
 
+[[nodiscard]] scope::workspace::CorrelationSuggestionQuery parseCorrelationSuggestionQuery(
+    std::string_view eventIdValue, std::string_view limitValue, std::string_view offsetValue);
+
+[[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkType> parseOptionalCorrelationAcceptType(
+    std::string_view body);
+
+[[nodiscard]] std::optional<std::string> parseOptionalCorrelationAcceptNote(std::string_view body);
+
 [[nodiscard]] foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path);
 
 /** Allows web.allowed_path_roots paths and staged multipart uploads under web.upload_temp_dir. */

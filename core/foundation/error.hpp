@@ -26,7 +26,8 @@ enum class ErrorCode
     IOError,         ///< An input/output operation failed.
     ParseError,              ///< Data parsing failed.
     InvalidLinkTarget,       ///< Timeline event anchor missing or invalid for a link.
-    DuplicateEvidenceLink    ///< Duplicate (source, target, type) evidence link.
+    DuplicateEvidenceLink,   ///< Duplicate (source, target, type) evidence link.
+    StaleSuggestion          ///< Correlation suggestion references events no longer in projection.
 };
 
 /**

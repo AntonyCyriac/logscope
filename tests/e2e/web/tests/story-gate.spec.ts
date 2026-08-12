@@ -7,6 +7,8 @@ import {
   createEvidenceLink,
   createInvestigation,
   openFirstArtifact,
+  story6AppLogPath,
+  story6SyslogPath,
   switchBottomTab,
   syslogPath,
   waitForReady,
@@ -85,6 +87,45 @@ test.describe('Story Gate — investigation workflow', () => {
     await expect(page.getByTestId('related-evidence-row').first()).toBeVisible();
     await page.getByTestId('related-evidence-row').first().click();
     await expect(page.getByTestId('status')).toContainText(/Opened|line|Jump/);
+  });
+
+  test('Story 6 positive: suggested connections accept creates Related Evidence link', async ({ page }) => {
+    await createInvestigation(page);
+    await addLogArtifact(page, story6AppLogPath);
+    await addLogArtifact(page, story6SyslogPath);
+    await openFirstArtifact(page);
+
+    await switchBottomTab(page, 'timeline');
+    const timelineRows = page.getByTestId('timeline-row');
+    await expect(timelineRows.first()).toBeVisible({ timeout: 15_000 });
+
+    await timelineRows.first().click();
+    await expect(page.getByTestId('suggested-connections-panel')).toBeVisible();
+    await expect(page.locator('.subsection-title', { hasText: 'Suggested connections' })).toBeVisible();
+    await expect(page.getByTestId('suggested-connection-row').first()).toContainText('request_id=abc-123');
+
+    await page.getByTestId('suggested-connection-accept').first().click();
+    await expect(page.getByTestId('status')).toContainText('Connection added from suggestion');
+    await expect(page.getByTestId('related-evidence-row').first()).toBeVisible();
+    await expect(page.getByTestId('suggested-connections-panel')).toBeHidden();
+  });
+
+  test('Story 6 negative: dismiss suggestion without creating evidence link', async ({ page }) => {
+    await createInvestigation(page);
+    await addLogArtifact(page, story6AppLogPath);
+    await addLogArtifact(page, story6SyslogPath);
+    await openFirstArtifact(page);
+
+    await switchBottomTab(page, 'timeline');
+    const timelineRows = page.getByTestId('timeline-row');
+    await expect(timelineRows.first()).toBeVisible({ timeout: 15_000 });
+    await timelineRows.first().click();
+
+    await expect(page.getByTestId('suggested-connection-row').first()).toBeVisible();
+    await page.getByTestId('suggested-connection-dismiss').first().click();
+    await expect(page.getByTestId('status')).toContainText('Suggestion dismissed');
+    await expect(page.getByTestId('suggested-connections-panel')).toBeHidden();
+    await expect(page.getByTestId('related-evidence-row')).toHaveCount(0);
   });
 
   test('Investigate: analyze populates results for default error search', async ({ page }) => {

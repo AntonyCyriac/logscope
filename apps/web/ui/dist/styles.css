@@ -922,6 +922,41 @@ body {
   text-align: right;
 }
 
+.suggested-connections-panel {
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.suggested-connections-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.suggested-connection-row {
+  border: 1px solid var(--border-subtle);
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+}
+
+.suggested-connection-row__summary {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+.suggested-connection-row__basis {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.suggested-connection-row__actions {
+  display: flex;
+  gap: 6px;
+}
+
 .timeline-link-badge {
   display: inline-flex;
   align-items: center;

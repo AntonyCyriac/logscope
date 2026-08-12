@@ -17,6 +17,7 @@ using scope::cli::InvestigationAddNoteOptions;
 using scope::cli::InvestigationAddOptions;
 using scope::cli::InvestigationCreateOptions;
 using scope::cli::InvestigationLinksOptions;
+using scope::cli::InvestigationSuggestionsOptions;
 using scope::cli::InvestigationOpenOptions;
 using scope::cli::InvestigationShowOptions;
 using scope::cli::InvestigationTimelineFormat;
@@ -25,6 +26,7 @@ using scope::cli::runInvestigationAddCommand;
 using scope::cli::runInvestigationAddNoteCommand;
 using scope::cli::runInvestigationCreateCommand;
 using scope::cli::runInvestigationLinksCommand;
+using scope::cli::runInvestigationSuggestionsCommand;
 using scope::cli::runInvestigationOpenCommand;
 using scope::cli::runInvestigationShowCommand;
 using scope::cli::runInvestigationTimelineCommand;
@@ -411,4 +413,46 @@ TEST_F(InvestigationCommandTest, TimelineJsonOutputAndLimit)
     EXPECT_EQ(std::string::npos, timelineOutput.str().find("first event"));
 
     std::filesystem::remove(appLog.string());
+}
+
+TEST_F(InvestigationCommandTest, SuggestionsListJsonOutputIncludesSuggestionsArray)
+{
+    const Path appLog = writeSourceFile("_app_suggest.log", "2026-08-06T10:00:00 ERROR request_id=abc-123 app\n");
+    const Path syslog = writeSourceFile("_sys_suggest.log", "2026-08-06T10:00:01 WARNING request_id=abc-123 sys\n");
+
+    InvestigationAddOptions addApp;
+    addApp.investigationId = m_investigationId;
+    addApp.logFile = appLog;
+    addApp.displayName = "app.log";
+    addApp.rootDirectory = m_root;
+
+    std::ostringstream addAppOutput;
+    std::ostringstream addAppError;
+    ASSERT_EQ(0, runInvestigationAddCommand(addApp, addAppOutput, addAppError));
+
+    InvestigationAddOptions addSyslog;
+    addSyslog.investigationId = m_investigationId;
+    addSyslog.logFile = syslog;
+    addSyslog.displayName = "syslog";
+    addSyslog.rootDirectory = m_root;
+
+    std::ostringstream addSyslogOutput;
+    std::ostringstream addSyslogError;
+    ASSERT_EQ(0, runInvestigationAddCommand(addSyslog, addSyslogOutput, addSyslogError));
+
+    InvestigationSuggestionsOptions options;
+    options.investigationId = m_investigationId;
+    options.rootDirectory = m_root;
+    options.format = InvestigationTimelineFormat::Json;
+
+    std::ostringstream output;
+    std::ostringstream errorOutput;
+
+    ASSERT_EQ(0, runInvestigationSuggestionsCommand(options, output, errorOutput));
+    EXPECT_NE(std::string::npos, output.str().find("\"suggestions\""));
+    EXPECT_NE(std::string::npos, output.str().find("request_id"));
+    EXPECT_NE(std::string::npos, output.str().find("abc-123"));
+
+    std::filesystem::remove(appLog.string());
+    std::filesystem::remove(syslog.string());
 }

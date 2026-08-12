@@ -1799,6 +1799,122 @@ std::optional<InvestigationLinksOptions> parseInvestigationLinksArguments(int ar
     return options;
 }
 
+std::optional<InvestigationSuggestionsOptions> parseInvestigationSuggestionsArguments(int argc, char* argv[],
+                                                                                      const int verbIndex)
+{
+    if (verbIndex >= argc)
+    {
+        return std::nullopt;
+    }
+
+    InvestigationSuggestionsOptions options;
+    const std::string suggestionsVerb = argv[verbIndex];
+
+    if (suggestionsVerb == "list")
+    {
+        options.subcommand = InvestigationSuggestionsSubcommand::List;
+    }
+    else if (suggestionsVerb == "accept")
+    {
+        options.subcommand = InvestigationSuggestionsSubcommand::Accept;
+    }
+    else if (suggestionsVerb == "dismiss")
+    {
+        options.subcommand = InvestigationSuggestionsSubcommand::Dismiss;
+    }
+    else
+    {
+        return std::nullopt;
+    }
+
+    for (int index = verbIndex + 1; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--format" && index + 1 < argc)
+        {
+            const auto format = parseInvestigationTimelineFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+            continue;
+        }
+
+        if (argument == "--dir" && index + 1 < argc)
+        {
+            options.rootDirectory = foundation::Path(argv[++index]);
+            continue;
+        }
+
+        if (argument == "--event" && index + 1 < argc)
+        {
+            options.eventId = argv[++index];
+            continue;
+        }
+
+        if (argument == "--limit" && index + 1 < argc)
+        {
+            options.limit = std::stoi(argv[++index]);
+            continue;
+        }
+
+        if (argument == "--offset" && index + 1 < argc)
+        {
+            options.offset = std::stoi(argv[++index]);
+            continue;
+        }
+
+        if (argument == "--suggestion" && index + 1 < argc)
+        {
+            options.suggestionId = argv[++index];
+            continue;
+        }
+
+        if (argument == "--type" && index + 1 < argc)
+        {
+            options.linkType = argv[++index];
+            continue;
+        }
+
+        if (argument == "--note" && index + 1 < argc)
+        {
+            options.note = argv[++index];
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.investigationId.empty())
+        {
+            options.investigationId = argument;
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.investigationId.empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1952,6 +2068,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         {
             parsed.command = CliCommand::InvestigationLinks;
             parsed.investigationLinks.showHelp = true;
+
+            return parsed;
+        }
+
+        if (argc >= 4 && std::string_view(argv[2]) == "investigation" && std::string_view(argv[3]) == "suggestions")
+        {
+            parsed.command = CliCommand::InvestigationSuggestions;
+            parsed.investigationSuggestions.showHelp = true;
 
             return parsed;
         }
@@ -2310,6 +2434,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
             parsed.command = CliCommand::InvestigationLinks;
             parsed.investigationLinks = *options;
+
+            return parsed;
+        }
+
+        if (subcommand == "suggestions")
+        {
+            const auto options = parseInvestigationSuggestionsArguments(argc, argv, 3);
+
+            if (!options)
+            {
+                return std::nullopt;
+            }
+
+            parsed.command = CliCommand::InvestigationSuggestions;
+            parsed.investigationSuggestions = *options;
 
             return parsed;
         }

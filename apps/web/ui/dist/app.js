@@ -15,6 +15,7 @@
     activeTimelineEventId: null,
     evidenceLinks: [],
     linksByEventId: {},
+    correlationSuggestions: [],
     linkCreateMode: false,
     activeCrashArtifactId: null,
     crashReport: null,
@@ -81,6 +82,9 @@
   const linkNoteInput = document.getElementById('linkNoteInput');
   const linkCreateBtn = document.getElementById('linkCreateBtn');
   const linkCreateCancelBtn = document.getElementById('linkCreateCancelBtn');
+  const suggestedConnectionsPanel = document.getElementById('suggestedConnectionsPanel');
+  const suggestedConnectionsEmpty = document.getElementById('suggestedConnectionsEmpty');
+  const suggestedConnectionsList = document.getElementById('suggestedConnectionsList');
   const crashEmpty = document.getElementById('crashEmpty');
   const crashWarnings = document.getElementById('crashWarnings');
   const crashContent = document.getElementById('crashContent');
@@ -937,6 +941,153 @@
     rebuildLinksIndex();
     renderTimelineList(state.timelineEvents);
     renderRelatedEvidencePanel();
+    renderSuggestedConnectionsPanel();
+  }
+
+  async function refreshCorrelationSuggestions() {
+    state.correlationSuggestions = [];
+
+    if (!state.activeInvestigationId || !state.activeTimelineEventId) {
+      renderSuggestedConnectionsPanel();
+      return;
+    }
+
+    const response = await api(
+      '/api/v1/investigations/' + state.activeInvestigationId
+      + '/correlation-suggestions?eventId=' + encodeURIComponent(state.activeTimelineEventId)
+    );
+
+    if (!response.ok) {
+      renderSuggestedConnectionsPanel();
+      return;
+    }
+
+    const payload = await response.json();
+    const data = payload.data || payload;
+    state.correlationSuggestions = data.suggestions || [];
+    renderSuggestedConnectionsPanel();
+  }
+
+  function formatSuggestionBasis(suggestion) {
+    const parts = [
+      suggestion.matchedKey + '=' + suggestion.matchedValue,
+      suggestion.sourceArtifactName,
+      suggestion.targetArtifactName,
+    ];
+
+    if (suggestion.timeDeltaMs != null) {
+      const seconds = Math.abs(suggestion.timeDeltaMs) / 1000;
+      parts.push('Δt ' + seconds.toFixed(1) + 's');
+    }
+
+    if (suggestion.sourceLineRef != null || suggestion.targetLineRef != null) {
+      parts.push('lines ' + (suggestion.sourceLineRef != null ? suggestion.sourceLineRef : '?')
+        + '→' + (suggestion.targetLineRef != null ? suggestion.targetLineRef : '?'));
+    }
+
+    return parts.join(' · ');
+  }
+
+  function renderSuggestedConnectionsPanel() {
+    suggestedConnectionsList.innerHTML = '';
+
+    if (!state.activeTimelineEventId) {
+      suggestedConnectionsPanel.hidden = true;
+      return;
+    }
+
+    const suggestions = state.correlationSuggestions || [];
+
+    if (suggestions.length === 0) {
+      suggestedConnectionsPanel.hidden = true;
+      return;
+    }
+
+    suggestedConnectionsPanel.hidden = false;
+    suggestedConnectionsEmpty.hidden = true;
+
+    suggestions.forEach(function (suggestion) {
+      const row = document.createElement('li');
+      row.className = 'suggested-connection-row';
+      row.setAttribute('data-testid', 'suggested-connection-row');
+
+      const summaryEl = document.createElement('div');
+      summaryEl.className = 'suggested-connection-row__summary';
+      summaryEl.textContent = suggestion.summary || '';
+      row.appendChild(summaryEl);
+
+      const basisEl = document.createElement('div');
+      basisEl.className = 'suggested-connection-row__basis';
+      basisEl.textContent = formatSuggestionBasis(suggestion);
+      row.appendChild(basisEl);
+
+      const actions = document.createElement('div');
+      actions.className = 'suggested-connection-row__actions';
+
+      const acceptBtn = document.createElement('button');
+      acceptBtn.type = 'button';
+      acceptBtn.className = 'btn btn-primary btn-sm';
+      acceptBtn.textContent = 'Accept';
+      acceptBtn.setAttribute('data-testid', 'suggested-connection-accept');
+      acceptBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        acceptCorrelationSuggestion(suggestion.id).catch(function (error) {
+          setStatus('Accept suggestion error: ' + error.message);
+        });
+      });
+      actions.appendChild(acceptBtn);
+
+      const dismissBtn = document.createElement('button');
+      dismissBtn.type = 'button';
+      dismissBtn.className = 'btn btn-ghost btn-sm';
+      dismissBtn.textContent = 'Dismiss';
+      dismissBtn.setAttribute('data-testid', 'suggested-connection-dismiss');
+      dismissBtn.addEventListener('click', function (event) {
+        event.stopPropagation();
+        dismissCorrelationSuggestion(suggestion.id).catch(function (error) {
+          setStatus('Dismiss suggestion error: ' + error.message);
+        });
+      });
+      actions.appendChild(dismissBtn);
+
+      row.appendChild(actions);
+      suggestedConnectionsList.appendChild(row);
+    });
+  }
+
+  async function acceptCorrelationSuggestion(suggestionId) {
+    const response = await api(
+      '/api/v1/investigations/' + state.activeInvestigationId
+      + '/correlation-suggestions/' + encodeURIComponent(suggestionId) + '/accept',
+      { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' }
+    );
+
+    if (!response.ok) {
+      const payload = await response.json().catch(function () { return {}; });
+      const message = (payload.error && payload.error.message) || response.statusText;
+      throw new Error(message);
+    }
+
+    setStatus('Connection added from suggestion');
+    await refreshEvidenceLinks();
+    await refreshCorrelationSuggestions();
+  }
+
+  async function dismissCorrelationSuggestion(suggestionId) {
+    const response = await api(
+      '/api/v1/investigations/' + state.activeInvestigationId
+      + '/correlation-suggestions/' + encodeURIComponent(suggestionId) + '/dismiss',
+      { method: 'POST' }
+    );
+
+    if (!response.ok) {
+      const payload = await response.json().catch(function () { return {}; });
+      const message = (payload.error && payload.error.message) || response.statusText;
+      throw new Error(message);
+    }
+
+    setStatus('Suggestion dismissed');
+    await refreshCorrelationSuggestions();
   }
 
   function peerEventForLink(link, selectedEventId) {
@@ -1153,6 +1304,9 @@
         state.activeTimelineEventId = event.id || null;
         renderTimelineList(state.timelineEvents);
         renderRelatedEvidencePanel();
+        refreshCorrelationSuggestions().catch(function (error) {
+          setStatus('Suggestions error: ' + error.message);
+        });
       });
 
       timelineList.appendChild(row);
@@ -1229,6 +1383,7 @@
 
     if (!append) {
       await refreshEvidenceLinks();
+      await refreshCorrelationSuggestions();
     } else {
       renderTimelineList(state.timelineEvents);
     }
@@ -1243,6 +1398,7 @@
     state.activeTimelineEventId = targetEvent.id || null;
     renderTimelineList(state.timelineEvents);
     renderRelatedEvidencePanel();
+    await refreshCorrelationSuggestions();
     setBottomTab('timeline');
 
     const source = targetEvent.source || {};

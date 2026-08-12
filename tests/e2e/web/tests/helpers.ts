@@ -5,6 +5,8 @@ const REPO_ROOT = path.resolve(__dirname, '../../../../');
 
 export const sampleLogPath = path.join(REPO_ROOT, 'samples', 'sample.log');
 export const syslogPath = path.join(REPO_ROOT, 'samples', 'syslog.log');
+export const story6AppLogPath = path.join(REPO_ROOT, 'samples', 'story6-app.log');
+export const story6SyslogPath = path.join(REPO_ROOT, 'samples', 'story6-syslog.log');
 export const pstackPath = path.join(REPO_ROOT, 'samples', 'pstack.txt');
 
 export async function waitForReady(page: Page): Promise<void> {

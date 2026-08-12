@@ -9,6 +9,7 @@
 #include "crash_analyzer.hpp"
 #include "evidence_link.hpp"
 #include "investigation_manifest_io.hpp"
+#include "correlation_engine.hpp"
 #include "timeline_projector.hpp"
 
 #include "foundation/clock.hpp"
@@ -561,6 +562,94 @@ foundation::Result<EvidenceLinkRecord> Investigation::addEvidenceLink(EvidenceLi
     }
 
     return foundation::Result<EvidenceLinkRecord>(annotateLinkStatus(link, eventIds));
+}
+
+foundation::Result<CorrelationSuggestionListResult> Investigation::listCorrelationSuggestions(
+    CorrelationSuggestionQuery query, const std::unordered_set<std::string>& dismissedSuggestionIds) const
+{
+    TimelineProjectionOptions options;
+    options.limit = 10'000U;
+    options.offset = 0U;
+    options.order = TimelineSortOrder::Ascending;
+
+    const auto timelineResult = projectTimeline(options);
+
+    if (!timelineResult)
+    {
+        return foundation::Result<CorrelationSuggestionListResult>(timelineResult.error());
+    }
+
+    return foundation::Result<CorrelationSuggestionListResult>(CorrelationEngine::computeSuggestions(
+        m_manifest.id, timelineResult->events, m_manifest.evidenceLinks, dismissedSuggestionIds, std::move(query)));
+}
+
+foundation::Result<EvidenceLinkRecord> Investigation::acceptCorrelationSuggestion(
+    const std::string& suggestionId, const std::optional<EvidenceLinkType> type,
+    const std::optional<std::string> note, const std::unordered_set<std::string>& dismissedSuggestionIds)
+{
+    std::optional<CorrelationSuggestion> matchedSuggestion;
+
+    for (int offset = 0;; offset += 50)
+    {
+        CorrelationSuggestionQuery query;
+        query.limit = 50;
+        query.offset = offset;
+
+        const auto suggestionsResult = listCorrelationSuggestions(query, dismissedSuggestionIds);
+
+        if (!suggestionsResult)
+        {
+            return foundation::Result<EvidenceLinkRecord>(suggestionsResult.error());
+        }
+
+        for (const CorrelationSuggestion& suggestion : suggestionsResult->suggestions)
+        {
+            if (suggestion.id == suggestionId)
+            {
+                matchedSuggestion = suggestion;
+                break;
+            }
+        }
+
+        if (matchedSuggestion.has_value() || offset + 50 >= suggestionsResult->total)
+        {
+            break;
+        }
+    }
+
+    if (!matchedSuggestion.has_value())
+    {
+        return foundation::Result<EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::FileNotFound, "Correlation suggestion not found."));
+    }
+
+    const std::unordered_set<std::string> eventIds = collectTimelineEventIds(*this);
+
+    if (eventIds.count(matchedSuggestion->sourceEventId) == 0U
+        || eventIds.count(matchedSuggestion->targetEventId) == 0U)
+    {
+        return foundation::Result<EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::StaleSuggestion,
+                              "Timeline events for suggestion are no longer available."));
+    }
+
+    EvidenceLinkCreateRequest createRequest;
+    createRequest.type = type.value_or(EvidenceLinkType::Related);
+    createRequest.source.kind = "timeline_event";
+    createRequest.source.eventId = matchedSuggestion->sourceEventId;
+    createRequest.target.kind = "timeline_event";
+    createRequest.target.eventId = matchedSuggestion->targetEventId;
+
+    if (note.has_value() && !note->empty())
+    {
+        createRequest.note = *note;
+    }
+    else
+    {
+        createRequest.note = matchedSuggestion->summary;
+    }
+
+    return addEvidenceLink(createRequest);
 }
 
 foundation::Result<bool> Investigation::removeEvidenceLink(const std::string& linkId)
