@@ -857,6 +857,11 @@ body {
   background: var(--bg-active);
 }
 
+.timeline-table tbody tr.timeline-event--crash-summary td:nth-child(2) {
+  color: #f97316;
+  font-weight: 600;
+}
+
 .timeline-layout {
   display: flex;
   gap: 12px;

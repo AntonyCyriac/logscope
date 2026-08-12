@@ -142,6 +142,7 @@
 
   function inferSeverity(event) {
     if (event.severity) return event.severity;
+    if (event.eventType === 'crash.summary') return 'ERROR';
     const message = String(event.message || '').toUpperCase();
     if (message.indexOf('FATAL') >= 0 || message.indexOf('CRASHED') >= 0) return 'FATAL';
     if (message.indexOf('ERROR') >= 0) return 'ERROR';
@@ -1271,12 +1272,20 @@
     setStatus('Connection removed');
   }
 
+  function formatTimelineEventType(event) {
+    if (event.eventType === 'crash.summary') return 'Crash';
+    return event.eventType || '';
+  }
+
   function renderTimelineList(events) {
     timelineList.innerHTML = '';
 
     events.forEach(function (event) {
       const row = document.createElement('tr');
       row.className = 'timeline-event timeline-event--clickable';
+      if (event.eventType === 'crash.summary') {
+        row.classList.add('timeline-event--crash-summary');
+      }
       row.setAttribute('data-testid', 'timeline-row');
 
       if (event.id && event.id === state.activeTimelineEventId) {
@@ -1284,7 +1293,7 @@
       }
 
       row.innerHTML = '<td>' + escapeHtml(event.timestamp || '') + '</td>'
-        + '<td>' + escapeHtml(event.eventType || '') + '</td>'
+        + '<td>' + escapeHtml(formatTimelineEventType(event)) + '</td>'
         + '<td>' + escapeHtml((event.source && event.source.artifactName) || '') + '</td>'
         + '<td>' + escapeHtml(event.message || '') + '</td>'
         + '<td>' + (function () {
@@ -1304,6 +1313,16 @@
         state.activeTimelineEventId = event.id || null;
         renderTimelineList(state.timelineEvents);
         renderRelatedEvidencePanel();
+        if (event.eventType === 'crash.summary' && event.artifactId) {
+          const artifact = (state.artifacts || []).find(function (item) {
+            return item.id === event.artifactId;
+          });
+          if (artifact) {
+            openArtifact(artifact).catch(function (error) {
+              setStatus('Crash navigation error: ' + error.message);
+            });
+          }
+        }
         refreshCorrelationSuggestions().catch(function (error) {
           setStatus('Suggestions error: ' + error.message);
         });

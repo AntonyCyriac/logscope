@@ -159,60 +159,8 @@ class NoteArtifactProjector final : public IArtifactProjector
     }
 };
 
-class AttachedArtifactProjector final : public IArtifactProjector
-{
-  public:
-    explicit AttachedArtifactProjector(std::string type, std::string messagePrefix)
-        : m_type(std::move(type)), m_messagePrefix(std::move(messagePrefix))
-    {
-    }
-
-    [[nodiscard]] std::string_view artifactType() const noexcept override
-    {
-        return m_type;
-    }
-
-    void project(const ArtifactRecord& artifact, const foundation::Path& dataPath,
-                 const ArtifactProjectionContext& context, TimelineEventSink& sink) const override
-    {
-        (void)dataPath;
-
-        const std::optional<foundation::Timestamp> importedAt = parseArtifactImportedAt(artifact.importedAt);
-
-        if (!importedAt.has_value())
-        {
-            return;
-        }
-
-        std::string message = m_messagePrefix;
-
-        if (const auto sizeIt = artifact.metadata.find("sizeBytes"); sizeIt != artifact.metadata.end())
-        {
-            message += " (" + sizeIt->second + " bytes)";
-        }
-
-        TimelineEvent event;
-        event.timestamp = importedAt->toString();
-        event.artifactId = artifact.id;
-        event.eventType = "artifact.attached";
-        event.message = message;
-        event.source = makeEventSource(artifact);
-        event.metadata = artifact.metadata;
-        event.id =
-            makeTimelineEventId(context.investigationId, artifact.id, 0U, event.timestamp, event.eventType);
-
-        (void)sink.append(std::move(event));
-    }
-
-  private:
-    std::string m_type;
-    std::string m_messagePrefix;
-};
-
 const LogArtifactProjector kLogProjector;
 const NoteArtifactProjector kNoteProjector;
-const AttachedArtifactProjector kPstackProjector("pstack", "Pstack attached");
-const AttachedArtifactProjector kCoreProjector("core", "Core dump attached");
 
 } // namespace
 
@@ -237,16 +185,6 @@ const IArtifactProjector* findArtifactProjector(const std::string_view type) noe
     if (type == "note")
     {
         return &kNoteProjector;
-    }
-
-    if (type == "pstack")
-    {
-        return &kPstackProjector;
-    }
-
-    if (type == "core")
-    {
-        return &kCoreProjector;
     }
 
     return nullptr;
