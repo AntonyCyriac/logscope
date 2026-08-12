@@ -8,6 +8,7 @@ add_library(scope_workspace
     artifact_projector.cpp
     crash_analyzer.cpp
     crash_report.cpp
+    crash_summary_timeline.cpp
     correlation_engine.cpp
     correlation_suggestion.cpp
     evidence_link.cpp

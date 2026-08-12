@@ -87,7 +87,7 @@ TEST(InvestigationTimelineTest, StableTimelineEventIdIsDeterministic)
     EXPECT_FALSE(first.empty());
 }
 
-TEST(InvestigationTimelineTest, CoreArtifactProducesAttachedMarker)
+TEST(InvestigationTimelineTest, CoreArtifactProducesCrashSummaryOnTimeline)
 {
     const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_core"));
     const Path coreFile(logscope::gtest::uniqueTestPath("_dump.core"));
@@ -117,9 +117,99 @@ TEST(InvestigationTimelineTest, CoreArtifactProducesAttachedMarker)
 
     ASSERT_TRUE(timelineResult.hasValue());
     ASSERT_EQ(1U, timelineResult->events.size());
-    EXPECT_EQ("artifact.attached", timelineResult->events[0].eventType);
+    EXPECT_EQ("crash.summary", timelineResult->events[0].eventType);
     EXPECT_EQ("core", timelineResult->events[0].source.artifactType);
-    EXPECT_NE(std::string::npos, timelineResult->events[0].message.find("Core dump attached"));
+    EXPECT_NE(std::string::npos, timelineResult->events[0].message.find("dump.core"));
+    EXPECT_EQ("failed", timelineResult->events[0].metadata.at("status"));
+}
+
+TEST(InvestigationTimelineTest, PstackArtifactProducesCrashSummaryOnTimeline)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_pstack"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack.txt"));
+
+    writeFile(pstackFile, R"(Thread 1 (LWP 12345):
+#0  0x00005555555a2b10 in SessionManager::create (this=0x0) at session_manager.cpp:42
+
+Program received signal SIGSEGV, Segmentation fault.
+[Switching to thread 1 (LWP 12345)]
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "pstack-timeline";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "pstack.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "pstack.txt"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+
+    const auto timelineResult = investigation.projectTimeline();
+
+    ASSERT_TRUE(timelineResult.hasValue());
+    ASSERT_EQ(1U, timelineResult->events.size());
+    EXPECT_EQ("crash.summary", timelineResult->events[0].eventType);
+    EXPECT_EQ("ready", timelineResult->events[0].metadata.at("status"));
+    EXPECT_EQ("SIGSEGV", timelineResult->events[0].metadata.at("signal"));
+    EXPECT_NE(std::string::npos, timelineResult->events[0].message.find("SessionManager::create"));
+    EXPECT_TRUE(timelineResult->events[0].severity.has_value());
+}
+
+TEST(InvestigationTimelineTest, MultiplePstackArtifactsProduceMultipleCrashSummaries)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_multi_pstack"));
+    const Path firstPstack(logscope::gtest::uniqueTestPath("_pstack_a.txt"));
+    const Path secondPstack(logscope::gtest::uniqueTestPath("_pstack_b.txt"));
+
+    writeFile(firstPstack, R"(Program received signal SIGSEGV, Segmentation fault.
+Thread 1 (LWP 1):
+#0  0x1 in first () at first.cpp:1
+)");
+    writeFile(secondPstack, R"(Program received signal SIGABRT, Aborted.
+Thread 1 (LWP 1):
+#0  0x2 in second () at second.cpp:2
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "multi-pstack";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest firstRequest;
+    firstRequest.type = "pstack";
+    firstRequest.name = "a.txt";
+    firstRequest.sourceFile = firstPstack;
+    firstRequest.source = ArtifactSource{"upload", "a.txt"};
+    ASSERT_TRUE(investigation.addArtifact(firstRequest));
+
+    ArtifactIngestRequest secondRequest;
+    secondRequest.type = "pstack";
+    secondRequest.name = "b.txt";
+    secondRequest.sourceFile = secondPstack;
+    secondRequest.source = ArtifactSource{"upload", "b.txt"};
+    ASSERT_TRUE(investigation.addArtifact(secondRequest));
+
+    const auto timelineResult = investigation.projectTimeline();
+
+    ASSERT_TRUE(timelineResult.hasValue());
+    ASSERT_EQ(2U, timelineResult->events.size());
+    EXPECT_EQ("crash.summary", timelineResult->events[0].eventType);
+    EXPECT_EQ("crash.summary", timelineResult->events[1].eventType);
+    EXPECT_NE(timelineResult->events[0].id, timelineResult->events[1].id);
 }
 
 TEST(InvestigationTimelineTest, PaginationTruncatesTimeline)

@@ -6,6 +6,7 @@
 
 #include "artifact_handler.hpp"
 #include "artifact_projector.hpp"
+#include "crash_summary_timeline.hpp"
 #include "foundation/timestamp.hpp"
 
 #include <algorithm>
@@ -56,7 +57,8 @@ class CollectingTimelineSink final : public TimelineEventSink
 
 foundation::Result<TimelineProjectionResult> TimelineProjector::project(const foundation::Path& investigationRoot,
                                                                           const InvestigationManifest& manifest,
-                                                                          TimelineProjectionOptions options)
+                                                                          TimelineProjectionOptions options,
+                                                                          const CrashReportProvider* crashProvider)
 {
     TimelineProjectionResult result;
     std::vector<SortableTimelineEvent> collected;
@@ -73,7 +75,11 @@ foundation::Result<TimelineProjectionResult> TimelineProjector::project(const fo
 
         if (projector == nullptr)
         {
-            result.warnings.push_back("No timeline projector for artifact type: " + artifact.type);
+            if (artifact.type != "pstack" && artifact.type != "core")
+            {
+                result.warnings.push_back("No timeline projector for artifact type: " + artifact.type);
+            }
+
             continue;
         }
 
@@ -95,6 +101,48 @@ foundation::Result<TimelineProjectionResult> TimelineProjector::project(const fo
 
         CollectingTimelineSink sink(collected);
         projector->project(artifact, *dataPathResult, context, sink);
+    }
+
+    if (crashProvider != nullptr)
+    {
+        for (const ArtifactRecord& artifact : manifest.artifacts)
+        {
+            if (artifact.type != "pstack" && artifact.type != "core")
+            {
+                continue;
+            }
+
+            const foundation::Result<CrashReport> reportResult = (*crashProvider)(artifact.id);
+
+            if (!reportResult)
+            {
+                result.warnings.push_back("Crash summary failed for artifact " + artifact.id + ": "
+                                          + reportResult.error().message());
+                continue;
+            }
+
+            const std::optional<TimelineEvent> summaryEvent =
+                makeCrashSummaryTimelineEvent(manifest.id, artifact, *reportResult);
+
+            if (!summaryEvent.has_value())
+            {
+                continue;
+            }
+
+            const auto instantResult = foundation::Timestamp::parse(summaryEvent->timestamp);
+
+            if (!instantResult)
+            {
+                result.warnings.push_back("Crash summary skipped: invalid timestamp for artifact " + artifact.id);
+                continue;
+            }
+
+            SortableTimelineEvent sortable;
+            sortable.event = *summaryEvent;
+            sortable.instant = *instantResult;
+            sortable.sequenceWithinArtifact = 0U;
+            collected.push_back(std::move(sortable));
+        }
     }
 
     const auto compareAscending = [](const SortableTimelineEvent& left, const SortableTimelineEvent& right) {

@@ -61,6 +61,22 @@ test.describe('Story Gate — investigation workflow', () => {
     await expect(page.locator('[data-testid="pstack-thread"].crash-pstack-thread--highlight')).toBeVisible();
   });
 
+  test('Crash Timeline: pstack crash.summary on timeline jumps to Crash evidence', async ({ page }) => {
+    await createInvestigation(page);
+    await addLogArtifact(page);
+    await addPstackArtifact(page);
+    await openFirstArtifact(page);
+
+    await switchBottomTab(page, 'timeline');
+    const crashRow = page.locator('[data-testid="timeline-row"]', { hasText: 'Crash' });
+    await expect(crashRow.first()).toBeVisible({ timeout: 15_000 });
+    await expect(crashRow.first()).toContainText(/SIGSEGV|SessionManager/i);
+
+    await crashRow.first().click();
+    await expect(page.getByTestId('crash-signal')).toContainText('SIGSEGV', { timeout: 15_000 });
+    await expect(page.getByTestId('crash-fault-thread')).toBeVisible();
+  });
+
   test('Story 5: evidence link decoration, Related Evidence panel, and jump', async ({ page }) => {
     await createInvestigation(page);
     await addLogArtifact(page);

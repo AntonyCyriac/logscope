@@ -408,7 +408,11 @@ foundation::Result<bool> Investigation::persist()
 
 foundation::Result<TimelineProjectionResult> Investigation::projectTimeline(TimelineProjectionOptions options) const
 {
-    return TimelineProjector::project(m_rootDirectory, m_manifest, options);
+    const CrashReportProvider provider = [this](const std::string& artifactId) {
+        return analyzeCrash(artifactId);
+    };
+
+    return TimelineProjector::project(m_rootDirectory, m_manifest, options, &provider);
 }
 
 foundation::Result<CrashReport> Investigation::analyzeCrash(const std::string& artifactId) const
