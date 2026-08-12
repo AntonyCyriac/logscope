@@ -21,7 +21,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.6.1** ships **Stories 1–4** (investigation container, multi-source, timeline, crash analysis). **Story 5: Connect the Evidence** completes Phase A — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+LogScope **v2.8.0** ships **Stories 1–6** (investigation container, multi-source, timeline, crash analysis, evidence links, correlation suggestions). Phase A is complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 ```text
 Source → Analysis → Investigation → Reporting
