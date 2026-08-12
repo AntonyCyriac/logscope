@@ -6,6 +6,8 @@
 #pragma once
 
 #include "artifact_record.hpp"
+#include "correlation_engine.hpp"
+#include "correlation_suggestion.hpp"
 #include "evidence_link.hpp"
 #include "investigation_container.hpp"
 #include "investigation_session.hpp"

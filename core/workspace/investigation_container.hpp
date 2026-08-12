@@ -5,10 +5,12 @@
 
 #pragma once
 
+#include <unordered_set>
 #include <vector>
 
 #include "artifact_handler.hpp"
 #include "artifact_record.hpp"
+#include "correlation_suggestion.hpp"
 #include "evidence_link.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
@@ -89,6 +91,20 @@ class Investigation
      * @brief Removes an evidence link by id (Story 5).
      */
     [[nodiscard]] foundation::Result<bool> removeEvidenceLink(const std::string& linkId);
+
+    /**
+     * @brief Lists ephemeral correlation suggestions (Story 6).
+     */
+    [[nodiscard]] foundation::Result<CorrelationSuggestionListResult> listCorrelationSuggestions(
+        CorrelationSuggestionQuery query,
+        const std::unordered_set<std::string>& dismissedSuggestionIds = {}) const;
+
+    /**
+     * @brief Accepts a correlation suggestion by creating an evidence link (Story 6).
+     */
+    [[nodiscard]] foundation::Result<EvidenceLinkRecord> acceptCorrelationSuggestion(
+        const std::string& suggestionId, std::optional<EvidenceLinkType> type, std::optional<std::string> note,
+        const std::unordered_set<std::string>& dismissedSuggestionIds = {});
 
   private:
     Investigation(foundation::Path investigationDir, InvestigationManifest manifest);

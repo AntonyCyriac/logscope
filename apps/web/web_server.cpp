@@ -1629,6 +1629,188 @@ void WebServer::registerRoutes()
                          response.set_header(kSessionHeader, sessionId);
                      });
 
+    m_server->Get(R"(/api/v1/investigations/([^/]+)/correlation-suggestions)",
+                  [this](const httplib::Request& request, httplib::Response& response) {
+                      if (!authorizeApiKey(m_config.apiKey, request, response))
+                      {
+                          return;
+                      }
+
+                      applyCors(m_config, request, response);
+
+                      const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                      if (rejectStaleSessionHeader(request, sessionId, response))
+                      {
+                          return;
+                      }
+
+                      WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                      if (workspace == nullptr)
+                      {
+                          return;
+                      }
+
+                      const std::string investigationId = request.matches[1];
+                      const std::string eventIdValue =
+                          request.has_param("eventId") ? request.get_param_value("eventId") : "";
+                      const std::string limitValue = request.has_param("limit") ? request.get_param_value("limit") : "";
+                      const std::string offsetValue =
+                          request.has_param("offset") ? request.get_param_value("offset") : "";
+                      scope::workspace::CorrelationSuggestionQuery query =
+                          parseCorrelationSuggestionQuery(eventIdValue, limitValue, offsetValue);
+
+                      if (query.limit < 0 || query.offset < 0)
+                      {
+                          setJsonResponse(response, 400,
+                                          errorEnvelope("INVALID_ARGUMENT", "Invalid correlation suggestion query."));
+
+                          return;
+                      }
+
+                      const std::unordered_set<std::string>& dismissed =
+                          workspace->correlationStateByInvestigation[investigationId].dismissedSuggestionIds;
+                      const auto suggestionsResult = m_workspaceStore.investigationStore().listCorrelationSuggestions(
+                          investigationId, query, dismissed);
+
+                      if (!suggestionsResult)
+                      {
+                          setErrorResponse(response, suggestionsResult.error());
+
+                          return;
+                      }
+
+                      setJsonResponse(
+                          response, 200,
+                          successEnvelope(formatCorrelationSuggestionsList(investigationId, *suggestionsResult)));
+                      response.set_header(kSessionHeader, sessionId);
+                  });
+
+    m_server->Post(R"(/api/v1/investigations/([^/]+)/correlation-suggestions/([^/]+)/accept)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
+                       WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                       if (workspace == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string investigationId = request.matches[1];
+                       const std::string suggestionId = request.matches[2];
+                       const auto typeResult = parseOptionalCorrelationAcceptType(request.body);
+
+                       if (!typeResult)
+                       {
+                           setErrorResponse(response, typeResult.error());
+
+                           return;
+                       }
+
+                       const std::optional<std::string> note = parseOptionalCorrelationAcceptNote(request.body);
+                       const std::unordered_set<std::string>& dismissed =
+                           workspace->correlationStateByInvestigation[investigationId].dismissedSuggestionIds;
+                       const auto linkResult = m_workspaceStore.investigationStore().acceptCorrelationSuggestion(
+                           investigationId, suggestionId, *typeResult, note, dismissed);
+
+                       if (!linkResult)
+                       {
+                           setErrorResponse(response, linkResult.error());
+
+                           return;
+                       }
+
+                       setJsonResponse(response, 201, successEnvelope(formatEvidenceLinkRecord(*linkResult)));
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
+    m_server->Post(R"(/api/v1/investigations/([^/]+)/correlation-suggestions/([^/]+)/dismiss)",
+                   [this](const httplib::Request& request, httplib::Response& response) {
+                       if (!authorizeApiKey(m_config.apiKey, request, response))
+                       {
+                           return;
+                       }
+
+                       applyCors(m_config, request, response);
+
+                       const std::string sessionId = resolveSessionId(m_sessionStore, request, true);
+
+                       if (rejectStaleSessionHeader(request, sessionId, response))
+                       {
+                           return;
+                       }
+
+                       WorkspaceSession* workspace = requireSession(*this, sessionId, response);
+
+                       if (workspace == nullptr)
+                       {
+                           return;
+                       }
+
+                       const std::string investigationId = request.matches[1];
+                       const std::string suggestionId = request.matches[2];
+                       const std::unordered_set<std::string> emptyDismissed;
+                       bool found = false;
+
+                       for (int offset = 0;; offset += 50)
+                       {
+                           scope::workspace::CorrelationSuggestionQuery pageQuery;
+                           pageQuery.limit = 50;
+                           pageQuery.offset = offset;
+
+                           const auto pageResult = m_workspaceStore.investigationStore().listCorrelationSuggestions(
+                               investigationId, pageQuery, emptyDismissed);
+
+                           if (!pageResult)
+                           {
+                               setErrorResponse(response, pageResult.error());
+
+                               return;
+                           }
+
+                           for (const scope::workspace::CorrelationSuggestion& suggestion : pageResult->suggestions)
+                           {
+                               if (suggestion.id == suggestionId)
+                               {
+                                   found = true;
+                                   break;
+                               }
+                           }
+
+                           if (found || offset + 50 >= pageResult->total)
+                           {
+                               break;
+                           }
+                       }
+
+                       if (!found)
+                       {
+                           setJsonResponse(response, 404,
+                                           errorEnvelope("NOT_FOUND", "Correlation suggestion not found."));
+
+                           return;
+                       }
+
+                       workspace->correlationStateByInvestigation[investigationId].dismissedSuggestionIds.insert(
+                           suggestionId);
+                       response.status = 204;
+                       response.set_header(kSessionHeader, sessionId);
+                   });
+
     m_server->Get(R"(/api/v1/investigations/([^/]+)/artifacts/([^/]+)/crash-analysis)",
                   [this](const httplib::Request& request, httplib::Response& response) {
                       if (!authorizeApiKey(m_config.apiKey, request, response))

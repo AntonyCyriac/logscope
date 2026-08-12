@@ -6,6 +6,7 @@
 
 #include "analytics_output.hpp"
 #include "crash_report.hpp"
+#include "correlation_suggestion.hpp"
 #include "evidence_link.hpp"
 #include "investigation_output.hpp"
 #include "output_format.hpp"
@@ -37,6 +38,8 @@ std::string errorCodeToken(const foundation::ErrorCode code)
         return "INVALID_LINK_TARGET";
     case foundation::ErrorCode::DuplicateEvidenceLink:
         return "DUPLICATE_EVIDENCE_LINK";
+    case foundation::ErrorCode::StaleSuggestion:
+        return "STALE_SUGGESTION";
     case foundation::ErrorCode::Unknown:
         return "INTERNAL";
     case foundation::ErrorCode::None:
@@ -134,6 +137,7 @@ int httpStatusForError(const foundation::Error& error)
     case foundation::ErrorCode::InvalidArgument:
     case foundation::ErrorCode::ParseError:
     case foundation::ErrorCode::InvalidLinkTarget:
+    case foundation::ErrorCode::StaleSuggestion:
         return 400;
     case foundation::ErrorCode::DuplicateEvidenceLink:
         return 409;
@@ -761,6 +765,63 @@ std::string formatEvidenceLinksList(const std::string& investigationId,
     }
 
     output << "    ]\n}";
+
+    return output.str();
+}
+
+std::string formatCorrelationSuggestion(const scope::workspace::CorrelationSuggestion& suggestion)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "        \"id\": \"" << escapeJsonString(suggestion.id) << "\",\n"
+           << "        \"sourceEventId\": \"" << escapeJsonString(suggestion.sourceEventId) << "\",\n"
+           << "        \"targetEventId\": \"" << escapeJsonString(suggestion.targetEventId) << "\",\n"
+           << "        \"matchedKey\": \"" << escapeJsonString(correlationKeyToString(suggestion.matchedKey))
+           << "\",\n"
+           << "        \"matchedValue\": \"" << escapeJsonString(suggestion.matchedValue) << "\",\n"
+           << "        \"sourceArtifactName\": \"" << escapeJsonString(suggestion.sourceArtifactName) << "\",\n"
+           << "        \"targetArtifactName\": \"" << escapeJsonString(suggestion.targetArtifactName) << "\",\n"
+           << "        \"sourceLineRef\": "
+           << (suggestion.sourceLineRef.has_value() ? std::to_string(*suggestion.sourceLineRef) : "null") << ",\n"
+           << "        \"targetLineRef\": "
+           << (suggestion.targetLineRef.has_value() ? std::to_string(*suggestion.targetLineRef) : "null") << ",\n"
+           << "        \"timeDeltaMs\": "
+           << (suggestion.timeDeltaMs.has_value() ? std::to_string(*suggestion.timeDeltaMs) : "null") << ",\n"
+           << "        \"ruleId\": \"" << escapeJsonString(suggestion.ruleId) << "\",\n"
+           << "        \"summary\": \"" << escapeJsonString(suggestion.summary) << "\"\n"
+           << "      }";
+
+    return output.str();
+}
+
+std::string formatCorrelationSuggestionsList(const std::string& investigationId,
+                                             const scope::workspace::CorrelationSuggestionListResult& result)
+{
+    std::ostringstream output;
+    output << "{\n"
+           << "  \"investigationId\": \"" << escapeJsonString(investigationId) << "\",\n"
+           << "  \"suggestions\": [";
+
+    for (std::size_t index = 0U; index < result.suggestions.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        output << "\n      " << formatCorrelationSuggestion(result.suggestions[index]);
+    }
+
+    if (!result.suggestions.empty())
+    {
+        output << '\n';
+    }
+
+    output << "    ],\n"
+           << "  \"total\": " << result.total << ",\n"
+           << "  \"limit\": " << result.limit << ",\n"
+           << "  \"offset\": " << result.offset << ",\n"
+           << "  \"truncated\": " << (result.truncated ? "true" : "false") << "\n}";
 
     return output.str();
 }

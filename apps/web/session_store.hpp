@@ -12,11 +12,20 @@
 #include <optional>
 #include <string>
 #include <unordered_map>
+#include <unordered_set>
 
 #include "application_service.hpp"
 
 namespace scope::web
 {
+
+/**
+ * @brief Session-scoped correlation suggestion state (Story 6).
+ */
+struct CorrelationSessionState
+{
+    std::unordered_set<std::string> dismissedSuggestionIds;
+};
 
 /**
  * @brief A single workspace with its own ApplicationService instance.
@@ -28,6 +37,7 @@ struct WorkspaceSession
     std::string tempUploadPath;
     std::string boundInvestigationId;
     std::string activeArtifactId;
+    std::unordered_map<std::string, CorrelationSessionState> correlationStateByInvestigation;
 };
 
 /**

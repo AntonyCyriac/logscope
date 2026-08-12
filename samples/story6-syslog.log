@@ -1,0 +1,2 @@
+2026-08-06T10:00:01 WARNING request_id=abc-123 peer warning
+2026-08-06T10:00:02 INFO request_id=abc-123 watchdog heartbeat

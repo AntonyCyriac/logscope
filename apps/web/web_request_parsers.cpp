@@ -5,6 +5,7 @@
 #include "web_request_parsers.hpp"
 
 #include "evidence_link.hpp"
+#include "correlation_suggestion.hpp"
 #include "json_parse.hpp"
 
 #include "analysis.hpp"
@@ -643,6 +644,81 @@ foundation::Result<scope::workspace::EvidenceLinkCreateRequest> parseEvidenceLin
     }
 
     return foundation::Result<scope::workspace::EvidenceLinkCreateRequest>(std::move(request));
+}
+
+scope::workspace::CorrelationSuggestionQuery parseCorrelationSuggestionQuery(const std::string_view eventIdValue,
+                                                                             const std::string_view limitValue,
+                                                                             const std::string_view offsetValue)
+{
+    scope::workspace::CorrelationSuggestionQuery query;
+
+    if (!eventIdValue.empty())
+    {
+        query.eventId = std::string(eventIdValue);
+    }
+
+    if (!limitValue.empty())
+    {
+        try
+        {
+            query.limit = std::stoi(std::string(limitValue));
+        }
+        catch (...)
+        {
+            query.limit = -1;
+        }
+    }
+
+    if (!offsetValue.empty())
+    {
+        try
+        {
+            query.offset = std::stoi(std::string(offsetValue));
+        }
+        catch (...)
+        {
+            query.offset = -1;
+        }
+    }
+
+    return query;
+}
+
+foundation::Result<scope::workspace::EvidenceLinkType> parseOptionalCorrelationAcceptType(
+    const std::string_view body)
+{
+    if (body.empty())
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkType>(scope::workspace::EvidenceLinkType::Related);
+    }
+
+    const std::optional<std::string> typeValue = jsonStringField(body, "type");
+
+    if (!typeValue || typeValue->empty())
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkType>(scope::workspace::EvidenceLinkType::Related);
+    }
+
+    const std::optional<scope::workspace::EvidenceLinkType> parsedType =
+        scope::workspace::parseEvidenceLinkType(*typeValue);
+
+    if (!parsedType)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkType>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "Invalid evidence link type."));
+    }
+
+    return foundation::Result<scope::workspace::EvidenceLinkType>(*parsedType);
+}
+
+std::optional<std::string> parseOptionalCorrelationAcceptNote(const std::string_view body)
+{
+    if (body.empty())
+    {
+        return std::nullopt;
+    }
+
+    return jsonStringField(body, "note");
 }
 
 foundation::Result<bool> validateServerPath(const WebConfig& config, const foundation::Path& path)

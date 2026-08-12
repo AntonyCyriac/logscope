@@ -30,6 +30,8 @@ void printInvestigationCrashUsage(std::ostream& output);
 
 void printInvestigationLinksUsage(std::ostream& output);
 
+void printInvestigationSuggestionsUsage(std::ostream& output);
+
 [[nodiscard]] int runInvestigationCreateCommand(const InvestigationCreateOptions& options,
                                                 std::ostream& output,
                                                 std::ostream& errorOutput);
@@ -65,5 +67,9 @@ void printInvestigationLinksUsage(std::ostream& output);
 [[nodiscard]] int runInvestigationLinksCommand(const InvestigationLinksOptions& options,
                                                std::ostream& output,
                                                std::ostream& errorOutput);
+
+[[nodiscard]] int runInvestigationSuggestionsCommand(const InvestigationSuggestionsOptions& options,
+                                                     std::ostream& output,
+                                                     std::ostream& errorOutput);
 
 } // namespace scope::cli

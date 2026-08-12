@@ -9,6 +9,7 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "application_service.hpp"
@@ -99,6 +100,15 @@ class InvestigationStore
 
     [[nodiscard]] foundation::Result<bool> removeEvidenceLink(const std::string& investigationId,
                                                               const std::string& linkId);
+
+    [[nodiscard]] foundation::Result<scope::workspace::CorrelationSuggestionListResult> listCorrelationSuggestions(
+        const std::string& investigationId, scope::workspace::CorrelationSuggestionQuery query,
+        const std::unordered_set<std::string>& dismissedSuggestionIds = {}) const;
+
+    [[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkRecord> acceptCorrelationSuggestion(
+        const std::string& investigationId, const std::string& suggestionId,
+        std::optional<scope::workspace::EvidenceLinkType> type, std::optional<std::string> note,
+        const std::unordered_set<std::string>& dismissedSuggestionIds = {});
 
     void touchUpdatedAt(const std::string& investigationId);
 
