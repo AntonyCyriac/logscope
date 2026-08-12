@@ -12,6 +12,22 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.8.0] - 2026-08-12
+
+**Story 6** — Discover the Connections (ephemeral correlation suggestions).
+
+### Added
+
+- **Correlation suggestions** — `CorrelationEngine` proposes cross-artifact matches on exact keys with explainability basis ([#166](https://github.com/AntonyCyriac/logscope/pull/166))
+- **REST** — `GET/POST …/correlation-suggestions` (list, accept, dismiss)
+- **CLI** — `investigation suggestions list|accept|dismiss`
+- **Web SPA** — Suggested connections panel on Timeline, Story 6 Playwright E2E
+- ADR-011-M16.0 Investigation Correlation Suggestions ([#165](https://github.com/AntonyCyriac/logscope/pull/165))
+
+See [v2.8.0 release notes](docs/release/v2.8.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.7.1] - 2026-08-07
 
 **Hotfix** — post-Story 5 bugfix bundle ([#145](https://github.com/AntonyCyriac/logscope/issues/145)–[#152](https://github.com/AntonyCyriac/logscope/issues/152)).

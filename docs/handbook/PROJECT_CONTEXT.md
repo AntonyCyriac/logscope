@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.19.0 |
+| Version | 3.20.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 06-08-2026 |
+| Last Updated | 12-08-2026 |
 
 ---
 
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.7.1` (shipped) — post-Story 5 hotfix bundle (investigation links CLI argv, truncated index lines, partial warnings, timeline sub-second, SQLite busy timeout, unknown CLI subcommands, NUL bytes, compress-only-when-smaller). Story 5 (**Connect the Evidence**) shipped in `v2.7.0` — Phase A complete. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** P0 Evidence Correlation (Execution Contract v2).
+**Current release:** `v2.8.0` (shipped) — Story 6 **Discover the Connections** (ephemeral correlation suggestions with explainability, session-scoped dismiss, accept → evidence links). Stories 1–6 shipped (Phase A complete). Prior `v2.7.1` hotfix bundle remains on the 2.7.x line. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** backlog per [Next Value-Add](../planning/NEXT-VALUE-ADD.md) (P1 Crash Timeline, P1.1 pstack dialects, P2 desktop parity).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -39,15 +39,14 @@ The project follows architecture-first development. Every implementation should 
 
 **Domain glossary:** Investigation, Evidence, Artifact, Timeline Event, Evidence Link, Crash Report, Conclusion — see strategy Product Bible (private).
 
-**Active queue (completes Phase A):**
+**Active queue (post–Phase A):**
 
 | Priority | Focus | Status |
 |----------|-------|--------|
-| P0 / Story 5 | Connect the Evidence — completes Phase A | Active — G0 TBD |
-| P0.1 | Timeline decorations + jump to related evidence | Ship first |
 | P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
-| P2 | Desktop Timeline/Crash parity | Necessary — don't block P0 |
-| P3 | ADR-010 domain model + events | Emergent after P0–P1 |
+| P1.1 | Alternate pstack dialects / pluggable crash analyzer | Backlog — [#144](https://github.com/AntonyCyriac/logscope/issues/144) |
+| P2 | Desktop Timeline/Crash parity | Necessary — don't block shipped web stories |
+| P3 | ADR-010 domain model + events | Emergent after P1 |
 | P4–P5 | IQL · AI Investigation Assistant | Research only |
 
 **Completed milestones:**

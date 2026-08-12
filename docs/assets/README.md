@@ -6,7 +6,7 @@ Homepage images for [README.md](../../README.md). **Refresh all three together**
 |------|---------|----------------|
 | `logscope-cli.png` | **CLI** | Terminal with `logscope` commands relevant to the current story line (analyze, investigate, `investigation timeline`, `investigation links`, `investigation crash` as shipped). |
 | `logscope-desktop.png` | **Desktop** | `logscope-desktop` with `samples/sample.log` analyzed; bottom tabs **Results · AI · Analytics** visible. |
-| `logscope-web.png` | **Web** | `logscope-web` IDE layout: artifacts, center viewer, bottom dock (**Timeline · Crash · AI · Results**), plus current story UI (e.g. Related Evidence panel and timeline connection badges for Story 5+). |
+| `logscope-web.png` | **Web** | `logscope-web` IDE layout: artifacts, center viewer, bottom dock (**Timeline · Crash · AI · Results**), plus current story UI (e.g. Suggested connections panel for Story 6+). |
 
 Keep PNGs reasonably sized (README loads in GitHub). Prefer viewport crops over full-page scroll captures.
 

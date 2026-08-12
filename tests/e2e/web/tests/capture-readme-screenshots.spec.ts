@@ -2,13 +2,11 @@ import * as path from 'node:path';
 import { test } from '@playwright/test';
 import {
   addLogArtifact,
-  addPstackArtifact,
-  analyzeHeader,
-  createEvidenceLink,
   createInvestigation,
   openFirstArtifact,
+  story6AppLogPath,
+  story6SyslogPath,
   switchBottomTab,
-  syslogPath,
   waitForReady,
 } from './helpers';
 
@@ -17,19 +15,19 @@ import {
 const REPO_ROOT = path.resolve(__dirname, '../../../../');
 const ASSETS = path.join(REPO_ROOT, 'docs', 'assets');
 
-test('capture README web screenshot (Story 5)', async ({ page }) => {
+test('capture README web screenshot (Story 6)', async ({ page }) => {
   await waitForReady(page);
   await createInvestigation(page, 'readme-screenshot');
-  await addLogArtifact(page);
-  await addLogArtifact(page, syslogPath);
-  await addPstackArtifact(page);
+  await addLogArtifact(page, story6AppLogPath);
+  await addLogArtifact(page, story6SyslogPath);
   await openFirstArtifact(page);
-  await analyzeHeader(page);
 
   await switchBottomTab(page, 'timeline');
-  await page.getByTestId('timeline-row').first().click();
-  await createEvidenceLink(page);
-  await page.getByTestId('timeline-link-badge').first().waitFor({ state: 'visible' });
+  const timelineRows = page.getByTestId('timeline-row');
+  await timelineRows.first().waitFor({ state: 'visible', timeout: 15_000 });
+  await timelineRows.first().click();
+  await page.getByTestId('suggested-connections-panel').waitFor({ state: 'visible' });
+  await page.getByTestId('suggested-connection-row').first().waitFor({ state: 'visible' });
 
   await page.screenshot({
     path: path.join(ASSETS, 'logscope-web.png'),

@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | Roadmap |
 | Category | Project Planning |
-| Version | 3.18.0 |
-| Last Updated | 06-08-2026 |
+| Version | 3.19.0 |
+| Last Updated | 12-08-2026 |
 
 ---
 
@@ -64,9 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.7.1`](CHANGELOG.md) — post-Story 5 hotfix bundle. Stories 1–5 shipped (Phase A complete). **Next:** P0 Evidence Correlation.
-
-**Next:** Story 5 **Connect the Evidence** (completes Phase A) — see [Project Context](handbook/PROJECT_CONTEXT.md) and [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Current release:** [`v2.8.0`](CHANGELOG.md) — Story 6 Discover the Connections. Stories 1–6 shipped (Phase A complete). **Next:** P1 Crash Timeline, P1.1 pstack dialects — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
