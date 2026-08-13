@@ -12,6 +12,20 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.10.0] - 2026-08-13
+
+**Minor** — P1.1 alternate pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)).
+
+### Added
+
+- **TID pstack dialect** — parse `TID n:` thread headers, `symbol - /path` frames, indented source lines ([#144](https://github.com/AntonyCyriac/logscope/issues/144))
+- **`__restore_rt` boundary** — signal-handler detection for dialects without GDB marker (extends #134)
+- Crash report metadata `pstackDialect` (`gdb` | `tid`); analyzer `pstack-v2`
+
+See [v2.10.0 release notes](docs/release/v2.10.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.9.1] - 2026-08-13
 
 **Patch** — Timeline hotfix ([#171](https://github.com/AntonyCyriac/logscope/issues/171), [#172](https://github.com/AntonyCyriac/logscope/issues/172)).

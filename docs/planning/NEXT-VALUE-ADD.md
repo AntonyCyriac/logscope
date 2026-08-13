@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.9.1` (Stories 1–6 + P1 Crash Timeline shipped; v2.9.1 timeline hotfix). Phase A + P1 complete — see §5–§6.
+**Current public release:** `v2.10.0` (Stories 1–6 + P1 + P1.1 TID pstack dialects shipped). Phase A + P1 + P1.1 complete — see §5–§6.
 
 ---
 
@@ -33,7 +33,8 @@ v2.7.1  → shipped (post-Story 5 hotfix bundle)
 v2.8.0  → shipped (Story 6 Discover the Connections)
 v2.9.0  → shipped (P1 Crash Timeline)
 v2.9.1  → shipped (timeline hotfix #171/#172)
-Next    → P1.1 pstack dialects · P2 desktop parity (§5)
+v2.10.0 → shipped (P1.1 TID pstack dialects #144)
+Next    → P2 desktop parity (§5)
 ```
 
 ---
@@ -68,7 +69,7 @@ Next    → P1.1 pstack dialects · P2 desktop parity (§5)
 | **P0.2** | Evidence Groups | **Implementation** | Named clusters of related events |
 | **P0.3** | Correlation View | **Deferred** | When links are rich |
 | **P1** | Crash Timeline | **Shipped** — `v2.9.0` | `crash.summary` on timeline projection |
-| **P1.1** | Alternate pstack dialects / pluggable crash analyzer | **Backlog** — [#144](https://github.com/AntonyCyriac/logscope/issues/144) | Non-GDB `TID n:` / `symbol - /path` dumps — post-`v2.9.0` |
+| **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Implementation** | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
 | **P3** | ADR-010 domain model + events | **Emergent** | Extract when patterns recur after P1 |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
@@ -119,4 +120,4 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.8.0 | 06-08-2026 | Phase A = five stories; Story 5 completes investigation methodology; relationships are evidence not conclusions. |
 | 1.9.0 | 07-08-2026 | `v2.7.1` shipped; [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects backlogged as P1.1. |
 | 2.0.0 | 12-08-2026 | `v2.8.0` shipped — Story 6 Discover the Connections; Phase A complete (Stories 1–6). |
-| 2.2.0 | 13-08-2026 | `v2.9.1` shipped — timeline hotfix (#171, #172). |
+| 2.3.0 | 13-08-2026 | `v2.10.0` shipped — P1.1 TID pstack dialects (#144). |

@@ -64,7 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.9.1`](CHANGELOG.md) — Timeline hotfix. Stories 1–6 + P1 shipped. **Next:** P1.1 pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)), P2 desktop parity — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Current release:** [`v2.10.0`](CHANGELOG.md) — P1.1 pstack dialects. Stories 1–6 + P1 + P1.1 shipped. **Next:** P2 desktop Timeline/Crash parity — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 

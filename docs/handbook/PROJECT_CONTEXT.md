@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.9.1` (shipped) — **P1 Crash Timeline** + **v2.9.1 hotfix** (crash timestamp, timeline skip warnings). Stories 1–6 + P1 shipped. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects (P1.1), P2 desktop parity — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
+**Current release:** `v2.10.0` (shipped) — **P1.1** TID pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)). Stories 1–6 + P1 shipped. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** P2 desktop Timeline/Crash parity — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -44,7 +44,7 @@ The project follows architecture-first development. Every implementation should 
 | Priority | Focus | Status |
 |----------|-------|--------|
 | P1 | Crash Timeline (`crash.summary`) | **Shipped** — `v2.9.0` |
-| P1.1 | Alternate pstack dialects / pluggable crash analyzer | Backlog — [#144](https://github.com/AntonyCyriac/logscope/issues/144) |
+| P1.1 | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) |
 | P2 | Desktop Timeline/Crash parity | Necessary — don't block shipped web stories |
 | P3 | ADR-010 domain model + events | Emergent after P1 |
 | P4–P5 | IQL · AI Investigation Assistant | Research only |
@@ -379,4 +379,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
 | 3.19.0 | 06-08-2026 | Current release `v2.7.0`; Story 5 Connect the Evidence shipped — Phase A complete. |
-| 3.22.0 | 13-08-2026 | Current release `v2.9.1`; timeline hotfix #171/#172 shipped. |
+| 3.23.0 | 13-08-2026 | Current release `v2.10.0`; P1.1 TID pstack dialects shipped (#144). |
