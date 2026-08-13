@@ -31,7 +31,7 @@ namespace scope::workspace
 namespace
 {
 
-constexpr const char* kPstackAnalyzerVersion = "pstack-v1";
+constexpr const char* kPstackAnalyzerVersion = "pstack-v2";
 constexpr const char* kCoreAnalyzerVersion = "core-gdb-v1";
 
 std::string trim(const std::string& value)
@@ -249,11 +249,6 @@ std::optional<CrashFrame> parseSignalHandlerMarker(const std::string& line)
     return frame;
 }
 
-bool isSignalHandlerBoundaryFrame(const CrashFrame& frame)
-{
-    return frame.symbol == "<signal handler called>";
-}
-
 std::optional<std::string> extractSwitchingThreadId(const std::string& line)
 {
     static const std::regex pattern(R"(\[Switching to thread (\d+))", std::regex::icase);
@@ -278,6 +273,17 @@ std::string toLowerCopy(std::string value)
 bool symbolContains(const std::string& symbol, const std::string& needle)
 {
     return toLowerCopy(symbol).find(toLowerCopy(needle)) != std::string::npos;
+}
+
+bool isSignalHandlerBoundaryFrame(const CrashFrame& frame)
+{
+    if (frame.symbol == "<signal handler called>")
+    {
+        return true;
+    }
+
+    return symbolContains(frame.symbol, "__restore_rt") ||
+           symbolContains(frame.symbol, "__kernel_rt_sigreturn");
 }
 
 bool isIdleWaitSymbol(const std::string& symbol)
@@ -465,6 +471,335 @@ const CrashFrame* prominentFaultFrame(const CrashThread& thread)
     return thread.frames.empty() ? nullptr : &thread.frames.front();
 }
 
+std::optional<std::string> extractTidThreadHeader(const std::string& line, std::string& threadName)
+{
+    static const std::regex pattern(R"(^TID\s+(\d+):\s*$)");
+    std::smatch match;
+
+    if (!std::regex_match(line, match, pattern) || match.size() < 2U)
+    {
+        return std::nullopt;
+    }
+
+    threadName = "TID " + match[1].str();
+    return match[1].str();
+}
+
+std::optional<CrashFrame> parseTidFrameLine(const std::string& line)
+{
+    const auto frameIndex = extractFrameIndex(line);
+
+    if (!frameIndex.has_value())
+    {
+        return std::nullopt;
+    }
+
+    std::size_t position = line.find('#') + 1U;
+
+    while (position < line.size() && std::isspace(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    while (position < line.size() && std::isdigit(static_cast<unsigned char>(line[position])) != 0)
+    {
+        ++position;
+    }
+
+    const auto address = extractHexAddress(line, position);
+
+    if (!address.has_value())
+    {
+        return std::nullopt;
+    }
+
+    std::string remainder = trim(line.substr(position));
+
+    static const std::regex variantPrefix(R"(^-\s*\d+\s+)");
+    remainder = std::regex_replace(remainder, variantPrefix, std::string{});
+    remainder = trim(remainder);
+
+    const std::size_t moduleSeparator = remainder.rfind(" - /");
+
+    if (moduleSeparator == std::string::npos)
+    {
+        return std::nullopt;
+    }
+
+    CrashFrame frame;
+    frame.index = *frameIndex;
+    frame.address = *address;
+    frame.symbol = trim(remainder.substr(0U, moduleSeparator));
+    frame.module = trim(remainder.substr(moduleSeparator + 3U));
+
+    if (frame.symbol.empty())
+    {
+        frame.symbol = "<unknown>";
+    }
+
+    return frame;
+}
+
+bool isTidSourceLocationLine(const std::string& line)
+{
+    if (line.empty() || (line.front() != ' ' && line.front() != '\t'))
+    {
+        return false;
+    }
+
+    const std::string trimmed = trim(line);
+
+    return !trimmed.empty() && trimmed.front() == '/';
+}
+
+enum class PstackDialect
+{
+    Gdb,
+    Tid,
+};
+
+PstackDialect detectPstackDialect(const std::string& content)
+{
+    static const std::regex tidHeader(R"(^TID\s+\d+:\s*$)");
+
+    std::istringstream stream(content);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+
+        const std::string trimmed = trim(line);
+
+        if (trimmed.empty())
+        {
+            continue;
+        }
+
+        if (std::regex_match(trimmed, tidHeader))
+        {
+            return PstackDialect::Tid;
+        }
+
+        if (trimmed.rfind("Thread ", 0) == 0)
+        {
+            return PstackDialect::Gdb;
+        }
+    }
+
+    return PstackDialect::Gdb;
+}
+
+void parseGdbPstackContent(const std::string& content, CrashReport& report,
+                           std::optional<std::string>& switchingThreadId)
+{
+    CrashThread* currentThread = nullptr;
+
+    std::istringstream stream(content);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+
+        const std::string trimmed = trim(line);
+
+        if (trimmed.empty())
+        {
+            continue;
+        }
+
+        if (const auto signal = extractSignal(trimmed); signal.has_value())
+        {
+            report.signal = signal;
+            continue;
+        }
+
+        if (const auto threadId = extractSwitchingThreadId(trimmed); threadId.has_value())
+        {
+            switchingThreadId = threadId;
+            continue;
+        }
+
+        std::string threadName;
+
+        if (const auto threadId = extractThreadHeader(trimmed, threadName); threadId.has_value())
+        {
+            CrashThread thread;
+            thread.id = *threadId;
+            thread.name = threadName;
+            report.threads.push_back(std::move(thread));
+            currentThread = &report.threads.back();
+            continue;
+        }
+
+        if (currentThread == nullptr)
+        {
+            continue;
+        }
+
+        if (const auto frame = parseSignalHandlerMarker(trimmed); frame.has_value())
+        {
+            currentThread->frames.push_back(*frame);
+            continue;
+        }
+
+        if (const auto frame = parseFrameLine(trimmed); frame.has_value())
+        {
+            currentThread->frames.push_back(*frame);
+        }
+    }
+}
+
+void parseTidPstackContent(const std::string& content, CrashReport& report)
+{
+    CrashThread* currentThread = nullptr;
+
+    std::istringstream stream(content);
+    std::string line;
+
+    while (std::getline(stream, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+        {
+            line.pop_back();
+        }
+
+        const std::string trimmed = trim(line);
+
+        if (trimmed.empty())
+        {
+            continue;
+        }
+
+        std::string threadName;
+
+        if (const auto threadId = extractTidThreadHeader(trimmed, threadName); threadId.has_value())
+        {
+            CrashThread thread;
+            thread.id = *threadId;
+            thread.name = threadName;
+            report.threads.push_back(std::move(thread));
+            currentThread = &report.threads.back();
+            continue;
+        }
+
+        if (currentThread == nullptr)
+        {
+            continue;
+        }
+
+        if (isTidSourceLocationLine(line))
+        {
+            if (!currentThread->frames.empty())
+            {
+                currentThread->frames.back().location = trimmed;
+            }
+
+            continue;
+        }
+
+        if (const auto frame = parseTidFrameLine(trimmed); frame.has_value())
+        {
+            currentThread->frames.push_back(*frame);
+        }
+    }
+}
+
+void finalizeParsedPstackReport(CrashReport& report, const std::optional<std::string>& switchingThreadId)
+{
+    if (report.threads.empty())
+    {
+        report.status = CrashAnalysisStatus::Failed;
+        report.summary = "No threads parsed from pstack";
+        report.warnings.push_back("Pstack format not recognized or file is empty.");
+
+        return;
+    }
+
+    report.faultThreadId = selectFaultThreadId(report.threads, switchingThreadId);
+
+    for (CrashThread& thread : report.threads)
+    {
+        thread.isFaultThread =
+            report.faultThreadId.has_value() && thread.id == *report.faultThreadId;
+    }
+
+    const CrashThread* faultThread = nullptr;
+
+    for (const CrashThread& thread : report.threads)
+    {
+        if (thread.isFaultThread)
+        {
+            faultThread = &thread;
+            break;
+        }
+    }
+
+    if (faultThread != nullptr)
+    {
+        if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
+            prominentFrame != nullptr)
+        {
+            std::ostringstream observation;
+            observation << "Fault in " << prominentFrame->symbol;
+
+            if (prominentFrame->location.has_value())
+            {
+                observation << " at " << *prominentFrame->location;
+            }
+
+            report.observations.push_back(observation.str());
+        }
+    }
+    else if (report.faultThreadId.has_value() == false)
+    {
+        report.observations.push_back(
+            "No fault thread identified (no abort chain or signal handler found)");
+    }
+
+    if (report.signal.has_value())
+    {
+        report.observations.push_back("Signal " + *report.signal + " received");
+    }
+
+    if (faultThread != nullptr)
+    {
+        if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
+            prominentFrame != nullptr)
+        {
+            std::ostringstream summary;
+            summary << faultThread->name;
+
+            if (report.signal.has_value())
+            {
+                summary << " received " << *report.signal;
+            }
+
+            summary << " in " << prominentFrame->symbol;
+            report.summary = summary.str();
+        }
+        else
+        {
+            report.summary = faultThread->name;
+        }
+    }
+    else
+    {
+        report.summary = "Pstack parsed with " + std::to_string(report.threads.size()) + " thread(s)";
+    }
+
+    report.status = CrashAnalysisStatus::Ready;
+    report.metadata["analyzer"] = kPstackAnalyzerVersion;
+    report.metadata["threadCount"] = std::to_string(report.threads.size());
+}
+
 CrashReport makeBaseReport(const ArtifactRecord& artifact, const CrashAnalysisContext& context,
                            const std::string& analyzerVersion)
 {
@@ -613,151 +948,24 @@ class PstackCrashAnalyzer final : public IArtifactCrashAnalyzer
             return foundation::Result<CrashReport>(std::move(report));
         }
 
-        CrashThread* currentThread = nullptr;
+        std::ostringstream content;
+        content << stream.rdbuf();
+        const std::string fileContent = content.str();
+
         std::optional<std::string> switchingThreadId;
-        std::size_t threadSequence = 0U;
 
-        std::string line;
-
-        while (std::getline(stream, line))
+        if (detectPstackDialect(fileContent) == PstackDialect::Tid)
         {
-            if (!line.empty() && line.back() == '\r')
-            {
-                line.pop_back();
-            }
-
-            const std::string trimmed = trim(line);
-
-            if (trimmed.empty())
-            {
-                continue;
-            }
-
-            if (const auto signal = extractSignal(trimmed); signal.has_value())
-            {
-                report.signal = signal;
-                continue;
-            }
-
-            if (const auto threadId = extractSwitchingThreadId(trimmed); threadId.has_value())
-            {
-                switchingThreadId = threadId;
-                continue;
-            }
-
-            std::string threadName;
-
-            if (const auto threadId = extractThreadHeader(trimmed, threadName); threadId.has_value())
-            {
-                CrashThread thread;
-                thread.id = *threadId;
-                thread.name = threadName;
-                report.threads.push_back(std::move(thread));
-                currentThread = &report.threads.back();
-                continue;
-            }
-
-            if (currentThread == nullptr)
-            {
-                continue;
-            }
-
-            if (const auto frame = parseSignalHandlerMarker(trimmed); frame.has_value())
-            {
-                currentThread->frames.push_back(*frame);
-                continue;
-            }
-
-            if (const auto frame = parseFrameLine(trimmed); frame.has_value())
-            {
-                currentThread->frames.push_back(*frame);
-            }
-        }
-
-        if (report.threads.empty())
-        {
-            report.status = CrashAnalysisStatus::Failed;
-            report.summary = "No threads parsed from pstack";
-            report.warnings.push_back("Pstack format not recognized or file is empty.");
-
-            return foundation::Result<CrashReport>(std::move(report));
-        }
-
-        report.faultThreadId = selectFaultThreadId(report.threads, switchingThreadId);
-
-        for (CrashThread& thread : report.threads)
-        {
-            thread.isFaultThread =
-                report.faultThreadId.has_value() && thread.id == *report.faultThreadId;
-        }
-
-        const CrashThread* faultThread = nullptr;
-
-        for (const CrashThread& thread : report.threads)
-        {
-            if (thread.isFaultThread)
-            {
-                faultThread = &thread;
-                break;
-            }
-        }
-
-        if (faultThread != nullptr)
-        {
-            if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
-                prominentFrame != nullptr)
-            {
-                std::ostringstream observation;
-                observation << "Fault in " << prominentFrame->symbol;
-
-                if (prominentFrame->location.has_value())
-                {
-                    observation << " at " << *prominentFrame->location;
-                }
-
-                report.observations.push_back(observation.str());
-            }
-        }
-        else if (report.faultThreadId.has_value() == false)
-        {
-            report.observations.push_back(
-                "No fault thread identified (no abort chain or signal handler found)");
-        }
-
-        if (report.signal.has_value())
-        {
-            report.observations.push_back("Signal " + *report.signal + " received");
-        }
-
-        if (faultThread != nullptr)
-        {
-            if (const CrashFrame* prominentFrame = prominentFaultFrame(*faultThread);
-                prominentFrame != nullptr)
-            {
-                std::ostringstream summary;
-                summary << faultThread->name;
-
-                if (report.signal.has_value())
-                {
-                    summary << " received " << *report.signal;
-                }
-
-                summary << " in " << prominentFrame->symbol;
-                report.summary = summary.str();
-            }
-            else
-            {
-                report.summary = faultThread->name;
-            }
+            parseTidPstackContent(fileContent, report);
+            report.metadata["pstackDialect"] = "tid";
         }
         else
         {
-            report.summary = "Pstack parsed with " + std::to_string(report.threads.size()) + " thread(s)";
+            parseGdbPstackContent(fileContent, report, switchingThreadId);
+            report.metadata["pstackDialect"] = "gdb";
         }
 
-        report.status = CrashAnalysisStatus::Ready;
-        report.metadata["analyzer"] = kPstackAnalyzerVersion;
-        report.metadata["threadCount"] = std::to_string(report.threads.size());
+        finalizeParsedPstackReport(report, switchingThreadId);
 
         return foundation::Result<CrashReport>(std::move(report));
     }
