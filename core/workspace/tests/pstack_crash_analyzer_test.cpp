@@ -248,12 +248,74 @@ Thread 2 (Thread 0x7f2a1a2b0700 (LWP 3109)):
 TEST(PstackCrashAnalyzerTest, StableCrashReportIdIsDeterministic)
 {
     const std::string first =
-        scope::workspace::makeCrashReportId("inv", "artifact", "pstack-v1");
+        scope::workspace::makeCrashReportId("inv", "artifact", "pstack-v2");
     const std::string second =
-        scope::workspace::makeCrashReportId("inv", "artifact", "pstack-v1");
+        scope::workspace::makeCrashReportId("inv", "artifact", "pstack-v2");
 
     EXPECT_EQ(first, second);
     EXPECT_FALSE(first.empty());
+}
+
+TEST(PstackCrashAnalyzerTest, ParsesTidDialectAbortBelowRestoreRtBoundary)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_crash_tid"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_tid.txt"));
+
+    writeFile(pstackFile, R"(PID 1234 - process
+TID 1234:
+#0  0x00007f0000000001     __select - /lib64/libc.so.6
+#1  0x00007f0000000002 - 1 platform_usleep - /opt/vendor/lib64/libplatform.so
+    /build/src/queue.c:474:9
+
+TID 1240:
+#0  0x00007f0000000010     epoll_wait - /lib64/libc.so.6
+#1  0x00007f0000000011 - 1 EventLoop::run - /opt/vendor/lib64/libapp.so
+
+TID 1250:
+#0  0x00007f0000000020     wait4 - /lib64/libc.so.6
+#1  0x00007f0000000021 - 1 do_system - /lib64/libc.so.6
+#2  0x00007f0000000022 - 1 sig_handler - /opt/vendor/lib64/libsighandler.so
+#3  0x00007f0000000023     __restore_rt - /lib64/libc.so.6
+#4  0x00007f0000000024     __pthread_kill_implementation - /lib64/libc.so.6
+#5  0x00007f0000000025 - 1 raise - /lib64/libc.so.6
+#6  0x00007f0000000026 - 1 abort - /lib64/libc.so.6
+#7  0x00007f0000000027 - 1 malloc_printerr - /lib64/libc.so.6
+#8  0x00007f0000000028 - 1 _int_malloc - /lib64/libc.so.6
+#9  0x00007f0000000029 - 1 operator new(unsigned long) - /lib64/libstdc++.so.6
+#10 0x00007f000000002a - 1 app::GrpcHandler::subscribe() - /opt/vendor/lib64/libapp.so
+#11 0x00007f000000002b - 1 start_thread - /lib64/libc.so.6
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "crash-tid";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "pstack.txt";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "pstack.txt"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+
+    const auto crashResult = investigation.analyzeCrash(artifactResult->id);
+
+    ASSERT_TRUE(crashResult.hasValue());
+    EXPECT_EQ(CrashAnalysisStatus::Ready, crashResult->status);
+    ASSERT_EQ(3U, crashResult->threads.size());
+    ASSERT_TRUE(crashResult->faultThreadId.has_value());
+    EXPECT_EQ("1250", *crashResult->faultThreadId);
+    ASSERT_FALSE(crashResult->observations.empty());
+    EXPECT_NE(std::string::npos, crashResult->observations.front().find("app::GrpcHandler::subscribe"));
+    EXPECT_EQ(std::string::npos, crashResult->observations.front().find("epoll_wait"));
+    EXPECT_EQ("tid", crashResult->metadata.at("pstackDialect"));
 }
 
 TEST(PstackCrashAnalyzerTest, LogArtifactIsNotAnalyzable)
