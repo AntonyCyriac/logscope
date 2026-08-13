@@ -9,16 +9,23 @@
 #include <gtest/gtest.h>
 
 #include "artifact_projector.hpp"
+#include "crash_report.hpp"
+#include "crash_summary_timeline.hpp"
 #include "gtest_temp_path.hpp"
 #include "workspace.hpp"
 
 using scope::foundation::Path;
 using scope::workspace::ArtifactIngestRequest;
+using scope::workspace::ArtifactRecord;
 using scope::workspace::ArtifactSource;
+using scope::workspace::CrashAnalysisStatus;
+using scope::workspace::CrashReport;
 using scope::workspace::Investigation;
 using scope::workspace::InvestigationCreateRequest;
+using scope::workspace::TimelineEvent;
 using scope::workspace::TimelineProjectionOptions;
 using scope::workspace::TimelineSortOrder;
+using scope::workspace::makeCrashSummaryTimelineEvent;
 
 namespace
 {
@@ -326,4 +333,132 @@ TEST(InvestigationTimelineTest, PreservesSubSecondPrecisionAndMessageBoundaries)
     EXPECT_NE(timelineResult->events[0].timestamp, timelineResult->events[1].timestamp);
     EXPECT_FALSE(timelineResult->events[0].message.empty());
     EXPECT_NE('.', timelineResult->events[0].message.front());
+}
+
+TEST(InvestigationTimelineTest, IngestCapturesSourceFileModifiedAt)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_mtime"));
+    const Path appLog(logscope::gtest::uniqueTestPath("_mtime.log"));
+
+    writeFile(appLog, "2026-08-01T10:00:00 event\n");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "mtime-capture";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest appRequest;
+    appRequest.type = "log";
+    appRequest.name = "app.log";
+    appRequest.sourceFile = appLog;
+    appRequest.source = ArtifactSource{"upload", "app.log"};
+
+    const auto artifactResult = investigation.addArtifact(appRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+    EXPECT_FALSE(artifactResult->sourceModifiedAt.empty());
+}
+
+TEST(InvestigationTimelineTest, CrashSummaryPrefersSourceModifiedAtOverImportedAt)
+{
+    ArtifactRecord artifact;
+    artifact.id = "artifact-1";
+    artifact.type = "pstack";
+    artifact.name = "app.pstack";
+    artifact.importedAt = "2026-08-13T03:23:28.568757549Z";
+    artifact.sourceModifiedAt = "2026-05-06T10:32:11Z";
+
+    CrashReport report;
+    report.id = "crash-1";
+    report.artifactId = artifact.id;
+    report.artifactType = "pstack";
+    report.status = CrashAnalysisStatus::Ready;
+    report.signal = "SIGSEGV";
+    report.summary = "SIGSEGV — thread 18";
+
+    const std::optional<TimelineEvent> event = makeCrashSummaryTimelineEvent("inv-1", artifact, report);
+
+    ASSERT_TRUE(event.has_value());
+    EXPECT_EQ("2026-05-06T10:32:11Z", event->timestamp);
+    EXPECT_EQ("source_mtime", event->metadata.at("timestampSource"));
+    EXPECT_EQ("true", event->metadata.at("timestampApproximate"));
+}
+
+TEST(InvestigationTimelineTest, UnrecognisedLogTimestampsEmitSkipWarning)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_skip"));
+    const Path appLog(logscope::gtest::uniqueTestPath("_skip.log"));
+
+    writeFile(appLog, "05-05-2026 12:57:48  100-10   clear   \"registered\"\n"
+                       "05-05-2026 12:58:28  107-46   major   \"pid died\"\n");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "timeline-skip";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest appRequest;
+    appRequest.type = "log";
+    appRequest.name = "platform.log";
+    appRequest.sourceFile = appLog;
+    appRequest.source = ArtifactSource{"upload", "platform.log"};
+
+    ASSERT_TRUE(investigation.addArtifact(appRequest));
+
+    const auto timelineResult = investigation.projectTimeline();
+
+    ASSERT_TRUE(timelineResult.hasValue());
+    EXPECT_TRUE(timelineResult->events.empty());
+    ASSERT_EQ(1U, timelineResult->artifactStats.size());
+    EXPECT_EQ(2U, timelineResult->artifactStats[0].linesRead);
+    EXPECT_EQ(2U, timelineResult->artifactStats[0].linesSkippedNoTimestamp);
+    ASSERT_FALSE(timelineResult->warnings.empty());
+    EXPECT_NE(std::string::npos, timelineResult->warnings[0].find("skipped"));
+}
+
+TEST(InvestigationTimelineTest, PstackIngestUsesSourceModifiedAtForCrashSummary)
+{
+    const Path investigationDir(logscope::gtest::uniqueTestPath("_timeline_pstack_mtime"));
+    const Path pstackFile(logscope::gtest::uniqueTestPath("_pstack_mtime.txt"));
+
+    writeFile(pstackFile, R"(Program received signal SIGSEGV, Segmentation fault.
+Thread 1 (LWP 1):
+#0  0x1 in fault () at fault.cpp:1
+)");
+
+    InvestigationCreateRequest createRequest;
+    createRequest.name = "pstack-mtime";
+
+    const auto createResult = Investigation::create(investigationDir, createRequest);
+
+    ASSERT_TRUE(createResult.hasValue());
+
+    Investigation investigation = std::move(*createResult);
+
+    ArtifactIngestRequest pstackRequest;
+    pstackRequest.type = "pstack";
+    pstackRequest.name = "app.pstack";
+    pstackRequest.sourceFile = pstackFile;
+    pstackRequest.source = ArtifactSource{"upload", "app.pstack"};
+
+    const auto artifactResult = investigation.addArtifact(pstackRequest);
+
+    ASSERT_TRUE(artifactResult.hasValue());
+    EXPECT_FALSE(artifactResult->sourceModifiedAt.empty());
+
+    const auto timelineResult = investigation.projectTimeline();
+
+    ASSERT_TRUE(timelineResult.hasValue());
+    ASSERT_EQ(1U, timelineResult->events.size());
+    EXPECT_EQ("crash.summary", timelineResult->events[0].eventType);
+    EXPECT_EQ(artifactResult->sourceModifiedAt, timelineResult->events[0].timestamp);
+    EXPECT_EQ("source_mtime", timelineResult->events[0].metadata.at("timestampSource"));
 }

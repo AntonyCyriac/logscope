@@ -569,6 +569,26 @@ std::string formatInvestigationTimeline(const std::string& investigationId,
     }
 
     output << "\n  },\n"
+           << "  \"projectionStats\": [";
+
+    for (std::size_t index = 0U; index < result.artifactStats.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        const scope::workspace::TimelineArtifactProjectionStats& stats = result.artifactStats[index];
+        output << "\n    {\n"
+               << "      \"artifactId\": \"" << escapeJsonString(stats.artifactId) << "\",\n"
+               << "      \"artifactName\": \"" << escapeJsonString(stats.artifactName) << "\",\n"
+               << "      \"linesRead\": " << stats.linesRead << ",\n"
+               << "      \"eventsEmitted\": " << stats.eventsEmitted << ",\n"
+               << "      \"linesSkippedNoTimestamp\": " << stats.linesSkippedNoTimestamp << "\n"
+               << "    }";
+    }
+
+    output << "\n  ],\n"
            << "  \"warnings\": [";
 
     for (std::size_t index = 0U; index < result.warnings.size(); ++index)

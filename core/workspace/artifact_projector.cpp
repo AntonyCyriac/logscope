@@ -9,6 +9,8 @@
 #include "foundation/timestamp.hpp"
 
 #include "plain_text_field_extractor.hpp"
+#include "format_parser.hpp"
+#include "json_lines_parser.hpp"
 
 #include <fstream>
 #include <iomanip>
@@ -82,33 +84,97 @@ class LogArtifactProjector final : public IArtifactProjector
         std::string line;
         std::size_t lineNumber = 0U;
         std::size_t sequence = 0U;
+        const analysis::FormatParser* pluginParser = context.options.lineParser;
 
         while (std::getline(stream, line))
         {
             ++lineNumber;
 
-            const analysis::PlainTextFields fields = analysis::PlainTextFieldExtractor::extract(line);
-
-            if (!fields.timestamp.has_value())
+            if (context.logStats != nullptr)
             {
-                continue;
+                ++context.logStats->linesRead;
+            }
+
+            std::optional<foundation::Timestamp> timestamp;
+            std::string message;
+
+            if (pluginParser != nullptr)
+            {
+                const analysis::JsonLineParseResult parsed = pluginParser->parseLine(line);
+
+                if (parsed.outcome == analysis::JsonLineParseOutcome::Blank)
+                {
+                    continue;
+                }
+
+                if (parsed.outcome == analysis::JsonLineParseOutcome::Invalid || parsed.timestampValue.empty())
+                {
+                    if (context.logStats != nullptr)
+                    {
+                        ++context.logStats->linesSkippedNoTimestamp;
+                    }
+
+                    continue;
+                }
+
+                const auto timestampResult = analysis::parseLogTimestamp(parsed.timestampValue);
+
+                if (!timestampResult.hasValue())
+                {
+                    if (context.logStats != nullptr)
+                    {
+                        ++context.logStats->linesSkippedNoTimestamp;
+                    }
+
+                    continue;
+                }
+
+                timestamp = *timestampResult;
+                message = parsed.messageValue.empty() ? truncateMessage(line) : parsed.messageValue;
+            }
+            else
+            {
+                const analysis::PlainTextFields fields = analysis::PlainTextFieldExtractor::extract(line);
+
+                if (!fields.timestamp.has_value())
+                {
+                    if (context.logStats != nullptr)
+                    {
+                        ++context.logStats->linesSkippedNoTimestamp;
+                    }
+
+                    continue;
+                }
+
+                timestamp = *fields.timestamp;
+                message = fields.messageExcerpt.empty() ? truncateMessage(line) : fields.messageExcerpt;
             }
 
             TimelineEvent event;
-            event.timestamp = fields.timestamp->toString();
+            event.timestamp = timestamp->toString();
             event.artifactId = artifact.id;
             event.eventType = "log.line";
-            event.message = fields.messageExcerpt.empty() ? truncateMessage(line) : fields.messageExcerpt;
+            event.message = message;
             event.source = makeEventSource(artifact, lineNumber);
             event.id = makeTimelineEventId(context.investigationId, artifact.id, sequence, event.timestamp,
                                            event.eventType);
 
             if (!sink.append(std::move(event)))
             {
+                if (context.logStats != nullptr)
+                {
+                    context.logStats->eventsEmitted = sequence;
+                }
+
                 return;
             }
 
             ++sequence;
+
+            if (context.logStats != nullptr)
+            {
+                context.logStats->eventsEmitted = sequence;
+            }
 
             if (sequence >= context.options.maxEventsPerArtifact)
             {

@@ -100,7 +100,29 @@ foundation::Result<TimelineProjectionResult> TimelineProjector::project(const fo
         }
 
         CollectingTimelineSink sink(collected);
+
+        TimelineArtifactProjectionStats logStats;
+        logStats.artifactId = artifact.id;
+        logStats.artifactName = artifact.name;
+
+        if (artifact.type == "log")
+        {
+            context.logStats = &logStats;
+        }
+
         projector->project(artifact, *dataPathResult, context, sink);
+        context.logStats = nullptr;
+
+        if (artifact.type == "log" && logStats.linesRead > 0U)
+        {
+            result.artifactStats.push_back(logStats);
+
+            if (logStats.linesSkippedNoTimestamp > 0U)
+            {
+                result.warnings.push_back(artifact.name + ": " + std::to_string(logStats.linesSkippedNoTimestamp)
+                                          + " line(s) skipped (no recognisable timestamp)");
+            }
+        }
     }
 
     if (crashProvider != nullptr)

@@ -8,6 +8,7 @@
 #include <iosfwd>
 
 #include "cli_parser.hpp"
+#include "configuration_manager.hpp"
 
 namespace scope::cli
 {
@@ -57,6 +58,7 @@ void printInvestigationSuggestionsUsage(std::ostream& output);
                                               std::ostream& errorOutput);
 
 [[nodiscard]] int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
+                                                  configuration::ConfigurationManager& configurationManager,
                                                   std::ostream& output,
                                                   std::ostream& errorOutput);
 

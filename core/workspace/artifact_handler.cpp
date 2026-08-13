@@ -7,6 +7,7 @@
 #include "foundation/clock.hpp"
 #include "foundation/uuid.hpp"
 
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 
@@ -19,6 +20,31 @@ namespace
 std::string currentTimestampIso()
 {
     return foundation::Clock::now().toString();
+}
+
+std::optional<std::string> captureSourceFileModifiedAt(const foundation::Path& sourceFile)
+{
+    std::error_code errorCode;
+    const auto fileTime = std::filesystem::last_write_time(sourceFile.string(), errorCode);
+
+    if (errorCode)
+    {
+        return std::nullopt;
+    }
+
+    const auto sctp = std::chrono::time_point_cast<std::chrono::system_clock::duration>(
+        fileTime - std::filesystem::file_time_type::clock::now() + std::chrono::system_clock::now());
+    const auto seconds =
+        std::chrono::duration_cast<std::chrono::seconds>(sctp.time_since_epoch()).count();
+    return foundation::Timestamp::fromUnixSeconds(seconds).toString();
+}
+
+void applySourceModifiedAt(ArtifactRecord& record, const foundation::Path& sourceFile)
+{
+    if (const std::optional<std::string> modifiedAt = captureSourceFileModifiedAt(sourceFile))
+    {
+        record.sourceModifiedAt = *modifiedAt;
+    }
 }
 
 foundation::Result<bool> copyFileTo(const foundation::Path& source, const foundation::Path& destination)
@@ -67,6 +93,7 @@ class LogArtifactHandler final : public IArtifactHandler
         record.name = request.name.empty() ? request.sourceFile.filename().string() : request.name;
         record.relativePath = "artifacts/" + record.id + "/data";
         record.importedAt = currentTimestampIso();
+        applySourceModifiedAt(record, request.sourceFile);
         record.source = request.source;
         record.status = "ready";
 
@@ -162,6 +189,7 @@ class PstackArtifactHandler final : public IArtifactHandler
         record.name = request.name.empty() ? request.sourceFile.filename().string() : request.name;
         record.relativePath = "artifacts/" + record.id + "/data";
         record.importedAt = currentTimestampIso();
+        applySourceModifiedAt(record, request.sourceFile);
         record.source = request.source;
         record.status = "ready";
 
@@ -210,6 +238,7 @@ class CoreArtifactHandler final : public IArtifactHandler
         record.name = request.name.empty() ? request.sourceFile.filename().string() : request.name;
         record.relativePath = "artifacts/" + record.id + "/data";
         record.importedAt = currentTimestampIso();
+        applySourceModifiedAt(record, request.sourceFile);
         record.source = request.source;
         record.status = "ready";
 

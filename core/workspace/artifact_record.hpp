@@ -34,6 +34,8 @@ struct ArtifactRecord
     std::string name;
     std::string relativePath;
     std::string importedAt;
+    /// Source file last-write time at import (ISO-8601). Empty when unknown or not file-backed.
+    std::string sourceModifiedAt;
     ArtifactSource source;
     std::string status = "ready";
     std::vector<std::string> tags;

@@ -11,8 +11,25 @@
 #include <string>
 #include <vector>
 
+namespace scope::analysis
+{
+class FormatParser;
+}
+
 namespace scope::workspace
 {
+
+/**
+ * @brief Per-artifact log projection counters (timeline diagnostics).
+ */
+struct TimelineArtifactProjectionStats
+{
+    std::string artifactId;
+    std::string artifactName;
+    std::size_t linesRead = 0U;
+    std::size_t eventsEmitted = 0U;
+    std::size_t linesSkippedNoTimestamp = 0U;
+};
 
 /**
  * @brief Provenance for navigating from a timeline event back to an artifact.
@@ -59,6 +76,8 @@ struct TimelineProjectionOptions
     std::size_t offset = 0U;
     std::size_t maxEventsPerArtifact = 5'000U;
     TimelineSortOrder order = TimelineSortOrder::Ascending;
+    /// Optional plugin format parser (analysis.plugin_format). When set, log lines use the plugin.
+    const scope::analysis::FormatParser* lineParser = nullptr;
 };
 
 /**
@@ -70,6 +89,7 @@ struct TimelineProjectionResult
     bool truncated = false;
     std::optional<std::size_t> totalMatched;
     std::vector<std::string> warnings;
+    std::vector<TimelineArtifactProjectionStats> artifactStats;
 };
 
 } // namespace scope::workspace

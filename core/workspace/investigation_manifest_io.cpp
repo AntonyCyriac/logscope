@@ -454,6 +454,7 @@ ArtifactRecord parseArtifactRecord(const std::string& object)
     record.name = extractJsonString(object, "name");
     record.relativePath = extractJsonString(object, "relativePath");
     record.importedAt = extractJsonString(object, "importedAt");
+    record.sourceModifiedAt = extractJsonString(object, "sourceModifiedAt");
     record.status = extractJsonString(object, "status");
 
     if (record.status.empty())
@@ -672,7 +673,14 @@ std::string formatArtifactRecordJson(const ArtifactRecord& record)
            << "      \"type\": \"" << escapeJsonString(record.type) << "\",\n"
            << "      \"name\": \"" << escapeJsonString(record.name) << "\",\n"
            << "      \"relativePath\": \"" << escapeJsonString(record.relativePath) << "\",\n"
-           << "      \"importedAt\": \"" << escapeJsonString(record.importedAt) << "\",\n"
+           << "      \"importedAt\": \"" << escapeJsonString(record.importedAt) << "\"";
+
+    if (!record.sourceModifiedAt.empty())
+    {
+        output << ",\n      \"sourceModifiedAt\": \"" << escapeJsonString(record.sourceModifiedAt) << '"';
+    }
+
+    output << ",\n"
            << "      \"source\": " << formatArtifactSourceJson(record.source) << ",\n"
            << "      \"status\": \"" << escapeJsonString(record.status) << "\",\n"
            << "      \"tags\": " << formatStringArrayJson(record.tags) << ",\n"

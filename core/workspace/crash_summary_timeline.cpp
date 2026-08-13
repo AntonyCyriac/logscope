@@ -23,9 +23,9 @@ EventSource makeEventSource(const ArtifactRecord& artifact)
     return source;
 }
 
-std::optional<std::string> resolveImportedAtIso(const ArtifactRecord& artifact)
+std::optional<std::string> resolveTimestampIso(const std::string& value)
 {
-    const auto parsed = foundation::Timestamp::parse(artifact.importedAt);
+    const auto parsed = foundation::Timestamp::parse(value);
 
     if (!parsed)
     {
@@ -33,6 +33,34 @@ std::optional<std::string> resolveImportedAtIso(const ArtifactRecord& artifact)
     }
 
     return parsed->toString();
+}
+
+struct ResolvedCrashTimestamp
+{
+    std::string iso;
+    std::string source;
+    bool approximate = false;
+};
+
+std::optional<ResolvedCrashTimestamp> resolveCrashSummaryTimestamp(const ArtifactRecord& artifact)
+{
+    if (!artifact.sourceModifiedAt.empty())
+    {
+        if (const std::optional<std::string> iso = resolveTimestampIso(artifact.sourceModifiedAt))
+        {
+            return ResolvedCrashTimestamp{*iso, "source_mtime", true};
+        }
+    }
+
+    if (!artifact.importedAt.empty())
+    {
+        if (const std::optional<std::string> iso = resolveTimestampIso(artifact.importedAt))
+        {
+            return ResolvedCrashTimestamp{*iso, "imported_at", true};
+        }
+    }
+
+    return std::nullopt;
 }
 
 void setMetadataValue(std::map<std::string, std::string>& metadata, const std::string& key,
@@ -55,7 +83,7 @@ std::optional<TimelineEvent> makeCrashSummaryTimelineEvent(const std::string& in
         return std::nullopt;
     }
 
-    const std::optional<std::string> timestamp = resolveImportedAtIso(artifact);
+    const std::optional<ResolvedCrashTimestamp> timestamp = resolveCrashSummaryTimestamp(artifact);
 
     if (!timestamp.has_value())
     {
@@ -63,12 +91,19 @@ std::optional<TimelineEvent> makeCrashSummaryTimelineEvent(const std::string& in
     }
 
     TimelineEvent event;
-    event.timestamp = *timestamp;
+    event.timestamp = timestamp->iso;
     event.artifactId = artifact.id;
     event.eventType = "crash.summary";
     event.source = makeEventSource(artifact);
     event.metadata["crashReportId"] = report.id;
     event.metadata["status"] = crashAnalysisStatusToString(report.status);
+    event.metadata["timestampSource"] = timestamp->source;
+
+    if (timestamp->approximate)
+    {
+        event.metadata["timestampApproximate"] = "true";
+    }
+
     setMetadataValue(event.metadata, "signal", report.signal);
     setMetadataValue(event.metadata, "faultThreadId", report.faultThreadId);
 

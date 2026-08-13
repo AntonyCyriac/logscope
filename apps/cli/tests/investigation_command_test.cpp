@@ -11,6 +11,7 @@
 
 #include "gtest_temp_path.hpp"
 #include "investigation_command.hpp"
+#include "configuration_manager.hpp"
 #include "workspace.hpp"
 
 using scope::cli::InvestigationAddNoteOptions;
@@ -368,8 +369,9 @@ TEST_F(InvestigationCommandTest, TimelineTableOutputIncludesEvents)
 
     std::ostringstream timelineOutput;
     std::ostringstream timelineError;
+    scope::configuration::ConfigurationManager configurationManager;
 
-    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, timelineOutput, timelineError));
+    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, configurationManager, timelineOutput, timelineError));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("timestamp\teventType\tsource\tmessage"));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("log.line"));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("first event"));
@@ -404,8 +406,9 @@ TEST_F(InvestigationCommandTest, TimelineJsonOutputAndLimit)
 
     std::ostringstream timelineOutput;
     std::ostringstream timelineError;
+    scope::configuration::ConfigurationManager configurationManager;
 
-    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, timelineOutput, timelineError));
+    ASSERT_EQ(0, runInvestigationTimelineCommand(timelineOptions, configurationManager, timelineOutput, timelineError));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("\"investigationId\": \"" + m_investigationId + '"'));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("\"eventType\": \"log.line\""));
     EXPECT_NE(std::string::npos, timelineOutput.str().find("\"truncated\": true"));
