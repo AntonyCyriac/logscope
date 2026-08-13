@@ -4,9 +4,9 @@
 |-------|-------|
 | Document | Domain Glossary |
 | Category | Handbook |
-| Version | 1.0.0 |
+| Version | 1.1.0 |
 | Status | Approved |
-| Last Updated | 06-08-2026 |
+| Last Updated | 13-08-2026 |
 
 ---
 
@@ -30,7 +30,8 @@ Not a log viewer or observability platform — an **investigation platform** cen
 | **Evidence** | Any artifact or derived observation that contributes to understanding an incident |
 | **Artifact** | A concrete piece of evidence stored in an investigation (log, pstack, core, note, report, …) |
 | **Timeline Event** | A time-ordered observation **projected** from evidence |
-| **Evidence Link** | A relationship between two pieces of evidence — **not** a conclusion (Story 5 — planned) |
+| **Evidence Link** | A relationship between two timeline events — **not** a conclusion (`v2.7.0` Story 5) |
+| **Correlation Suggestion** | Ephemeral proposal to link events that share an exact correlation key; accept → Evidence Link (`v2.8.0` Story 6) |
 | **Crash Report** | Structured analysis **projected** from a crash artifact (`pstack` / `core`) |
 | **Conclusion** | Human judgment based on evidence — not stored as truth by LogScope |
 
@@ -52,19 +53,21 @@ Not a log viewer or observability platform — an **investigation platform** cen
 |--------|---------------------|
 | Investigate incident | Analyze log |
 | Evidence analysis | Log analysis |
-| Related evidence / Connections | Correlation (engineering term) |
+| Related evidence / Suggested connections | Correlation (engineering term) |
 
 ---
 
-## Investigation methodology (Phase A)
+## Investigation methodology (Phase A + P1)
 
-| Question | Story | Shipped |
-|----------|-------|---------|
+| Question | Story / item | Shipped |
+|----------|--------------|---------|
 | Where is my evidence? | Create an Investigation | `v2.3.0` |
 | What evidence do I have? | Understand Everything | `v2.4.0` |
 | What happened? | See What Happened | `v2.5.0` |
 | Why did it crash? | Understand Why It Crashed | `v2.6.0` |
-| How is it connected? | **Connect the Evidence** | Active (completes Phase A) |
+| How is it connected? | Connect the Evidence | `v2.7.0` |
+| What else connects? | Discover the Connections | `v2.8.0` |
+| Where is the crash on the timeline? | Crash Timeline (P1) | `v2.9.0` |
 
 See [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) and [Roadmap](../ROADMAP.md).
 

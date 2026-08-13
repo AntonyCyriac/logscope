@@ -19,27 +19,30 @@ Pointers for AI assistants — **where code and tests live**. Session bootstrap:
 | Area | Paths |
 |------|--------|
 | Routes | `web_server.cpp` |
-| Investigations (v2.3.0+ / M15.5–M15.9) | `investigation_store.*` — `/api/v1/investigations`, artifacts, open/switch, **`GET …/timeline`**, **`GET/POST/DELETE …/evidence-links`** (v2.7.0) |
+| Investigations (v2.3.0+ / M15.5–M15.9) | `investigation_store.*` — `/api/v1/investigations`, artifacts, open/switch, **`GET …/timeline`**, **`GET/POST/DELETE …/evidence-links`** (v2.7.0), **`GET …/correlation-suggestions`** + accept/dismiss (v2.8.0) |
 | Shared workspaces (v2.2.0 compat) | `workspace_store.*` — delegates to `InvestigationStore`; `/api/v1/workspaces` alias |
 | Async analyze jobs | `analyze_job_queue.*` |
 | Sessions | `session_store.*` |
 | SPA assets | `ui/dist/` — IDE three-pane layout: left artifacts, center viewer, bottom dock (Timeline \| Crash \| AI \| Results) — see [WEB_UI_DESIGN.md](WEB_UI_DESIGN.md) |
 | Web E2E (Playwright) | `tests/e2e/web/` — Story Gate browser automation (CI `web` job) |
 
-## Domain — investigation container (Stories 1–4)
+## Domain — investigation container (Stories 1–6 + P1)
 
 | Area | Paths |
 |------|--------|
 | Investigation aggregate | `core/workspace/investigation_container.{hpp,cpp}` — manifest, artifacts, `projectTimeline()`, `analyzeCrash()` |
 | Crash analysis (Story 4) | `crash_report.hpp`, `crash_analyzer.{hpp,cpp}` — `IArtifactCrashAnalyzer`, `PstackCrashAnalyzer` |
+| Crash timeline (P1 / v2.9.0) | `crash_summary_timeline.{hpp,cpp}` — `makeCrashSummaryTimelineEvent()`; enricher in `timeline_projector.cpp` |
+| Correlation suggestions (Story 6) | `correlation_suggestion.{hpp,cpp}`, `correlation_engine.{hpp,cpp}` |
+| Evidence links (Story 5) | `evidence_link.{hpp,cpp}` — manifest `schemaVersion: 2` |
 | Artifact handlers | `core/workspace/artifact_handler.{hpp,cpp}` — `artifactTypeSupportsSessionOpen()` |
-| Timeline projection (Story 3) | `timeline_event.hpp`, `artifact_projector.{hpp,cpp}`, `timeline_projector.{hpp,cpp}` — `IArtifactProjector`, merge + sort |
+| Timeline projection (Story 3+) | `timeline_event.hpp`, `artifact_projector.{hpp,cpp}`, `timeline_projector.{hpp,cpp}` — `IArtifactProjector`, merge + sort |
 | Manifest I/O | `core/workspace/investigation_manifest_io.cpp` — **required** by `investigation_store.cpp` (`loadManifest`/`saveManifest`) |
 | M3 analysis engine | `core/investigation/` — **not** the Story 1 container; avoid `investigation.hpp` name under `workspace/` |
 
 ## CLI — investigation commands (v2.3.0+)
 
-`logscope investigation create|add|add-note|list|show|open|timeline|crash` — Story 2: `add --type`, `--role`; `open --artifact`; Story 3: `timeline`; Story 4: `crash` — dispatch in `apps/cli/cli_parser.cpp`, `investigation_command.cpp`.
+`logscope investigation create|add|add-note|list|show|open|timeline|crash|links|suggestions` — Story 2: `add --type`, `--role`; `open --artifact`; Story 3: `timeline`; Story 4: `crash`; Story 5: `links`; Story 6: `suggestions` — dispatch in `apps/cli/cli_parser.cpp`, `investigation_command.cpp`.
 
 ## Tests
 
@@ -63,9 +66,12 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [V240-UNDERSTAND-EVERYTHING-SCENARIOS.md](../planning/V240-UNDERSTAND-EVERYTHING-SCENARIOS.md)
 - [V250-SEE-WHAT-HAPPENED-SCENARIOS.md](../planning/V250-SEE-WHAT-HAPPENED-SCENARIOS.md) — Story 3 timeline (Story Gate closed)
 - [V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md](../planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) — Story 4 crash (Story Gate closed)
+- [V270-CONNECT-THE-EVIDENCE-SCENARIOS.md](../planning/V270-CONNECT-THE-EVIDENCE-SCENARIOS.md) — Story 5 evidence links
+- [V280-DISCOVER-THE-CONNECTIONS-SCENARIOS.md](../planning/V280-DISCOVER-THE-CONNECTIONS-SCENARIOS.md) — Story 6 correlation suggestions
+- [V290-CRASH-TIMELINE-SCENARIOS.md](../planning/V290-CRASH-TIMELINE-SCENARIOS.md) — P1 crash.summary on timeline
 - [GLOSSARY.md](GLOSSARY.md) — domain vocabulary
-- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md) · [ADR-010 M15.9](../architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md) (v2.7.0)
-- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.6.1 release notes](../release/v2.6.1-RELEASE-NOTES.md)
+- [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md) · [M15.9 Crash Timeline](../architecture/decisions/ADR-009-M15.9-Crash-Timeline.md) (v2.9.0) · [ADR-010 M15.9](../architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md) (v2.7.0) · [ADR-011](../architecture/decisions/ADR-011-M16.0-Investigation-Correlation-Suggestions.md) (v2.8.0)
+- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.9.0 release notes](../release/v2.9.0-RELEASE-NOTES.md)
 
 ## CI
 

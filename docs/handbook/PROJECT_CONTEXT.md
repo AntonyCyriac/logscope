@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.20.0 |
+| Version | 3.21.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 12-08-2026 |
+| Last Updated | 13-08-2026 |
 
 ---
 
@@ -345,7 +345,7 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
 | [GLOSSARY.md](GLOSSARY.md) | Domain vocabulary — evidence-centric investigation platform |
-| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — Story 5 completes Phase A |
+| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — P1.1 pstack dialects, P2 desktop parity |
 | [PRD-001 AI Engineering Agents](../requirements/future/PRD-001-AI-Engineering-Agents.md) | Future product agent vision (not current milestone scope) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |
@@ -379,3 +379,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
 | 3.19.0 | 06-08-2026 | Current release `v2.7.0`; Story 5 Connect the Evidence shipped — Phase A complete. |
+| 3.21.0 | 13-08-2026 | Current release `v2.9.0`; P1 Crash Timeline shipped; next P1.1 [#144](https://github.com/AntonyCyriac/logscope/issues/144). |

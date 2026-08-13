@@ -118,7 +118,7 @@ More: [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started) · [CLI 
 
 ### Desktop
 
-Open a log file, filter by level, tail live, export HTML/PDF reports. Investigation workflow (create, artifacts, timeline, crash) is **web-first** in v2.7.x; desktop has Results · AI · Analytics tabs. [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
+Open a log file, filter by level, tail live, export HTML/PDF reports. Investigation workflow (create, artifacts, timeline, crash) is **web-first** through `v2.9.0`; desktop has Results · AI · Analytics tabs (Timeline/Crash parity is P2). [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
 
 ### Web
 
