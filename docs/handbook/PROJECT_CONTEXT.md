@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.8.0` (shipped) — Story 6 **Discover the Connections** (ephemeral correlation suggestions with explainability, session-scoped dismiss, accept → evidence links). Stories 1–6 shipped (Phase A complete). Prior `v2.7.1` hotfix bundle remains on the 2.7.x line. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** backlog per [Next Value-Add](../planning/NEXT-VALUE-ADD.md) (P1 Crash Timeline, P1.1 pstack dialects, P2 desktop parity).
+**Current release:** `v2.9.0` (shipped) — **P1 Crash Timeline** (`crash.summary` on investigation timeline from existing `CrashReport`). Stories 1–6 + P1 shipped. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects (P1.1), P2 desktop parity — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -43,7 +43,7 @@ The project follows architecture-first development. Every implementation should 
 
 | Priority | Focus | Status |
 |----------|-------|--------|
-| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
+| P1 | Crash Timeline (`crash.summary`) | **Shipped** — `v2.9.0` |
 | P1.1 | Alternate pstack dialects / pluggable crash analyzer | Backlog — [#144](https://github.com/AntonyCyriac/logscope/issues/144) |
 | P2 | Desktop Timeline/Crash parity | Necessary — don't block shipped web stories |
 | P3 | ADR-010 domain model + events | Emergent after P1 |

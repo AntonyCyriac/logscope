@@ -4,22 +4,22 @@ P1: surface `crash.summary` on the investigation timeline from existing `CrashRe
 
 | ID | Scenario | REST | CLI | Web | Unit | E2E | Notes |
 |----|----------|------|-----|-----|------|-----|-------|
-| CT.1 | Single pstack → one `crash.summary` when `ready` | P | P | P | P | E | Story Gate path |
-| CT.2 | `eventType` literal `crash.summary` | P | P | P | P | — | ADR binding |
-| CT.3 | Stable `TimelineEvent.id` across GETs | P | P | — | P | — | `makeTimelineEventId` |
-| CT.4 | Timestamp from `artifact.importedAt` | P | P | — | P | — | v2.9.0 only |
-| CT.5 | No `artifact.attached` for pstack/core | P | P | — | P | — | Replaced by CT.1 |
-| CT.6 | Other types still emit `artifact.attached` | P | P | — | P | — | Notes, etc. unchanged |
-| CT.7 | Two pstack artifacts → two summaries | P | P | P | P | — | N artifacts → N max |
-| CT.8 | Chronological merge with log events | P | P | P | P | E | Global sort |
-| CT.9 | `unavailable` → degraded `crash.summary` | P | P | P | P | — | Visible row |
-| CT.10 | `failed` → degraded `crash.summary` | P | P | P | P | — | Visible row |
-| CT.11 | `not_supported` → no summary | P | — | — | P | — | |
-| CT.12 | Metadata: `crashReportId`, `status`, `signal` | P | P | — | P | — | No `lineNumber` |
-| CT.13 | Timeline row → jump to Crash tab | — | — | P | — | E | Story Gate |
-| CT.14 | Evidence link to `crash.summary` id | P | P | P | P | — | Story 5 stretch |
-| CT.15 | Story 4 crash-analysis tests unchanged | — | — | — | P | — | No Story 4 reopen |
-| CT.16 | No manifest schema bump | P | — | — | P | — | |
+| CT.1 | Single pstack → one `crash.summary` when `ready` | I | I | I | U | E | Story Gate path |
+| CT.2 | `eventType` literal `crash.summary` | I | I | I | U | — | ADR binding |
+| CT.3 | Stable `TimelineEvent.id` across GETs | I | I | — | U | — | `makeTimelineEventId` |
+| CT.4 | Timestamp from `artifact.importedAt` | I | I | — | U | — | v2.9.0 only |
+| CT.5 | No `artifact.attached` for pstack/core | I | I | — | U | — | Replaced by CT.1 |
+| CT.6 | Other types still emit `artifact.attached` | I | I | — | U | — | Notes, etc. unchanged |
+| CT.7 | Two pstack artifacts → two summaries | I | I | I | U | — | N artifacts → N max |
+| CT.8 | Chronological merge with log events | I | I | I | U | E | Global sort |
+| CT.9 | `unavailable` → degraded `crash.summary` | I | I | I | U | — | Visible row |
+| CT.10 | `failed` → degraded `crash.summary` | I | I | I | U | — | Visible row |
+| CT.11 | `not_supported` → no summary | I | — | — | U | — | |
+| CT.12 | Metadata: `crashReportId`, `status`, `signal` | I | I | — | U | — | No `lineNumber` |
+| CT.13 | Timeline row → jump to Crash tab | — | — | I | — | E | Story Gate |
+| CT.14 | Evidence link to `crash.summary` id | I | I | I | U | — | Story 5 stretch |
+| CT.15 | Story 4 crash-analysis tests unchanged | — | — | — | U | — | No Story 4 reopen |
+| CT.16 | No manifest schema bump | I | — | — | U | — | |
 
 ## Story Gate (E2E)
 
@@ -53,3 +53,4 @@ Create Investigation → Add app.log → Add pstack
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 12-08-2026 | Initial matrix from G1-approved design |
+| 1.1.0 | 13-08-2026 | Status update — P1 shipped in `v2.9.0` |

@@ -12,6 +12,24 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.9.0] - 2026-08-13
+
+**P1** — Crash Timeline (`crash.summary` on investigation timeline).
+
+### Added
+
+- **Crash Timeline** — `crash.summary` timeline events from existing `CrashReport` projection ([#169](https://github.com/AntonyCyriac/logscope/pull/169))
+- **Web SPA** — Timeline Crash rows with jump to Crash tab; Crash Timeline Playwright E2E
+- ADR-009-M15.9 Crash Timeline ([#168](https://github.com/AntonyCyriac/logscope/pull/168))
+
+### Changed
+
+- pstack/core artifacts emit `crash.summary` instead of `artifact.attached` on timeline
+
+See [v2.9.0 release notes](docs/release/v2.9.0-RELEASE-NOTES.md).
+
+---
+
 ## [2.8.0] - 2026-08-12
 
 **Story 6** — Discover the Connections (ephemeral correlation suggestions).
