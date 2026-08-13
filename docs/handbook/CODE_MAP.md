@@ -71,7 +71,7 @@ ctest -C Release -L "scope_web_tests|logscope_web_integration_tests" --test-dir 
 - [V290-CRASH-TIMELINE-SCENARIOS.md](../planning/V290-CRASH-TIMELINE-SCENARIOS.md) — P1 crash.summary on timeline
 - [GLOSSARY.md](GLOSSARY.md) — domain vocabulary
 - [ADR-009](../architecture/decisions/ADR-009-Web-Platform-REST.md) · [M15.3](../architecture/decisions/ADR-009-M15.3-Shared-Investigations.md) · [M15.5](../architecture/decisions/ADR-009-M15.5-Investigation-Container.md) · [M15.6](../architecture/decisions/ADR-009-M15.6-Multi-Source-Investigation.md) · [M15.7](../architecture/decisions/ADR-009-M15.7-Investigation-Timeline.md) · [M15.8](../architecture/decisions/ADR-009-M15.8-Crash-Analysis.md) · [M15.9 Crash Timeline](../architecture/decisions/ADR-009-M15.9-Crash-Timeline.md) (v2.9.0) · [ADR-010 M15.9](../architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md) (v2.7.0) · [ADR-011](../architecture/decisions/ADR-011-M16.0-Investigation-Correlation-Suggestions.md) (v2.8.0)
-- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.9.0 release notes](../release/v2.9.0-RELEASE-NOTES.md)
+- [openapi-v1.yaml](../api/openapi-v1.yaml) · [v2.9.1 release notes](../release/v2.9.1-RELEASE-NOTES.md)
 
 ## CI
 

@@ -21,7 +21,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.9.0** ships **Stories 1–6** plus **P1 Crash Timeline** (`crash.summary` on the investigation timeline). Phase A is complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+LogScope **v2.9.1** ships **Stories 1–6** plus **P1 Crash Timeline** (`crash.summary` on the investigation timeline), with **v2.9.1** hotfix for crash timestamp binding and timeline skip warnings. Phase A is complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 ```text
 Source → Analysis → Investigation → Reporting

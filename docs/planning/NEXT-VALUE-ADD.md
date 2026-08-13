@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.9.0` (Stories 1–6 + P1 Crash Timeline shipped). Phase A + P1 complete — see §5–§6.
+**Current public release:** `v2.9.1` (Stories 1–6 + P1 Crash Timeline shipped; v2.9.1 timeline hotfix). Phase A + P1 complete — see §5–§6.
 
 ---
 
@@ -32,6 +32,7 @@ v2.7.0  → shipped (Story 5 Connect the Evidence)
 v2.7.1  → shipped (post-Story 5 hotfix bundle)
 v2.8.0  → shipped (Story 6 Discover the Connections)
 v2.9.0  → shipped (P1 Crash Timeline)
+v2.9.1  → shipped (timeline hotfix #171/#172)
 Next    → P1.1 pstack dialects · P2 desktop parity (§5)
 ```
 
@@ -118,4 +119,4 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.8.0 | 06-08-2026 | Phase A = five stories; Story 5 completes investigation methodology; relationships are evidence not conclusions. |
 | 1.9.0 | 07-08-2026 | `v2.7.1` shipped; [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects backlogged as P1.1. |
 | 2.0.0 | 12-08-2026 | `v2.8.0` shipped — Story 6 Discover the Connections; Phase A complete (Stories 1–6). |
-| 2.1.0 | 13-08-2026 | `v2.9.0` shipped — P1 Crash Timeline (`crash.summary` on investigation timeline). |
+| 2.2.0 | 13-08-2026 | `v2.9.1` shipped — timeline hotfix (#171, #172). |
