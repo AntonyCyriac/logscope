@@ -17,7 +17,7 @@
 
 ## Screenshots
 
-**CLI** — analyze, investigate, `investigation links`, and `investigation suggestions` from the terminal (`v2.8.0`):
+**CLI** — analyze, investigate, timeline crash summaries, links, and suggestions (`v2.9.0`):
 
 ![LogScope CLI](docs/assets/logscope-cli.png)
 
@@ -25,11 +25,11 @@
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
-**Web** — `logscope-web` IDE-style investigation UI (`v2.8.0`, Timeline + Suggested connections + Related Evidence):
+**Web** — `logscope-web` IDE-style investigation UI (`v2.9.0`, Timeline + Crash summary rows + Suggested connections):
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.8.0`](CHANGELOG.md) — Story 6 Discover the Connections (correlation suggestions). Stories 1–6 shipped. [Release notes](docs/release/v2.8.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.9.0`](CHANGELOG.md) — Crash Timeline (crash on the incident timeline). Stories 1–6 + P1 shipped. [Release notes](docs/release/v2.9.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
@@ -38,7 +38,7 @@
 Engineers still grep giant files, stitch together format-specific tools, and manually reconstruct incidents across logs, syslog, stack traces, and cores. LogScope gives you **one investigation workflow** across evidence types:
 
 ```text
-Investigation → Artifacts → Timeline → Crash → Suggested connections → Evidence Links
+Investigation → Artifacts → Timeline (logs + crash.summary) → Crash → Suggested connections → Evidence Links
          ↑______________________________________________________________|
                     CLI · Desktop · Web
 ```
@@ -62,11 +62,11 @@ Investigation → Artifacts → Timeline → Crash → Suggested connections →
 | **Analytics** | Frequency, clustering, timelines, trends, correlations |
 | **Storage** | SQLite hybrid index, compression, incremental append, query cache |
 | **Desktop** | Live tail, session save/load, export dialogs, AI panel, bottom tabs (Results · AI · Analytics) |
-| **Web** | REST API, IDE SPA, investigations, timeline, crash analysis, suggested connections, evidence links, shared workspaces, async analyze, tail poll, API key auth |
-| **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis, correlation suggestions, evidence links (`v2.3.0`–`v2.8.0`) |
+| **Web** | REST API, IDE SPA, investigations, timeline with crash summaries, crash analysis, suggested connections, evidence links, shared workspaces, async analyze, tail poll, API key auth |
+| **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis, correlation suggestions, evidence links (`v2.3.0`–`v2.9.0`) |
 | **Plugins** | Runtime `.so`/`.dll` loading — parser, report, search, storage providers |
 
-Phase A investigation stories are **complete** through Story 6. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
+Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
 
 ## Install
 
@@ -118,7 +118,7 @@ More: [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started) · [CLI 
 
 ### Desktop
 
-Open a log file, filter by level, tail live, export HTML/PDF reports. Investigation workflow (create, artifacts, timeline, crash) is **web-first** in v2.7.x; desktop has Results · AI · Analytics tabs. [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
+Open a log file, filter by level, tail live, export HTML/PDF reports. Investigation workflow (create, artifacts, timeline, crash) is **web-first** through `v2.9.0`; desktop has Results · AI · Analytics tabs (Timeline/Crash parity is P2). [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
 
 ### Web
 
@@ -128,7 +128,7 @@ cmake --build build --target logscope-web
 ./build/apps/web/logscope-web --config samples/web.properties
 ```
 
-Open `http://127.0.0.1:8080` (or HTTPS with TLS). Create investigations, add artifacts, view **Timeline** and **Crash** tabs, review **Suggested connections**, and connect events with **Related Evidence** links (`v2.8.0`). REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md) · correlation suggestions: [ADR-011](docs/architecture/decisions/ADR-011-M16.0-Investigation-Correlation-Suggestions.md) · evidence links: [ADR-010](docs/architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md). Secure shared hosts: [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md).
+Open `http://127.0.0.1:8080` (or HTTPS with TLS). Create investigations, add artifacts, view **Timeline** (including **crash.summary** rows), **Crash** tab, **Suggested connections**, and **Related Evidence** links (`v2.9.0`). REST API: [ADR-009](docs/architecture/decisions/ADR-009-Web-Platform-REST.md) · crash timeline: [ADR-009-M15.9](docs/architecture/decisions/ADR-009-M15.9-Crash-Timeline.md) · correlation suggestions: [ADR-011](docs/architecture/decisions/ADR-011-M16.0-Investigation-Correlation-Suggestions.md) · evidence links: [ADR-010](docs/architecture/decisions/ADR-010-M15.9-Investigation-Evidence-Links.md). Secure shared hosts: [Securing logscope-web](docs/handbook/SECURING_LOGSCOPE_WEB.md).
 
 | Flag / env | Purpose |
 |------------|---------|

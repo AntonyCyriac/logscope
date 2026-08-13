@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | LogScope Project Context |
 | Category | Handbook |
-| Version | 3.20.0 |
+| Version | 3.21.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 12-08-2026 |
+| Last Updated | 13-08-2026 |
 
 ---
 
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.8.0` (shipped) — Story 6 **Discover the Connections** (ephemeral correlation suggestions with explainability, session-scoped dismiss, accept → evidence links). Stories 1–6 shipped (Phase A complete). Prior `v2.7.1` hotfix bundle remains on the 2.7.x line. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** backlog per [Next Value-Add](../planning/NEXT-VALUE-ADD.md) (P1 Crash Timeline, P1.1 pstack dialects, P2 desktop parity).
+**Current release:** `v2.9.0` (shipped) — **P1 Crash Timeline** (`crash.summary` on investigation timeline from existing `CrashReport`). Stories 1–6 + P1 shipped. Delivery surfaces: **CLI**, **desktop** (`logscope-desktop`), **web** (`logscope-web`). **Next:** [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects (P1.1), P2 desktop parity — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -43,7 +43,7 @@ The project follows architecture-first development. Every implementation should 
 
 | Priority | Focus | Status |
 |----------|-------|--------|
-| P1 | Crash Timeline (`crash.summary`) | Quick win — small release |
+| P1 | Crash Timeline (`crash.summary`) | **Shipped** — `v2.9.0` |
 | P1.1 | Alternate pstack dialects / pluggable crash analyzer | Backlog — [#144](https://github.com/AntonyCyriac/logscope/issues/144) |
 | P2 | Desktop Timeline/Crash parity | Necessary — don't block shipped web stories |
 | P3 | ADR-010 domain model + events | Emergent after P1 |
@@ -345,7 +345,7 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 |----------|---------|
 | [ROADMAP.md](../ROADMAP.md) | Milestones and current phase |
 | [GLOSSARY.md](GLOSSARY.md) | Domain vocabulary — evidence-centric investigation platform |
-| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — Story 5 completes Phase A |
+| [NEXT-VALUE-ADD.md](../planning/NEXT-VALUE-ADD.md) | Active queue — P1.1 pstack dialects, P2 desktop parity |
 | [PRD-001 AI Engineering Agents](../requirements/future/PRD-001-AI-Engineering-Agents.md) | Future product agent vision (not current milestone scope) |
 | [POST_V1_STRATEGIC_ROADMAP.md](../planning/POST_V1_STRATEGIC_ROADMAP.md) | Long-term vision and version targets |
 | [CHANGELOG.md](../../CHANGELOG.md) | Release history |
@@ -379,3 +379,4 @@ See [Future Requirements README](../requirements/future/README.md) for scope and
 | 2.9.0 | 04-08-2026 | Public horizon ends at investigation stories; enterprise/cloud strategy-only. |
 | 3.1.0 | 05-08-2026 | Current release `v2.3.0` (Story 1 Create an Investigation); next `v2.4.0` Story 2. |
 | 3.19.0 | 06-08-2026 | Current release `v2.7.0`; Story 5 Connect the Evidence shipped — Phase A complete. |
+| 3.21.0 | 13-08-2026 | Current release `v2.9.0`; P1 Crash Timeline shipped; next P1.1 [#144](https://github.com/AntonyCyriac/logscope/issues/144). |

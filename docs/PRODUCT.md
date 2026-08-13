@@ -21,7 +21,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.8.0** ships **Stories 1–6** (investigation container, multi-source, timeline, crash analysis, evidence links, correlation suggestions). Phase A is complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+LogScope **v2.9.0** ships **Stories 1–6** plus **P1 Crash Timeline** (`crash.summary` on the investigation timeline). Phase A is complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 ```text
 Source → Analysis → Investigation → Reporting
