@@ -181,7 +181,8 @@ int CliApplication::run(const ParsedCli& parsed,
     case CliCommand::InvestigationOpen:
         return runInvestigationOpenCommand(parsed.investigationOpen, output, errorOutput);
     case CliCommand::InvestigationTimeline:
-        return runInvestigationTimelineCommand(parsed.investigationTimeline, output, errorOutput);
+        return runInvestigationTimelineCommand(parsed.investigationTimeline, configurationManager, output,
+                                             errorOutput);
     case CliCommand::InvestigationCrash:
         return runInvestigationCrashCommand(parsed.investigationCrash, output, errorOutput);
     case CliCommand::InvestigationLinks:

@@ -19,7 +19,7 @@ namespace scope::workspace
 /**
  * @brief Builds a crash.summary timeline event from an existing CrashReport.
  *
- * Returns nullopt when status is not_supported or importedAt is unusable.
+ * Returns nullopt when status is not_supported or no usable timestamp source exists.
  */
 [[nodiscard]] std::optional<TimelineEvent> makeCrashSummaryTimelineEvent(
     const std::string& investigationId, const ArtifactRecord& artifact, const CrashReport& report);

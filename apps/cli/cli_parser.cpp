@@ -1606,6 +1606,12 @@ std::optional<InvestigationTimelineOptions> parseInvestigationTimelineArguments(
             continue;
         }
 
+        if (argument == "--config" && index + 1 < argc)
+        {
+            options.configFile = foundation::Path(argv[++index]);
+            continue;
+        }
+
         if (isOption(argument))
         {
             return std::nullopt;

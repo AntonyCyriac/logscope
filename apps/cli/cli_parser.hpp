@@ -232,6 +232,7 @@ struct InvestigationTimelineOptions
 {
     std::string investigationId;
     foundation::Path rootDirectory = foundation::Path("workspaces");
+    foundation::Path configFile;
     InvestigationTimelineFormat format = InvestigationTimelineFormat::Table;
     std::optional<std::size_t> limit;
     scope::workspace::TimelineSortOrder order = scope::workspace::TimelineSortOrder::Ascending;

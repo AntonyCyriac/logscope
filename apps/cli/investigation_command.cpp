@@ -5,8 +5,12 @@
 
 #include "investigation_command.hpp"
 
+#include "analysis_config.hpp"
+#include "cli_config.hpp"
+#include "cli_extension_runtime.hpp"
 #include "foundation/uuid.hpp"
 #include "output_format.hpp"
+#include "parser_registry.hpp"
 #include "crash_analyzer.hpp"
 #include "crash_report.hpp"
 #include "timeline_event.hpp"
@@ -31,6 +35,7 @@ using scope::workspace::InvestigationCreateRequest;
 using scope::workspace::CrashReport;
 using scope::workspace::CrashThread;
 using scope::workspace::TimelineEvent;
+using scope::workspace::TimelineArtifactProjectionStats;
 using scope::workspace::TimelineProjectionOptions;
 using scope::workspace::TimelineProjectionResult;
 
@@ -217,6 +222,26 @@ std::string formatInvestigationTimelineJson(const std::string& investigationId, 
     }
 
     output << "\n  },\n"
+           << "  \"projectionStats\": [";
+
+    for (std::size_t index = 0U; index < result.artifactStats.size(); ++index)
+    {
+        if (index > 0U)
+        {
+            output << ',';
+        }
+
+        const TimelineArtifactProjectionStats& stats = result.artifactStats[index];
+        output << "\n    {\n"
+               << "      \"artifactId\": \"" << escapeJsonString(stats.artifactId) << "\",\n"
+               << "      \"artifactName\": \"" << escapeJsonString(stats.artifactName) << "\",\n"
+               << "      \"linesRead\": " << stats.linesRead << ",\n"
+               << "      \"eventsEmitted\": " << stats.eventsEmitted << ",\n"
+               << "      \"linesSkippedNoTimestamp\": " << stats.linesSkippedNoTimestamp << "\n"
+               << "    }";
+    }
+
+    output << "\n  ],\n"
            << "  \"warnings\": [";
 
     for (std::size_t index = 0U; index < result.warnings.size(); ++index)
@@ -272,6 +297,27 @@ void printInvestigationTimelineTable(const TimelineProjectionResult& result, std
     for (const std::string& warning : result.warnings)
     {
         output << "warning: " << warning << '\n';
+    }
+
+    if (!result.artifactStats.empty())
+    {
+        std::size_t sourceLines = 0U;
+        std::size_t skippedLines = 0U;
+
+        for (const TimelineArtifactProjectionStats& stats : result.artifactStats)
+        {
+            sourceLines += stats.linesRead;
+            skippedLines += stats.linesSkippedNoTimestamp;
+        }
+
+        output << "\nsource lines\t: " << sourceLines << '\n'
+               << "timeline events\t: " << result.events.size() << '\n'
+               << "warnings\t: " << result.warnings.size() << '\n';
+
+        if (skippedLines > 0U)
+        {
+            output << "skipped lines\t: " << skippedLines << '\n';
+        }
     }
 }
 
@@ -494,12 +540,13 @@ void printInvestigationOpenUsage(std::ostream& output)
 void printInvestigationTimelineUsage(std::ostream& output)
 {
     output << "Usage: logscope investigation timeline <investigation-id> [--format json|table] [--limit N] "
-              "[--order asc|desc] [--dir <root>]\n"
+              "[--order asc|desc] [--config <file>] [--dir <root>]\n"
            << "\n"
            << "Options:\n"
            << "  --format <format>     Output format: table or json (default: table)\n"
            << "  --limit <N>           Maximum number of timeline events to return\n"
            << "  --order <order>       Sort order: asc or desc (default: asc)\n"
+           << "  --config <file>       Load configuration (e.g. analysis.plugin_format for custom log formats)\n"
            << "  --dir <root>          Investigations root directory (default: ./workspaces)\n"
            << "  --help, -h            Show this help message\n";
 }
@@ -909,6 +956,7 @@ int runInvestigationOpenCommand(const InvestigationOpenOptions& options,
 }
 
 int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
+                                    configuration::ConfigurationManager& configurationManager,
                                     std::ostream& output,
                                     std::ostream& errorOutput)
 {
@@ -926,6 +974,26 @@ int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
         return 1;
     }
 
+    if (!options.configFile.string().empty())
+    {
+        if (!initializeConfiguration(options.configFile, configurationManager, errorOutput))
+        {
+            return 1;
+        }
+    }
+
+    (void)createConfiguredExtensionManager(configurationManager.configuration());
+
+    const scope::analysis::AnalysisConfig analysisConfig = scope::analysis::resolveAnalysisConfig(
+        configurationManager.configuration(), scope::analysis::AnalysisConfig::defaults());
+
+    const scope::analysis::FormatParser* lineParser = nullptr;
+
+    if (analysisConfig.pluginFormatId.has_value())
+    {
+        lineParser = scope::analysis::ParserRegistry::instance().findParser(*analysisConfig.pluginFormatId);
+    }
+
     const Path investigationDir = investigationDirectory(options.rootDirectory, options.investigationId);
     const auto investigationResult = Investigation::open(investigationDir);
 
@@ -938,6 +1006,7 @@ int runInvestigationTimelineCommand(const InvestigationTimelineOptions& options,
 
     TimelineProjectionOptions projectionOptions;
     projectionOptions.order = options.order;
+    projectionOptions.lineParser = lineParser;
 
     if (options.limit.has_value())
     {

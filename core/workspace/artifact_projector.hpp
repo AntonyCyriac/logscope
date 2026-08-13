@@ -36,6 +36,7 @@ struct ArtifactProjectionContext
     std::string investigationId;
     foundation::Path investigationRoot;
     TimelineProjectionOptions options;
+    TimelineArtifactProjectionStats* logStats = nullptr;
 };
 
 /**

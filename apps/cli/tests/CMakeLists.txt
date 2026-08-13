@@ -5,6 +5,7 @@ add_executable(logscope_cli_tests
     output_format_test.cpp
     report_output_test.cpp
     ../cli_analysis_config.cpp
+    ../cli_config.cpp
     ../cli_parser.cpp
     ../investigation_command.cpp
     ../output_format.cpp
@@ -17,8 +18,10 @@ target_link_libraries(logscope_cli_tests
         logscope_gtest_support
         scope_analysis
         scope_configuration
+        scope_extension
         scope_foundation
         scope_investigation
+        scope_plugin
         scope_reporting
         scope_workspace
         GTest::gtest_main
