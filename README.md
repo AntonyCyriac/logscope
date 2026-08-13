@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.9.0`](CHANGELOG.md) — Crash Timeline (crash on the incident timeline). Stories 1–6 + P1 shipped. [Release notes](docs/release/v2.9.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.9.1`](CHANGELOG.md) — Timeline hotfix (crash timestamp + skip warnings). Stories 1–6 + P1 shipped. [Release notes](docs/release/v2.9.1-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 

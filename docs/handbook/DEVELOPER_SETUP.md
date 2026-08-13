@@ -23,7 +23,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.9.0`](../../CHANGELOG.md) — Stories 1–6 + P1 Crash Timeline (CLI, desktop, web). **Next:** P1.1 pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)). See [CHANGELOG](../../CHANGELOG.md) for release history.
+**Current release:** [`v2.9.1`](../../CHANGELOG.md) — Stories 1–6 + P1 Crash Timeline + v2.9.1 timeline hotfix (CLI, desktop, web). **Next:** P1.1 pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)). See [CHANGELOG](../../CHANGELOG.md) for release history.
 
 **Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 
@@ -441,4 +441,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.13.0 | 30-07-2026 | Current release baseline (`v2.0.5`); CI/build hotfix, versioned release artifacts. |
 | 2.15.0 | 05-08-2026 | Current release baseline (`v2.3.0`); Story 1 investigations; next `v2.4.0`. |
 | 2.16.0 | 06-08-2026 | Current release baseline (`v2.6.1`); Story 5 Connect the Evidence active. |
-| 2.17.0 | 13-08-2026 | Current release baseline (`v2.9.0`); Stories 1–6 + P1 Crash Timeline shipped. |
+| 2.18.0 | 13-08-2026 | Current release baseline (`v2.9.1`); timeline hotfix #171/#172. |

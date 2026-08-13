@@ -7,7 +7,7 @@ P1: surface `crash.summary` on the investigation timeline from existing `CrashRe
 | CT.1 | Single pstack → one `crash.summary` when `ready` | I | I | I | U | E | Story Gate path |
 | CT.2 | `eventType` literal `crash.summary` | I | I | I | U | — | ADR binding |
 | CT.3 | Stable `TimelineEvent.id` across GETs | I | I | — | U | — | `makeTimelineEventId` |
-| CT.4 | Timestamp from `artifact.importedAt` | I | I | — | U | — | v2.9.0 only |
+| CT.4 | Timestamp from `sourceModifiedAt` or `importedAt` | I | I | — | U | — | v2.9.1 ([#172](https://github.com/AntonyCyriac/logscope/issues/172)) |
 | CT.5 | No `artifact.attached` for pstack/core | I | I | — | U | — | Replaced by CT.1 |
 | CT.6 | Other types still emit `artifact.attached` | I | I | — | U | — | Notes, etc. unchanged |
 | CT.7 | Two pstack artifacts → two summaries | I | I | I | U | — | N artifacts → N max |

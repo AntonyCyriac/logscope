@@ -12,6 +12,20 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.9.1] - 2026-08-13
+
+**Patch** — Timeline hotfix ([#171](https://github.com/AntonyCyriac/logscope/issues/171), [#172](https://github.com/AntonyCyriac/logscope/issues/172)).
+
+### Fixed
+
+- **crash.summary timestamp** — prefer `sourceModifiedAt` (source file mtime at ingest) over `importedAt` ([#172](https://github.com/AntonyCyriac/logscope/issues/172))
+- **Timeline skip visibility** — warnings and `projectionStats` when log lines lack recognisable timestamps ([#171](https://github.com/AntonyCyriac/logscope/issues/171))
+- **`investigation timeline --config`** — plugin format parsers apply to timeline projection ([#171](https://github.com/AntonyCyriac/logscope/issues/171))
+
+See [v2.9.1 release notes](docs/release/v2.9.1-RELEASE-NOTES.md).
+
+---
+
 ## [2.9.0] - 2026-08-13
 
 **P1** — Crash Timeline (`crash.summary` on investigation timeline).
