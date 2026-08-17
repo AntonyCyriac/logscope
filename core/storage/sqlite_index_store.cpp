@@ -708,25 +708,25 @@ struct SqliteIndexStore::Impl
     static constexpr std::size_t writeBatchSize = 5000U;
 
     sqlite3* database{nullptr};
-    foundation::Path databasePath;
-    IndexMetadata metadata;
     std::uint64_t storedLines{0U};
     sqlite3_stmt* insertStatement{nullptr};
     sqlite3_stmt* jsonFieldInsertStatement{nullptr};
     sqlite3_stmt* ftsInsertStatement{nullptr};
-    bool inWriteBatch{false};
     std::size_t linesInWriteBatch{0U};
-    bool compressContent{false};
     std::size_t compressThresholdBytes{256U};
-    bool indexUsesZlib{false};
-    bool compressionAdaptiveDisabled{false};
     std::size_t compressionAttempts{0U};
     std::size_t compressionWins{0U};
-    bool queryCacheEnabled{true};
     std::size_t queryCacheMaxEntries{64U};
+    foundation::Path databasePath;
     foundation::Path finalDatabasePath;
-    bool buildingAtTempPath{false};
     std::optional<IndexBuildLock> buildLock;
+    IndexMetadata metadata;
+    bool inWriteBatch{false};
+    bool compressContent{false};
+    bool indexUsesZlib{false};
+    bool compressionAdaptiveDisabled{false};
+    bool queryCacheEnabled{true};
+    bool buildingAtTempPath{false};
 };
 
 namespace
