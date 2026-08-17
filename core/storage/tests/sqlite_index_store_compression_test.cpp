@@ -424,3 +424,47 @@ TEST(SqliteIndexStoreCompressionTest, RejectsCorruptCompressedBlob)
 
     cleanupWorkspace(workspace);
 }
+
+TEST(SqliteIndexStoreCompressionTest, AdaptiveShortCircuitDisablesFutileCompression)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = uniqueSourcePath(workspace, "adaptive_short");
+    std::string sourceContent;
+
+    for (std::uint64_t lineNumber = 1U; lineNumber <= 64U; ++lineNumber)
+    {
+        sourceContent += typicalShortLogLine(lineNumber) + '\n';
+    }
+
+    writeTempSource(sourcePath, sourceContent);
+    const auto metadata = makeMetadata(sourcePath);
+
+    const Path databasePath = uniqueDatabasePath(workspace, "adaptive_short");
+    IndexStoreOptions options;
+    options.compressContent = true;
+    options.compressThresholdBytes = 1U;
+
+    const auto created = SqliteIndexStore::create(databasePath, metadata, options);
+    ASSERT_TRUE(created);
+
+    for (std::uint64_t lineNumber = 1U; lineNumber <= 64U; ++lineNumber)
+    {
+        const std::string line = typicalShortLogLine(lineNumber);
+        ASSERT_TRUE((*created)->appendLine(makeLine(lineNumber, DetectedLogLevel::Info, line), line));
+    }
+
+    ASSERT_TRUE((*created)->finalize(64U));
+
+    const auto attempts = readMetaValue(databasePath, "content_compression_attempts");
+    const auto wins = readMetaValue(databasePath, "content_compression_wins");
+    const auto adaptiveDisabled = readMetaValue(databasePath, "content_compression_adaptive_disabled");
+
+    ASSERT_TRUE(attempts.has_value());
+    ASSERT_TRUE(wins.has_value());
+    ASSERT_TRUE(adaptiveDisabled.has_value());
+    EXPECT_EQ("32", *attempts);
+    EXPECT_EQ("0", *wins);
+    EXPECT_EQ("true", *adaptiveDisabled);
+
+    cleanupWorkspace(workspace);
+}

@@ -10,6 +10,7 @@
 #include <sqlite3.h>
 
 #include "gtest_temp_path.hpp"
+#include "index_build_lock.hpp"
 #include "index_fingerprint.hpp"
 #include "schema_version.hpp"
 #include "sqlite_index_store.hpp"
@@ -68,6 +69,8 @@ void cleanupPath(const Path& path)
 {
     std::error_code error;
     std::filesystem::remove(path.string(), error);
+    scope::storage::removeDatabaseArtifacts(scope::storage::indexBuildingDatabasePath(path));
+    std::filesystem::remove(scope::storage::indexBuildLockPath(path).string(), error);
 }
 
 std::optional<std::string> readMetaValue(const Path& databasePath, const std::string& key)
@@ -472,6 +475,7 @@ TEST(SqliteIndexStoreTest, RejectsUnsupportedFutureSchema)
 
     const auto created = SqliteIndexStore::create(databasePath, metadata);
     ASSERT_TRUE(created);
+    ASSERT_TRUE((*created)->finalize(0U));
 
     sqlite3* database = nullptr;
     ASSERT_EQ(SQLITE_OK, sqlite3_open(databasePath.string().c_str(), &database));
