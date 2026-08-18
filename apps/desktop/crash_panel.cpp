@@ -4,11 +4,15 @@
 
 #include "crash_panel.hpp"
 
+#include "crash_load_worker.hpp"
 #include "pstack_text_utils.hpp"
 
+#include <QApplication>
 #include <QComboBox>
+#include <QElapsedTimer>
 #include <QLabel>
 #include <QListWidget>
+#include <QMetaType>
 #include <QTextBrowser>
 #include <QThread>
 #include <QVBoxLayout>
@@ -16,13 +20,50 @@
 namespace scope::desktop
 {
 
+namespace
+{
+
+void shutdownWorkerThread(QThread* thread, QObject* worker, QObject* receiver)
+{
+    if (worker != nullptr && receiver != nullptr)
+    {
+        worker->disconnect(receiver);
+        receiver->disconnect(worker);
+    }
+
+    if (thread == nullptr)
+    {
+        return;
+    }
+
+    thread->quit();
+    thread->wait();
+}
+
+} // namespace
+
 CrashPanel::CrashPanel(scope::application::InvestigationController* controller, QWidget* parent)
     : QWidget(parent), m_controller(controller)
 {
+    qRegisterMetaType<scope::workspace::CrashReport>("scope::workspace::CrashReport");
+
     setupUi();
+
+    m_workerThread = new QThread(this);
+    m_worker = new CrashLoadWorker();
+    m_worker->moveToThread(m_workerThread);
+
+    connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+    connect(m_worker, &CrashLoadWorker::loadFinished, this, &CrashPanel::onLoadFinished, Qt::QueuedConnection);
+    connect(m_worker, &CrashLoadWorker::loadFailed, this, &CrashPanel::onLoadFailed, Qt::QueuedConnection);
+
+    m_workerThread->start();
 }
 
-CrashPanel::~CrashPanel() = default;
+CrashPanel::~CrashPanel()
+{
+    shutdownWorkerThread(m_workerThread, m_worker, this);
+}
 
 void CrashPanel::setupUi()
 {
@@ -148,11 +189,30 @@ void CrashPanel::refresh()
 
     const QString artifactId = currentArtifactId();
 
-    if (artifactId.isEmpty() || m_loading)
+    if (artifactId.isEmpty())
     {
-        m_emptyLabel->setVisible(artifactId.isEmpty());
+        m_emptyLabel->setVisible(true);
         m_emptyLabel->setText(QStringLiteral("Add a pstack or core artifact to analyze a crash."));
 
+        return;
+    }
+
+    startAsyncLoad();
+}
+
+void CrashPanel::startAsyncLoad()
+{
+    if (m_loading)
+    {
+        m_refreshPending = true;
+
+        return;
+    }
+
+    const QString artifactId = currentArtifactId();
+
+    if (artifactId.isEmpty())
+    {
         return;
     }
 
@@ -160,20 +220,64 @@ void CrashPanel::refresh()
     m_errorLabel->setVisible(false);
     m_emptyLabel->setVisible(false);
 
-    const auto crashResult = m_controller->analyzeCrash(artifactId.toStdString());
+    const QString investigationDir = QString::fromStdString(m_controller->investigationDirectory().string());
 
+    QMetaObject::invokeMethod(m_worker, "load", Qt::QueuedConnection, Q_ARG(QString, investigationDir),
+                              Q_ARG(QString, artifactId));
+}
+
+void CrashPanel::onLoadFinished(const scope::workspace::CrashReport report)
+{
     m_loading = false;
+    m_report = report;
+    renderReport(m_report);
 
-    if (!crashResult)
+    if (m_refreshPending)
     {
-        m_errorLabel->setText(QString::fromStdString(crashResult.error().message()));
-        m_errorLabel->setVisible(true);
+        m_refreshPending = false;
+        startAsyncLoad();
+    }
+}
 
-        return;
+void CrashPanel::onLoadFailed(const QString& message)
+{
+    m_loading = false;
+    m_refreshPending = false;
+    m_errorLabel->setText(message);
+    m_errorLabel->setVisible(true);
+}
+
+bool CrashPanel::waitForLoadComplete(const int timeoutMs)
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    while (timer.elapsed() < timeoutMs)
+    {
+        QApplication::processEvents();
+
+        if (!m_loading)
+        {
+            if (currentArtifactId().isEmpty())
+            {
+                return true;
+            }
+
+            if (m_errorLabel->isVisible())
+            {
+                return true;
+            }
+
+            if (m_report.status == scope::workspace::CrashAnalysisStatus::Ready || m_threadList->count() > 0)
+            {
+                return true;
+            }
+        }
+
+        QThread::msleep(10);
     }
 
-    m_report = *crashResult;
-    renderReport(m_report);
+    return !m_loading && m_threadList->count() > 0;
 }
 
 void CrashPanel::renderReport(const scope::workspace::CrashReport& report)

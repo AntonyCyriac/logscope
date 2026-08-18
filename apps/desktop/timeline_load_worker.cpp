@@ -4,15 +4,31 @@
 
 #include "timeline_load_worker.hpp"
 
+#include <QMetaType>
+
 #include "investigation_container.hpp"
 
 namespace scope::desktop
 {
 
-TimelineLoadWorker::TimelineLoadWorker(QObject* parent) : QObject(parent) {}
+namespace
+{
 
-void TimelineLoadWorker::load(const QString& investigationDirectoryPath,
-                              scope::workspace::TimelineProjectionOptions options)
+const int kTimelineResultMetaType = []() {
+    qRegisterMetaType<scope::workspace::TimelineProjectionResult>("scope::workspace::TimelineProjectionResult");
+
+    return 0;
+}();
+
+} // namespace
+
+TimelineLoadWorker::TimelineLoadWorker(QObject* parent) : QObject(parent)
+{
+    Q_UNUSED(kTimelineResultMetaType);
+}
+
+void TimelineLoadWorker::load(const QString& investigationDirectoryPath, const quint64 limit,
+                              const quint64 offset)
 {
     const auto investigationResult =
         scope::workspace::Investigation::open(scope::foundation::Path(investigationDirectoryPath.toStdString()));
@@ -23,6 +39,10 @@ void TimelineLoadWorker::load(const QString& investigationDirectoryPath,
 
         return;
     }
+
+    scope::workspace::TimelineProjectionOptions options;
+    options.limit = static_cast<std::size_t>(limit);
+    options.offset = static_cast<std::size_t>(offset);
 
     const auto timelineResult = investigationResult->projectTimeline(options);
 

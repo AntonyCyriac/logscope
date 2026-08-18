@@ -33,6 +33,7 @@
 #include "run_stats_dialog.hpp"
 #include "save_session_dialog.hpp"
 #include <optional>
+#include <unordered_set>
 
 #include "tail_worker.hpp"
 
@@ -93,6 +94,19 @@ class MainWindow : public QMainWindow
     [[nodiscard]] bool timelineHasEventType(const QString& eventType) const;
     [[nodiscard]] int timelineRowCount() const;
     [[nodiscard]] QString currentBottomTabName() const;
+
+    /// P2.1 Story Gate helpers (headless tests).
+    [[nodiscard]] bool waitForTimelineLoad(int timeoutMs = 5000);
+    [[nodiscard]] bool waitForCrashLoad(int timeoutMs = 5000);
+    [[nodiscard]] bool selectTimelineRow(int row);
+    [[nodiscard]] bool createEvidenceLinkBetweenRows(int sourceRow, int targetRow);
+    [[nodiscard]] int timelineLinkBadgeCount() const;
+    [[nodiscard]] int relatedEvidenceRowCount() const;
+    [[nodiscard]] bool suggestionPanelVisible() const;
+    [[nodiscard]] bool acceptFirstSuggestion();
+    [[nodiscard]] bool dismissFirstSuggestion();
+    [[nodiscard]] bool removeFirstEvidenceLink();
+    [[nodiscard]] bool openFirstRelatedEvidence();
 
   private:
     void createMenus();
@@ -162,6 +176,7 @@ class MainWindow : public QMainWindow
     std::string m_profile;
     bool m_hasRunStats{false};
     bool m_investigationMode{false};
+    std::unordered_set<std::string> m_dismissedSuggestionIds;
     scope::analysis::AnalysisStats m_lastAnalysisStats{};
 };
 

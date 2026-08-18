@@ -271,6 +271,98 @@ foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>> Investigat
     return investigationResult->listEvidenceLinks();
 }
 
+foundation::Result<scope::workspace::EvidenceLinkRecord> InvestigationController::addEvidenceLink(
+    const scope::workspace::EvidenceLinkCreateRequest& request)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!m_investigation.has_value())
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "No investigation is open."));
+    }
+
+    const auto addResult = m_investigation->addEvidenceLink(request);
+
+    if (!addResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(addResult.error());
+    }
+
+    const auto persistResult = m_investigation->persist();
+
+    if (!persistResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(persistResult.error());
+    }
+
+    return addResult;
+}
+
+foundation::Result<bool> InvestigationController::removeEvidenceLink(const std::string& linkId)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!m_investigation.has_value())
+    {
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "No investigation is open."));
+    }
+
+    const auto removeResult = m_investigation->removeEvidenceLink(linkId);
+
+    if (!removeResult)
+    {
+        return removeResult;
+    }
+
+    return m_investigation->persist();
+}
+
+foundation::Result<scope::workspace::CorrelationSuggestionListResult> InvestigationController::listCorrelationSuggestions(
+    const scope::workspace::CorrelationSuggestionQuery& query,
+    const std::unordered_set<std::string>& dismissedSuggestionIds) const
+{
+    const auto investigationResult = openInvestigation();
+
+    if (!investigationResult)
+    {
+        return foundation::Result<scope::workspace::CorrelationSuggestionListResult>(investigationResult.error());
+    }
+
+    return investigationResult->listCorrelationSuggestions(query, dismissedSuggestionIds);
+}
+
+foundation::Result<scope::workspace::EvidenceLinkRecord> InvestigationController::acceptCorrelationSuggestion(
+    const std::string& suggestionId, const std::unordered_set<std::string>& dismissedSuggestionIds,
+    const std::optional<scope::workspace::EvidenceLinkType> type, const std::optional<std::string> note)
+{
+    std::lock_guard<std::mutex> lock(m_mutex);
+
+    if (!m_investigation.has_value())
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "No investigation is open."));
+    }
+
+    const auto acceptResult =
+        m_investigation->acceptCorrelationSuggestion(suggestionId, type, note, dismissedSuggestionIds);
+
+    if (!acceptResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(acceptResult.error());
+    }
+
+    const auto persistResult = m_investigation->persist();
+
+    if (!persistResult)
+    {
+        return foundation::Result<scope::workspace::EvidenceLinkRecord>(persistResult.error());
+    }
+
+    return acceptResult;
+}
+
 foundation::Result<Path> InvestigationController::resolveLogArtifactPath(const std::string& artifactId) const
 {
     const auto investigationResult = openInvestigation();
