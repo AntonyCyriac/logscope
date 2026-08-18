@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | v2.13.0 Hardening Matrix |
 | Category | Project Planning |
-| Version | 1.1.0 |
-| Status | G0 pending — theme locked; **release slice TBD** |
+| Version | 1.2.0 |
+| Status | **G0 approved** — Wave 1 chartered; G1 pending |
 | Created | 18-08-2026 |
 | Milestone | [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1) |
 
@@ -45,43 +45,46 @@ G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias:
 
 ---
 
-## Recommended fix order (priority backlog — G0 selects slice)
+## G0 Wave 1 — in scope for `v2.13.0` (approved 18-08-2026)
+
+| Issue | Subsystem | Summary | Gate |
+|-------|-----------|---------|------|
+| [#188](https://github.com/AntonyCyriac/logscope/issues/188) | storage | Same-size in-place rewrite → stale index reused | G1→G5 |
+| [#189](https://github.com/AntonyCyriac/logscope/issues/189) | storage | Incremental append after mid-file edit keeps stale prefix | G1→G5 |
+| [#195](https://github.com/AntonyCyriac/logscope/issues/195) | storage | Unsupported `schema_version` silently rebuilt | G1→G5 |
+| [#203](https://github.com/AntonyCyriac/logscope/issues/203) | plugin | Storage `append_line` failure ignored; exit 0 | G1→G5 |
+
+**Product freeze:** no new UX or architectural ambitions. **No `feat/v2.13.0-*` implementation branch until G1.**
+
+**Deferred** (same hardening theme; later wave or `v2.13.x`): #185–#187, #190–#202, #194, #196–#199.
 
 ```text
-P0  storage/index integrity     #188 #189 #195 #203
-P1  web/session correctness      #194 #200 #201
-P1  user-visible correctness     #185 #186 #191 #198
-P2  edge cases / polish          #187 #190 #192 #193 #196 #197 #199
-—   housekeeping                 #202 (fixed forward v2.12.0)
+G0 ✅ → G1 design → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
 ```
 
-**Likely G0 Wave 1 candidate:** P0 only — storage/index + silent plugin failure (#188 #189 #195 #203).
+## Priority backlog (full matrix)
 
----
-
-## Issue matrix
-
-| Priority | Issue | Subsystem | Summary |
-|----------|-------|-----------|---------|
-| **P0** | [#188](https://github.com/AntonyCyriac/logscope/issues/188) | storage | Same-size in-place rewrite → stale index reused |
-| **P0** | [#189](https://github.com/AntonyCyriac/logscope/issues/189) | storage | Incremental append after mid-file edit keeps stale prefix |
-| **P0** | [#195](https://github.com/AntonyCyriac/logscope/issues/195) | storage | Unsupported `schema_version` silently rebuilt |
-| **P0** | [#203](https://github.com/AntonyCyriac/logscope/issues/203) | plugin | Storage `append_line` failure ignored; exit 0 |
-| **P1** | [#200](https://github.com/AntonyCyriac/logscope/issues/200) | web | `session_ttl_seconds` not enforced on `/analyze` |
-| **P1** | [#201](https://github.com/AntonyCyriac/logscope/issues/201) | web | `job_max_concurrent_per_session` cap not enforced |
-| **P1** | [#194](https://github.com/AntonyCyriac/logscope/issues/194) | web | `GET /api/v1/sessions` 500 when directory omitted |
-| **P1** | [#185](https://github.com/AntonyCyriac/logscope/issues/185) | plugin | `investigation.search_provider` never calls plugin ABI |
-| **P1** | [#198](https://github.com/AntonyCyriac/logscope/issues/198) | query | JSON field `>` / `<` always match nothing |
-| **P1** | [#186](https://github.com/AntonyCyriac/logscope/issues/186) | reporting | `--format json` invalid when lines contain C0 controls |
-| **P1** | [#191](https://github.com/AntonyCyriac/logscope/issues/191) | session | Save/load drops analytics, timeline, clusters sections |
-| **P2** | [#196](https://github.com/AntonyCyriac/logscope/issues/196) | storage | Query cache FNV-1a vs SHA-256; `max_entries=0` stores rows |
-| **P2** | [#197](https://github.com/AntonyCyriac/logscope/issues/197) | query | FTS5 `contains()` misses CJK |
-| **P2** | [#187](https://github.com/AntonyCyriac/logscope/issues/187) | cli | Analytics config overrides `--bucket`/`--top` (inverted) |
-| **P2** | [#190](https://github.com/AntonyCyriac/logscope/issues/190) | cli | Session list ignores non-`*.logscope-session` files |
-| **P2** | [#192](https://github.com/AntonyCyriac/logscope/issues/192) | plugin | Duplicate report section on double-load |
-| **P2** | [#193](https://github.com/AntonyCyriac/logscope/issues/193) | plugin | Old `api_version` loads with no warning |
-| **P2** | [#199](https://github.com/AntonyCyriac/logscope/issues/199) | config | `storage.backend=plugin:<unknown>` passes validation |
-| — | [#202](https://github.com/AntonyCyriac/logscope/issues/202) | release | `v2.11.0` tag reports `2.10.1` — **fixed forward in `v2.12.0`**; tag not rewritten (housekeeping) |
+| Scope | Priority | Issue | Subsystem | Summary |
+|-------|----------|-------|-----------|---------|
+| **Wave 1** | P0 | [#188](https://github.com/AntonyCyriac/logscope/issues/188) | storage | Same-size in-place rewrite → stale index reused |
+| **Wave 1** | P0 | [#189](https://github.com/AntonyCyriac/logscope/issues/189) | storage | Incremental append after mid-file edit keeps stale prefix |
+| **Wave 1** | P0 | [#195](https://github.com/AntonyCyriac/logscope/issues/195) | storage | Unsupported `schema_version` silently rebuilt |
+| **Wave 1** | P0 | [#203](https://github.com/AntonyCyriac/logscope/issues/203) | plugin | Storage `append_line` failure ignored; exit 0 |
+| Deferred | P1 | [#200](https://github.com/AntonyCyriac/logscope/issues/200) | web | `session_ttl_seconds` not enforced on `/analyze` |
+| Deferred | P1 | [#201](https://github.com/AntonyCyriac/logscope/issues/201) | web | `job_max_concurrent_per_session` cap not enforced |
+| Deferred | P1 | [#194](https://github.com/AntonyCyriac/logscope/issues/194) | web | `GET /api/v1/sessions` 500 when directory omitted |
+| Deferred | P1 | [#185](https://github.com/AntonyCyriac/logscope/issues/185) | plugin | `investigation.search_provider` never calls plugin ABI |
+| Deferred | P1 | [#198](https://github.com/AntonyCyriac/logscope/issues/198) | query | JSON field `>` / `<` always match nothing |
+| Deferred | P1 | [#186](https://github.com/AntonyCyriac/logscope/issues/186) | reporting | `--format json` invalid when lines contain C0 controls |
+| Deferred | P1 | [#191](https://github.com/AntonyCyriac/logscope/issues/191) | session | Save/load drops analytics, timeline, clusters sections |
+| Deferred | P2 | [#196](https://github.com/AntonyCyriac/logscope/issues/196) | storage | Query cache FNV-1a vs SHA-256; `max_entries=0` stores rows |
+| Deferred | P2 | [#197](https://github.com/AntonyCyriac/logscope/issues/197) | query | FTS5 `contains()` misses CJK |
+| Deferred | P2 | [#187](https://github.com/AntonyCyriac/logscope/issues/187) | cli | Analytics config overrides `--bucket`/`--top` (inverted) |
+| Deferred | P2 | [#190](https://github.com/AntonyCyriac/logscope/issues/190) | cli | Session list ignores non-`*.logscope-session` files |
+| Deferred | P2 | [#192](https://github.com/AntonyCyriac/logscope/issues/192) | plugin | Duplicate report section on double-load |
+| Deferred | P2 | [#193](https://github.com/AntonyCyriac/logscope/issues/193) | plugin | Old `api_version` loads with no warning |
+| Deferred | P2 | [#199](https://github.com/AntonyCyriac/logscope/issues/199) | config | `storage.backend=plugin:<unknown>` passes validation |
+| — | — | [#202](https://github.com/AntonyCyriac/logscope/issues/202) | release | `v2.11.0` tag reports `2.10.1` — **fixed forward in `v2.12.0`** |
 
 ---
 
@@ -100,4 +103,4 @@ P2  edge cases / polish          #187 #190 #192 #193 #196 #197 #199
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Hardening backlog locked; milestone + priority labels |
-| 1.1.0 | 18-08-2026 | G0 owns release slice; waves = priority backlog not committed scope; product freeze |
+| 1.2.0 | 18-08-2026 | G0 Wave 1 approved — #188 #189 #195 #203 in scope; product freeze |

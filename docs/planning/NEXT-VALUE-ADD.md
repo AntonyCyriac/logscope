@@ -78,7 +78,7 @@ Next    → v2.13.0 Hardening (§5.2) · then #144-B when justified (§5) · P3 
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
 | **P2.1** | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` | Related Evidence, suggestions, async refresh; matrix: [`V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md`](V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md) |
-| **H0** | Quality & Integrity hardening | **Next** — `v2.13.0` (G0 slice TBD) | Theme + [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203) backlog; matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
+| **H0** | Quality & Integrity hardening | **Active** — `v2.13.0` Wave 1 (G1 pending) | G0 ✅ [#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203); matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
 | **#144-B** | `register_crash_analyzer` plugin hook | **After hardening** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
@@ -117,26 +117,17 @@ Crash analyzer registry → pstack parser · GDB parser · custom analyzer
 
 **Trigger:** A real second crash dialect or analyzer appears that should **not** belong in core. Do not implement merely because it is in the backlog. **Do not** bundle with v2.13.0 hardening.
 
-### v2.13.0 — Quality & Integrity (next — G0 pending)
+### v2.13.0 — Quality & Integrity (active — G0 Wave 1 approved)
 
-**Definition:** Pay down correctness and integrity debt before new architecture. **Product UX frozen** until G0-chartered slice ships.
+**Definition:** Pay down correctness and integrity debt before new architecture. **Product UX frozen** until Wave 1 ships.
 
-**Type:** Platform hardening — **not** product UX, **not** #144-B.
+**G0 answer (Wave 1):** storage/index integrity + silent plugin failure — [#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203).
 
-**G0 question:** *Which existing correctness failures most threaten trust in an investigation?*
+**Gate chain:** G0 ✅ → G1 design → G2 implementation → G3 → G4 → G5 `v2.13.0`. **No feat branch until G1.**
 
-**Priority backlog** (G0 selects the `v2.13.0` slice — not all 19 by default):
+**Deferred** (hardening backlog, not Wave 1): remaining #185–#202, #194, #196–#199.
 
-```text
-P0  storage/index integrity     #188 #189 #195 #203
-P1  web/session correctness      #194 #200 #201
-P1  user-visible correctness     #185 #186 #191 #198
-P2  edge cases / polish          #187 #190 #192 #193 #196 #197 #199
-```
-
-See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) and GitHub milestone [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1).
-
-**Out of v2.13.0 theme:** new investigation stories, desktop UX, `register_crash_analyzer`, P3 charter.
+See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md).
 
 ### P3 — domain architecture (reactive only)
 
