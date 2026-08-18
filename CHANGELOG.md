@@ -12,6 +12,28 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.12.0] - 2026-08-18
+
+**Minor** — P2.1 desktop Evidence & Suggestions interactive parity.
+
+### Added
+
+- **Related Evidence panel** — create/remove links, jump to linked log line or crash (Story 5)
+- **Suggested connections panel** — accept/dismiss correlation suggestions (Story 6)
+- **Timeline Connections column** — `Related (N)` badge on linked events
+- **`InvestigationController`** — `addEvidenceLink`, `removeEvidenceLink`, `listCorrelationSuggestions`, `acceptCorrelationSuggestion`
+- **Async Timeline/Crash load** — `TimelineLoadWorker` / `CrashLoadWorker` (closes v2.11.0 sync refresh limitation)
+- **`logscope_desktop_parity_test`** — Story 5/6 Story Gate + P2 regression (7 scenarios)
+
+### Notes
+
+- Dismissed suggestions are session-local in `MainWindow` (not persisted to investigation manifest)
+- No new domain types or REST/CLI JSON changes
+
+See [v2.12.0 release notes](docs/release/v2.12.0-RELEASE-NOTES.md) · ADR-008-M14.2.
+
+---
+
 ## [2.11.0] - 2026-08-18
 
 **Minor** — P2 desktop Timeline + Crash parity.

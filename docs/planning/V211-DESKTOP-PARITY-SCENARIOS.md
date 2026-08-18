@@ -15,16 +15,16 @@ P2: Qt **Timeline** + **Crash** tabs consuming existing `projectTimeline()` / `a
 | DP.9 | Timeline `log.line` → Results highlight | I | D | — | Optional stretch |
 | DP.10 | Session mode unchanged (open/analyze/AI) | I | D | — | Regression |
 | DP.11 | Timeline/Crash disabled without investigation | I | D | — | Empty state |
-| DP.12 | Synchronous Timeline/Crash refresh (v2.11.0) | I | D | — | Known limitation — see below |
+| DP.12 | Async Timeline/Crash refresh | I | D | — | Shipped `v2.12.0` (was sync in v2.11.0) |
 | DP.13 | Investigations interoperable with CLI container | I | U | — | Open round-trip test |
 | DP.14 | No REST/CLI JSON shape changes | I | U | — | Regression |
 | DP.15 | Web Playwright Story Gate unchanged | — | — | E | Regression |
 
-## Known limitation (v2.11.0 — not an architectural defect)
+## Known limitation (v2.11.0 — resolved in v2.12.0)
 
-> **v2.11.0 uses synchronous Timeline/Crash refresh for the initial desktop parity release.** Background execution remains a follow-up performance improvement and does not affect the investigation domain contract.
+> **v2.11.0 used synchronous Timeline/Crash refresh on the UI thread.** P2.1 (`v2.12.0`) wires `TimelineLoadWorker` / `CrashLoadWorker` as the default load path. Domain contracts are unchanged.
 
-`TimelinePanel` and `CrashPanel` call `InvestigationController::projectTimeline()` / `analyzeCrash()` on the UI thread when a tab is activated or refreshed. Do **not** introduce a desktop-specific domain model or parallel projection path to “fix” this — use `QThread` / `QtConcurrent` against the existing controller APIs when optimizing.
+Historical note (v2.11.0 only): `TimelinePanel` and `CrashPanel` called `InvestigationController::projectTimeline()` / `analyzeCrash()` on the UI thread when a tab was activated. Do **not** introduce a desktop-specific domain model to optimize — background workers against existing controller APIs is the approved path (now shipped).
 
 ## Story Gate (Desktop headless — blocking G3)
 

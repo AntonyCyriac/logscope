@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.11.0` (P2 desktop Timeline/Crash parity shipped). Phase A + P1 + P1.1 + P2 complete — see §5–§6.
+**Current public release:** `v2.12.0` (P2.1 desktop Evidence/Suggestions shipped). Phase A + P1 + P1.1 + P2 + P2.1 complete — see §5–§6.
 
 ---
 
@@ -36,7 +36,8 @@ v2.9.1  → shipped (timeline hotfix #171/#172)
 v2.10.0 → shipped (P1.1 TID pstack dialects #144)
 v2.10.1 → shipped (storage hotfix #163/#164)
 v2.11.0 → shipped (P2 desktop Timeline/Crash parity)
-Next    → P2.1 (§5) · then #144 Option B (§5) · P3 ADR-010 reactive only (§5)
+v2.12.0 → shipped (P2.1 desktop Evidence/Suggestions)
+Next    → #144 Option B (§5) · P3 ADR-010 reactive only (§5)
 ```
 
 **Queue discipline:** P2.1 (product UX), #144 Option B (developer extensibility), and P3 domain architecture are **three separate tracks** — do not combine into one milestone.
@@ -75,15 +76,15 @@ Next    → P2.1 (§5) · then #144 Option B (§5) · P3 ADR-010 reactive only (
 | **P1** | Crash Timeline | **Shipped** — `v2.9.0` | `crash.summary` on timeline projection |
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
-| **P2.1** | Desktop Evidence & Suggestions chrome | **Next** — G1 pending (`v2.12.0`) | Make desktop investigations as interactive as web; see §5.1 |
-| **#144-B** | `register_crash_analyzer` plugin hook | **Backlog** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
+| **P2.1** | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` | Related Evidence, suggestions, async refresh; matrix: [`V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md`](V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md) |
+| **#144-B** | `register_crash_analyzer` plugin hook | **Next** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
 | **P5** | AI Investigation Assistant | **Research only** | Evidence-based sequence synthesis — don't build yet |
 
 Tactical planning docs are added when each **implementation** item (P0–P2.1, #144-B) is chartered for release (G0).
 
-### P2.1 — Desktop Evidence & Suggestions (next)
+### P2.1 — Desktop Evidence & Suggestions (shipped `v2.12.0`)
 
 **Definition:** Make desktop investigations as interactive as web investigations.
 
@@ -104,7 +105,7 @@ Timeline → Related Evidence → Suggested connections → accept/dismiss → j
 
 **Out of P2.1:** new parsers, `register_crash_analyzer`, correlation algorithm changes, redesign.
 
-### #144 Option B — `register_crash_analyzer` (after P2.1, when justified)
+### #144 Option B — `register_crash_analyzer` (next, when justified)
 
 **Type:** Architecture / developer extensibility — **not** product UX.
 
@@ -179,3 +180,4 @@ Crash analyzer registry → pstack parser · GDB parser · custom analyzer
 | 2.6.0 | 18-08-2026 | P2 G1 approved — ADR-008-M14.1 + V211 scenario matrix. |
 | 2.7.0 | 18-08-2026 | `v2.11.0` shipped — P2 desktop Timeline/Crash parity. |
 | 2.8.0 | 18-08-2026 | Post-`v2.11.0` queue locked: **P2.1** (product) → **#144-B** (extensibility, when justified) → **P3** (reactive charter only). |
+| 2.9.0 | 18-08-2026 | `v2.12.0` shipped — P2.1 desktop Evidence/Suggestions + async refresh. |

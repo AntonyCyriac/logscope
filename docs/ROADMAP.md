@@ -64,7 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.11.0`](CHANGELOG.md) — P2 desktop parity. Stories 1–6 + P1 + P1.1 + P2 shipped. **Next:** P2.1 (desktop Evidence/Suggestions) — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Current release:** [`v2.12.0`](CHANGELOG.md) — P2.1 desktop Evidence/Suggestions. Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. **Next:** #144-B — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 

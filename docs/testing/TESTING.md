@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **529+** automated tests through **`v2.11.0`** (includes `logscope_desktop_parity_test` P2 Story Gate). Coverage includes `scope_application_tests` (M14 + `InvestigationControllerTest`), `logscope_desktop_tests` (M14 GUI headless), `logscope_desktop_parity_test` (P2 desktop Timeline/Crash), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
+**Current baseline:** **536+** automated tests through **`v2.12.0`** (includes `logscope_desktop_parity_test` P2 + P2.1 Story Gate). Coverage includes `scope_application_tests` (M14 + `InvestigationControllerTest` link/suggestion APIs), `logscope_desktop_tests` (M14 GUI headless), `logscope_desktop_parity_test` (P2/P2.1 desktop Story Gate), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 
@@ -242,4 +242,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.16.0 | 30-07-2026 | Current release baseline `v2.0.5`; directory e2e isolation, versioned release artifacts. |
 | 1.17.0 | 04-08-2026 | Baseline through `v2.2.1`; M15 web integration tests noted. |
 | 1.18.0 | 06-08-2026 | Playwright web E2E (Story Gate); CI `web` job runs browser tests. |
-| 1.23.0 | 18-08-2026 | Baseline through `v2.11.0`; P2 `logscope_desktop_parity_test`. |
+| 1.24.0 | 18-08-2026 | Baseline through `v2.12.0`; P2.1 Story 5/6 desktop Story Gate. |

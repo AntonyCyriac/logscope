@@ -4,19 +4,19 @@ P2.1: Qt **Related Evidence** + **Suggested connections** chrome and async Timel
 
 | ID | Scenario | Desktop | Unit | Web E2E | Notes |
 |----|----------|---------|------|---------|-------|
-| ES.1 | Timeline row select shows Related Evidence panel | P | — | — | Story 5 |
-| ES.2 | Timeline row select shows Suggested connections when suggestions exist | P | — | E | Story 6 fixtures |
-| ES.3 | Create evidence link between two timeline events | P | U | — | `addEvidenceLink` |
-| ES.4 | Timeline `Related (N)` badge after link create | P | D | — | `timeline-link-badge` |
-| ES.5 | Related Evidence row jump to peer log line | P | D | — | Results highlight |
-| ES.6 | Remove evidence link clears badge | P | D | — | |
-| ES.7 | Accept suggestion creates persisted link | P | U | E | Story 6 positive |
-| ES.8 | Dismiss suggestion — no link persisted | P | D | E | Story 6 negative |
-| ES.9 | Async timeline load — UI not blocked | P | D | — | Worker wired |
-| ES.10 | Async crash load — UI not blocked | P | D | — | Worker wired |
-| ES.11 | P2 Story Gate regression | P | D | — | DP.1–DP.15 |
-| ES.12 | Session mode unchanged | P | D | — | Regression |
-| ES.13 | No REST/CLI JSON shape changes | P | U | — | Regression |
+| ES.1 | Timeline row select shows Related Evidence panel | I | — | — | Story 5 |
+| ES.2 | Timeline row select shows Suggested connections when suggestions exist | I | — | E | Story 6 fixtures |
+| ES.3 | Create evidence link between two timeline events | I | U | — | `addEvidenceLink` |
+| ES.4 | Timeline `Related (N)` badge after link create | I | D | — | `timeline-link-badge` |
+| ES.5 | Related Evidence row jump to peer log line | I | D | — | Results highlight |
+| ES.6 | Remove evidence link clears badge | I | D | — | |
+| ES.7 | Accept suggestion creates persisted link | I | U | E | Story 6 positive |
+| ES.8 | Dismiss suggestion — no link persisted | I | D | E | Story 6 negative |
+| ES.9 | Async timeline load — UI not blocked | I | D | — | Worker wired |
+| ES.10 | Async crash load — UI not blocked | I | D | — | Worker wired |
+| ES.11 | P2 Story Gate regression | I | D | — | DP.1–DP.15 |
+| ES.12 | Session mode unchanged | I | D | — | Regression |
+| ES.13 | No REST/CLI JSON shape changes | I | U | — | Regression |
 | ES.14 | Web Playwright Story 5/6 unchanged | — | — | E | Regression |
 
 ## Story Gate (Desktop headless — blocking G3)
@@ -57,3 +57,4 @@ Investigation → story6-app.log + story6-syslog.log
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Initial matrix from G1-approved design (pending sign-off) |
+| 1.1.0 | 18-08-2026 | G3 — statuses updated; shipped `v2.12.0` |

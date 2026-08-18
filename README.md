@@ -21,7 +21,7 @@
 
 ![LogScope CLI](docs/assets/logscope-cli.png)
 
-**Desktop** — `logscope-desktop` with investigation mode: Timeline · Crash · Results · AI · Analytics (`v2.11.0`):
+**Desktop** — `logscope-desktop` with investigation mode: Timeline · Crash · Results · AI · Analytics (`v2.12.0`):
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.11.0`](CHANGELOG.md) — Desktop Timeline + Crash parity (P2). Stories 1–6 + P1 + P1.1 shipped. [Release notes](docs/release/v2.11.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.12.0`](CHANGELOG.md) — Desktop Evidence & Suggestions (P2.1). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.12.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
@@ -61,12 +61,12 @@ Investigation → Artifacts → Timeline (logs + crash.summary) → Crash → Su
 | **Reporting** | Text, JSON, HTML, PDF — charts, executive summaries, section picker |
 | **Analytics** | Frequency, clustering, timelines, trends, correlations |
 | **Storage** | SQLite hybrid index, compression, incremental append, query cache |
-| **Desktop** | Live tail, session save/load, export dialogs, AI panel, investigation mode, Timeline · Crash · Results · AI · Analytics (`v2.11.0`) |
+| **Desktop** | Live tail, session save/load, export dialogs, AI panel, investigation mode, Timeline · Crash · Results · AI · Analytics, Related Evidence + Suggestions (`v2.12.0`) |
 | **Web** | REST API, IDE SPA, investigations, timeline with crash summaries, crash analysis, suggested connections, evidence links, shared workspaces, async analyze, tail poll, API key auth |
 | **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis, correlation suggestions, evidence links (`v2.3.0`–`v2.9.0`) |
 | **Plugins** | Runtime `.so`/`.dll` loading — parser, report, search, storage providers |
 
-Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
+Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`; **P2.1 Evidence/Suggestions** in `v2.12.0`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
 
 ## Install
 
@@ -118,7 +118,7 @@ More: [User Manual §2](docs/handbook/USER_MANUAL.md#2-getting-started) · [CLI 
 
 ### Desktop
 
-Open a log file, filter by level, tail live, export HTML/PDF reports — or use **Investigation → New Investigation** for Timeline and Crash tabs (`v2.11.0`). Session mode (Results · AI · Analytics) unchanged. [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
+Open a log file, filter by level, tail live, export HTML/PDF reports — or use **Investigation → New Investigation** for Timeline, Crash, Related Evidence, and Suggested connections (`v2.12.0`). Session mode (Results · AI · Analytics) unchanged. [User Manual](docs/handbook/USER_MANUAL.md) · desktop shipped since v2.0.1.
 
 ### Web
 
