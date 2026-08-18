@@ -6,7 +6,7 @@ on:
       target_branch:
         description: Branch to commit updated PNGs to
         required: true
-        default: chore/readme-v2.7.0-snapshot
+        default: master
 
 permissions:
   contents: write
@@ -72,8 +72,8 @@ jobs:
             echo "No asset changes"
             exit 0
           fi
-          git commit -m "docs(assets): refresh README web, CLI, and desktop screenshots for v2.7.0"
+          git commit -m "docs(assets): refresh README web, CLI, and desktop screenshots for v2.11.0"
           git push origin "$BRANCH"
           gh pr create --base master --head "$BRANCH" \
-            --title "docs(assets): refresh README screenshots for v2.7.0" \
-            --body "Automated capture from Capture README assets workflow (web Story 5, CLI, and desktop)."
+            --title "docs(assets): refresh README screenshots for v2.11.0" \
+            --body "Automated capture from Capture README assets workflow (web Story 6, CLI, and desktop P2 investigation mode)."

@@ -17,7 +17,7 @@
 
 ## Screenshots
 
-**CLI** — analyze, investigate, timeline crash summaries, links, and suggestions (`v2.9.0`):
+**CLI** — analyze, investigate, timeline crash summaries, links, and suggestions (`v2.11.0`):
 
 ![LogScope CLI](docs/assets/logscope-cli.png)
 
@@ -25,7 +25,7 @@
 
 ![LogScope Desktop](docs/assets/logscope-desktop.png)
 
-**Web** — `logscope-web` IDE-style investigation UI (`v2.9.0`, Timeline + Crash summary rows + Suggested connections):
+**Web** — `logscope-web` IDE-style investigation UI (`v2.11.0`, Timeline + Crash summary rows + Suggested connections):
 
 ![LogScope Web](docs/assets/logscope-web.png)
 

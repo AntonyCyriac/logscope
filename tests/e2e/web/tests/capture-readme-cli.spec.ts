@@ -27,7 +27,7 @@ test('capture README CLI screenshot', async ({ page }) => {
     '',
     'PS> ./build/apps/cli/logscope investigation timeline <id> --format table',
     'PS> ./build/apps/cli/logscope investigation links list <id>',
-    '(investigation subcommands — v2.7.0)',
+    '(investigation subcommands — v2.11.0)',
   ].join('\n');
 
   const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>
