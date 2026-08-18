@@ -7,7 +7,7 @@
 | Version | 3.21.0 |
 | Status | Approved |
 | Created | 21-07-2026 |
-| Last Updated | 13-08-2026 |
+| Last Updated | 18-08-2026 |
 
 ---
 
@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.11.0` (shipped) — **P2 desktop Timeline/Crash parity**. Stories 1–6 + P1 + P1.1 + P2 shipped. **Next:** #144 Option B · P3 — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
+**Current release:** `v2.11.0` (shipped) — **P2 desktop Timeline/Crash parity**. Stories 1–6 + P1 + P1.1 + P2 shipped. **Next:** **P2.1** — desktop Evidence/Suggestions interactive parity — see [Next Value-Add](../planning/NEXT-VALUE-ADD.md).
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -45,8 +45,10 @@ The project follows architecture-first development. Every implementation should 
 |----------|-------|--------|
 | P1 | Crash Timeline (`crash.summary`) | **Shipped** — `v2.9.0` |
 | P1.1 | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) |
-| P2 | Desktop Timeline/Crash parity | Shipped — `v2.11.0` |
-| P3 | ADR-010 domain model + events | Emergent after P1 |
+| P2 | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` |
+| P2.1 | Desktop Evidence & Suggestions chrome | **Next** — product UX |
+| #144-B | `register_crash_analyzer` | Backlog — when a real second analyzer justifies it |
+| P3 | Domain architecture charter | **Reactive** — not scheduled |
 | P4–P5 | IQL · AI Investigation Assistant | Research only |
 
 **Completed milestones:**
