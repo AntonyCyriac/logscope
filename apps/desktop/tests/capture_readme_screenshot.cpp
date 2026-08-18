@@ -35,7 +35,8 @@ int main(int argc, char* argv[])
 {
     QApplication app(argc, argv);
 
-    scope::desktop::MainWindow window(scope::foundation::Path("samples/ai-noop.properties"));
+    scope::desktop::MainWindow window(scope::foundation::Path("samples/ai-noop.properties"),
+                                      scope::foundation::Path("build/readme_capture_investigations"));
     window.resize(1280, 800);
     window.show();
 
@@ -43,20 +44,42 @@ int main(int argc, char* argv[])
         return 1;
     }
 
-    if (!window.openLogFile(QStringLiteral("samples/sample.log"))) {
+    if (!window.createInvestigation(QStringLiteral("readme-screenshot"))) {
         return 2;
+    }
+    if (!window.addInvestigationLogArtifact(QStringLiteral("samples/sample.log"))) {
+        return 3;
+    }
+    if (!window.addInvestigationPstackArtifact(QStringLiteral("samples/pstack.txt"))) {
+        return 4;
+    }
+    if (!window.switchBottomTab(QStringLiteral("Timeline"))) {
+        return 5;
+    }
+
+    QElapsedTimer timelineTimer;
+    timelineTimer.start();
+    while (timelineTimer.elapsed() < 10000) {
+        QApplication::processEvents();
+        if (window.timelineRowCount() > 0 && window.timelineHasEventType(QStringLiteral("crash.summary"))) {
+            break;
+        }
+        QThread::msleep(50);
+    }
+    if (window.timelineRowCount() == 0) {
+        return 6;
     }
 
     QApplication::processEvents();
 
     const QPixmap screenshot = window.grab();
     if (screenshot.isNull()) {
-        return 3;
+        return 7;
     }
 
     const QString outputPath = QStringLiteral("docs/assets/logscope-desktop.png");
     if (!screenshot.save(outputPath)) {
-        return 4;
+        return 8;
     }
 
     return 0;

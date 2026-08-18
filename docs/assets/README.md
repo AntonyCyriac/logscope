@@ -5,7 +5,7 @@ Homepage images for [README.md](../../README.md). **Refresh all three together**
 | File | Surface | What to show |
 |------|---------|----------------|
 | `logscope-cli.png` | **CLI** | Terminal with `logscope` commands relevant to the current story line (analyze, investigate, `investigation timeline`, `investigation links`, `investigation crash` as shipped). |
-| `logscope-desktop.png` | **Desktop** | `logscope-desktop` with `samples/sample.log` analyzed; bottom tabs **Results · AI · Analytics** visible. |
+| `logscope-desktop.png` | **Desktop** | `logscope-desktop` in investigation mode with log + pstack; bottom tabs **Timeline · Crash · Results · AI · Analytics** visible (Timeline showing `crash.summary`). |
 | `logscope-web.png` | **Web** | `logscope-web` IDE layout: artifacts, center viewer, bottom dock (**Timeline · Crash · AI · Results**), plus current story UI (e.g. Suggested connections panel for Story 6+). |
 
 Keep PNGs reasonably sized (README loads in GitHub). Prefer viewport crops over full-page scroll captures.
@@ -42,9 +42,9 @@ cmake --build build --target logscope_capture_readme_desktop
 QT_QPA_PLATFORM=offscreen ./build/apps/desktop/tests/logscope_capture_readme_desktop
 ```
 
-Writes `docs/assets/logscope-desktop.png` with `samples/sample.log` analyzed and bottom tabs **Results · AI · Analytics** visible.
+Writes `docs/assets/logscope-desktop.png` with an investigation (log + pstack), **Timeline** tab active, and bottom tabs **Timeline · Crash · Results · AI · Analytics** visible.
 
-For a manual capture on a visible GUI, build `logscope-desktop`, open `samples/sample.log`, run **Analyze**, and save the window including the bottom tab bar.
+For a manual capture on a visible GUI, build `logscope-desktop`, create an investigation, add `samples/sample.log` and `samples/pstack.txt`, switch to **Timeline**, and save the window including the bottom tab bar.
 
 ## CI note
 
