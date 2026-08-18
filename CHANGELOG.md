@@ -12,6 +12,19 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.10.1] - 2026-08-18
+
+**Patch** — Storage hotfix ([#163](https://github.com/AntonyCyriac/logscope/issues/163), [#164](https://github.com/AntonyCyriac/logscope/issues/164)).
+
+### Fixed
+
+- **Concurrent index create** — build lock + `.building` temp path; no unlink race ([#163](https://github.com/AntonyCyriac/logscope/issues/163))
+- **`compress_content` CPU waste** — adaptive short-circuit when compression never wins ([#164](https://github.com/AntonyCyriac/logscope/issues/164))
+
+See [v2.10.1 release notes](docs/release/v2.10.1-RELEASE-NOTES.md).
+
+---
+
 ## [2.10.0] - 2026-08-13
 
 **Minor** — P1.1 alternate pstack dialects ([#144](https://github.com/AntonyCyriac/logscope/issues/144)).

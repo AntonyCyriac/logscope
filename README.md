@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.10.0`](CHANGELOG.md) — P1.1 TID pstack dialects (#144). Stories 1–6 + P1 shipped. [Release notes](docs/release/v2.10.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.10.1`](CHANGELOG.md) — Storage hotfix (concurrent index + compression). Stories 1–6 + P1 shipped. [Release notes](docs/release/v2.10.1-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
