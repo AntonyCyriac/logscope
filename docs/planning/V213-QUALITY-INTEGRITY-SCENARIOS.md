@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | v2.13.0 Hardening Matrix |
 | Category | Project Planning |
-| Version | 1.0.0 |
-| Status | Approved |
+| Version | 1.1.0 |
+| Status | G0 pending — theme locked; **release slice TBD** |
 | Created | 18-08-2026 |
 | Milestone | [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1) |
 
@@ -13,26 +13,49 @@
 
 ## Purpose
 
-Single **hardening release** for correctness and platform integrity debt filed as [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203). **Not** combined with P2.1 (shipped `v2.12.0`) or **#144-B** (`register_crash_analyzer`).
+**Hardening theme** for correctness and platform integrity debt filed as [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203). **Not** combined with P2.1 (shipped `v2.12.0`/`v2.12.1`) or **#144-B** (`register_crash_analyzer`).
+
+**G0 defines the release slice** — do **not** commit to fixing all 19 issues in `v2.13.0` before G0 sign-off. Waves below are a **priority backlog**, not a locked scope.
+
+**Product sequence (locked):**
+
+| Track | Meaning |
+|-------|---------|
+| P2.1 | User value (shipped `v2.12.0` + `v2.12.1`) |
+| **v2.13.0** | **Trust / correctness** (this theme) |
+| #144-B | Extensibility when real demand justifies it |
+| P3 / next bet | Reactive or next product milestone |
 
 **Product story:**
 
 > `v2.12.0` made desktop investigation parity real.  
 > `v2.13.0` makes the underlying platform trustworthy.
 
-**Queue discipline:** One milestone, priority labels (`priority-p0` / `priority-p1` / `priority-p2`), subsystem tracked in issue titles — no per-issue mini-milestones.
+**Queue discipline:** One GitHub milestone (`v2.13.0 — Quality & Integrity`), priority labels (`priority-p0` / `priority-p1` / `priority-p2`) — no per-issue mini-milestones. **Product UX frozen** until hardening slice ships.
 
 ---
 
-## Recommended fix order
+## G0 framing question
+
+> **Which existing correctness failures most threaten trust in an investigation?**
+
+G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias: **storage/index integrity** (P0) before plugin ergonomics and cosmetic P2 items.
+
+**G0 outputs:** chartered issue list · acceptance criteria · explicit deferrals to `v2.13.x` or backlog.
+
+---
+
+## Recommended fix order (priority backlog — G0 selects slice)
 
 ```text
-Wave 1 (P0)  #188 #189 #195 #203   storage/index + silent plugin failure
-Wave 2 (P1)  #200 #201 #194       web session enforcement
-Wave 3 (P1)  #185 #198 #186 #191   plugin ABI, query, reporting, session
-Wave 4 (P2)  #196 #197 #187 #190 #192 #193 #199
-Housekeeping #202                 version string corrected forward in v2.12.0 (v2.11.0 tag unchanged)
+P0  storage/index integrity     #188 #189 #195 #203
+P1  web/session correctness      #194 #200 #201
+P1  user-visible correctness     #185 #186 #191 #198
+P2  edge cases / polish          #187 #190 #192 #193 #196 #197 #199
+—   housekeeping                 #202 (fixed forward v2.12.0)
 ```
+
+**Likely G0 Wave 1 candidate:** P0 only — storage/index + silent plugin failure (#188 #189 #195 #203).
 
 ---
 
@@ -77,3 +100,4 @@ Housekeeping #202                 version string corrected forward in v2.12.0 (v
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Hardening backlog locked; milestone + priority labels |
+| 1.1.0 | 18-08-2026 | G0 owns release slice; waves = priority backlog not committed scope; product freeze |
