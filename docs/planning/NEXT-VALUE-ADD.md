@@ -78,7 +78,7 @@ Next    → v2.13.0 Hardening (§5.2) · then #144-B when justified (§5) · P3 
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
 | **P2.1** | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` | Related Evidence, suggestions, async refresh; matrix: [`V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md`](V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md) |
-| **H0** | Quality & Integrity hardening | **Next** — `v2.13.0` | [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203); matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
+| **H0** | Quality & Integrity hardening | **Next** — `v2.13.0` (G0 slice TBD) | Theme + [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203) backlog; matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
 | **#144-B** | `register_crash_analyzer` plugin hook | **After hardening** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
@@ -117,22 +117,26 @@ Crash analyzer registry → pstack parser · GDB parser · custom analyzer
 
 **Trigger:** A real second crash dialect or analyzer appears that should **not** belong in core. Do not implement merely because it is in the backlog. **Do not** bundle with v2.13.0 hardening.
 
-### v2.13.0 — Quality & Integrity (next)
+### v2.13.0 — Quality & Integrity (next — G0 pending)
 
-**Definition:** Pay down correctness and integrity debt before new architecture.
+**Definition:** Pay down correctness and integrity debt before new architecture. **Product UX frozen** until G0-chartered slice ships.
 
 **Type:** Platform hardening — **not** product UX, **not** #144-B.
 
+**G0 question:** *Which existing correctness failures most threaten trust in an investigation?*
+
+**Priority backlog** (G0 selects the `v2.13.0` slice — not all 19 by default):
+
 ```text
-Wave 1: storage/index (#188 #189 #195) + plugin silent failure (#203)
-Wave 2: web session enforcement (#200 #201 #194)
-Wave 3: plugin ABI, query, reporting, session (#185 #198 #186 #191)
-Wave 4: remaining P2 (#196–#199, #187, #190, #192, #193)
+P0  storage/index integrity     #188 #189 #195 #203
+P1  web/session correctness      #194 #200 #201
+P1  user-visible correctness     #185 #186 #191 #198
+P2  edge cases / polish          #187 #190 #192 #193 #196 #197 #199
 ```
 
 See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) and GitHub milestone [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1).
 
-**Out of v2.13.0:** new investigation stories, desktop UX, `register_crash_analyzer`, P3 charter.
+**Out of v2.13.0 theme:** new investigation stories, desktop UX, `register_crash_analyzer`, P3 charter.
 
 ### P3 — domain architecture (reactive only)
 
@@ -202,3 +206,4 @@ See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md)
 | 2.9.0 | 18-08-2026 | `v2.12.0` shipped — P2.1 desktop Evidence/Suggestions + async refresh. |
 | 2.10.0 | 18-08-2026 | Post-`v2.12.0` queue: **v2.13.0 Hardening** → **#144-B** (when justified) → **P3** reactive. |
 | 2.11.0 | 18-08-2026 | `v2.12.1` shipped — desktop timeline refresh after pagination (ES.15). |
+| 2.12.0 | 18-08-2026 | v2.13.0 Hardening theme locked; **G0 owns release slice** (not all #185–#203). Product UX frozen. |
