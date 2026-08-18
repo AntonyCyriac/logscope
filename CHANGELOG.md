@@ -12,6 +12,16 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.12.1] - 2026-08-18
+
+**Patch** — desktop Timeline refresh after pagination.
+
+### Fixed
+
+- **Desktop Timeline** — `refresh()` always rebuilds from offset 0 after artifact add or investigation reload; fixes stale timeline when **Load more** had been used (Bugbot #184 finding #2). **Load more** now appends pages without resetting.
+
+---
+
 ## [2.12.0] - 2026-08-18
 
 **Minor** — P2.1 desktop Evidence & Suggestions interactive parity.

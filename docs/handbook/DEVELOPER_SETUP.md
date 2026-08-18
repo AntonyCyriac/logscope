@@ -5,7 +5,7 @@
 | Document | Developer Setup |
 | Category | Handbook |
 | Version | 2.17.0 |
-| Last Updated | 13-08-2026 |
+| Last Updated | 18-08-2026 |
 
 ---
 
@@ -23,7 +23,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.12.0`](../../CHANGELOG.md) — Stories 1–6 + P1 + P1.1 + P2 + P2.1 desktop parity (CLI, desktop, web). **Next:** #144-B. See [CHANGELOG](../../CHANGELOG.md) for release history.
+**Current release:** [`v2.12.1`](../../CHANGELOG.md) — P2.1 desktop parity + timeline refresh patch. Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. **Next:** [v2.13.0 Quality & Integrity](../planning/V213-QUALITY-INTEGRITY-SCENARIOS.md) hardening. See [CHANGELOG](../../CHANGELOG.md) for release history.
 
 **Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 

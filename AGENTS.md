@@ -11,7 +11,7 @@ At the beginning of a session, load (attach or reference):
 | 1 | [docs/handbook/PROJECT_CONTEXT.md](docs/handbook/PROJECT_CONTEXT.md) | Engineering mindset, release, milestones, CI rules |
 | 2 | [docs/handbook/GLOSSARY.md](docs/handbook/GLOSSARY.md) | Domain vocabulary (evidence-centric platform) |
 | 3 | [docs/handbook/CODE_MAP.md](docs/handbook/CODE_MAP.md) | Where CLI, desktop, web, core, and tests live |
-| 4 | [docs/release/v2.10.1-RELEASE-NOTES.md](docs/release/v2.10.1-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
+| 4 | [docs/release/v2.12.1-RELEASE-NOTES.md](docs/release/v2.12.1-RELEASE-NOTES.md) | Current shipped release (update when tagging) |
 
 Optional: [docs/planning/NEXT-VALUE-ADD.md](docs/planning/NEXT-VALUE-ADD.md) · [docs/DOCUMENT_MAP.md](docs/DOCUMENT_MAP.md) · [docs/ROADMAP.md](docs/ROADMAP.md) · [CHANGELOG.md](CHANGELOG.md) · [V260 scenarios](docs/planning/V260-UNDERSTAND-WHY-IT-CRASHED-SCENARIOS.md) · [ADR-009-M15.8 Crash Analysis](docs/architecture/decisions/ADR-009-M15.8-Crash-Analysis.md)
 
@@ -66,7 +66,7 @@ Before changing web or desktop UI, read:
 | Tests | Prefer Playwright [`tests/e2e/web/`](tests/e2e/web/) + `data-testid` hooks |
 | **Web ↔ desktop sync** | **One Investigation UI, two shells** — same modes, terminology, workflows; ship both or track gap. See [UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md). |
 
-Desktop bottom tabs: **Timeline · Crash · Results · AI · Analytics** (investigation mode). Session mode unchanged. P2.1: Evidence Links / Suggestions UI deferred.
+Desktop bottom tabs: **Timeline · Crash · Results · AI · Analytics** (investigation mode). Session mode unchanged. P2.1 Evidence/Suggestions shipped `v2.12.0`; timeline refresh fix `v2.12.1`.
 
 ## Web UI browser automation
 

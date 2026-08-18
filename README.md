@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.12.0`](CHANGELOG.md) — Desktop Evidence & Suggestions (P2.1). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.12.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.12.1`](CHANGELOG.md) — P2.1 desktop Evidence/Suggestions + timeline refresh patch. Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.12.1-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
