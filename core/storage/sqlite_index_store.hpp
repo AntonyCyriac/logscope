@@ -88,6 +88,10 @@ class SqliteIndexStore final : public IndexStore
     [[nodiscard]] foundation::Result<bool> bindAndInsertLine(const analysis::IndexedLine& line,
                                                              std::string_view fullContent);
 
+    void closeDatabaseConnection() noexcept;
+
+    [[nodiscard]] foundation::Result<bool> reopenDatabaseConnection();
+
     std::unique_ptr<Impl> m_impl;
 };
 

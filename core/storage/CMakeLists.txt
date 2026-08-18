@@ -44,6 +44,7 @@ add_library(scope_storage
     index_fingerprint.cpp
     index_reader.cpp
     index_reuse.cpp
+    index_build_lock.cpp
     index_store_factory.cpp
     query_planner.cpp
     query_cache_codec.cpp

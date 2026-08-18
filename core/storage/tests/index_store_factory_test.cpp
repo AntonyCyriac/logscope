@@ -220,6 +220,7 @@ TEST(IndexStoreFactoryTest, RebuildsV1IndexThroughFactory)
     {
         const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
         ASSERT_TRUE(created);
+        ASSERT_TRUE((*created)->finalize(0U));
     }
 
     const auto schemaVersion = readMetaValue(databasePath, "schema_version");

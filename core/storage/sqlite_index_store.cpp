@@ -8,6 +8,7 @@
 
 #include <chrono>
 #include <filesystem>
+#include <optional>
 #include <sstream>
 #include <string>
 
@@ -15,6 +16,7 @@
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
 #include "foundation/string.hpp"
+#include "index_build_lock.hpp"
 #include "index_fingerprint.hpp"
 #include "source_snapshot.hpp"
 #include "log_format.hpp"
@@ -694,24 +696,37 @@ fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lin
 
 } // namespace
 
+namespace
+{
+
+constexpr std::size_t kCompressionAdaptiveSampleAttempts = 32U;
+
+} // namespace
+
 struct SqliteIndexStore::Impl
 {
     static constexpr std::size_t writeBatchSize = 5000U;
 
     sqlite3* database{nullptr};
-    foundation::Path databasePath;
-    IndexMetadata metadata;
     std::uint64_t storedLines{0U};
     sqlite3_stmt* insertStatement{nullptr};
     sqlite3_stmt* jsonFieldInsertStatement{nullptr};
     sqlite3_stmt* ftsInsertStatement{nullptr};
-    bool inWriteBatch{false};
     std::size_t linesInWriteBatch{0U};
-    bool compressContent{false};
     std::size_t compressThresholdBytes{256U};
-    bool indexUsesZlib{false};
-    bool queryCacheEnabled{true};
+    std::size_t compressionAttempts{0U};
+    std::size_t compressionWins{0U};
     std::size_t queryCacheMaxEntries{64U};
+    foundation::Path databasePath;
+    foundation::Path finalDatabasePath;
+    std::optional<IndexBuildLock> buildLock;
+    IndexMetadata metadata;
+    bool inWriteBatch{false};
+    bool compressContent{false};
+    bool indexUsesZlib{false};
+    bool compressionAdaptiveDisabled{false};
+    bool queryCacheEnabled{true};
+    bool buildingAtTempPath{false};
 };
 
 namespace
@@ -730,6 +745,69 @@ namespace
 }
 
 } // namespace
+
+void SqliteIndexStore::closeDatabaseConnection() noexcept
+{
+    if (m_impl == nullptr || m_impl->database == nullptr)
+    {
+        return;
+    }
+
+    if (m_impl->insertStatement != nullptr)
+    {
+        sqlite3_finalize(m_impl->insertStatement);
+        m_impl->insertStatement = nullptr;
+    }
+
+    if (m_impl->jsonFieldInsertStatement != nullptr)
+    {
+        sqlite3_finalize(m_impl->jsonFieldInsertStatement);
+        m_impl->jsonFieldInsertStatement = nullptr;
+    }
+
+    finalizeFtsInsertStatement(m_impl->ftsInsertStatement);
+
+    sqlite3_close(m_impl->database);
+    m_impl->database = nullptr;
+}
+
+foundation::Result<bool> SqliteIndexStore::reopenDatabaseConnection()
+{
+    if (m_impl == nullptr || m_impl->database != nullptr)
+    {
+        return foundation::Result<bool>(true);
+    }
+
+    sqlite3* database = nullptr;
+
+    if (sqlite3_open(m_impl->databasePath.string().c_str(), &database) != SQLITE_OK)
+    {
+        const foundation::Error error = database != nullptr
+                                            ? makeSqliteError(database)
+                                            : foundation::Error(foundation::ErrorCode::IOError,
+                                                                "Unable to open database.");
+
+        if (database != nullptr)
+        {
+            sqlite3_close(database);
+        }
+
+        return foundation::Result<bool>(error);
+    }
+
+    const auto connectionResult = configureSqliteConnection(database);
+
+    if (!connectionResult)
+    {
+        sqlite3_close(database);
+
+        return connectionResult;
+    }
+
+    m_impl->database = database;
+
+    return foundation::Result<bool>(true);
+}
 
 foundation::Result<bool> SqliteIndexStore::beginWriteBatch()
 {
@@ -817,7 +895,8 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
 
     sqlite3_bind_text(statement, 4, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
 
-    if (m_impl->compressContent && fullContent.size() >= m_impl->compressThresholdBytes)
+    if (m_impl->compressContent && !m_impl->compressionAdaptiveDisabled &&
+        fullContent.size() >= m_impl->compressThresholdBytes)
     {
         const auto compressed = compressZlib(fullContent);
 
@@ -826,8 +905,11 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
             return foundation::Result<bool>(compressed.error());
         }
 
+        ++m_impl->compressionAttempts;
+
         if (compressed->size() < fullContent.size())
         {
+            ++m_impl->compressionWins;
             sqlite3_bind_blob(statement, 5, compressed->data(), static_cast<int>(compressed->size()),
                               SQLITE_TRANSIENT);
         }
@@ -835,6 +917,12 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
         {
             sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()),
                               SQLITE_TRANSIENT);
+        }
+
+        if (m_impl->compressionAttempts >= kCompressionAdaptiveSampleAttempts &&
+            m_impl->compressionWins == 0U)
+        {
+            m_impl->compressionAdaptiveDisabled = true;
         }
     }
     else
@@ -880,24 +968,17 @@ SqliteIndexStore::~SqliteIndexStore()
 
     (void)commitWriteBatch();
 
-    if (m_impl->insertStatement != nullptr)
+    closeDatabaseConnection();
+
+    if (m_impl->buildingAtTempPath)
     {
-        sqlite3_finalize(m_impl->insertStatement);
-        m_impl->insertStatement = nullptr;
+        removeDatabaseArtifacts(m_impl->databasePath);
     }
 
-    if (m_impl->jsonFieldInsertStatement != nullptr)
+    if (m_impl->buildLock.has_value())
     {
-        sqlite3_finalize(m_impl->jsonFieldInsertStatement);
-        m_impl->jsonFieldInsertStatement = nullptr;
-    }
-
-    finalizeFtsInsertStatement(m_impl->ftsInsertStatement);
-
-    if (m_impl->database != nullptr)
-    {
-        sqlite3_close(m_impl->database);
-        m_impl->database = nullptr;
+        m_impl->buildLock->release();
+        m_impl->buildLock.reset();
     }
 }
 
@@ -905,11 +986,23 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
                                                            const IndexMetadata& metadata,
                                                            const IndexStoreOptions& options)
 {
-    std::error_code removeError;
-    std::filesystem::remove(std::filesystem::path(databasePath.string()), removeError);
+    const foundation::Path finalDatabasePath = databasePath;
+    auto lockResult = IndexBuildLock::acquire(finalDatabasePath);
 
-    if (sqlite3* database = nullptr;
-        sqlite3_open(databasePath.string().c_str(), &database) != SQLITE_OK)
+    if (!lockResult)
+    {
+        return foundation::Result<IndexStorePtr>(lockResult.error());
+    }
+
+    std::optional<IndexBuildLock> buildLock;
+    buildLock.emplace(std::move(lockResult.value()));
+    const foundation::Path buildingPath = indexBuildingDatabasePath(finalDatabasePath);
+
+    removeDatabaseArtifacts(buildingPath);
+
+    sqlite3* database = nullptr;
+
+    if (sqlite3_open(buildingPath.string().c_str(), &database) != SQLITE_OK)
     {
         const foundation::Error error = database != nullptr
                                             ? makeSqliteError(database)
@@ -921,87 +1014,96 @@ foundation::Result<IndexStorePtr> SqliteIndexStore::create(const foundation::Pat
             sqlite3_close(database);
         }
 
+        buildLock->release();
+
         return foundation::Result<IndexStorePtr>(error);
     }
-    else
+
+    const auto connectionResult = configureSqliteConnection(database);
+
+    if (!connectionResult)
     {
-        const auto connectionResult = configureSqliteConnection(database);
+        sqlite3_close(database);
+        buildLock->release();
 
-        if (!connectionResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(connectionResult.error());
-        }
-
-        auto impl = std::make_unique<Impl>();
-        impl->database = database;
-        impl->databasePath = databasePath;
-        impl->metadata = metadata;
-        impl->compressContent = options.compressContent;
-        impl->compressThresholdBytes = options.compressThresholdBytes;
-        impl->indexUsesZlib = options.compressContent;
-        impl->queryCacheEnabled = options.queryCacheEnabled;
-        impl->queryCacheMaxEntries = options.queryCacheMaxEntries;
-
-        const auto schemaResult = initializeSchemaV2(database);
-
-        if (!schemaResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(schemaResult.error());
-        }
-
-        const auto pragmaResult = configureBulkInsertPragmas(database);
-
-        if (!pragmaResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(pragmaResult.error());
-        }
-
-        const auto fingerprintResult = setMeta(database, "fingerprint", metadata.fingerprint);
-
-        if (!fingerprintResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(fingerprintResult.error());
-        }
-
-        const auto sourceResult = setMeta(database, "source_path", metadata.sourcePath.string());
-
-        if (!sourceResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(sourceResult.error());
-        }
-
-        const auto formatResult = setMeta(database, "format", logFormatToString(metadata.format));
-
-        if (!formatResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(formatResult.error());
-        }
-
-        const auto compressionResult =
-            setMeta(database, "content_compression", options.compressContent ? "zlib" : "none");
-
-        if (!compressionResult)
-        {
-            sqlite3_close(database);
-
-            return foundation::Result<IndexStorePtr>(compressionResult.error());
-        }
-
-        return foundation::Result<IndexStorePtr>(
-            IndexStorePtr(new SqliteIndexStore(std::move(impl))));
+        return foundation::Result<IndexStorePtr>(connectionResult.error());
     }
+
+    auto impl = std::make_unique<Impl>();
+    impl->database = database;
+    impl->databasePath = buildingPath;
+    impl->finalDatabasePath = finalDatabasePath;
+    impl->buildingAtTempPath = true;
+    impl->buildLock = std::move(buildLock);
+    impl->metadata = metadata;
+    impl->compressContent = options.compressContent;
+    impl->compressThresholdBytes = options.compressThresholdBytes;
+    impl->indexUsesZlib = options.compressContent;
+    impl->queryCacheEnabled = options.queryCacheEnabled;
+    impl->queryCacheMaxEntries = options.queryCacheMaxEntries;
+
+    const auto schemaResult = initializeSchemaV2(database);
+
+    if (!schemaResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(schemaResult.error());
+    }
+
+    const auto pragmaResult = configureBulkInsertPragmas(database);
+
+    if (!pragmaResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(pragmaResult.error());
+    }
+
+    const auto fingerprintResult = setMeta(database, "fingerprint", metadata.fingerprint);
+
+    if (!fingerprintResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(fingerprintResult.error());
+    }
+
+    const auto sourceResult = setMeta(database, "source_path", metadata.sourcePath.string());
+
+    if (!sourceResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(sourceResult.error());
+    }
+
+    const auto formatResult = setMeta(database, "format", logFormatToString(metadata.format));
+
+    if (!formatResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(formatResult.error());
+    }
+
+    const auto compressionResult =
+        setMeta(database, "content_compression", options.compressContent ? "zlib" : "none");
+
+    if (!compressionResult)
+    {
+        sqlite3_close(database);
+        impl->buildLock->release();
+
+        return foundation::Result<IndexStorePtr>(compressionResult.error());
+    }
+
+    return foundation::Result<IndexStorePtr>(IndexStorePtr(new SqliteIndexStore(std::move(impl))));
 }
 
 foundation::Result<IndexStorePtr> SqliteIndexStore::open(const foundation::Path& databasePath)
@@ -1223,7 +1325,75 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
 
     m_impl->metadata.fingerprint = fingerprintResult->value();
 
-    return setMeta(m_impl->database, "fingerprint", m_impl->metadata.fingerprint);
+    const auto fingerprintMetaResult =
+        setMeta(m_impl->database, "fingerprint", m_impl->metadata.fingerprint);
+
+    if (!fingerprintMetaResult)
+    {
+        return fingerprintMetaResult;
+    }
+
+    if (m_impl->compressContent)
+    {
+        const auto attemptsResult =
+            setMeta(m_impl->database, "content_compression_attempts",
+                    std::to_string(m_impl->compressionAttempts));
+
+        if (!attemptsResult)
+        {
+            return attemptsResult;
+        }
+
+        const auto winsResult =
+            setMeta(m_impl->database, "content_compression_wins", std::to_string(m_impl->compressionWins));
+
+        if (!winsResult)
+        {
+            return winsResult;
+        }
+
+        const auto adaptiveResult =
+            setMeta(m_impl->database, "content_compression_adaptive_disabled",
+                    m_impl->compressionAdaptiveDisabled ? "true" : "false");
+
+        if (!adaptiveResult)
+        {
+            return adaptiveResult;
+        }
+    }
+
+    if (m_impl->buildingAtTempPath)
+    {
+        const foundation::Path buildingPath = m_impl->databasePath;
+        const foundation::Path finalPath = m_impl->finalDatabasePath;
+
+        closeDatabaseConnection();
+
+        const auto promoteResult = promoteBuildingDatabase(buildingPath, finalPath);
+
+        if (!promoteResult)
+        {
+            return promoteResult;
+        }
+
+        m_impl->databasePath = finalPath;
+        m_impl->buildingAtTempPath = false;
+
+        const auto reopenResult = reopenDatabaseConnection();
+
+        if (!reopenResult)
+        {
+            return reopenResult;
+        }
+    }
+
+    if (m_impl->buildLock.has_value())
+    {
+        m_impl->buildLock->release();
+        m_impl->buildLock.reset();
+    }
+
+    return foundation::Result<bool>(true);
 }
 
 bool SqliteIndexStore::usesContentCompression() const noexcept
