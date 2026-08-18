@@ -12,6 +12,31 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.13.0] - 2026-08-18
+
+**Minor** — v2.13.0 Quality & Integrity hardening (Wave 1).
+
+### Fixed
+
+- **Index reuse — same-size rewrite** ([#188](https://github.com/AntonyCyriac/logscope/issues/188)) — content hash mismatch triggers rebuild instead of stale hits
+- **Index reuse — mid-file edit** ([#189](https://github.com/AntonyCyriac/logscope/issues/189)) — prefix hash mismatch triggers rebuild on incremental append
+- **Unsupported index schema** ([#195](https://github.com/AntonyCyriac/logscope/issues/195)) — future `schema_version` fails closed; DB not silently overwritten
+- **Plugin storage write failures** ([#203](https://github.com/AntonyCyriac/logscope/issues/203)) — `append_line` / `finalize` errors propagate; CLI/web no longer exit 0 on failure
+
+### Changed
+
+- Index metadata persists `source_content_sha256` and prefix hash at `finalize()`
+- `--reuse-index` may rebuild or error more often when integrity cannot be proven (correct behavior)
+
+### Notes
+
+- No investigation-domain, REST/CLI JSON, or desktop/web UX changes
+- Partial in-memory index cap still emits WARNING (not hard abort)
+
+See [v2.13.0 release notes](docs/release/v2.13.0-RELEASE-NOTES.md) · ADR-005-M11.1.
+
+---
+
 ## [2.12.1] - 2026-08-18
 
 **Patch** — desktop Timeline refresh after pagination.

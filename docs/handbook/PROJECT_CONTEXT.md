@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.12.1` (shipped). **Active:** **v2.13.0 Hardening Wave 1** — G1 ✅; G2 pending ([#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203)). **Product UX frozen.**
+**Current release:** `v2.13.0` (shipped). **Next:** **#144-B** `register_crash_analyzer` when justified · **P3** reactive charter. Product UX unfrozen for queue planning; hardening Wave 1 complete.
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -47,8 +47,8 @@ The project follows architecture-first development. Every implementation should 
 | P1.1 | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) |
 | P2 | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` |
 | P2.1 | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` (+ refresh fix `v2.12.1`) |
-| H0 | Quality & Integrity hardening | **Active** — `v2.13.0` Wave 1 (G2 pending) |
-| #144-B | `register_crash_analyzer` | **After hardening** — when a real second analyzer justifies it |
+| H0 | Quality & Integrity hardening | **Shipped** — `v2.13.0` Wave 1 ([#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203)) |
+| #144-B | `register_crash_analyzer` | **Next** — when a real second analyzer justifies it |
 | P3 | Domain architecture charter | **Reactive** — not scheduled |
 | P4–P5 | IQL · AI Investigation Assistant | Research only |
 

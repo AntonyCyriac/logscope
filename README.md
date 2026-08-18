@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.12.1`](CHANGELOG.md) — P2.1 desktop Evidence/Suggestions + timeline refresh patch. Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.12.1-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.13.0`](CHANGELOG.md) — Quality & Integrity hardening (Wave 1). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.13.0-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
@@ -66,7 +66,7 @@ Investigation → Artifacts → Timeline (logs + crash.summary) → Crash → Su
 | **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis, correlation suggestions, evidence links (`v2.3.0`–`v2.9.0`) |
 | **Plugins** | Runtime `.so`/`.dll` loading — parser, report, search, storage providers |
 
-Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`; **P2.1 Evidence/Suggestions** in `v2.12.0`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
+Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`; **P2.1 Evidence/Suggestions** in `v2.12.0`; **v2.13.0** integrity hardening shipped. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
 
 ## Install
 

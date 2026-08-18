@@ -23,7 +23,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.12.1`](../../CHANGELOG.md) — P2.1 desktop parity + timeline refresh patch. Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. **Next:** [v2.13.0 Quality & Integrity](../planning/V213-QUALITY-INTEGRITY-SCENARIOS.md) hardening. See [CHANGELOG](../../CHANGELOG.md) for release history.
+**Current release:** [`v2.13.0`](../../CHANGELOG.md) — Quality & Integrity hardening (Wave 1). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. **Next:** [#144-B](https://github.com/AntonyCyriac/logscope/issues/144) when justified. See [CHANGELOG](../../CHANGELOG.md) for release history.
 
 **Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 

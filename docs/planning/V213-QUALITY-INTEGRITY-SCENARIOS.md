@@ -5,7 +5,7 @@
 | Document | v2.13.0 Hardening Matrix |
 | Category | Project Planning |
 | Version | 1.2.0 |
-| Status | **G1 approved** — G2 pending (no feat branch until G2 start) |
+| Status | **G4 complete** — ready for G5 tag `v2.13.0` |
 | Created | 18-08-2026 |
 | Milestone | [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1) |
 
@@ -59,8 +59,62 @@ G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias:
 **Deferred** (same hardening theme; later wave or `v2.13.x`): #185–#187, #190–#202, #194, #196–#199.
 
 ```text
-G0 ✅ → G1 ✅ → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.0
 ```
+
+## Scenario matrix (Wave 1 — G3)
+
+Status key: **P** planned · **U** unit · **Int** integration · **E** CLI E2E · **R** regression
+
+| ID | Scenario | Unit | Integration | E2E | Notes |
+|----|----------|------|-------------|-----|-------|
+| QI.1 | [#188](https://github.com/AntonyCyriac/logscope/issues/188) same-size rewrite invalidates stale index | U | Int | — | `SourceSnapshotTest.DetectsSameSizeContentRewrite`, `IndexReuseTest.RebuildsWhenSameSizeContentChanges` |
+| QI.2 | [#189](https://github.com/AntonyCyriac/logscope/issues/189) mid-file edit before growth → rebuild | U | Int | — | `SourceSnapshotTest.DetectsMidFileEditBeforeGrowth`, `IndexReuseTest.RebuildsWhenMidFileEditPrecedesGrowth` |
+| QI.3 | mtime-only change with same content → reuse allowed | U | Int | — | `SourceSnapshotTest.IgnoresMtimeOnlyChange`, `IndexReuseTest.ReusesUnchangedSource` |
+| QI.4 | [#195](https://github.com/AntonyCyriac/logscope/issues/195) unsupported future schema fail-closed | U | Int | — | `SqliteIndexStoreTest.RejectsUnsupportedFutureSchema`, `IndexReuseTest.FailsClosedOnUnsupportedFutureSchema` |
+| QI.5 | content hash persisted at finalize | U | — | — | `SqliteIndexStoreTest.FinalizePersistsSourceSnapshotMeta` |
+| QI.6 | [#203](https://github.com/AntonyCyriac/logscope/issues/203) plugin `append_line` failure → `Error` | — | Int | — | `PluginProviderIntegrationTest.PropagatesPluginStorageWriteFailures` |
+| QI.7 | partial-index WARNING preserved (no hard cap abort) | — | — | E | `CliE2eTest.InvestigatePartialIndexWarnsWhenFilterApplied` |
+| QI.8 | storage reuse regression (stdin/dir/file) | — | — | R | `StorageRegressionTest.*` |
+
+## Integrity Gate (blocking G3)
+
+**#188 path:**
+
+```text
+Build index for log → same-size in-place rewrite (new token)
+  → reopen with --reuse-index → rebuild (not stale hits)
+```
+
+**#189 path:**
+
+```text
+Build index → mid-file edit + append growth
+  → prefix hash mismatch → rebuild (not stale prefix)
+```
+
+**#195 path:**
+
+```text
+Open index with schema_version > supported
+  → Error (no silent rebuild, no DB delete)
+```
+
+**#203 path:**
+
+```text
+Analyze with plugin:failing + --persist-index
+  → append_line non-zero → analyze Error (not exit 0)
+```
+
+## Non-goals (NG)
+
+| ID | Scenario | Expected |
+|----|----------|----------|
+| NG.1 | #144-B `register_crash_analyzer` | Separate milestone |
+| NG.2 | P3 domain events charter | Reactive only |
+| NG.3 | New investigation UX | Product freeze |
+| NG.4 | Deferred P1/P2 hardening (#185–#202 except Wave 1) | `v2.13.x` backlog |
 
 ## G1 design summary (approved 18-08-2026)
 
@@ -119,3 +173,5 @@ G0 ✅ → G1 ✅ → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Hardening backlog locked; milestone + priority labels |
 | 1.3.0 | 18-08-2026 | G1 approved — integrity hash model, schema fail-closed, plugin Error propagation |
+| 1.4.0 | 18-08-2026 | G3 — scenario matrix statuses; Wave 1 merged [#209](https://github.com/AntonyCyriac/logscope/pull/209) (`d211173`) |
+| 1.5.0 | 18-08-2026 | G4 — release notes, CHANGELOG, ADR-005-M11.1 Accepted |
