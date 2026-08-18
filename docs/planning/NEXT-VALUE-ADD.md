@@ -42,7 +42,7 @@ v2.13.0 → shipped (Quality & Integrity Wave 1 — #188 #189 #195 #203)
 Next    → #144-B when justified (§5) · deferred hardening backlog · P3 reactive (§5)
 ```
 
-**Queue discipline:** **v2.13.0 Hardening** (#185–#203), **#144-B** (developer extensibility when justified), and **P3** domain architecture are **three separate tracks** — do not combine into one milestone.
+**Queue discipline:** **#144-B** (developer extensibility when justified), deferred **v2.13.x** hardening backlog (#185–#202), and **P3** domain architecture are **three separate tracks** — do not combine into one milestone.
 
 ---
 

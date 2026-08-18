@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | v2.13.0 Hardening Matrix |
 | Category | Project Planning |
-| Version | 1.2.0 |
-| Status | **G4 complete** — ready for G5 tag `v2.13.0` |
+| Version | 1.6.0 |
+| Status | **Shipped** — `v2.13.0` Wave 1 (`e8be380`) |
 | Created | 18-08-2026 |
 | Milestone | [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1) |
 
@@ -22,7 +22,7 @@
 | Track | Meaning |
 |-------|---------|
 | P2.1 | User value (shipped `v2.12.0` + `v2.12.1`) |
-| **v2.13.0** | **Trust / correctness** (this theme) |
+| **v2.13.0** | **Trust / correctness** (shipped Wave 1) |
 | #144-B | Extensibility when real demand justifies it |
 | P3 / next bet | Reactive or next product milestone |
 
@@ -31,7 +31,7 @@
 > `v2.12.0` made desktop investigation parity real.  
 > `v2.13.0` makes the underlying platform trustworthy.
 
-**Queue discipline:** One GitHub milestone (`v2.13.0 — Quality & Integrity`), priority labels (`priority-p0` / `priority-p1` / `priority-p2`) — no per-issue mini-milestones. **Product UX frozen** until hardening slice ships.
+**Queue discipline:** One GitHub milestone (`v2.13.0 — Quality & Integrity`), priority labels (`priority-p0` / `priority-p1` / `priority-p2`) — no per-issue mini-milestones. Wave 1 **shipped** in `v2.13.0`; deferred items remain in backlog.
 
 ---
 
@@ -59,7 +59,7 @@ G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias:
 **Deferred** (same hardening theme; later wave or `v2.13.x`): #185–#187, #190–#202, #194, #196–#199.
 
 ```text
-G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.0
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 ✅ v2.13.0
 ```
 
 ## Scenario matrix (Wave 1 — G3)
@@ -175,3 +175,4 @@ Analyze with plugin:failing + --persist-index
 | 1.3.0 | 18-08-2026 | G1 approved — integrity hash model, schema fail-closed, plugin Error propagation |
 | 1.4.0 | 18-08-2026 | G3 — scenario matrix statuses; Wave 1 merged [#209](https://github.com/AntonyCyriac/logscope/pull/209) (`d211173`) |
 | 1.5.0 | 18-08-2026 | G4 — release notes, CHANGELOG, ADR-005-M11.1 Accepted |
+| 1.6.0 | 18-08-2026 | G5 — shipped `v2.13.0`; stale freeze language removed |
