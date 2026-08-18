@@ -132,7 +132,7 @@ void TimelinePanel::setupUi()
 
     connect(m_table, &QTableWidget::cellClicked, this, &TimelinePanel::handleRowActivated);
     connect(m_loadMoreButton, &QPushButton::clicked, this, [this]() {
-        refresh();
+        startAsyncLoad();
     });
 
     connect(m_relatedPanel, &RelatedEvidencePanel::createLinkRequested, this,
@@ -188,11 +188,7 @@ void TimelinePanel::refresh()
         return;
     }
 
-    if (m_offset == 0U)
-    {
-        clearTable();
-    }
-
+    clearTable();
     startAsyncLoad();
 }
 
@@ -221,6 +217,15 @@ void TimelinePanel::onLoadFinished(const scope::workspace::TimelineProjectionRes
 {
     m_loading = false;
 
+    if (m_refreshPending)
+    {
+        m_refreshPending = false;
+        clearTable();
+        startAsyncLoad();
+
+        return;
+    }
+
     if (m_offset == 0U)
     {
         m_events.clear();
@@ -243,12 +248,6 @@ void TimelinePanel::onLoadFinished(const scope::workspace::TimelineProjectionRes
     if (m_selectedRow >= 0 && m_selectedRow < static_cast<int>(m_events.size()))
     {
         refreshPanelsForSelection();
-    }
-
-    if (m_refreshPending)
-    {
-        m_refreshPending = false;
-        startAsyncLoad();
     }
 }
 

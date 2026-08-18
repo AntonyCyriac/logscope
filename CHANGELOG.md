@@ -10,6 +10,10 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ## [Unreleased]
 
+### Fixed
+
+- **Desktop Timeline** — `refresh()` always rebuilds from offset 0 after artifact add or investigation reload; fixes stale timeline when **Load more** had been used (Bugbot #184 finding #2). **Load more** now appends pages without resetting.
+
 ---
 
 ## [2.12.0] - 2026-08-18
