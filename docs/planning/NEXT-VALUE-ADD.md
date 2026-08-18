@@ -75,7 +75,7 @@ Next    → P2.1 (§5) · then #144 Option B (§5) · P3 ADR-010 reactive only (
 | **P1** | Crash Timeline | **Shipped** — `v2.9.0` | `crash.summary` on timeline projection |
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
-| **P2.1** | Desktop Evidence & Suggestions chrome | **Next** — product UX | Make desktop investigations as interactive as web; see §5.1 |
+| **P2.1** | Desktop Evidence & Suggestions chrome | **Next** — G1 pending (`v2.12.0`) | Make desktop investigations as interactive as web; see §5.1 |
 | **#144-B** | `register_crash_analyzer` plugin hook | **Backlog** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
