@@ -58,7 +58,7 @@ Housekeeping #202                 version string corrected forward in v2.12.0 (v
 | **P2** | [#192](https://github.com/AntonyCyriac/logscope/issues/192) | plugin | Duplicate report section on double-load |
 | **P2** | [#193](https://github.com/AntonyCyriac/logscope/issues/193) | plugin | Old `api_version` loads with no warning |
 | **P2** | [#199](https://github.com/AntonyCyriac/logscope/issues/199) | config | `storage.backend=plugin:<unknown>` passes validation |
-| — | [#202](https://github.com/AntonyCyriac/logscope/issues/202) | release | `v2.11.0` tag reports `2.10.1` — fixed forward in `v2.12.0`; tag not rewritten |
+| — | [#202](https://github.com/AntonyCyriac/logscope/issues/202) | release | `v2.11.0` tag reports `2.10.1` — **fixed forward in `v2.12.0`**; tag not rewritten (housekeeping) |
 
 ---
 

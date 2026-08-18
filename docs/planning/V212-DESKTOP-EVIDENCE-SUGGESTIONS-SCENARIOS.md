@@ -18,6 +18,7 @@ P2.1: Qt **Related Evidence** + **Suggested connections** chrome and async Timel
 | ES.12 | Session mode unchanged | I | D | — | Regression |
 | ES.13 | No REST/CLI JSON shape changes | I | U | — | Regression |
 | ES.14 | Web Playwright Story 5/6 unchanged | — | — | E | Regression |
+| ES.15 | Timeline refresh after Load more + artifact add | I | D | — | Shipped `v2.12.1` — full reload from offset 0 |
 
 ## Story Gate (Desktop headless — blocking G3)
 
@@ -58,3 +59,4 @@ Investigation → story6-app.log + story6-syslog.log
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Initial matrix from G1-approved design (pending sign-off) |
 | 1.1.0 | 18-08-2026 | G3 — statuses updated; shipped `v2.12.0` |
+| 1.2.0 | 18-08-2026 | ES.15 — timeline refresh after pagination; shipped `v2.12.1` |

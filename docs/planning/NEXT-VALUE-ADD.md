@@ -37,7 +37,7 @@ v2.10.0 → shipped (P1.1 TID pstack dialects #144)
 v2.10.1 → shipped (storage hotfix #163/#164)
 v2.11.0 → shipped (P2 desktop Timeline/Crash parity)
 v2.12.0 → shipped (P2.1 desktop Evidence/Suggestions)
-v2.12.1 → patch (#204 timeline refresh after pagination)
+v2.12.1 → shipped (timeline refresh after pagination — #204)
 Next    → v2.13.0 Hardening (§5.2) · then #144-B when justified (§5) · P3 reactive (§5)
 ```
 
@@ -84,7 +84,7 @@ Next    → v2.13.0 Hardening (§5.2) · then #144-B when justified (§5) · P3 
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
 | **P5** | AI Investigation Assistant | **Research only** | Evidence-based sequence synthesis — don't build yet |
 
-Tactical planning docs are added when each **implementation** item (P0–P2.1, #144-B) is chartered for release (G0).
+Tactical planning docs are added when each **implementation** item (P0–P2.1, H0, #144-B) is chartered for release (G0).
 
 ### P2.1 — Desktop Evidence & Suggestions (shipped `v2.12.0`)
 
@@ -201,3 +201,4 @@ See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md)
 | 2.8.0 | 18-08-2026 | Post-`v2.11.0` queue locked: **P2.1** (product) → **#144-B** (extensibility, when justified) → **P3** (reactive charter only). |
 | 2.9.0 | 18-08-2026 | `v2.12.0` shipped — P2.1 desktop Evidence/Suggestions + async refresh. |
 | 2.10.0 | 18-08-2026 | Post-`v2.12.0` queue: **v2.13.0 Hardening** → **#144-B** (when justified) → **P3** reactive. |
+| 2.11.0 | 18-08-2026 | `v2.12.1` shipped — desktop timeline refresh after pagination (ES.15). |
