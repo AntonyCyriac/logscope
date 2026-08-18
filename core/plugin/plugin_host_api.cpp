@@ -95,6 +95,23 @@ class ScopedPluginStorageBackend final
     LogScopeStorageBackend* m_backend;
 };
 
+class ScopedPluginStorageStoreWrapper final
+{
+  public:
+    explicit ScopedPluginStorageStoreWrapper(LogScopeStorageStore* store) noexcept : m_store(store) {}
+
+    ~ScopedPluginStorageStoreWrapper()
+    {
+        delete m_store;
+    }
+
+    ScopedPluginStorageStoreWrapper(const ScopedPluginStorageStoreWrapper&) = delete;
+    ScopedPluginStorageStoreWrapper& operator=(const ScopedPluginStorageStoreWrapper&) = delete;
+
+  private:
+    LogScopeStorageStore* m_store;
+};
+
 class CFormatParserAdapter final : public analysis::FormatParser
 {
   public:
@@ -547,6 +564,7 @@ int PluginHostApi::registerStorageBackendThunk(void* context, const char* backen
             metadata.format = format;
 
             LogScopeStorageStore* store = static_cast<LogScopeStorageStore*>(storeOpaque);
+            ScopedPluginStorageStoreWrapper scopedStore(store);
 
             return foundation::Result<storage::IndexStorePtr>(storage::IndexStorePtr(
                 new CStorageStoreAdapter(*store, std::move(metadata), sourcePath, std::string(backendId))));
