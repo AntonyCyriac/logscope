@@ -1455,6 +1455,11 @@ bool MainWindow::openInvestigationAtPath(const QString& path)
     setInvestigationMode(true);
     updateStatus(QStringLiteral("Investigation: %1").arg(QString::fromStdString(openResult->name)));
 
+    if (m_timelinePanel != nullptr)
+    {
+        m_timelinePanel->refresh();
+    }
+
     return true;
 }
 

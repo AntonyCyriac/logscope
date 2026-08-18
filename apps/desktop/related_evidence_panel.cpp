@@ -114,11 +114,11 @@ void RelatedEvidencePanel::setupUi()
     connect(m_cancelButton, &QPushButton::clicked, this, [this]() {
         m_createMode = false;
         m_createForm->setVisible(false);
-        m_addButton->setVisible(m_activeEvent != nullptr);
+        m_addButton->setVisible(m_activeEventId.has_value());
     });
 
     connect(m_createButton, &QPushButton::clicked, this, [this]() {
-        if (m_activeEvent == nullptr || m_targetCombo->currentData().toString().isEmpty())
+        if (!m_activeEventId.has_value() || m_targetCombo->currentData().toString().isEmpty())
         {
             return;
         }
@@ -132,7 +132,7 @@ void RelatedEvidencePanel::setupUi()
     });
 
     connect(m_list, &QListWidget::itemClicked, this, [this](QListWidgetItem* item) {
-        if (item == nullptr || m_activeEvent == nullptr)
+        if (item == nullptr || !m_activeEventId.has_value())
         {
             return;
         }
@@ -176,21 +176,21 @@ void RelatedEvidencePanel::setupUi()
     });
 }
 
-void RelatedEvidencePanel::setActiveEvent(const scope::workspace::TimelineEvent* event,
+void RelatedEvidencePanel::setActiveEvent(const std::string& activeEventId,
                                             const std::vector<scope::workspace::EvidenceLinkRecord>& links,
                                             const std::vector<scope::workspace::TimelineEvent>& timelineEvents)
 {
-    m_activeEvent = event;
+    m_activeEventId = activeEventId;
     m_links = links;
     m_timelineEvents = timelineEvents;
-    setVisible(event != nullptr);
-    m_addButton->setVisible(event != nullptr && !m_createMode);
+    setVisible(true);
+    m_addButton->setVisible(!m_createMode);
     renderLinks();
 }
 
 void RelatedEvidencePanel::clear()
 {
-    m_activeEvent = nullptr;
+    m_activeEventId.reset();
     m_links.clear();
     m_timelineEvents.clear();
     m_list->clear();
@@ -220,6 +220,16 @@ bool RelatedEvidencePanel::openFirstRow()
     return true;
 }
 
+const scope::workspace::TimelineEvent* RelatedEvidencePanel::activeEvent() const
+{
+    if (!m_activeEventId.has_value())
+    {
+        return nullptr;
+    }
+
+    return findEvent(*m_activeEventId);
+}
+
 const scope::workspace::TimelineEvent* RelatedEvidencePanel::findEvent(const std::string& eventId) const
 {
     for (const scope::workspace::TimelineEvent& event : m_timelineEvents)
@@ -237,14 +247,14 @@ void RelatedEvidencePanel::renderLinks()
 {
     m_list->clear();
 
-    if (m_activeEvent == nullptr)
+    if (!m_activeEventId.has_value())
     {
         m_emptyLabel->setVisible(true);
 
         return;
     }
 
-    const QString activeId = QString::fromStdString(m_activeEvent->id);
+    const QString activeId = QString::fromStdString(*m_activeEventId);
     bool hasRows = false;
 
     for (const scope::workspace::EvidenceLinkRecord& link : m_links)
@@ -297,12 +307,12 @@ void RelatedEvidencePanel::populateTargetChoices()
 {
     m_targetCombo->clear();
 
-    if (m_activeEvent == nullptr)
+    if (!m_activeEventId.has_value())
     {
         return;
     }
 
-    const QString activeId = QString::fromStdString(m_activeEvent->id);
+    const QString activeId = QString::fromStdString(*m_activeEventId);
 
     for (const scope::workspace::TimelineEvent& event : m_timelineEvents)
     {

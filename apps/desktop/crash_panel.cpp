@@ -17,11 +17,30 @@
 #include <QThread>
 #include <QVBoxLayout>
 
-#include <QApplication>
-#include <QElapsedTimer>
-
 namespace scope::desktop
 {
+
+namespace
+{
+
+void shutdownWorkerThread(QThread* thread, QObject* worker, QObject* receiver)
+{
+    if (worker != nullptr && receiver != nullptr)
+    {
+        worker->disconnect(receiver);
+        receiver->disconnect(worker);
+    }
+
+    if (thread == nullptr)
+    {
+        return;
+    }
+
+    thread->quit();
+    thread->wait();
+}
+
+} // namespace
 
 CrashPanel::CrashPanel(scope::application::InvestigationController* controller, QWidget* parent)
     : QWidget(parent), m_controller(controller)
@@ -43,11 +62,7 @@ CrashPanel::CrashPanel(scope::application::InvestigationController* controller, 
 
 CrashPanel::~CrashPanel()
 {
-    if (m_workerThread != nullptr)
-    {
-        m_workerThread->quit();
-        m_workerThread->wait(2000);
-    }
+    shutdownWorkerThread(m_workerThread, m_worker, this);
 }
 
 void CrashPanel::setupUi()

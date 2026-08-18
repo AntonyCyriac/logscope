@@ -28,6 +28,23 @@ namespace
 
 constexpr int kTimelinePageSize = 500;
 
+void shutdownWorkerThread(QThread* thread, QObject* worker, QObject* receiver)
+{
+    if (worker != nullptr && receiver != nullptr)
+    {
+        worker->disconnect(receiver);
+        receiver->disconnect(worker);
+    }
+
+    if (thread == nullptr)
+    {
+        return;
+    }
+
+    thread->quit();
+    thread->wait();
+}
+
 scope::workspace::EvidenceLinkType parseLinkType(const QString& value)
 {
     if (value == QStringLiteral("PRECEDES"))
@@ -72,11 +89,7 @@ TimelinePanel::TimelinePanel(scope::application::InvestigationController* contro
 
 TimelinePanel::~TimelinePanel()
 {
-    if (m_workerThread != nullptr)
-    {
-        m_workerThread->quit();
-        m_workerThread->wait(2000);
-    }
+    shutdownWorkerThread(m_workerThread, m_worker, this);
 }
 
 void TimelinePanel::setupUi()
@@ -164,6 +177,8 @@ void TimelinePanel::clearTable()
     m_errorLabel->clear();
     m_errorLabel->setVisible(false);
     m_loadMoreButton->setVisible(false);
+    m_relatedPanel->clear();
+    m_suggestionsPanel->clear();
 }
 
 void TimelinePanel::refresh()
@@ -224,6 +239,11 @@ void TimelinePanel::onLoadFinished(const scope::workspace::TimelineProjectionRes
     }
 
     populateTable();
+
+    if (m_selectedRow >= 0 && m_selectedRow < static_cast<int>(m_events.size()))
+    {
+        refreshPanelsForSelection();
+    }
 
     if (m_refreshPending)
     {
@@ -431,7 +451,7 @@ void TimelinePanel::refreshPanelsForSelection()
     }
 
     const scope::workspace::TimelineEvent& event = m_events[static_cast<std::size_t>(m_selectedRow)];
-    m_relatedPanel->setActiveEvent(&event, linksForActiveEvent(), m_events);
+    m_relatedPanel->setActiveEvent(event.id, linksForActiveEvent(), m_events);
 
     scope::workspace::CorrelationSuggestionQuery query;
     query.eventId = event.id;

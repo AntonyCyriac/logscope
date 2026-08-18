@@ -9,6 +9,8 @@
 
 #include "viewer_navigation.hpp"
 
+#include <optional>
+#include <string>
 #include <vector>
 
 #include "evidence_link.hpp"
@@ -34,7 +36,7 @@ class RelatedEvidencePanel : public QWidget
   public:
     explicit RelatedEvidencePanel(QWidget* parent = nullptr);
 
-    void setActiveEvent(const scope::workspace::TimelineEvent* event,
+    void setActiveEvent(const std::string& activeEventId,
                         const std::vector<scope::workspace::EvidenceLinkRecord>& links,
                         const std::vector<scope::workspace::TimelineEvent>& timelineEvents);
 
@@ -53,8 +55,9 @@ class RelatedEvidencePanel : public QWidget
     void renderLinks();
     void populateTargetChoices();
     [[nodiscard]] const scope::workspace::TimelineEvent* findEvent(const std::string& eventId) const;
+    [[nodiscard]] const scope::workspace::TimelineEvent* activeEvent() const;
 
-    const scope::workspace::TimelineEvent* m_activeEvent{nullptr};
+    std::optional<std::string> m_activeEventId;
     std::vector<scope::workspace::EvidenceLinkRecord> m_links;
     std::vector<scope::workspace::TimelineEvent> m_timelineEvents;
 
