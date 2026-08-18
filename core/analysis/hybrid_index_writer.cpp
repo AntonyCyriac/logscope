@@ -58,12 +58,6 @@ foundation::Result<bool> HybridIndexWriter::tryAddLine(IndexedLine line, const s
         }
     }
 
-    if (!storedInMemory && m_persistentStore == nullptr)
-    {
-        return foundation::Result<bool>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "In-memory line index capacity exceeded."));
-    }
-
     return foundation::Result<bool>(true);
 }
 

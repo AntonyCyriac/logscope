@@ -68,6 +68,33 @@ analysis::JsonLineParseResult toJsonLineParseResult(const LogScopeParsedLine& pa
     return result;
 }
 
+class ScopedPluginStorageBackend final
+{
+  public:
+    explicit ScopedPluginStorageBackend(LogScopeStorageBackend* backend) noexcept : m_backend(backend) {}
+
+    ~ScopedPluginStorageBackend()
+    {
+        if (m_backend == nullptr)
+        {
+            return;
+        }
+
+        if (m_backend->vtable != nullptr && m_backend->vtable->destroy != nullptr)
+        {
+            m_backend->vtable->destroy(m_backend->instance);
+        }
+
+        delete m_backend;
+    }
+
+    ScopedPluginStorageBackend(const ScopedPluginStorageBackend&) = delete;
+    ScopedPluginStorageBackend& operator=(const ScopedPluginStorageBackend&) = delete;
+
+  private:
+    LogScopeStorageBackend* m_backend;
+};
+
 class CFormatParserAdapter final : public analysis::FormatParser
 {
   public:
@@ -496,13 +523,15 @@ int PluginHostApi::registerStorageBackendThunk(void* context, const char* backen
         [createFn, backendId](const storage::StorageConfig& /*config*/, const storage::IndexFingerprint& fingerprint,
                    const foundation::Path& sourcePath, const analysis::LogFormat format)
             -> foundation::Result<storage::IndexStorePtr> {
-            LogScopeStorageBackend* backend = createFn();
+            LogScopeStorageBackend* const backend = createFn();
 
             if (backend == nullptr || backend->vtable == nullptr || backend->vtable->create_store == nullptr)
             {
                 return foundation::Result<storage::IndexStorePtr>(foundation::Error(
                     foundation::ErrorCode::Unknown, "Storage backend factory returned null."));
             }
+
+            ScopedPluginStorageBackend scopedBackend(backend);
 
             void* storeOpaque = nullptr;
 
