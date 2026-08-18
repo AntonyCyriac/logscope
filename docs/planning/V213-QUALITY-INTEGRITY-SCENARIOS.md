@@ -5,7 +5,7 @@
 | Document | v2.13.0 Hardening Matrix |
 | Category | Project Planning |
 | Version | 1.2.0 |
-| Status | **G0 approved** — Wave 1 chartered; G1 pending |
+| Status | **G1 approved** — G2 pending (no feat branch until G2 start) |
 | Created | 18-08-2026 |
 | Milestone | [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1) |
 
@@ -59,8 +59,23 @@ G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias:
 **Deferred** (same hardening theme; later wave or `v2.13.x`): #185–#187, #190–#202, #194, #196–#199.
 
 ```text
-G0 ✅ → G1 design → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
+G0 ✅ → G1 ✅ → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
 ```
+
+## G1 design summary (approved 18-08-2026)
+
+**Binding principle:** correctness failures become explicit — never a plausible wrong result.
+
+| Issue | G1 decision |
+|-------|-------------|
+| #188 | `source_content_sha256` — equal size + hash mismatch → rebuild |
+| #189 | Prefix byte-range hash before append — mismatch → rebuild |
+| #195 | Future schema fail-closed; v1 explicit error; no silent open-failure fallback |
+| #203 | Plugin non-zero → `Error` through adapter/writer/engine; CLI/web fail |
+
+**ADR:** [ADR-005-M11.1](../architecture/decisions/ADR-005-M11.1-Index-Integrity-Hardening.md) (Proposed → Accepted at G4).
+
+**EngOS:** `logscope-strategy/engos/artifacts/v2.13.0-quality-integrity/design.md`
 
 ## Priority backlog (full matrix)
 
@@ -103,4 +118,4 @@ G0 ✅ → G1 design → G2 #188 #189 #195 #203 → G3 → G4 → G5 v2.13.0
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 18-08-2026 | Hardening backlog locked; milestone + priority labels |
-| 1.2.0 | 18-08-2026 | G0 Wave 1 approved — #188 #189 #195 #203 in scope; product freeze |
+| 1.3.0 | 18-08-2026 | G1 approved — integrity hash model, schema fail-closed, plugin Error propagation |
