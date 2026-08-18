@@ -23,6 +23,11 @@ add_executable(logscope-desktop
     log_table_model.cpp
     theme_manager.cpp
     tail_worker.cpp
+    timeline_panel.cpp
+    timeline_load_worker.cpp
+    crash_panel.cpp
+    crash_load_worker.cpp
+    pstack_text_utils.cpp
     analytics_panel.cpp
     ai_panel.cpp
     export_report_dialog.cpp

@@ -86,15 +86,17 @@ Tabs stay in the bar but may be **disabled** until data exists — do not hide t
 
 Desktop (`apps/desktop/main_window.cpp`) follows the same philosophy where features exist:
 
-| Web | Desktop |
-|-----|---------|
-| Left artifacts | Left **Workspace** navigator (sessions / extensions) |
+| Web | Desktop (`v2.11.0`) |
+|-----|---------------------|
+| Left artifacts | Left **Artifacts** sidebar (investigation mode) or **Workspace** (session mode) |
 | Center artifact viewer | **Results** tab: log table + filters |
-| Bottom Timeline / Crash | *Not yet on desktop* |
+| Bottom Timeline / Crash | **Timeline** · **Crash** tabs |
 | Bottom AI | **AI** tab |
 | — | **Analytics** tab (desktop-only until projected on web) |
 
-Use **QTabWidget** for bottom area (Results | AI | Analytics), not side-by-side split panels.
+Use **QTabWidget** for bottom area (**Timeline · Crash · Results · AI · Analytics** in investigation mode), not side-by-side split panels.
+
+**P2.1 deferred on desktop:** Related Evidence panel, evidence-link UI, correlation suggestions UI.
 
 ---
 
@@ -109,7 +111,7 @@ When a change is **user-visible** (new tab, artifact action, navigation, analyze
 1. **Implement on both surfaces** in the same milestone/PR when feasible (`apps/web/ui/dist/` **and** `apps/desktop/`).
 2. **Reuse the same orchestration** — `ApplicationService` and domain APIs; no duplicate business logic in SPA or Qt.
 3. **Match structure** — same tab names, same artifact actions (Open / Analyze / Investigate), same progressive disclosure (bottom tabs, not extra panels).
-4. **Test both** — extend Playwright (`tests/e2e/web/`) **and** headless desktop tests (`logscope_desktop_tests`) for the shared flow.
+4. **Test both** — extend Playwright (`tests/e2e/web/`) **and** headless desktop tests (`logscope_desktop_tests`, `logscope_desktop_parity_test`) for the shared flow.
 
 ### When one surface must lag
 

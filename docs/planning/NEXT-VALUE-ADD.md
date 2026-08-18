@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.10.1` (Stories 1–6 + P1 + P1.1 + v2.10.1 storage hotfix shipped). Phase A + P1 + P1.1 complete — see §5–§6.
+**Current public release:** `v2.11.0` (P2 desktop Timeline/Crash parity shipped). Phase A + P1 + P1.1 + P2 complete — see §5–§6.
 
 ---
 
@@ -35,7 +35,8 @@ v2.9.0  → shipped (P1 Crash Timeline)
 v2.9.1  → shipped (timeline hotfix #171/#172)
 v2.10.0 → shipped (P1.1 TID pstack dialects #144)
 v2.10.1 → shipped (storage hotfix #163/#164)
-Next    → P2 desktop parity (§5)
+v2.11.0 → shipped (P2 desktop Timeline/Crash parity)
+Next    → #144 Option B · P3 ADR-010 (§5)
 ```
 
 ---
@@ -71,12 +72,25 @@ Next    → P2 desktop parity (§5)
 | **P0.3** | Correlation View | **Deferred** | When links are rich |
 | **P1** | Crash Timeline | **Shipped** — `v2.9.0` | `crash.summary` on timeline projection |
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
-| **P2** | Desktop Timeline/Crash parity | **Implementation** | Web has bottom dock tabs; desktop gap in [`tests/e2e/web/README.md`](../../tests/e2e/web/README.md) |
+| **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
 | **P3** | ADR-010 domain model + events | **Emergent** | Extract when patterns recur after P1 |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
 | **P5** | AI Investigation Assistant | **Research only** | Evidence-based sequence synthesis — don't build yet |
 
 Tactical planning docs are added when each **implementation** item (P0–P2) is chartered for release (G0).
+
+### P2 acceptance criteria (G0 — measurable)
+
+| # | Criterion |
+|---|-----------|
+| 1 | Desktop bottom dock: **Timeline** + **Crash** tabs (same labels as web) |
+| 2 | Timeline renders `TimelineProjectionResult` including `crash.summary` (P1) |
+| 3 | Crash tab renders ephemeral `CrashReport` (Story 4) |
+| 4 | Story Gate on desktop: investigation + app.log + pstack → timeline → crash → jump |
+| 5 | Headless `logscope_desktop_tests` covers AC.4; web Playwright remains green |
+| 6 | No new timeline/crash capabilities; no desktop-specific domain models |
+
+**Out of P2:** new parsers (#144), correlation changes, redesign, AI, enterprise.
 
 ---
 
@@ -122,3 +136,6 @@ Tactical planning docs are added when each **implementation** item (P0–P2) is 
 | 1.9.0 | 07-08-2026 | `v2.7.1` shipped; [#144](https://github.com/AntonyCyriac/logscope/issues/144) pstack dialects backlogged as P1.1. |
 | 2.0.0 | 12-08-2026 | `v2.8.0` shipped — Story 6 Discover the Connections; Phase A complete (Stories 1–6). |
 | 2.4.0 | 18-08-2026 | `v2.10.1` shipped — storage hotfix (#163, #164). |
+| 2.5.0 | 18-08-2026 | P2 desktop Timeline/Crash parity — G0 chartered (target `v2.11.0`). |
+| 2.6.0 | 18-08-2026 | P2 G1 approved — ADR-008-M14.1 + V211 scenario matrix. |
+| 2.7.0 | 18-08-2026 | `v2.11.0` shipped — P2 desktop Timeline/Crash parity. |

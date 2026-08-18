@@ -72,7 +72,7 @@ Writes `docs/assets/logscope-web.png`. CLI and desktop PNGs: [docs/assets/README
 
 ## Desktop parity gaps
 
-Web bottom dock tabs **Timeline** and **Crash** are not yet on desktop. Desktop uses bottom tabs **Results**, **AI**, and **Analytics**.
+Web bottom dock tabs **Timeline** and **Crash** ship on desktop in **v2.11.0** (P2). See [`docs/planning/V211-DESKTOP-PARITY-SCENARIOS.md`](../../../docs/planning/V211-DESKTOP-PARITY-SCENARIOS.md).
 
 **Agent rule:** For new user-visible features, implement on **both** web and desktop in the same milestone when feasible. If one surface lags, document the gap here and in the scenario matrix — do not let UIs drift silently. See [`docs/handbook/WEB_UI_DESIGN.md`](../../../docs/handbook/WEB_UI_DESIGN.md) § Web ↔ desktop sync.
 

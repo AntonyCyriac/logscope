@@ -46,7 +46,7 @@ Create Investigation → Add app.log → Add pstack
 | NG.1 | Parser / GDB / dialect changes | TID dialect shipped `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)); plugin hook deferred |
 | NG.2 | Fault-frame `lineNumber` on event | Omitted in v2.9.0 |
 | NG.3 | AI root cause fields | Absent |
-| NG.4 | Desktop Timeline parity | P2 deferred |
+| NG.4 | Desktop Timeline parity | Shipped `v2.11.0` — [V211-DESKTOP-PARITY-SCENARIOS.md](V211-DESKTOP-PARITY-SCENARIOS.md) |
 
 ## Revision history
 

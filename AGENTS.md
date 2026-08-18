@@ -66,7 +66,7 @@ Before changing web or desktop UI, read:
 | Tests | Prefer Playwright [`tests/e2e/web/`](tests/e2e/web/) + `data-testid` hooks |
 | **Web ↔ desktop sync** | **One Investigation UI, two shells** — same modes, terminology, workflows; ship both or track gap. See [UI_ARCHITECTURE.md](docs/architecture/UI_ARCHITECTURE.md). |
 
-Desktop bottom tabs: **Results \| AI \| Analytics** (Timeline/Crash web-only until shipped on Qt — tracked gap).
+Desktop bottom tabs: **Timeline · Crash · Results · AI · Analytics** (investigation mode). Session mode unchanged. P2.1: Evidence Links / Suggestions UI deferred.
 
 ## Web UI browser automation
 

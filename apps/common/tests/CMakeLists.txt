@@ -4,6 +4,7 @@
 
 add_executable(scope_application_tests
     application_service_test.cpp
+    investigation_controller_test.cpp
 )
 
 target_link_libraries(scope_application_tests

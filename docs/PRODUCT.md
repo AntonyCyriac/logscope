@@ -21,7 +21,7 @@ LogScope provides a technology-independent approach to:
 
 ## Current Status
 
-LogScope **v2.10.1** ships **Stories 1–6**, **P1 Crash Timeline**, **P1.1** TID pstack dialects, and **v2.10.1** storage hotfixes. Phase A + P1 + P1.1 complete — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+LogScope **v2.11.0** ships **Stories 1–6**, **P1 Crash Timeline**, **P1.1** TID pstack dialects, **P2** desktop Timeline/Crash parity, and **v2.10.1** storage hotfixes. See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 ```text
 Source → Analysis → Investigation → Reporting

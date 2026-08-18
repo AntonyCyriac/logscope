@@ -14,6 +14,7 @@
 #include <QListWidgetItem>
 #include <QMenuBar>
 #include <QMessageBox>
+#include <QInputDialog>
 #include <QSplitter>
 #include <QTabWidget>
 #include <QStandardPaths>
@@ -52,9 +53,24 @@ QString extensionStatusLabel(const scope::extension::ExtensionStatus status)
     return QStringLiteral("unknown");
 }
 
+scope::foundation::Path resolveInvestigationsRoot(const scope::foundation::Path& overrideRoot)
+{
+    if (!overrideRoot.string().empty())
+    {
+        return overrideRoot;
+    }
+
+    const QString root =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + QStringLiteral("/investigations");
+
+    return scope::foundation::Path(root.toStdString());
+}
+
 } // namespace
 
-MainWindow::MainWindow(const scope::foundation::Path& configFile, QWidget* parent) : QMainWindow(parent)
+MainWindow::MainWindow(const scope::foundation::Path& configFile,
+                       const scope::foundation::Path& investigationsRoot, QWidget* parent)
+    : QMainWindow(parent), m_investigationController(resolveInvestigationsRoot(investigationsRoot))
 {
     setWindowTitle(QStringLiteral("LogScope Desktop"));
     resize(1200, 800);
@@ -100,6 +116,13 @@ void MainWindow::createMenus()
     sessionMenu->addAction(QStringLiteral("Save…"), this, &MainWindow::saveSession);
     sessionMenu->addAction(QStringLiteral("Load…"), this, &MainWindow::loadSession);
 
+    auto* investigationMenu = menuBar()->addMenu(QStringLiteral("Investigation"));
+    investigationMenu->addAction(QStringLiteral("New Investigation…"), this, &MainWindow::promptCreateInvestigation);
+    investigationMenu->addAction(QStringLiteral("Open Investigation…"), this, &MainWindow::openInvestigation);
+    investigationMenu->addAction(QStringLiteral("Close Investigation"), this, &MainWindow::closeInvestigation);
+    investigationMenu->addSeparator();
+    investigationMenu->addAction(QStringLiteral("Add Artifact…"), this, &MainWindow::addInvestigationArtifact);
+
     auto* viewMenu = menuBar()->addMenu(QStringLiteral("View"));
     viewMenu->addAction(QStringLiteral("Run Statistics…"), this, &MainWindow::showRunStats);
     viewMenu->addAction(QStringLiteral("Light Theme"), this, &MainWindow::applyLightTheme);
@@ -115,6 +138,9 @@ void MainWindow::createLayout()
     auto* navLayout = new QVBoxLayout(navigator);
 
     m_sessionList = new QListWidget(navigator);
+    m_artifactList = new QListWidget(navigator);
+    m_artifactList->setObjectName(QStringLiteral("artifact-list"));
+    m_artifactList->setVisible(false);
     m_extensionList = new QListWidget(navigator);
     m_extensionDetails = new QTextEdit(navigator);
     m_extensionDetails->setReadOnly(true);
@@ -122,6 +148,8 @@ void MainWindow::createLayout()
     m_extensionDetails->setMaximumHeight(120);
     navLayout->addWidget(new QLabel(QStringLiteral("Workspace"), navigator));
     navLayout->addWidget(m_sessionList);
+    navLayout->addWidget(new QLabel(QStringLiteral("Artifacts"), navigator));
+    navLayout->addWidget(m_artifactList);
     navLayout->addWidget(new QLabel(QStringLiteral("Extensions"), navigator));
     navLayout->addWidget(m_extensionList);
     navLayout->addWidget(m_extensionDetails);
@@ -182,6 +210,10 @@ void MainWindow::createLayout()
     resultsLayout->addWidget(m_logView, 1);
 
     m_bottomTabs = new QTabWidget(workArea);
+    m_timelinePanel = new TimelinePanel(&m_investigationController, m_bottomTabs);
+    m_crashPanel = new CrashPanel(&m_investigationController, m_bottomTabs);
+    m_bottomTabs->addTab(m_timelinePanel, QStringLiteral("Timeline"));
+    m_bottomTabs->addTab(m_crashPanel, QStringLiteral("Crash"));
     m_bottomTabs->addTab(resultsTab, QStringLiteral("Results"));
     m_analyticsPanel = new AnalyticsPanel(m_bottomTabs);
     m_aiPanel = new AiPanel(&m_service, m_bottomTabs);
@@ -208,7 +240,23 @@ void MainWindow::createLayout()
         {
             runAnalytics();
         }
+
+        if (m_investigationMode && m_bottomTabs->widget(index) == m_timelinePanel)
+        {
+            m_timelinePanel->refresh();
+        }
+
+        if (m_investigationMode && m_bottomTabs->widget(index) == m_crashPanel)
+        {
+            m_crashPanel->refresh();
+        }
     });
+    connect(m_timelinePanel, &TimelinePanel::navigationRequested, this, &MainWindow::applyViewerNavigation);
+    connect(m_crashPanel, &CrashPanel::navigationRequested, this, &MainWindow::applyViewerNavigation);
+    connect(m_artifactList, &QListWidget::currentItemChanged, this,
+            [this](QListWidgetItem* /*current*/, QListWidgetItem* /*previous*/) {
+                onArtifactSelectionChanged();
+            });
     connect(m_aiPanel, &AiPanel::investigationReady, this, &MainWindow::populateTableFromInvestigation);
     connect(m_tailCheck, &QCheckBox::toggled, this, &MainWindow::toggleTail);
     connect(m_extensionList, &QListWidget::currentItemChanged, this,
@@ -225,6 +273,8 @@ void MainWindow::createLayout()
 
     refreshSessions();
     refreshExtensions();
+    updateInvestigationTabAvailability();
+    switchToBottomTab(QStringLiteral("Results"));
 }
 
 void MainWindow::loadConfigurationFile()
@@ -973,6 +1023,454 @@ scope::investigation::InvestigationCriteria MainWindow::buildInvestigationCriter
     }
 
     return criteria;
+}
+
+void MainWindow::promptCreateInvestigation()
+{
+    bool ok = false;
+    const QString name =
+        QInputDialog::getText(this, QStringLiteral("New Investigation"), QStringLiteral("Name:"),
+                              QLineEdit::Normal, QStringLiteral("desktop-investigation"), &ok);
+
+    if (!ok || name.trimmed().isEmpty())
+    {
+        return;
+    }
+
+    if (!createInvestigation(name.trimmed()))
+    {
+        QMessageBox::warning(this, QStringLiteral("Investigation"),
+                             QStringLiteral("Could not create investigation."));
+    }
+}
+
+void MainWindow::openInvestigation()
+{
+    const QString path =
+        QFileDialog::getExistingDirectory(this, QStringLiteral("Open Investigation"), QString{});
+
+    if (path.isEmpty())
+    {
+        return;
+    }
+
+    const auto openResult = m_investigationController.open(scope::foundation::Path(path.toStdString()));
+
+    if (!openResult)
+    {
+        QMessageBox::warning(this, QStringLiteral("Investigation"),
+                             QString::fromStdString(openResult.error().message()));
+
+        return;
+    }
+
+    setInvestigationMode(true);
+    updateStatus(QStringLiteral("Investigation: %1").arg(QString::fromStdString(openResult->name)));
+}
+
+void MainWindow::closeInvestigation()
+{
+    m_investigationController.close();
+    setInvestigationMode(false);
+    updateStatus(QStringLiteral("Investigation closed"));
+}
+
+void MainWindow::addInvestigationArtifact()
+{
+    if (!m_investigationMode)
+    {
+        QMessageBox::information(this, QStringLiteral("Investigation"),
+                                 QStringLiteral("Create or open an investigation first."));
+
+        return;
+    }
+
+    const QString path =
+        QFileDialog::getOpenFileName(this, QStringLiteral("Add Artifact"), QString{},
+                                     QStringLiteral("All files (*.*)"));
+
+    if (path.isEmpty())
+    {
+        return;
+    }
+
+    const scope::foundation::Path sourcePath(path.toStdString());
+    const std::string type = scope::application::InvestigationController::inferArtifactType({}, sourcePath);
+
+    const auto result = type == "log" ? m_investigationController.addLogArtifact(sourcePath)
+                                      : m_investigationController.addArtifactFile(sourcePath, type);
+
+    if (!result)
+    {
+        QMessageBox::warning(this, QStringLiteral("Investigation"),
+                             QString::fromStdString(result.error().message()));
+
+        return;
+    }
+
+    refreshArtifactList();
+    updateInvestigationTabAvailability();
+    m_timelinePanel->refresh();
+
+    if (type == "pstack" || type == "core")
+    {
+        m_crashPanel->setActiveArtifactId(QString::fromStdString(result->id));
+        m_crashPanel->refresh();
+    }
+
+    updateStatus(QStringLiteral("Added artifact: %1").arg(path));
+}
+
+void MainWindow::refreshArtifactList()
+{
+    m_artifactList->blockSignals(true);
+    m_artifactList->clear();
+
+    if (!m_investigationController.isOpen())
+    {
+        return;
+    }
+
+    for (const scope::workspace::ArtifactRecord& artifact : m_investigationController.manifest().artifacts)
+    {
+        auto* item = new QListWidgetItem(
+            QStringLiteral("%1 (%2)").arg(QString::fromStdString(artifact.name), QString::fromStdString(artifact.type)));
+        item->setData(Qt::UserRole, QString::fromStdString(artifact.id));
+        item->setData(Qt::UserRole + 1, QString::fromStdString(artifact.type));
+        m_artifactList->addItem(item);
+    }
+
+    m_artifactList->blockSignals(false);
+}
+
+void MainWindow::setInvestigationMode(const bool enabled)
+{
+    m_investigationMode = enabled;
+    m_sessionList->setVisible(!enabled);
+    m_artifactList->setVisible(enabled);
+    refreshArtifactList();
+    m_timelinePanel->setInvestigationActive(enabled);
+    m_crashPanel->setInvestigationActive(enabled);
+    updateInvestigationTabAvailability();
+
+    if (enabled)
+    {
+        setWindowTitle(QStringLiteral("LogScope Desktop — %1")
+                           .arg(QString::fromStdString(m_investigationController.manifest().name)));
+    }
+    else
+    {
+        setWindowTitle(QStringLiteral("LogScope Desktop"));
+    }
+}
+
+void MainWindow::updateInvestigationTabAvailability()
+{
+    const bool enabled = m_investigationMode && m_investigationController.isOpen();
+
+    if (!enabled && (m_bottomTabs->currentWidget() == m_timelinePanel
+                     || m_bottomTabs->currentWidget() == m_crashPanel))
+    {
+        switchToBottomTab(QStringLiteral("Results"));
+    }
+
+    m_bottomTabs->setTabEnabled(m_bottomTabs->indexOf(m_timelinePanel), enabled);
+
+    bool hasCrashArtifact = false;
+
+    if (enabled)
+    {
+        for (const scope::workspace::ArtifactRecord& artifact : m_investigationController.manifest().artifacts)
+        {
+            if (artifact.type == "pstack" || artifact.type == "core")
+            {
+                hasCrashArtifact = true;
+                break;
+            }
+        }
+    }
+
+    m_bottomTabs->setTabEnabled(m_bottomTabs->indexOf(m_crashPanel), enabled && hasCrashArtifact);
+}
+
+void MainWindow::switchToBottomTab(const QString& tabName)
+{
+    for (int index = 0; index < m_bottomTabs->count(); ++index)
+    {
+        if (m_bottomTabs->tabText(index).compare(tabName, Qt::CaseInsensitive) == 0)
+        {
+            m_bottomTabs->setCurrentIndex(index);
+
+            return;
+        }
+    }
+}
+
+void MainWindow::applyViewerNavigation(const ViewerNavigation& navigation)
+{
+    if (!navigation.statusMessage.isEmpty())
+    {
+        updateStatus(navigation.statusMessage);
+    }
+
+    if (navigation.targetTab == QStringLiteral("crash"))
+    {
+        if (!navigation.artifactId.isEmpty())
+        {
+            m_crashPanel->setActiveArtifactId(navigation.artifactId);
+            m_crashPanel->refresh();
+        }
+
+        switchToBottomTab(QStringLiteral("Crash"));
+
+        return;
+    }
+
+    if (navigation.targetTab == QStringLiteral("results") && !navigation.artifactId.isEmpty())
+    {
+        openInvestigationLogArtifact(navigation.artifactId, navigation.lineNumber);
+        switchToBottomTab(QStringLiteral("Results"));
+
+        return;
+    }
+
+    if (!navigation.targetTab.isEmpty())
+    {
+        switchToBottomTab(navigation.targetTab);
+    }
+}
+
+void MainWindow::openInvestigationLogArtifact(const QString& artifactId,
+                                              const std::optional<std::size_t> highlightLine)
+{
+    const auto pathResult = m_investigationController.resolveLogArtifactPath(artifactId.toStdString());
+
+    if (!pathResult)
+    {
+        updateStatus(QString::fromStdString(pathResult.error().message()));
+
+        return;
+    }
+
+    const QString path = QString::fromStdString(pathResult->string());
+
+    if (!openLogFile(path))
+    {
+        return;
+    }
+
+    runAnalyze();
+
+    if (highlightLine.has_value())
+    {
+        for (int row = 0; row < m_logModel->rowCount(); ++row)
+        {
+            const QModelIndex index = m_logModel->index(row, 0);
+            const QVariant lineValue = m_logModel->data(index, Qt::DisplayRole);
+
+            if (lineValue.toULongLong() == *highlightLine)
+            {
+                m_logView->selectRow(row);
+                m_logView->scrollTo(index, QAbstractItemView::PositionAtCenter);
+
+                break;
+            }
+        }
+    }
+}
+
+void MainWindow::onArtifactSelectionChanged()
+{
+    QListWidgetItem* item = m_artifactList->currentItem();
+
+    if (item == nullptr || !m_investigationMode)
+    {
+        return;
+    }
+
+    const QString artifactId = item->data(Qt::UserRole).toString();
+    const QString artifactType = item->data(Qt::UserRole + 1).toString();
+
+    if (artifactType == QStringLiteral("log"))
+    {
+        openInvestigationLogArtifact(artifactId, std::nullopt);
+    }
+    else if (artifactType == QStringLiteral("pstack") || artifactType == QStringLiteral("core"))
+    {
+        m_crashPanel->setActiveArtifactId(artifactId);
+        m_crashPanel->refresh();
+        switchToBottomTab(QStringLiteral("Crash"));
+    }
+}
+
+bool MainWindow::createInvestigation(const QString& name)
+{
+    const auto createResult = m_investigationController.create(name.toStdString());
+
+    if (!createResult)
+    {
+        return false;
+    }
+
+    setInvestigationMode(true);
+    updateStatus(QStringLiteral("Investigation: %1").arg(name));
+
+    return true;
+}
+
+bool MainWindow::addInvestigationLogArtifact(const QString& path)
+{
+    if (!m_investigationMode)
+    {
+        return false;
+    }
+
+    const auto result = m_investigationController.addLogArtifact(scope::foundation::Path(path.toStdString()));
+
+    if (!result)
+    {
+        return false;
+    }
+
+    refreshArtifactList();
+    updateInvestigationTabAvailability();
+
+    return true;
+}
+
+bool MainWindow::addInvestigationPstackArtifact(const QString& path)
+{
+    if (!m_investigationMode)
+    {
+        return false;
+    }
+
+    const auto result =
+        m_investigationController.addArtifactFile(scope::foundation::Path(path.toStdString()), "pstack");
+
+    if (!result)
+    {
+        return false;
+    }
+
+    refreshArtifactList();
+    updateInvestigationTabAvailability();
+    m_crashPanel->setActiveArtifactId(QString::fromStdString(result->id));
+
+    return true;
+}
+
+bool MainWindow::switchBottomTab(const QString& tabName)
+{
+    switchToBottomTab(tabName);
+
+    return m_bottomTabs->tabText(m_bottomTabs->currentIndex()).compare(tabName, Qt::CaseInsensitive) == 0;
+}
+
+bool MainWindow::selectTimelineCrashSummary()
+{
+    switchToBottomTab(QStringLiteral("Timeline"));
+    m_timelinePanel->refresh();
+
+    return m_timelinePanel->selectRowByEventType(QStringLiteral("crash.summary"));
+}
+
+bool MainWindow::clickCrashFaultThread()
+{
+    switchToBottomTab(QStringLiteral("Crash"));
+
+    return m_crashPanel->clickFaultThread();
+}
+
+QString MainWindow::crashSignalText() const
+{
+    return m_crashPanel->signalText();
+}
+
+bool MainWindow::investigationModeActive() const
+{
+    return m_investigationMode;
+}
+
+bool MainWindow::closeActiveInvestigation()
+{
+    if (!m_investigationMode)
+    {
+        return false;
+    }
+
+    closeInvestigation();
+
+    return !m_investigationMode;
+}
+
+bool MainWindow::openInvestigationAtPath(const QString& path)
+{
+    const auto openResult =
+        m_investigationController.open(scope::foundation::Path(path.toStdString()));
+
+    if (!openResult)
+    {
+        return false;
+    }
+
+    setInvestigationMode(true);
+    updateStatus(QStringLiteral("Investigation: %1").arg(QString::fromStdString(openResult->name)));
+
+    return true;
+}
+
+bool MainWindow::isBottomTabEnabled(const QString& tabName) const
+{
+    for (int index = 0; index < m_bottomTabs->count(); ++index)
+    {
+        if (m_bottomTabs->tabText(index).compare(tabName, Qt::CaseInsensitive) == 0)
+        {
+            return m_bottomTabs->isTabEnabled(index);
+        }
+    }
+
+    return false;
+}
+
+int MainWindow::investigationArtifactCount() const
+{
+    if (!m_investigationController.isOpen())
+    {
+        return 0;
+    }
+
+    return static_cast<int>(m_investigationController.manifest().artifacts.size());
+}
+
+QString MainWindow::investigationDirectoryPath() const
+{
+    if (!m_investigationController.isOpen())
+    {
+        return {};
+    }
+
+    return QString::fromStdString(m_investigationController.investigationDirectory().string());
+}
+
+bool MainWindow::timelineHasEventType(const QString& eventType) const
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->hasEventType(eventType);
+}
+
+int MainWindow::timelineRowCount() const
+{
+    return m_timelinePanel != nullptr ? m_timelinePanel->rowCount() : 0;
+}
+
+QString MainWindow::currentBottomTabName() const
+{
+    if (m_bottomTabs == nullptr || m_bottomTabs->currentIndex() < 0)
+    {
+        return {};
+    }
+
+    return m_bottomTabs->tabText(m_bottomTabs->currentIndex());
 }
 
 } // namespace scope::desktop

@@ -17,8 +17,12 @@
 #include <QTextEdit>
 
 #include "application_service.hpp"
+#include "investigation_controller.hpp"
 #include "analytics_panel.hpp"
 #include "ai_panel.hpp"
+#include "crash_panel.hpp"
+#include "timeline_panel.hpp"
+#include "viewer_navigation.hpp"
 #include "analysis_stats.hpp"
 #include "configuration_editor_dialog.hpp"
 #include "desktop_analysis_config.hpp"
@@ -28,6 +32,8 @@
 #include "open_log_dialog.hpp"
 #include "run_stats_dialog.hpp"
 #include "save_session_dialog.hpp"
+#include <optional>
+
 #include "tail_worker.hpp"
 
 namespace scope::desktop
@@ -41,7 +47,8 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
   public:
-    explicit MainWindow(const scope::foundation::Path& configFile = {}, QWidget* parent = nullptr);
+    explicit MainWindow(const scope::foundation::Path& configFile = {},
+                        const scope::foundation::Path& investigationsRoot = {}, QWidget* parent = nullptr);
 
     /// Opens and analyzes a log file (used by desktop integration tests).
     [[nodiscard]] bool openLogFile(const QString& path,
@@ -69,9 +76,38 @@ class MainWindow : public QMainWindow
     [[nodiscard]] bool saveSessionToPath(const QString& path);
     [[nodiscard]] bool loadSessionFromPath(const QString& path);
 
+    /// Investigation mode helpers (P2 / desktop parity tests).
+    [[nodiscard]] bool createInvestigation(const QString& name);
+    [[nodiscard]] bool addInvestigationLogArtifact(const QString& path);
+    [[nodiscard]] bool addInvestigationPstackArtifact(const QString& path);
+    [[nodiscard]] bool switchBottomTab(const QString& tabName);
+    [[nodiscard]] bool selectTimelineCrashSummary();
+    [[nodiscard]] bool clickCrashFaultThread();
+    [[nodiscard]] QString crashSignalText() const;
+    [[nodiscard]] bool investigationModeActive() const;
+    [[nodiscard]] bool closeActiveInvestigation();
+    [[nodiscard]] bool openInvestigationAtPath(const QString& path);
+    [[nodiscard]] bool isBottomTabEnabled(const QString& tabName) const;
+    [[nodiscard]] int investigationArtifactCount() const;
+    [[nodiscard]] QString investigationDirectoryPath() const;
+    [[nodiscard]] bool timelineHasEventType(const QString& eventType) const;
+    [[nodiscard]] int timelineRowCount() const;
+    [[nodiscard]] QString currentBottomTabName() const;
+
   private:
     void createMenus();
     void createLayout();
+    void promptCreateInvestigation();
+    void openInvestigation();
+    void closeInvestigation();
+    void addInvestigationArtifact();
+    void refreshArtifactList();
+    void setInvestigationMode(bool enabled);
+    void updateInvestigationTabAvailability();
+    void applyViewerNavigation(const ViewerNavigation& navigation);
+    void switchToBottomTab(const QString& tabName);
+    void openInvestigationLogArtifact(const QString& artifactId, std::optional<std::size_t> highlightLine);
+    void onArtifactSelectionChanged();
     void loadConfigurationFile();
     void showConfigurationEditor();
     void openFile();
@@ -97,9 +133,11 @@ class MainWindow : public QMainWindow
         QString* errorMessage) const;
 
     scope::application::ApplicationService m_service;
+    scope::application::InvestigationController m_investigationController;
     LogTableModel* m_logModel{nullptr};
     QTableView* m_logView{nullptr};
     QListWidget* m_sessionList{nullptr};
+    QListWidget* m_artifactList{nullptr};
     QListWidget* m_extensionList{nullptr};
     QTextEdit* m_extensionDetails{nullptr};
     QLineEdit* m_searchEdit{nullptr};
@@ -114,6 +152,8 @@ class MainWindow : public QMainWindow
     QCheckBox* m_persistIndexCheck{nullptr};
     QCheckBox* m_reuseIndexCheck{nullptr};
     QTabWidget* m_bottomTabs{nullptr};
+    TimelinePanel* m_timelinePanel{nullptr};
+    CrashPanel* m_crashPanel{nullptr};
     AnalyticsPanel* m_analyticsPanel{nullptr};
     AiPanel* m_aiPanel{nullptr};
     TailWorker* m_tailWorker{nullptr};
@@ -121,6 +161,7 @@ class MainWindow : public QMainWindow
     scope::analysis::LogFormat m_formatHint{scope::analysis::LogFormat::Auto};
     std::string m_profile;
     bool m_hasRunStats{false};
+    bool m_investigationMode{false};
     scope::analysis::AnalysisStats m_lastAnalysisStats{};
 };
 

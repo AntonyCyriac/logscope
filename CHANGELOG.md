@@ -12,6 +12,27 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.11.0] - 2026-08-18
+
+**Minor** — P2 desktop Timeline + Crash parity.
+
+### Added
+
+- **Desktop Investigation mode** — New/Open/Close investigation, artifact sidebar, `InvestigationController` over `workspace::Investigation`
+- **Timeline tab** — `projectTimeline()` including `crash.summary` rows (P1 parity)
+- **Crash tab** — `analyzeCrash()`, fault-thread list, pstack viewer with thread highlight
+- **`ViewerNavigation`** — timeline ↔ Results ↔ Crash cross-tab jumps
+- **`logscope_desktop_parity_test`** — headless Story Gate for desktop parity
+
+### Notes
+
+- Timeline/Crash refresh is **synchronous** on the UI thread in v2.11.0 (documented limitation; performance follow-up)
+- Story 5/6 interactive UI remains web-only (P2.1)
+
+See [v2.11.0 release notes](docs/release/v2.11.0-RELEASE-NOTES.md) · ADR-008-M14.1.
+
+---
+
 ## [2.10.1] - 2026-08-18
 
 **Patch** — Storage hotfix ([#163](https://github.com/AntonyCyriac/logscope/issues/163), [#164](https://github.com/AntonyCyriac/logscope/issues/164)).
