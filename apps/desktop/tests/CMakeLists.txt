@@ -14,6 +14,8 @@ add_executable(logscope_desktop_tests
     ../tail_worker.cpp
     ../timeline_panel.cpp
     ../timeline_load_worker.cpp
+    ../related_evidence_panel.cpp
+    ../suggested_connections_panel.cpp
     ../crash_panel.cpp
     ../crash_load_worker.cpp
     ../pstack_text_utils.cpp
@@ -60,6 +62,8 @@ add_executable(logscope_desktop_parity_test
     ../tail_worker.cpp
     ../timeline_panel.cpp
     ../timeline_load_worker.cpp
+    ../related_evidence_panel.cpp
+    ../suggested_connections_panel.cpp
     ../crash_panel.cpp
     ../crash_load_worker.cpp
     ../pstack_text_utils.cpp
@@ -110,6 +114,8 @@ add_executable(logscope_capture_readme_desktop
     ../tail_worker.cpp
     ../timeline_panel.cpp
     ../timeline_load_worker.cpp
+    ../related_evidence_panel.cpp
+    ../suggested_connections_panel.cpp
     ../crash_panel.cpp
     ../crash_load_worker.cpp
     ../pstack_text_utils.cpp

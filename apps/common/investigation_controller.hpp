@@ -8,9 +8,11 @@
 #include <mutex>
 #include <optional>
 #include <string>
+#include <unordered_set>
 #include <vector>
 
 #include "artifact_record.hpp"
+#include "correlation_suggestion.hpp"
 #include "crash_report.hpp"
 #include "evidence_link.hpp"
 #include "foundation/path.hpp"
@@ -58,6 +60,20 @@ class InvestigationController
     [[nodiscard]] foundation::Result<scope::workspace::CrashReport> analyzeCrash(const std::string& artifactId) const;
 
     [[nodiscard]] foundation::Result<std::vector<scope::workspace::EvidenceLinkRecord>> listEvidenceLinks() const;
+
+    [[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkRecord> addEvidenceLink(
+        const scope::workspace::EvidenceLinkCreateRequest& request);
+
+    [[nodiscard]] foundation::Result<bool> removeEvidenceLink(const std::string& linkId);
+
+    [[nodiscard]] foundation::Result<scope::workspace::CorrelationSuggestionListResult> listCorrelationSuggestions(
+        const scope::workspace::CorrelationSuggestionQuery& query,
+        const std::unordered_set<std::string>& dismissedSuggestionIds = {}) const;
+
+    [[nodiscard]] foundation::Result<scope::workspace::EvidenceLinkRecord> acceptCorrelationSuggestion(
+        const std::string& suggestionId, const std::unordered_set<std::string>& dismissedSuggestionIds,
+        std::optional<scope::workspace::EvidenceLinkType> type = std::nullopt,
+        std::optional<std::string> note = std::nullopt);
 
     [[nodiscard]] foundation::Result<foundation::Path> resolveLogArtifactPath(const std::string& artifactId) const;
 

@@ -4,12 +4,28 @@
 
 #include "crash_load_worker.hpp"
 
+#include <QMetaType>
+
 #include "investigation_container.hpp"
 
 namespace scope::desktop
 {
 
-CrashLoadWorker::CrashLoadWorker(QObject* parent) : QObject(parent) {}
+namespace
+{
+
+const int kCrashReportMetaType = []() {
+    qRegisterMetaType<scope::workspace::CrashReport>("scope::workspace::CrashReport");
+
+    return 0;
+}();
+
+} // namespace
+
+CrashLoadWorker::CrashLoadWorker(QObject* parent) : QObject(parent)
+{
+    Q_UNUSED(kCrashReportMetaType);
+}
 
 void CrashLoadWorker::load(const QString& investigationDirectoryPath, const QString& artifactId)
 {

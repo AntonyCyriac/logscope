@@ -40,9 +40,14 @@ class CrashPanel : public QWidget
 
     [[nodiscard]] QString signalText() const;
     [[nodiscard]] bool clickFaultThread();
+    [[nodiscard]] bool waitForLoadComplete(int timeoutMs = 5000);
 
   signals:
     void navigationRequested(const scope::desktop::ViewerNavigation& navigation);
+
+  private slots:
+    void onLoadFinished(scope::workspace::CrashReport report);
+    void onLoadFailed(const QString& message);
 
   private:
     void setupUi();
@@ -65,6 +70,11 @@ class CrashPanel : public QWidget
     QString m_activeArtifactId;
     QString m_highlightThreadId;
     bool m_loading{false};
+    QThread* m_workerThread{nullptr};
+    CrashLoadWorker* m_worker{nullptr};
+    bool m_refreshPending{false};
+
+    void startAsyncLoad();
 };
 
 } // namespace scope::desktop

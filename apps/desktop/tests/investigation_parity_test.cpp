@@ -1,6 +1,6 @@
 /**
  * @file investigation_parity_test.cpp
- * @brief P2 Story Gate — desktop Timeline + Crash parity (headless).
+ * @brief P2 / P2.1 Story Gate — desktop Timeline, Crash, evidence links, suggestions (headless).
  */
 
 #include <QtTest>
@@ -21,6 +21,21 @@ QString sampleLogPath()
     return QStringLiteral("samples/sample.log");
 }
 
+QString syslogPath()
+{
+    return QStringLiteral("samples/syslog.log");
+}
+
+QString story6AppLogPath()
+{
+    return QStringLiteral("samples/story6-app.log");
+}
+
+QString story6SyslogPath()
+{
+    return QStringLiteral("samples/story6-syslog.log");
+}
+
 QString pstackPath()
 {
     return QStringLiteral("samples/pstack.txt");
@@ -37,6 +52,12 @@ scope::desktop::MainWindow makeWindow()
                                       scope::foundation::Path(investigationsRoot().toStdString()));
 }
 
+void openTimelineAndWait(scope::desktop::MainWindow& window)
+{
+    QVERIFY(window.switchBottomTab(QStringLiteral("Timeline")));
+    QVERIFY(window.waitForTimelineLoad());
+}
+
 } // namespace
 
 class InvestigationParityTest : public QObject
@@ -48,6 +69,9 @@ class InvestigationParityTest : public QObject
     void crashTabDisabledUntilPstackArtifact();
     void openInvestigationRoundTrip();
     void storyGateTimelineCrashAndFaultThreadJump();
+    void storyGateEvidenceLinkCreateBadgeJumpRemove();
+    void storyGateSuggestionAcceptCreatesLink();
+    void storyGateSuggestionDismissNoLink();
 };
 
 void InvestigationParityTest::investigationTabsDisabledWithoutInvestigation()
@@ -99,8 +123,7 @@ void InvestigationParityTest::openInvestigationRoundTrip()
     QVERIFY(window.openInvestigationAtPath(investigationPath));
     QCOMPARE(window.investigationArtifactCount(), 2);
 
-    QVERIFY(window.switchBottomTab(QStringLiteral("Timeline")));
-    QTest::qWait(500);
+    openTimelineAndWait(window);
     QVERIFY(window.timelineRowCount() > 0);
     QVERIFY(window.timelineHasEventType(QStringLiteral("crash.summary")));
 }
@@ -112,26 +135,91 @@ void InvestigationParityTest::storyGateTimelineCrashAndFaultThreadJump()
     QTest::qWait(100);
 
     QVERIFY(window.createInvestigation(QStringLiteral("parity-test")));
-    QTest::qWait(50);
-
     QVERIFY(window.addInvestigationLogArtifact(sampleLogPath()));
-    QTest::qWait(50);
-
     QVERIFY(window.addInvestigationPstackArtifact(pstackPath()));
-    QTest::qWait(200);
 
-    QVERIFY(window.switchBottomTab(QStringLiteral("Timeline")));
-    QTest::qWait(500);
+    openTimelineAndWait(window);
 
-    QVERIFY(window.timelineHasEventType(QStringLiteral("crash.summary")));
     QVERIFY(window.selectTimelineCrashSummary());
-    QTest::qWait(200);
+    QVERIFY(window.waitForCrashLoad());
 
     QCOMPARE(window.currentBottomTabName(), QStringLiteral("Crash"));
     QVERIFY(window.crashSignalText().contains(QStringLiteral("SIGSEGV")));
 
     QVERIFY(window.clickCrashFaultThread());
     QVERIFY(window.statusMessage().contains(QStringLiteral("Jumped to pstack thread")));
+}
+
+void InvestigationParityTest::storyGateEvidenceLinkCreateBadgeJumpRemove()
+{
+    scope::desktop::MainWindow window = makeWindow();
+    window.show();
+    QTest::qWait(50);
+
+    QVERIFY(window.createInvestigation(QStringLiteral("parity-story5")));
+    QVERIFY(window.addInvestigationLogArtifact(sampleLogPath()));
+    QVERIFY(window.addInvestigationLogArtifact(syslogPath()));
+    QVERIFY(window.addInvestigationPstackArtifact(pstackPath()));
+
+    openTimelineAndWait(window);
+    QVERIFY(window.timelineRowCount() > 1);
+
+    QVERIFY(window.selectTimelineRow(0));
+    QCOMPARE(window.timelineLinkBadgeCount(), 0);
+
+    QVERIFY(window.createEvidenceLinkBetweenRows(0, 1));
+    QVERIFY(window.timelineLinkBadgeCount() >= 1);
+    QVERIFY(window.relatedEvidenceRowCount() >= 1);
+
+    QVERIFY(window.openFirstRelatedEvidence());
+    QVERIFY(window.statusMessage().contains(QStringLiteral("Opened linked")));
+
+    QVERIFY(window.selectTimelineRow(0));
+    QVERIFY(window.removeFirstEvidenceLink());
+    QCOMPARE(window.timelineLinkBadgeCount(), 0);
+    QCOMPARE(window.relatedEvidenceRowCount(), 0);
+}
+
+void InvestigationParityTest::storyGateSuggestionAcceptCreatesLink()
+{
+    scope::desktop::MainWindow window = makeWindow();
+    window.show();
+    QTest::qWait(50);
+
+    QVERIFY(window.createInvestigation(QStringLiteral("parity-story6-accept")));
+    QVERIFY(window.addInvestigationLogArtifact(story6AppLogPath()));
+    QVERIFY(window.addInvestigationLogArtifact(story6SyslogPath()));
+
+    openTimelineAndWait(window);
+    QVERIFY(window.timelineRowCount() > 0);
+
+    QVERIFY(window.selectTimelineRow(0));
+    QVERIFY(window.suggestionPanelVisible());
+
+    QVERIFY(window.acceptFirstSuggestion());
+    QVERIFY(window.statusMessage().contains(QStringLiteral("Connection added from suggestion")));
+    QVERIFY(window.relatedEvidenceRowCount() >= 1);
+    QVERIFY(!window.suggestionPanelVisible());
+}
+
+void InvestigationParityTest::storyGateSuggestionDismissNoLink()
+{
+    scope::desktop::MainWindow window = makeWindow();
+    window.show();
+    QTest::qWait(50);
+
+    QVERIFY(window.createInvestigation(QStringLiteral("parity-story6-dismiss")));
+    QVERIFY(window.addInvestigationLogArtifact(story6AppLogPath()));
+    QVERIFY(window.addInvestigationLogArtifact(story6SyslogPath()));
+
+    openTimelineAndWait(window);
+    QVERIFY(window.selectTimelineRow(0));
+    QVERIFY(window.suggestionPanelVisible());
+
+    QVERIFY(window.dismissFirstSuggestion());
+    QVERIFY(window.statusMessage().contains(QStringLiteral("Suggestion dismissed")));
+    QVERIFY(!window.suggestionPanelVisible());
+    QCOMPARE(window.relatedEvidenceRowCount(), 0);
 }
 
 QTEST_MAIN(InvestigationParityTest)

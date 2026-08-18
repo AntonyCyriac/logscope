@@ -4,6 +4,7 @@
 
 #include "crash_panel.hpp"
 
+#include "crash_load_worker.hpp"
 #include "pstack_text_utils.hpp"
 
 #include <QComboBox>
@@ -13,6 +14,9 @@
 #include <QThread>
 #include <QVBoxLayout>
 
+#include <QApplication>
+#include <QElapsedTimer>
+
 namespace scope::desktop
 {
 
@@ -20,9 +24,26 @@ CrashPanel::CrashPanel(scope::application::InvestigationController* controller, 
     : QWidget(parent), m_controller(controller)
 {
     setupUi();
+
+    m_workerThread = new QThread(this);
+    m_worker = new CrashLoadWorker();
+    m_worker->moveToThread(m_workerThread);
+
+    connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
+    connect(m_worker, &CrashLoadWorker::loadFinished, this, &CrashPanel::onLoadFinished);
+    connect(m_worker, &CrashLoadWorker::loadFailed, this, &CrashPanel::onLoadFailed);
+
+    m_workerThread->start();
 }
 
-CrashPanel::~CrashPanel() = default;
+CrashPanel::~CrashPanel()
+{
+    if (m_workerThread != nullptr)
+    {
+        m_workerThread->quit();
+        m_workerThread->wait(2000);
+    }
+}
 
 void CrashPanel::setupUi()
 {
@@ -148,11 +169,30 @@ void CrashPanel::refresh()
 
     const QString artifactId = currentArtifactId();
 
-    if (artifactId.isEmpty() || m_loading)
+    if (artifactId.isEmpty())
     {
-        m_emptyLabel->setVisible(artifactId.isEmpty());
+        m_emptyLabel->setVisible(true);
         m_emptyLabel->setText(QStringLiteral("Add a pstack or core artifact to analyze a crash."));
 
+        return;
+    }
+
+    startAsyncLoad();
+}
+
+void CrashPanel::startAsyncLoad()
+{
+    if (m_loading)
+    {
+        m_refreshPending = true;
+
+        return;
+    }
+
+    const QString artifactId = currentArtifactId();
+
+    if (artifactId.isEmpty())
+    {
         return;
     }
 
@@ -160,20 +200,45 @@ void CrashPanel::refresh()
     m_errorLabel->setVisible(false);
     m_emptyLabel->setVisible(false);
 
-    const auto crashResult = m_controller->analyzeCrash(artifactId.toStdString());
+    const QString investigationDir = QString::fromStdString(m_controller->investigationDirectory().string());
 
+    QMetaObject::invokeMethod(m_worker, "load", Qt::QueuedConnection, Q_ARG(QString, investigationDir),
+                              Q_ARG(QString, artifactId));
+}
+
+void CrashPanel::onLoadFinished(const scope::workspace::CrashReport report)
+{
     m_loading = false;
+    m_report = report;
+    renderReport(m_report);
 
-    if (!crashResult)
+    if (m_refreshPending)
     {
-        m_errorLabel->setText(QString::fromStdString(crashResult.error().message()));
-        m_errorLabel->setVisible(true);
+        m_refreshPending = false;
+        startAsyncLoad();
+    }
+}
 
-        return;
+void CrashPanel::onLoadFailed(const QString& message)
+{
+    m_loading = false;
+    m_refreshPending = false;
+    m_errorLabel->setText(message);
+    m_errorLabel->setVisible(true);
+}
+
+bool CrashPanel::waitForLoadComplete(const int timeoutMs)
+{
+    QElapsedTimer timer;
+    timer.start();
+
+    while (m_loading && timer.elapsed() < timeoutMs)
+    {
+        QApplication::processEvents();
+        QThread::msleep(10);
     }
 
-    m_report = *crashResult;
-    renderReport(m_report);
+    return !m_loading;
 }
 
 void CrashPanel::renderReport(const scope::workspace::CrashReport& report)

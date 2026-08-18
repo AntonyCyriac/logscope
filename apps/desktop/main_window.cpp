@@ -252,6 +252,8 @@ void MainWindow::createLayout()
         }
     });
     connect(m_timelinePanel, &TimelinePanel::navigationRequested, this, &MainWindow::applyViewerNavigation);
+    connect(m_timelinePanel, &TimelinePanel::statusMessageRequested, this, &MainWindow::updateStatus);
+    m_timelinePanel->setDismissedSuggestionIds(&m_dismissedSuggestionIds);
     connect(m_crashPanel, &CrashPanel::navigationRequested, this, &MainWindow::applyViewerNavigation);
     connect(m_artifactList, &QListWidget::currentItemChanged, this,
             [this](QListWidgetItem* /*current*/, QListWidgetItem* /*previous*/) {
@@ -1070,6 +1072,7 @@ void MainWindow::openInvestigation()
 
 void MainWindow::closeInvestigation()
 {
+    m_dismissedSuggestionIds.clear();
     m_investigationController.close();
     setInvestigationMode(false);
     updateStatus(QStringLiteral("Investigation closed"));
@@ -1208,11 +1211,6 @@ void MainWindow::switchToBottomTab(const QString& tabName)
 
 void MainWindow::applyViewerNavigation(const ViewerNavigation& navigation)
 {
-    if (!navigation.statusMessage.isEmpty())
-    {
-        updateStatus(navigation.statusMessage);
-    }
-
     if (navigation.targetTab == QStringLiteral("crash"))
     {
         if (!navigation.artifactId.isEmpty())
@@ -1223,6 +1221,11 @@ void MainWindow::applyViewerNavigation(const ViewerNavigation& navigation)
 
         switchToBottomTab(QStringLiteral("Crash"));
 
+        if (!navigation.statusMessage.isEmpty())
+        {
+            updateStatus(navigation.statusMessage);
+        }
+
         return;
     }
 
@@ -1231,12 +1234,22 @@ void MainWindow::applyViewerNavigation(const ViewerNavigation& navigation)
         openInvestigationLogArtifact(navigation.artifactId, navigation.lineNumber);
         switchToBottomTab(QStringLiteral("Results"));
 
+        if (!navigation.statusMessage.isEmpty())
+        {
+            updateStatus(navigation.statusMessage);
+        }
+
         return;
     }
 
     if (!navigation.targetTab.isEmpty())
     {
         switchToBottomTab(navigation.targetTab);
+    }
+
+    if (!navigation.statusMessage.isEmpty())
+    {
+        updateStatus(navigation.statusMessage);
     }
 }
 
@@ -1335,6 +1348,11 @@ bool MainWindow::addInvestigationLogArtifact(const QString& path)
     refreshArtifactList();
     updateInvestigationTabAvailability();
 
+    if (m_timelinePanel != nullptr)
+    {
+        m_timelinePanel->refresh();
+    }
+
     return true;
 }
 
@@ -1357,6 +1375,11 @@ bool MainWindow::addInvestigationPstackArtifact(const QString& path)
     updateInvestigationTabAvailability();
     m_crashPanel->setActiveArtifactId(QString::fromStdString(result->id));
 
+    if (m_timelinePanel != nullptr)
+    {
+        m_timelinePanel->refresh();
+    }
+
     return true;
 }
 
@@ -1372,12 +1395,27 @@ bool MainWindow::selectTimelineCrashSummary()
     switchToBottomTab(QStringLiteral("Timeline"));
     m_timelinePanel->refresh();
 
-    return m_timelinePanel->selectRowByEventType(QStringLiteral("crash.summary"));
+    if (!m_timelinePanel->waitForLoadComplete())
+    {
+        return false;
+    }
+
+    if (!m_timelinePanel->selectRowByEventType(QStringLiteral("crash.summary")))
+    {
+        return false;
+    }
+
+    return waitForCrashLoad();
 }
 
 bool MainWindow::clickCrashFaultThread()
 {
     switchToBottomTab(QStringLiteral("Crash"));
+
+    if (!waitForCrashLoad())
+    {
+        return false;
+    }
 
     return m_crashPanel->clickFaultThread();
 }
@@ -1471,6 +1509,61 @@ QString MainWindow::currentBottomTabName() const
     }
 
     return m_bottomTabs->tabText(m_bottomTabs->currentIndex());
+}
+
+bool MainWindow::waitForTimelineLoad(int timeoutMs)
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->waitForLoadComplete(timeoutMs);
+}
+
+bool MainWindow::waitForCrashLoad(int timeoutMs)
+{
+    return m_crashPanel != nullptr && m_crashPanel->waitForLoadComplete(timeoutMs);
+}
+
+bool MainWindow::selectTimelineRow(int row)
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->selectRow(row);
+}
+
+bool MainWindow::createEvidenceLinkBetweenRows(int sourceRow, int targetRow)
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->createLinkBetweenRows(sourceRow, targetRow);
+}
+
+int MainWindow::timelineLinkBadgeCount() const
+{
+    return m_timelinePanel != nullptr ? m_timelinePanel->linkBadgeCount() : 0;
+}
+
+int MainWindow::relatedEvidenceRowCount() const
+{
+    return m_timelinePanel != nullptr ? m_timelinePanel->relatedEvidenceRowCount() : 0;
+}
+
+bool MainWindow::suggestionPanelVisible() const
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->suggestionPanelVisible();
+}
+
+bool MainWindow::acceptFirstSuggestion()
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->acceptFirstSuggestion();
+}
+
+bool MainWindow::dismissFirstSuggestion()
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->dismissFirstSuggestion();
+}
+
+bool MainWindow::removeFirstEvidenceLink()
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->removeFirstEvidenceLink();
+}
+
+bool MainWindow::openFirstRelatedEvidence()
+{
+    return m_timelinePanel != nullptr && m_timelinePanel->openFirstRelatedEvidence();
 }
 
 } // namespace scope::desktop

@@ -6,6 +6,8 @@
 
 #include <QObject>
 
+#include <QtGlobal>
+
 #include "foundation/path.hpp"
 #include "timeline_event.hpp"
 #include "workspace.hpp"
@@ -21,8 +23,7 @@ class TimelineLoadWorker : public QObject
     explicit TimelineLoadWorker(QObject* parent = nullptr);
 
   public slots:
-    void load(const QString& investigationDirectoryPath,
-              scope::workspace::TimelineProjectionOptions options);
+    void load(const QString& investigationDirectoryPath, quint64 limit, quint64 offset);
 
   signals:
     void loadFinished(scope::workspace::TimelineProjectionResult result);

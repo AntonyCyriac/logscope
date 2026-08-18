@@ -20,6 +20,7 @@ struct ViewerNavigation
     QString artifactId;
     std::optional<std::size_t> lineNumber;
     std::optional<QString> faultThreadId;
+    std::optional<QString> peerEventId;
     QString targetTab;
     QString statusMessage;
 };
