@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **529+** automated tests through **`v2.10.0`** (7 `PstackCrashAnalyzerTest` cases including TID dialect #144). Coverage includes `scope_application_tests` (M14), `logscope_desktop_tests` (M14 GUI headless), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
+**Current baseline:** **529+** automated tests through **`v2.10.1`** (83 `scope_storage_tests` cases including #163/#164). Coverage includes `scope_application_tests` (M14), `logscope_desktop_tests` (M14 GUI headless), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 
@@ -242,4 +242,4 @@ Requires `clang-tidy` on PATH. Checks and `WarningsAsErrors` are defined in `.cl
 | 1.16.0 | 30-07-2026 | Current release baseline `v2.0.5`; directory e2e isolation, versioned release artifacts. |
 | 1.17.0 | 04-08-2026 | Baseline through `v2.2.1`; M15 web integration tests noted. |
 | 1.18.0 | 06-08-2026 | Playwright web E2E (Story Gate); CI `web` job runs browser tests. |
-| 1.21.0 | 13-08-2026 | Baseline through `v2.10.0`; P1.1 TID pstack dialect tests (#144). |
+| 1.22.0 | 18-08-2026 | Baseline through `v2.10.1`; storage hotfix tests (#163/#164). |

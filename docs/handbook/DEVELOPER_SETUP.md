@@ -23,7 +23,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.10.0`](../../CHANGELOG.md) — Stories 1–6 + P1 + P1.1 TID pstack dialects (CLI, desktop, web). **Next:** P2 desktop Timeline/Crash parity. See [CHANGELOG](../../CHANGELOG.md) for release history.
+**Current release:** [`v2.10.1`](../../CHANGELOG.md) — Stories 1–6 + P1 + P1.1 + v2.10.1 storage hotfix (CLI, desktop, web). **Next:** P2 desktop Timeline/Crash parity. See [CHANGELOG](../../CHANGELOG.md) for release history.
 
 **Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 
@@ -441,4 +441,4 @@ For benchmarks, fuzz tests, sanitizers, coverage, and the bulk-log CLI matrix, s
 | 2.13.0 | 30-07-2026 | Current release baseline (`v2.0.5`); CI/build hotfix, versioned release artifacts. |
 | 2.15.0 | 05-08-2026 | Current release baseline (`v2.3.0`); Story 1 investigations; next `v2.4.0`. |
 | 2.16.0 | 06-08-2026 | Current release baseline (`v2.6.1`); Story 5 Connect the Evidence active. |
-| 2.19.0 | 13-08-2026 | Current release baseline (`v2.10.0`); P1.1 TID pstack dialects (#144). |
+| 2.20.0 | 18-08-2026 | Current release baseline (`v2.10.1`); storage hotfix #163/#164. |
