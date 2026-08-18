@@ -4,6 +4,7 @@
 
 add_library(scope_application
     application_service.cpp
+    investigation_controller.cpp
 )
 
 target_link_libraries(scope_application

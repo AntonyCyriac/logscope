@@ -62,11 +62,11 @@ Investigation
 
 Modes are **tabs/views** over one investigation. New stories add modes on **both shells** when user-visible.
 
-| Mode | Web | Desktop (target) |
-|------|-----|------------------|
-| Artifacts + viewer | ✅ | ✅ |
-| Timeline | ✅ | Same tab (parity) |
-| Crash | ✅ | Same tab (parity) |
+| Mode | Web | Desktop |
+|------|-----|---------|
+| Artifacts + viewer | ✅ | ✅ (`v2.11.0`) |
+| Timeline | ✅ | ✅ (`v2.11.0`) |
+| Crash | ✅ | ✅ (`v2.11.0`) |
 | Results | ✅ | ✅ |
 | AI | ✅ | ✅ |
 
@@ -81,7 +81,7 @@ Create Investigation → Add Log → Analyze → Timeline → Crash
 ```
 
 - Web: Playwright [`tests/e2e/web/`](../../tests/e2e/web/README.md)
-- Desktop: `logscope_desktop_tests` (headless Qt)
+- Desktop: `logscope_desktop_parity_test` (P2 Story Gate), `logscope_desktop_tests` (headless Qt)
 
 Use **identical** user-facing labels (Investigation, Artifacts, Timeline, Crash, Results, AI, Open, Analyze, Investigate).
 

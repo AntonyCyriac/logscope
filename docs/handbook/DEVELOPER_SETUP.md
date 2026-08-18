@@ -23,7 +23,7 @@ A developer should be able to:
 
 This document focuses on environment setup. For contributing workflow and testing expectations, see [Developer Guide](DEVELOPER_GUIDE.md). Architecture guidance is in the architecture documentation.
 
-**Current release:** [`v2.10.1`](../../CHANGELOG.md) — Stories 1–6 + P1 + P1.1 + v2.10.1 storage hotfix (CLI, desktop, web). **Next:** P2 desktop Timeline/Crash parity. See [CHANGELOG](../../CHANGELOG.md) for release history.
+**Current release:** [`v2.11.0`](../../CHANGELOG.md) — Stories 1–6 + P1 + P1.1 + P2 desktop parity (CLI, desktop, web). **Next:** #144 Option B · P3. See [CHANGELOG](../../CHANGELOG.md) for release history.
 
 **Planning:** [Next Value-Add Backlog](../planning/NEXT-VALUE-ADD.md) · Plugin development: [Plugin Development Guide](PLUGIN_DEVELOPMENT_GUIDE.md)
 

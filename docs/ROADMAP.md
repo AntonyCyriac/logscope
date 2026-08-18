@@ -64,7 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.10.1`](CHANGELOG.md) — Storage hotfix. Stories 1–6 + P1 + P1.1 shipped. **Next:** P2 desktop Timeline/Crash parity — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Current release:** [`v2.11.0`](CHANGELOG.md) — P2 desktop parity. Stories 1–6 + P1 + P1.1 + P2 shipped. **Next:** #144 Option B · P3 — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
