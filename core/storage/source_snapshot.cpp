@@ -9,6 +9,7 @@
 
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
+#include "source_content_hash.hpp"
 #include "sqlite_connection.hpp"
 #include "sqlite3.h"
 
@@ -153,6 +154,24 @@ foundation::Result<StoredSourceSnapshot> readStoredSourceSnapshot(sqlite3* datab
         }
     }
 
+    const auto sourceContentSha256 = getMeta(database, std::string(kSourceContentSha256MetaKey));
+
+    if (!sourceContentSha256)
+    {
+        return foundation::Result<StoredSourceSnapshot>(sourceContentSha256.error());
+    }
+
+    snapshot.sourceContentSha256 = *sourceContentSha256;
+
+    const auto sourcePrefixSha256 = getMeta(database, std::string(kSourcePrefixSha256MetaKey));
+
+    if (!sourcePrefixSha256)
+    {
+        return foundation::Result<StoredSourceSnapshot>(sourcePrefixSha256.error());
+    }
+
+    snapshot.sourcePrefixSha256 = *sourcePrefixSha256;
+
     return foundation::Result<StoredSourceSnapshot>(std::move(snapshot));
 }
 
@@ -181,9 +200,38 @@ foundation::Result<SourceChangeKind> compareSourceChange(const StoredSourceSnaps
         return foundation::Result<SourceChangeKind>(SourceChangeKind::Truncated);
     }
 
+    if (stored.sourceContentSha256.empty() || stored.sourcePrefixSha256.empty())
+    {
+        return foundation::Result<SourceChangeKind>(SourceChangeKind::Unknown);
+    }
+
     if (*currentSize == stored.sourceSize)
     {
+        const auto currentHash = computeSourceSha256Hex(sourcePath);
+
+        if (!currentHash)
+        {
+            return foundation::Result<SourceChangeKind>(currentHash.error());
+        }
+
+        if (*currentHash != stored.sourceContentSha256)
+        {
+            return foundation::Result<SourceChangeKind>(SourceChangeKind::Unknown);
+        }
+
         return foundation::Result<SourceChangeKind>(SourceChangeKind::Unchanged);
+    }
+
+    const auto prefixHash = computeSourcePrefixSha256Hex(sourcePath, stored.sourceSize);
+
+    if (!prefixHash)
+    {
+        return foundation::Result<SourceChangeKind>(prefixHash.error());
+    }
+
+    if (*prefixHash != stored.sourcePrefixSha256)
+    {
+        return foundation::Result<SourceChangeKind>(SourceChangeKind::Unknown);
     }
 
     return foundation::Result<SourceChangeKind>(SourceChangeKind::Grown);

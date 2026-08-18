@@ -19,6 +19,8 @@ constexpr int kIndexSchemaVersionMaxSupported = 2;
  */
 [[nodiscard]] bool requiresSchemaRebuild(const foundation::Error& error) noexcept;
 
+[[nodiscard]] bool isUnsupportedSchemaVersion(const foundation::Error& error) noexcept;
+
 [[nodiscard]] bool requiresCompressionRebuild(const foundation::Error& error) noexcept;
 
 } // namespace scope::storage

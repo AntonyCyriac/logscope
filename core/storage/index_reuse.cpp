@@ -12,6 +12,7 @@
 #include "foundation/filesystem.hpp"
 #include "index_store_factory.hpp"
 #include "index_store_options.hpp"
+#include "schema_version.hpp"
 #include "source_snapshot.hpp"
 #include "sqlite_index_store.hpp"
 #include "sqlite_connection.hpp"
@@ -97,8 +98,8 @@ openIncrementalStore(const StorageConfig& config, const foundation::Path& databa
     return std::filesystem::remove(basePath, error);
 }
 
-[[nodiscard]] bool removeTruncatedIndexIfNeeded(const foundation::Path& databasePath,
-                                                const foundation::Path& sourcePath) noexcept
+[[nodiscard]] foundation::Result<SourceChangeKind>
+peekSourceChangeKind(const foundation::Path& databasePath, const foundation::Path& sourcePath)
 {
     sqlite3* database = nullptr;
 
@@ -109,7 +110,8 @@ openIncrementalStore(const StorageConfig& config, const foundation::Path& databa
             sqlite3_close(database);
         }
 
-        return false;
+        return foundation::Result<SourceChangeKind>(foundation::Error(
+            foundation::ErrorCode::IOError, "Failed to open persisted index for source integrity check."));
     }
 
     (void)configureSqliteConnection(database);
@@ -119,12 +121,23 @@ openIncrementalStore(const StorageConfig& config, const foundation::Path& databa
 
     if (!snapshot)
     {
+        return foundation::Result<SourceChangeKind>(snapshot.error());
+    }
+
+    return compareSourceChange(*snapshot, sourcePath);
+}
+
+[[nodiscard]] bool invalidateIndexOnIntegrityMismatch(const foundation::Path& databasePath,
+                                                    const foundation::Path& sourcePath)
+{
+    const auto change = peekSourceChangeKind(databasePath, sourcePath);
+
+    if (!change)
+    {
         return false;
     }
 
-    const auto change = compareSourceChange(*snapshot, sourcePath);
-
-    if (!change || *change != SourceChangeKind::Truncated)
+    if (*change != SourceChangeKind::Truncated && *change != SourceChangeKind::Unknown)
     {
         return false;
     }
@@ -132,72 +145,38 @@ openIncrementalStore(const StorageConfig& config, const foundation::Path& databa
     return removeIndexDatabase(databasePath);
 }
 
-} // namespace
+[[nodiscard]] foundation::Result<IndexReusePrepareResult>
+makeIndexOpenFailure(const foundation::Error& error, const foundation::Path& databasePath)
+{
+    if (isUnsupportedSchemaVersion(error) || requiresSchemaRebuild(error))
+    {
+        return foundation::Result<IndexReusePrepareResult>(error);
+    }
 
-foundation::Result<IndexReusePrepareResult>
-prepareIndexReuse(const StorageConfig& config, const IndexFingerprint& fingerprint,
-                  const foundation::Path& sourcePath)
+    if (error.message().find("fingerprint mismatch") != std::string::npos ||
+        error.message().find("source path mismatch") != std::string::npos ||
+        requiresCompressionRebuild(error))
+    {
+        (void)removeIndexDatabase(databasePath);
+
+        return foundation::Result<IndexReusePrepareResult>(IndexReusePrepareResult{});
+    }
+
+    return foundation::Result<IndexReusePrepareResult>(error);
+}
+
+[[nodiscard]] foundation::Result<IndexReusePrepareResult>
+prepareReuseFromOpenedStore(IndexStorePtr store, const foundation::Path& sourcePath,
+                            const foundation::Path& databasePath)
 {
     IndexReusePrepareResult result;
-
-    if (!config.reuseIndex)
-    {
-        return foundation::Result<IndexReusePrepareResult>(result);
-    }
-
-    const foundation::Path databasePath = resolveIndexPath(config, sourcePath, fingerprint);
-    const auto exists = foundation::FileSystem::exists(databasePath);
-
-    if (!exists || !*exists)
-    {
-        return foundation::Result<IndexReusePrepareResult>(result);
-    }
-
-    if (config.incrementalAppend && removeTruncatedIndexIfNeeded(databasePath, sourcePath))
-    {
-        return foundation::Result<IndexReusePrepareResult>(result);
-    }
-
-    if (!config.incrementalAppend)
-    {
-        const auto matches = IndexFingerprint::matchesSource(fingerprint, sourcePath);
-
-        if (!matches || !*matches)
-        {
-            return foundation::Result<IndexReusePrepareResult>(result);
-        }
-
-        const auto opened = openReusableStore(config, databasePath, fingerprint);
-
-        if (!opened)
-        {
-            return foundation::Result<IndexReusePrepareResult>(result);
-        }
-
-        result.mode = IndexReuseMode::Unchanged;
-        result.store = *opened;
-
-        return foundation::Result<IndexReusePrepareResult>(std::move(result));
-    }
-
-    IndexStorePtr store;
-    {
-        const auto opened = openIncrementalStore(config, databasePath, sourcePath);
-
-        if (!opened)
-        {
-            return foundation::Result<IndexReusePrepareResult>(result);
-        }
-
-        store = *opened;
-    }
 
     const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(store);
     const auto snapshot = sqliteStore->storedSourceSnapshot();
 
     if (!snapshot)
     {
-        return foundation::Result<IndexReusePrepareResult>(result);
+        return foundation::Result<IndexReusePrepareResult>(snapshot.error());
     }
 
     const auto change = compareSourceChange(*snapshot, sourcePath);
@@ -221,6 +200,101 @@ prepareIndexReuse(const StorageConfig& config, const IndexFingerprint& fingerpri
         result.store = std::move(store);
 
         return foundation::Result<IndexReusePrepareResult>(std::move(result));
+    }
+
+    sqliteStore->clearQueryCache();
+    result.mode = IndexReuseMode::Append;
+    result.store = std::move(store);
+    result.linesToSkip = snapshot->totalLines;
+
+    return foundation::Result<IndexReusePrepareResult>(std::move(result));
+}
+
+} // namespace
+
+foundation::Result<IndexReusePrepareResult>
+prepareIndexReuse(const StorageConfig& config, const IndexFingerprint& fingerprint,
+                  const foundation::Path& sourcePath)
+{
+    IndexReusePrepareResult result;
+
+    if (!config.reuseIndex)
+    {
+        return foundation::Result<IndexReusePrepareResult>(result);
+    }
+
+    const foundation::Path databasePath = resolveIndexPath(config, sourcePath, fingerprint);
+    const auto exists = foundation::FileSystem::exists(databasePath);
+
+    if (!exists || !*exists)
+    {
+        return foundation::Result<IndexReusePrepareResult>(result);
+    }
+
+    if (config.incrementalAppend && invalidateIndexOnIntegrityMismatch(databasePath, sourcePath))
+    {
+        return foundation::Result<IndexReusePrepareResult>(result);
+    }
+
+    if (!config.incrementalAppend)
+    {
+        const auto matches = IndexFingerprint::matchesSource(fingerprint, sourcePath);
+
+        if (!matches || !*matches)
+        {
+            return foundation::Result<IndexReusePrepareResult>(result);
+        }
+
+        const auto opened = openReusableStore(config, databasePath, fingerprint);
+
+        if (!opened)
+        {
+            return makeIndexOpenFailure(opened.error(), databasePath);
+        }
+
+        return prepareReuseFromOpenedStore(*opened, sourcePath, databasePath);
+    }
+
+    IndexStorePtr store;
+    const auto changeKind = peekSourceChangeKind(databasePath, sourcePath);
+
+    if (!changeKind)
+    {
+        return foundation::Result<IndexReusePrepareResult>(changeKind.error());
+    }
+
+    if (*changeKind == SourceChangeKind::Truncated || *changeKind == SourceChangeKind::Unknown)
+    {
+        (void)removeIndexDatabase(databasePath);
+
+        return foundation::Result<IndexReusePrepareResult>(result);
+    }
+
+    {
+        const auto opened = openIncrementalStore(config, databasePath, sourcePath);
+
+        if (!opened)
+        {
+            return makeIndexOpenFailure(opened.error(), databasePath);
+        }
+
+        store = *opened;
+    }
+
+    if (*changeKind == SourceChangeKind::Unchanged)
+    {
+        result.mode = IndexReuseMode::Unchanged;
+        result.store = std::move(store);
+
+        return foundation::Result<IndexReusePrepareResult>(std::move(result));
+    }
+
+    const auto sqliteStore = std::static_pointer_cast<SqliteIndexStore>(store);
+    const auto snapshot = sqliteStore->storedSourceSnapshot();
+
+    if (!snapshot)
+    {
+        return foundation::Result<IndexReusePrepareResult>(snapshot.error());
     }
 
     sqliteStore->clearQueryCache();

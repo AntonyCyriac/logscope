@@ -90,19 +90,20 @@ IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLe
     return indexedLine;
 }
 
-void indexPlainTextLine(const std::uint64_t lineNumber, const std::string& line, const DetectedLogLevel level,
-                        HybridIndexWriter& writer) noexcept
+foundation::Result<bool> indexPlainTextLine(const std::uint64_t lineNumber, const std::string& line,
+                                            const DetectedLogLevel level, HybridIndexWriter& writer)
 {
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     const std::string correlationId = extractCorrelationId(line, std::string_view{});
 
-    (void)writer.tryAddLine(buildIndexedLine(lineNumber, level, fields.timestamp, fields.messageExcerpt, correlationId,
-                                             line, {}),
-                            line);
+    return writer.tryAddLine(buildIndexedLine(lineNumber, level, fields.timestamp, fields.messageExcerpt, correlationId,
+                                              line, {}),
+                             line);
 }
 
-void indexJsonLine(const std::uint64_t lineNumber, const std::string& line, const JsonLineParseResult& parsed,
-                   const DetectedLogLevel level, HybridIndexWriter& writer) noexcept
+foundation::Result<bool> indexJsonLine(const std::uint64_t lineNumber, const std::string& line,
+                                       const JsonLineParseResult& parsed, const DetectedLogLevel level,
+                                       HybridIndexWriter& writer)
 {
     std::optional<foundation::Timestamp> timestamp;
 
@@ -118,25 +119,28 @@ void indexJsonLine(const std::uint64_t lineNumber, const std::string& line, cons
 
     const std::string correlationId = extractCorrelationId(line, parsed.correlationValue);
 
-    (void)writer.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
-                                             parsed.topLevelKeys, parsed.topLevelFieldValues),
-                            line);
+    return writer.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
+                                              parsed.topLevelKeys, parsed.topLevelFieldValues),
+                             line);
 }
 
-void analyzePlainTextLine(const std::string& line, const std::uint64_t lineNumber, LogLevelCounts& levelCounts,
-                          FieldSummary& fieldSummary, HybridIndexWriter& writer) noexcept
+foundation::Result<bool> analyzePlainTextLine(const std::string& line, const std::uint64_t lineNumber,
+                                              LogLevelCounts& levelCounts, FieldSummary& fieldSummary,
+                                              HybridIndexWriter& writer)
 {
     const DetectedLogLevel level = detectLogLevel(line);
     recordLevel(levelCounts, level);
 
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     recordExtractedFields(fieldSummary, fields.timestamp, fields.messageExcerpt);
-    indexPlainTextLine(lineNumber, line, level, writer);
+
+    return indexPlainTextLine(lineNumber, line, level, writer);
 }
 
-void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, LogLevelCounts& levelCounts,
-                     JsonLinesSummary& summary, FieldSummary& fieldSummary, HybridIndexWriter& writer,
-                     const JsonFieldMapping& mapping) noexcept
+foundation::Result<bool> analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber,
+                                         LogLevelCounts& levelCounts, JsonLinesSummary& summary,
+                                         FieldSummary& fieldSummary, HybridIndexWriter& writer,
+                                         const JsonFieldMapping& mapping)
 {
     const JsonLineParseResult parsed = JsonLinesParser::parse(line, mapping);
 
@@ -144,16 +148,15 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
     {
         levelCounts.recordBlank();
 
-        return;
+        return foundation::Result<bool>(true);
     }
 
     if (parsed.outcome == JsonLineParseOutcome::Invalid)
     {
         summary.recordParseFailure();
         levelCounts.recordOther();
-        indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
 
-        return;
+        return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
     }
 
     summary.recordValidLine(parsed.topLevelKeys);
@@ -192,13 +195,13 @@ void analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber, Lo
         recordExtractedFields(fieldSummary, timestamp, std::string_view{});
     }
 
-    indexJsonLine(lineNumber, line, parsed, level, writer);
+    return indexJsonLine(lineNumber, line, parsed, level, writer);
 }
 
-void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
-                 LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary, FieldSummary& fieldSummary,
-                 HybridIndexWriter& writer, const JsonFieldMapping& mapping,
-                 const FormatParser* pluginParser) noexcept
+foundation::Result<bool> analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
+                                   LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary,
+                                   FieldSummary& fieldSummary, HybridIndexWriter& writer,
+                                   const JsonFieldMapping& mapping, const FormatParser* pluginParser)
 {
     if (pluginParser != nullptr)
     {
@@ -208,15 +211,14 @@ void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const 
         {
             levelCounts.recordBlank();
 
-            return;
+            return foundation::Result<bool>(true);
         }
 
         if (parsed.outcome == JsonLineParseOutcome::Invalid)
         {
             levelCounts.recordOther();
-            indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
 
-            return;
+            return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
         }
 
         DetectedLogLevel level = DetectedLogLevel::Other;
@@ -253,19 +255,15 @@ void analyzeLine(const std::string& line, const std::uint64_t lineNumber, const 
             recordExtractedFields(fieldSummary, timestamp, std::string_view{});
         }
 
-        indexJsonLine(lineNumber, line, parsed, level, writer);
-
-        return;
+        return indexJsonLine(lineNumber, line, parsed, level, writer);
     }
 
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
-        analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping);
-
-        return;
+        return analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping);
     }
 
-    analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer);
+    return analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer);
 }
 
 void trackSanitizedLine(std::string& line, std::size_t& sanitizedLineCount) noexcept
@@ -383,23 +381,25 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 const auto prepared =
                     storage::prepareIndexReuse(config.storage, *sourceFingerprint, dataset.path());
 
-                if (prepared)
+                if (!prepared)
                 {
-                    if (prepared->mode == storage::IndexReuseMode::Unchanged && prepared->store != nullptr)
-                    {
-                        const storage::IndexMetadata& metadata = prepared->store->metadata();
+                    return foundation::Result<AnalysisModel>(prepared.error());
+                }
 
-                        recordStats(metadata.totalLines, byteCount, true);
+                if (prepared->mode == storage::IndexReuseMode::Unchanged && prepared->store != nullptr)
+                {
+                    const storage::IndexMetadata& metadata = prepared->store->metadata();
 
-                        return foundation::Result<AnalysisModel>(AnalysisModel(
-                            dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
-                            std::nullopt, std::nullopt, prepared->store));
-                    }
+                    recordStats(metadata.totalLines, byteCount, true);
 
-                    if (prepared->mode == storage::IndexReuseMode::Append && prepared->store != nullptr)
-                    {
-                        appendReuse = std::move(*prepared);
-                    }
+                    return foundation::Result<AnalysisModel>(AnalysisModel(
+                        dataset.path(), metadata.totalLines, LogLevelCounts{}, metadata.format, std::nullopt,
+                        std::nullopt, std::nullopt, prepared->store));
+                }
+
+                if (prepared->mode == storage::IndexReuseMode::Append && prepared->store != nullptr)
+                {
+                    appendReuse = std::move(*prepared);
                 }
             }
         }
@@ -529,8 +529,14 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
             trackSanitizedLine(sampleLine, sanitizedLineCount);
 
-            analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
-                        indexWriter, config.jsonFieldMapping, pluginParser);
+            const auto analyzeResult =
+                analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
+                            indexWriter, config.jsonFieldMapping, pluginParser);
+
+            if (!analyzeResult)
+            {
+                return foundation::Result<AnalysisModel>(analyzeResult.error());
+            }
         }
 
         while (true)
@@ -558,8 +564,14 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 byteCount += line.size() + 1U;
             }
 
-            analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                        config.jsonFieldMapping, pluginParser);
+            const auto analyzeResult =
+                analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
+                            config.jsonFieldMapping, pluginParser);
+
+            if (!analyzeResult)
+            {
+                return foundation::Result<AnalysisModel>(analyzeResult.error());
+            }
         }
 
         const auto finalizeResult = indexWriter.finalize(totalLines);
@@ -567,6 +579,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
         if (!finalizeResult)
         {
             return foundation::Result<AnalysisModel>(finalizeResult.error());
+        }
+
+        if (!*finalizeResult)
+        {
+            return foundation::Result<AnalysisModel>(foundation::Error(
+                foundation::ErrorCode::IOError, "Failed to finalize persistent index store."));
         }
 
         SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines");
@@ -623,8 +641,14 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             byteCount += line.size() + 1U;
         }
 
-        analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                    config.jsonFieldMapping, pluginParser);
+        const auto analyzeResult =
+            analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
+                        config.jsonFieldMapping, pluginParser);
+
+        if (!analyzeResult)
+        {
+            return foundation::Result<AnalysisModel>(analyzeResult.error());
+        }
     }
 
     const auto finalizeResult = indexWriter.finalize(totalLines);
@@ -632,6 +656,12 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     if (!finalizeResult)
     {
         return foundation::Result<AnalysisModel>(finalizeResult.error());
+    }
+
+    if (!*finalizeResult)
+    {
+        return foundation::Result<AnalysisModel>(foundation::Error(
+            foundation::ErrorCode::IOError, "Failed to finalize persistent index store."));
     }
 
     SCOPE_LOG_INFO("analysis", "Counted " + std::to_string(totalLines) + " log lines after append");

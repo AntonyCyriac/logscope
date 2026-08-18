@@ -7,9 +7,12 @@
 #include <filesystem>
 #include <fstream>
 
+#include <sqlite3.h>
+
 #include "index_fingerprint.hpp"
 #include "index_reuse.hpp"
 #include "index_store_factory.hpp"
+#include "schema_version.hpp"
 #include "sqlite_index_store.hpp"
 
 using scope::analysis::DetectedLogLevel;
@@ -22,6 +25,7 @@ using scope::storage::IndexReuseMode;
 using scope::storage::SqliteIndexStore;
 using scope::storage::StorageConfig;
 using scope::storage::createIndexStore;
+using scope::storage::isUnsupportedSchemaVersion;
 using scope::storage::prepareIndexReuse;
 using scope::storage::resolveIndexPath;
 
@@ -233,6 +237,110 @@ TEST(IndexReuseTest, UsesStablePathKeyForDefaultIndexLocation)
 
     const Path resolved = resolveIndexPath(config, sourcePath, *fingerprint);
     EXPECT_EQ(workspace.append(stableKey->value() + ".db").string(), resolved.string());
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(IndexReuseTest, RebuildsWhenSameSizeContentChanges)
+{
+    const Path workspace = testWorkspace();
+    Path sourcePath = writeSource(workspace, "alpha\nbeta\n");
+    StorageConfig config = makeReuseConfig(workspace);
+
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(fingerprint);
+
+    const Path databasePath = resolveIndexPath(config, sourcePath, *fingerprint);
+
+    {
+        const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
+        ASSERT_TRUE(created);
+        ASSERT_TRUE((*created)->appendLine(makeLine(1U), "alpha\n"));
+        ASSERT_TRUE((*created)->appendLine(makeLine(2U), "beta\n"));
+        ASSERT_TRUE((*created)->finalize(2U));
+    }
+
+    writeSourceAt(sourcePath, "alphX\nbetY\n");
+
+    const auto rewrittenFingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(rewrittenFingerprint);
+
+    const auto prepared = prepareIndexReuse(config, *rewrittenFingerprint, sourcePath);
+    ASSERT_TRUE(prepared);
+    EXPECT_EQ(IndexReuseMode::Rebuild, prepared->mode);
+    EXPECT_EQ(nullptr, prepared->store);
+    EXPECT_FALSE(std::filesystem::exists(databasePath.string()));
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(IndexReuseTest, RebuildsWhenMidFileEditPrecedesGrowth)
+{
+    const Path workspace = testWorkspace();
+    Path sourcePath = writeSource(workspace, "AAAA\nBBBB\n");
+    StorageConfig config = makeReuseConfig(workspace);
+
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(fingerprint);
+
+    const Path databasePath = resolveIndexPath(config, sourcePath, *fingerprint);
+
+    {
+        const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
+        ASSERT_TRUE(created);
+        ASSERT_TRUE((*created)->appendLine(makeLine(1U), "AAAA\n"));
+        ASSERT_TRUE((*created)->appendLine(makeLine(2U), "BBBB\n"));
+        ASSERT_TRUE((*created)->finalize(2U));
+    }
+
+    writeSourceAt(sourcePath, "XXXX\nBBBB\nCCCC\n");
+
+    const auto grownFingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(grownFingerprint);
+
+    const auto prepared = prepareIndexReuse(config, *grownFingerprint, sourcePath);
+    ASSERT_TRUE(prepared);
+    EXPECT_EQ(IndexReuseMode::Rebuild, prepared->mode);
+    EXPECT_EQ(nullptr, prepared->store);
+    EXPECT_FALSE(std::filesystem::exists(databasePath.string()));
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(IndexReuseTest, FailsClosedOnUnsupportedFutureSchema)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = writeSource(workspace, "alpha\n");
+    StorageConfig config = makeReuseConfig(workspace);
+
+    const auto fingerprint = IndexFingerprint::compute(sourcePath);
+    ASSERT_TRUE(fingerprint);
+
+    const Path databasePath = resolveIndexPath(config, sourcePath, *fingerprint);
+
+    {
+        const auto created = createIndexStore(config, *fingerprint, sourcePath, LogFormat::PlainText);
+        ASSERT_TRUE(created);
+        ASSERT_TRUE((*created)->appendLine(makeLine(1U), "alpha\n"));
+        ASSERT_TRUE((*created)->finalize(1U));
+    }
+
+    sqlite3* database = nullptr;
+    ASSERT_EQ(SQLITE_OK, sqlite3_open(databasePath.string().c_str(), &database));
+
+    sqlite3_stmt* statement = nullptr;
+    ASSERT_EQ(SQLITE_OK,
+              sqlite3_prepare_v2(database,
+                                 "UPDATE meta SET value = '99' WHERE key = 'schema_version';", -1, &statement,
+                                 nullptr));
+    ASSERT_EQ(SQLITE_DONE, sqlite3_step(statement));
+    sqlite3_finalize(statement);
+    sqlite3_close(database);
+
+    const auto prepared = prepareIndexReuse(config, *fingerprint, sourcePath);
+    ASSERT_FALSE(prepared);
+    EXPECT_TRUE(isUnsupportedSchemaVersion(prepared.error()));
+    EXPECT_TRUE(std::filesystem::exists(databasePath.string()));
 
     cleanupWorkspace(workspace);
 }

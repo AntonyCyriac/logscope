@@ -68,6 +68,50 @@ analysis::JsonLineParseResult toJsonLineParseResult(const LogScopeParsedLine& pa
     return result;
 }
 
+class ScopedPluginStorageBackend final
+{
+  public:
+    explicit ScopedPluginStorageBackend(LogScopeStorageBackend* backend) noexcept : m_backend(backend) {}
+
+    ~ScopedPluginStorageBackend()
+    {
+        if (m_backend == nullptr)
+        {
+            return;
+        }
+
+        if (m_backend->vtable != nullptr && m_backend->vtable->destroy != nullptr)
+        {
+            m_backend->vtable->destroy(m_backend->instance);
+        }
+
+        delete m_backend;
+    }
+
+    ScopedPluginStorageBackend(const ScopedPluginStorageBackend&) = delete;
+    ScopedPluginStorageBackend& operator=(const ScopedPluginStorageBackend&) = delete;
+
+  private:
+    LogScopeStorageBackend* m_backend;
+};
+
+class ScopedPluginStorageStoreWrapper final
+{
+  public:
+    explicit ScopedPluginStorageStoreWrapper(LogScopeStorageStore* store) noexcept : m_store(store) {}
+
+    ~ScopedPluginStorageStoreWrapper()
+    {
+        delete m_store;
+    }
+
+    ScopedPluginStorageStoreWrapper(const ScopedPluginStorageStoreWrapper&) = delete;
+    ScopedPluginStorageStoreWrapper& operator=(const ScopedPluginStorageStoreWrapper&) = delete;
+
+  private:
+    LogScopeStorageStore* m_store;
+};
+
 class CFormatParserAdapter final : public analysis::FormatParser
 {
   public:
@@ -255,8 +299,9 @@ class CStorageStoreAdapter final : public storage::IndexStore
 {
   public:
     explicit CStorageStoreAdapter(LogScopeStorageStore store, storage::IndexMetadata metadata,
-                                  foundation::Path path)
-        : m_store(store), m_metadata(std::move(metadata)), m_path(std::move(path))
+                                  foundation::Path path, std::string backendId)
+        : m_store(store), m_metadata(std::move(metadata)), m_path(std::move(path)),
+          m_backendId(std::move(backendId))
     {
     }
 
@@ -288,7 +333,15 @@ class CStorageStoreAdapter final : public storage::IndexStore
         const int status =
             m_store.vtable->append_line(m_store.instance, line.lineNumber, std::string(fullContent).c_str());
 
-        return foundation::Result<bool>(status == 0);
+        if (status != 0)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::IOError,
+                "Plugin storage backend '" + m_backendId + "' append_line failed with status " +
+                    std::to_string(status) + "."));
+        }
+
+        return foundation::Result<bool>(true);
     }
 
     [[nodiscard]] foundation::Result<bool> finalize(std::uint64_t totalLines) override
@@ -301,7 +354,17 @@ class CStorageStoreAdapter final : public storage::IndexStore
 
         m_metadata.totalLines = totalLines;
 
-        return foundation::Result<bool>(m_store.vtable->finalize(m_store.instance, totalLines) == 0);
+        const int status = m_store.vtable->finalize(m_store.instance, totalLines);
+
+        if (status != 0)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::IOError,
+                "Plugin storage backend '" + m_backendId + "' finalize failed with status " +
+                    std::to_string(status) + "."));
+        }
+
+        return foundation::Result<bool>(true);
     }
 
     [[nodiscard]] std::uint64_t storedLineCount() const noexcept override
@@ -339,6 +402,7 @@ class CStorageStoreAdapter final : public storage::IndexStore
     LogScopeStorageStore m_store;
     storage::IndexMetadata m_metadata;
     foundation::Path m_path;
+    std::string m_backendId;
 };
 
 } // namespace
@@ -473,16 +537,18 @@ int PluginHostApi::registerStorageBackendThunk(void* context, const char* backen
 
     storage::StorageBackendRegistry::instance().registerBackend(
         backendId,
-        [createFn](const storage::StorageConfig& /*config*/, const storage::IndexFingerprint& fingerprint,
+        [createFn, backendId](const storage::StorageConfig& /*config*/, const storage::IndexFingerprint& fingerprint,
                    const foundation::Path& sourcePath, const analysis::LogFormat format)
             -> foundation::Result<storage::IndexStorePtr> {
-            LogScopeStorageBackend* backend = createFn();
+            LogScopeStorageBackend* const backend = createFn();
 
             if (backend == nullptr || backend->vtable == nullptr || backend->vtable->create_store == nullptr)
             {
                 return foundation::Result<storage::IndexStorePtr>(foundation::Error(
                     foundation::ErrorCode::Unknown, "Storage backend factory returned null."));
             }
+
+            ScopedPluginStorageBackend scopedBackend(backend);
 
             void* storeOpaque = nullptr;
 
@@ -498,9 +564,10 @@ int PluginHostApi::registerStorageBackendThunk(void* context, const char* backen
             metadata.format = format;
 
             LogScopeStorageStore* store = static_cast<LogScopeStorageStore*>(storeOpaque);
+            ScopedPluginStorageStoreWrapper scopedStore(store);
 
             return foundation::Result<storage::IndexStorePtr>(storage::IndexStorePtr(
-                new CStorageStoreAdapter(*store, std::move(metadata), sourcePath)));
+                new CStorageStoreAdapter(*store, std::move(metadata), sourcePath, std::string(backendId))));
         });
 
     SCOPE_LOG_DEBUG("plugin", std::string("Registered storage backend: ") + backendId);

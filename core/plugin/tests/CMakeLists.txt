@@ -11,6 +11,7 @@ set(PLUGIN_TEST_OUTPUT_DIR ${CMAKE_CURRENT_BINARY_DIR}/plugins)
 string(REPLACE "\\" "/" PLUGIN_TEST_REPORT_DIR "${PLUGIN_TEST_OUTPUT_DIR}/report")
 string(REPLACE "\\" "/" PLUGIN_TEST_FULL_DIR "${PLUGIN_TEST_OUTPUT_DIR}/full")
 string(REPLACE "\\" "/" PLUGIN_TEST_STORAGE_DIR "${PLUGIN_TEST_OUTPUT_DIR}/storage")
+string(REPLACE "\\" "/" PLUGIN_TEST_FAILING_STORAGE_DIR "${PLUGIN_TEST_OUTPUT_DIR}/failing_storage")
 string(REPLACE "\\" "/" PLUGIN_TESTDATA_DIR "${CMAKE_CURRENT_SOURCE_DIR}/testdata")
 
 add_library(logscope_test_report_plugin SHARED test_report_plugin.cpp)
@@ -28,9 +29,15 @@ set_target_properties(logscope_test_storage_plugin PROPERTIES WINDOWS_EXPORT_ALL
 target_compile_definitions(logscope_test_storage_plugin PRIVATE LOGSCOPE_PLUGIN_EXPORT)
 target_link_libraries(logscope_test_storage_plugin PRIVATE logscope_plugin_sdk)
 
+add_library(logscope_test_failing_storage_plugin SHARED test_failing_storage_plugin.cpp)
+set_target_properties(logscope_test_failing_storage_plugin PROPERTIES WINDOWS_EXPORT_ALL_SYMBOLS ON)
+target_compile_definitions(logscope_test_failing_storage_plugin PRIVATE LOGSCOPE_PLUGIN_EXPORT)
+target_link_libraries(logscope_test_failing_storage_plugin PRIVATE logscope_plugin_sdk)
+
 logscope_set_flat_output_directory(logscope_test_report_plugin "${PLUGIN_TEST_OUTPUT_DIR}/report")
 logscope_set_flat_output_directory(logscope_test_full_plugin "${PLUGIN_TEST_OUTPUT_DIR}/full")
 logscope_set_flat_output_directory(logscope_test_storage_plugin "${PLUGIN_TEST_OUTPUT_DIR}/storage")
+logscope_set_flat_output_directory(logscope_test_failing_storage_plugin "${PLUGIN_TEST_OUTPUT_DIR}/failing_storage")
 
 add_executable(scope_plugin_tests
     plugin_loader_test.cpp
@@ -55,10 +62,12 @@ target_compile_definitions(scope_plugin_tests PRIVATE
     PLUGIN_TEST_REPORT_DIR="${PLUGIN_TEST_REPORT_DIR}"
     PLUGIN_TEST_FULL_DIR="${PLUGIN_TEST_FULL_DIR}"
     PLUGIN_TEST_STORAGE_DIR="${PLUGIN_TEST_STORAGE_DIR}"
+    PLUGIN_TEST_FAILING_STORAGE_DIR="${PLUGIN_TEST_FAILING_STORAGE_DIR}"
     PLUGIN_TESTDATA_DIR="${PLUGIN_TESTDATA_DIR}"
 )
 
-add_dependencies(scope_plugin_tests logscope_test_report_plugin logscope_test_full_plugin logscope_test_storage_plugin)
+add_dependencies(scope_plugin_tests logscope_test_report_plugin logscope_test_full_plugin logscope_test_storage_plugin
+    logscope_test_failing_storage_plugin)
 
 include(GoogleTest)
 gtest_discover_tests(scope_plugin_tests)

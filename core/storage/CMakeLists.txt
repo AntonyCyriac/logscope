@@ -50,6 +50,7 @@ add_library(scope_storage
     query_cache_codec.cpp
     query_cache_key.cpp
     schema_version.cpp
+    source_content_hash.cpp
     source_snapshot.cpp
     sqlite_connection.cpp
     sqlite_index_store.cpp

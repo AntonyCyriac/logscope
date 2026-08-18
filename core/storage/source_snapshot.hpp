@@ -23,6 +23,8 @@ struct StoredSourceSnapshot
     std::int64_t sourceMtime{0};
     std::uint64_t totalLines{0U};
     std::uint64_t indexedLineCount{0U};
+    std::string sourceContentSha256;
+    std::string sourcePrefixSha256;
 };
 
 enum class SourceChangeKind

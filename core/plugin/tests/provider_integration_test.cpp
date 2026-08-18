@@ -4,6 +4,8 @@
  */
 
 #include <algorithm>
+#include <filesystem>
+#include <fstream>
 #include <gtest/gtest.h>
 
 #include "analysis_engine.hpp"
@@ -20,7 +22,6 @@
 
 using scope::analysis::AnalysisConfig;
 using scope::analysis::AnalysisEngine;
-using scope::analysis::FormatParser;
 using scope::analysis::ParserRegistry;
 using scope::extension::ExtensionManager;
 using scope::foundation::Path;
@@ -31,6 +32,7 @@ using scope::plugin::loadPluginsForManager;
 using scope::reporting::ReportSectionRegistry;
 using scope::search::SearchProviderRegistry;
 using scope::search::SearchQuery;
+using scope::source::SourceManager;
 using scope::storage::StorageBackendRegistry;
 
 namespace
@@ -49,6 +51,15 @@ Path storagePluginDirectory()
 {
 #ifdef PLUGIN_TEST_STORAGE_DIR
     return Path(PLUGIN_TEST_STORAGE_DIR);
+#else
+    return Path(".");
+#endif
+}
+
+Path failingStoragePluginDirectory()
+{
+#ifdef PLUGIN_TEST_FAILING_STORAGE_DIR
+    return Path(PLUGIN_TEST_FAILING_STORAGE_DIR);
 #else
     return Path(".");
 #endif
@@ -81,6 +92,22 @@ void loadStorageTestPlugin()
     PluginConfig config;
     config.enabled = true;
     config.paths = {storagePluginDirectory()};
+
+    const auto loaded = loadPluginsForManager(manager, config);
+
+    ASSERT_TRUE(loaded.hasValue());
+    ASSERT_GT(*loaded, 0U);
+}
+
+void loadFailingStorageTestPlugin()
+{
+    StorageBackendRegistry::instance().clear();
+
+    ExtensionManager manager = ExtensionManager::createWithBuiltIns();
+
+    PluginConfig config;
+    config.enabled = true;
+    config.paths = {failingStoragePluginDirectory()};
 
     const auto loaded = loadPluginsForManager(manager, config);
 
@@ -132,4 +159,39 @@ TEST(PluginProviderIntegrationTest, RegistersReportContributor)
 
     ASSERT_TRUE(describeResult.hasValue());
     EXPECT_TRUE(describeResult->dynamic);
+}
+
+TEST(PluginProviderIntegrationTest, PropagatesPluginStorageWriteFailures)
+{
+    loadFailingStorageTestPlugin();
+
+    const auto* testInfo = ::testing::UnitTest::GetInstance()->current_test_info();
+    const Path sourcePath = Path((std::filesystem::temp_directory_path() /
+                                  ("logscope_plugin_fail_" + std::string(testInfo->name()) + ".log"))
+                                     .string());
+
+    {
+        std::ofstream output(sourcePath.string());
+        output << "alpha\nbeta\n";
+    }
+
+    scope::source::SourceManager sourceManager;
+    auto datasetResult = sourceManager.open(sourcePath);
+
+    ASSERT_TRUE(datasetResult.hasValue());
+
+    AnalysisConfig config = AnalysisConfig::defaults();
+    config.storage.persistIndex = true;
+    config.storage.backend = "plugin:failing";
+    config.storage.indexDirectory = Path(sourcePath.string() + ".ws");
+
+    AnalysisEngine engine;
+    const auto modelResult = engine.analyze(*datasetResult, config);
+
+    EXPECT_FALSE(modelResult.hasValue());
+    EXPECT_NE(modelResult.error().message().find("append_line failed"), std::string::npos);
+
+    std::error_code error;
+    std::filesystem::remove(sourcePath.string(), error);
+    std::filesystem::remove_all(config.storage.indexDirectory.string(), error);
 }
