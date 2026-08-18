@@ -37,10 +37,11 @@ v2.10.0 → shipped (P1.1 TID pstack dialects #144)
 v2.10.1 → shipped (storage hotfix #163/#164)
 v2.11.0 → shipped (P2 desktop Timeline/Crash parity)
 v2.12.0 → shipped (P2.1 desktop Evidence/Suggestions)
-Next    → #144 Option B (§5) · P3 ADR-010 reactive only (§5)
+v2.12.1 → patch (#204 timeline refresh after pagination)
+Next    → v2.13.0 Hardening (§5.2) · then #144-B when justified (§5) · P3 reactive (§5)
 ```
 
-**Queue discipline:** P2.1 (product UX), #144 Option B (developer extensibility), and P3 domain architecture are **three separate tracks** — do not combine into one milestone.
+**Queue discipline:** **v2.13.0 Hardening** (#185–#203), **#144-B** (developer extensibility when justified), and **P3** domain architecture are **three separate tracks** — do not combine into one milestone.
 
 ---
 
@@ -77,7 +78,8 @@ Next    → #144 Option B (§5) · P3 ADR-010 reactive only (§5)
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
 | **P2.1** | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` | Related Evidence, suggestions, async refresh; matrix: [`V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md`](V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md) |
-| **#144-B** | `register_crash_analyzer` plugin hook | **Next** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
+| **H0** | Quality & Integrity hardening | **Next** — `v2.13.0` | [#185](https://github.com/AntonyCyriac/logscope/issues/185)–[#203](https://github.com/AntonyCyriac/logscope/issues/203); matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
+| **#144-B** | `register_crash_analyzer` plugin hook | **After hardening** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |
 | **P5** | AI Investigation Assistant | **Research only** | Evidence-based sequence synthesis — don't build yet |
@@ -105,7 +107,7 @@ Timeline → Related Evidence → Suggested connections → accept/dismiss → j
 
 **Out of P2.1:** new parsers, `register_crash_analyzer`, correlation algorithm changes, redesign.
 
-### #144 Option B — `register_crash_analyzer` (next, when justified)
+### #144 Option B — `register_crash_analyzer` (after hardening, when justified)
 
 **Type:** Architecture / developer extensibility — **not** product UX.
 
@@ -113,7 +115,24 @@ Timeline → Related Evidence → Suggested connections → accept/dismiss → j
 Crash analyzer registry → pstack parser · GDB parser · custom analyzer
 ```
 
-**Trigger:** A real second crash dialect or analyzer appears that should **not** belong in core. Do not implement merely because it is in the backlog.
+**Trigger:** A real second crash dialect or analyzer appears that should **not** belong in core. Do not implement merely because it is in the backlog. **Do not** bundle with v2.13.0 hardening.
+
+### v2.13.0 — Quality & Integrity (next)
+
+**Definition:** Pay down correctness and integrity debt before new architecture.
+
+**Type:** Platform hardening — **not** product UX, **not** #144-B.
+
+```text
+Wave 1: storage/index (#188 #189 #195) + plugin silent failure (#203)
+Wave 2: web session enforcement (#200 #201 #194)
+Wave 3: plugin ABI, query, reporting, session (#185 #198 #186 #191)
+Wave 4: remaining P2 (#196–#199, #187, #190, #192, #193)
+```
+
+See [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) and GitHub milestone [v2.13.0 — Quality & Integrity](https://github.com/AntonyCyriac/logscope/milestone/1).
+
+**Out of v2.13.0:** new investigation stories, desktop UX, `register_crash_analyzer`, P3 charter.
 
 ### P3 — domain architecture (reactive only)
 
@@ -181,3 +200,4 @@ Crash analyzer registry → pstack parser · GDB parser · custom analyzer
 | 2.7.0 | 18-08-2026 | `v2.11.0` shipped — P2 desktop Timeline/Crash parity. |
 | 2.8.0 | 18-08-2026 | Post-`v2.11.0` queue locked: **P2.1** (product) → **#144-B** (extensibility, when justified) → **P3** (reactive charter only). |
 | 2.9.0 | 18-08-2026 | `v2.12.0` shipped — P2.1 desktop Evidence/Suggestions + async refresh. |
+| 2.10.0 | 18-08-2026 | Post-`v2.12.0` queue: **v2.13.0 Hardening** → **#144-B** (when justified) → **P3** reactive. |
