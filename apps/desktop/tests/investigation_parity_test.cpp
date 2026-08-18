@@ -55,7 +55,8 @@ scope::desktop::MainWindow makeWindow()
 void openTimelineAndWait(scope::desktop::MainWindow& window)
 {
     QVERIFY(window.switchBottomTab(QStringLiteral("Timeline")));
-    QVERIFY(window.waitForTimelineLoad());
+    QVERIFY(window.waitForTimelineLoad(10000));
+    QVERIFY(window.timelineRowCount() > 0);
 }
 
 } // namespace

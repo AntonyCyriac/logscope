@@ -7,9 +7,12 @@
 #include "crash_load_worker.hpp"
 #include "pstack_text_utils.hpp"
 
+#include <QApplication>
 #include <QComboBox>
+#include <QElapsedTimer>
 #include <QLabel>
 #include <QListWidget>
+#include <QMetaType>
 #include <QTextBrowser>
 #include <QThread>
 #include <QVBoxLayout>
@@ -23,6 +26,8 @@ namespace scope::desktop
 CrashPanel::CrashPanel(scope::application::InvestigationController* controller, QWidget* parent)
     : QWidget(parent), m_controller(controller)
 {
+    qRegisterMetaType<scope::workspace::CrashReport>("scope::workspace::CrashReport");
+
     setupUi();
 
     m_workerThread = new QThread(this);
@@ -30,8 +35,8 @@ CrashPanel::CrashPanel(scope::application::InvestigationController* controller, 
     m_worker->moveToThread(m_workerThread);
 
     connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-    connect(m_worker, &CrashLoadWorker::loadFinished, this, &CrashPanel::onLoadFinished);
-    connect(m_worker, &CrashLoadWorker::loadFailed, this, &CrashPanel::onLoadFailed);
+    connect(m_worker, &CrashLoadWorker::loadFinished, this, &CrashPanel::onLoadFinished, Qt::QueuedConnection);
+    connect(m_worker, &CrashLoadWorker::loadFailed, this, &CrashPanel::onLoadFailed, Qt::QueuedConnection);
 
     m_workerThread->start();
 }
@@ -232,13 +237,32 @@ bool CrashPanel::waitForLoadComplete(const int timeoutMs)
     QElapsedTimer timer;
     timer.start();
 
-    while (m_loading && timer.elapsed() < timeoutMs)
+    while (timer.elapsed() < timeoutMs)
     {
         QApplication::processEvents();
+
+        if (!m_loading)
+        {
+            if (currentArtifactId().isEmpty())
+            {
+                return true;
+            }
+
+            if (m_errorLabel->isVisible())
+            {
+                return true;
+            }
+
+            if (m_report.status == scope::workspace::CrashAnalysisStatus::Ready || m_threadList->count() > 0)
+            {
+                return true;
+            }
+        }
+
         QThread::msleep(10);
     }
 
-    return !m_loading;
+    return !m_loading && m_threadList->count() > 0;
 }
 
 void CrashPanel::renderReport(const scope::workspace::CrashReport& report)

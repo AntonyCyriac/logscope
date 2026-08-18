@@ -13,6 +13,7 @@
 #include <QElapsedTimer>
 #include <QHeaderView>
 #include <QLabel>
+#include <QMetaType>
 #include <QPushButton>
 #include <QTableWidget>
 #include <QTableWidgetItem>
@@ -52,6 +53,9 @@ scope::workspace::EvidenceLinkType parseLinkType(const QString& value)
 TimelinePanel::TimelinePanel(scope::application::InvestigationController* controller, QWidget* parent)
     : QWidget(parent), m_controller(controller)
 {
+    qRegisterMetaType<scope::workspace::TimelineProjectionResult>(
+        "scope::workspace::TimelineProjectionResult");
+
     setupUi();
 
     m_workerThread = new QThread(this);
@@ -59,8 +63,9 @@ TimelinePanel::TimelinePanel(scope::application::InvestigationController* contro
     m_worker->moveToThread(m_workerThread);
 
     connect(m_workerThread, &QThread::finished, m_worker, &QObject::deleteLater);
-    connect(m_worker, &TimelineLoadWorker::loadFinished, this, &TimelinePanel::onLoadFinished);
-    connect(m_worker, &TimelineLoadWorker::loadFailed, this, &TimelinePanel::onLoadFailed);
+    connect(m_worker, &TimelineLoadWorker::loadFinished, this, &TimelinePanel::onLoadFinished,
+            Qt::QueuedConnection);
+    connect(m_worker, &TimelineLoadWorker::loadFailed, this, &TimelinePanel::onLoadFailed, Qt::QueuedConnection);
 
     m_workerThread->start();
 }
@@ -240,13 +245,27 @@ bool TimelinePanel::waitForLoadComplete(const int timeoutMs)
     QElapsedTimer timer;
     timer.start();
 
-    while (m_loading && timer.elapsed() < timeoutMs)
+    while (timer.elapsed() < timeoutMs)
     {
         QApplication::processEvents();
+
+        if (!m_loading)
+        {
+            if (m_controller == nullptr || !m_controller->isOpen())
+            {
+                return true;
+            }
+
+            if (!m_events.empty() || m_errorLabel->isVisible())
+            {
+                return true;
+            }
+        }
+
         QThread::msleep(10);
     }
 
-    return !m_loading;
+    return !m_loading && !m_events.empty();
 }
 
 QString TimelinePanel::formatEventType(const scope::workspace::TimelineEvent& event)
