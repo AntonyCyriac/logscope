@@ -152,6 +152,54 @@ TEST(SourceSnapshotTest, DetectsGrowthAndTruncation)
     cleanupWorkspace(workspace);
 }
 
+TEST(SourceSnapshotTest, DetectsSameSizeContentRewrite)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = writeSource(workspace, "alpha\nbeta\n");
+    const Path databasePath = workspace.append("index.db");
+
+    createIndexedStore(databasePath, sourcePath, 2U);
+
+    sqlite3* database = nullptr;
+    ASSERT_EQ(SQLITE_OK, sqlite3_open(databasePath.string().c_str(), &database));
+
+    const auto snapshot = readStoredSourceSnapshot(database);
+    ASSERT_TRUE(snapshot);
+
+    writeSourceAt(sourcePath, "alphX\nbetY\n");
+
+    const auto change = compareSourceChange(*snapshot, sourcePath);
+    ASSERT_TRUE(change);
+    EXPECT_EQ(SourceChangeKind::Unknown, *change);
+
+    sqlite3_close(database);
+    cleanupWorkspace(workspace);
+}
+
+TEST(SourceSnapshotTest, DetectsMidFileEditBeforeGrowth)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = writeSource(workspace, "AAAA\nBBBB\n");
+    const Path databasePath = workspace.append("index.db");
+
+    createIndexedStore(databasePath, sourcePath, 2U);
+
+    sqlite3* database = nullptr;
+    ASSERT_EQ(SQLITE_OK, sqlite3_open(databasePath.string().c_str(), &database));
+
+    const auto snapshot = readStoredSourceSnapshot(database);
+    ASSERT_TRUE(snapshot);
+
+    writeSourceAt(sourcePath, "XXXX\nBBBB\nCCCC\n");
+
+    const auto change = compareSourceChange(*snapshot, sourcePath);
+    ASSERT_TRUE(change);
+    EXPECT_EQ(SourceChangeKind::Unknown, *change);
+
+    sqlite3_close(database);
+    cleanupWorkspace(workspace);
+}
+
 TEST(SourceSnapshotTest, IgnoresMtimeOnlyChange)
 {
     const Path workspace = testWorkspace();

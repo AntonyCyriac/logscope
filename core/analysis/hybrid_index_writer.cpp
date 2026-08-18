@@ -24,7 +24,7 @@ HybridIndexWriter::HybridIndexWriter(LineIndex lineIndex, storage::StorageConfig
 {
 }
 
-bool HybridIndexWriter::tryAddLine(IndexedLine line, const std::string_view fullContent)
+foundation::Result<bool> HybridIndexWriter::tryAddLine(IndexedLine line, const std::string_view fullContent)
 {
     const bool storedInMemory = m_lineIndex.tryAddLine(line);
 
@@ -37,27 +37,52 @@ bool HybridIndexWriter::tryAddLine(IndexedLine line, const std::string_view full
         {
             const auto appendResult = m_persistentStore->appendLine(line, fullContent);
 
-            if (appendResult)
+            if (!appendResult)
             {
-                ++m_persistedLineCount;
+                return foundation::Result<bool>(appendResult.error());
+            }
 
-                if (m_persistedLineCount % persistProgressInterval == 0U)
-                {
-                    SCOPE_LOG_INFO("analysis",
-                                   "Indexed " + std::to_string(m_persistedLineCount) + " lines to persistent store");
-                }
+            if (!*appendResult)
+            {
+                return foundation::Result<bool>(foundation::Error(
+                    foundation::ErrorCode::IOError, "Persistent index store rejected line append."));
+            }
+
+            ++m_persistedLineCount;
+
+            if (m_persistedLineCount % persistProgressInterval == 0U)
+            {
+                SCOPE_LOG_INFO("analysis",
+                               "Indexed " + std::to_string(m_persistedLineCount) + " lines to persistent store");
             }
         }
     }
 
-    return storedInMemory || m_persistentStore != nullptr;
+    if (!storedInMemory && m_persistentStore == nullptr)
+    {
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument, "In-memory line index capacity exceeded."));
+    }
+
+    return foundation::Result<bool>(true);
 }
 
 foundation::Result<bool> HybridIndexWriter::finalize(const std::uint64_t totalLines)
 {
     if (m_persistentStore != nullptr)
     {
-        return m_persistentStore->finalize(totalLines);
+        const auto finalizeResult = m_persistentStore->finalize(totalLines);
+
+        if (!finalizeResult)
+        {
+            return finalizeResult;
+        }
+
+        if (!*finalizeResult)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::IOError, "Persistent index store rejected finalize."));
+        }
     }
 
     return foundation::Result<bool>(true);

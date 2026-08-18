@@ -25,7 +25,7 @@ class HybridIndexWriter
     HybridIndexWriter(LineIndex lineIndex, storage::StorageConfig storageConfig,
                       storage::IndexStorePtr persistentStore) noexcept;
 
-    [[nodiscard]] bool tryAddLine(IndexedLine line, std::string_view fullContent);
+    [[nodiscard]] foundation::Result<bool> tryAddLine(IndexedLine line, std::string_view fullContent);
 
     [[nodiscard]] foundation::Result<bool> finalize(std::uint64_t totalLines);
 

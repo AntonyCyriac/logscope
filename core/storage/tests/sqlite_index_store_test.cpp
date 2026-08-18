@@ -13,11 +13,14 @@
 #include "index_build_lock.hpp"
 #include "index_fingerprint.hpp"
 #include "schema_version.hpp"
+#include "source_content_hash.hpp"
 #include "sqlite_index_store.hpp"
 #include "foundation/filesystem.hpp"
 
 using scope::storage::IndexFingerprint;
 using scope::storage::kIndexSchemaVersionCurrent;
+using scope::storage::kSourceContentSha256MetaKey;
+using scope::storage::kSourcePrefixSha256MetaKey;
 using scope::storage::requiresSchemaRebuild;
 
 using scope::analysis::DetectedLogLevel;
@@ -525,6 +528,14 @@ TEST(SqliteIndexStoreTest, FinalizePersistsSourceSnapshotMeta)
     EXPECT_EQ("2", *indexedLineCount);
     EXPECT_EQ(std::to_string(*sizeResult), *sourceSize);
     EXPECT_FALSE(sourceMtime->empty());
+
+    const auto contentHash = readMetaValue(databasePath, std::string(kSourceContentSha256MetaKey));
+    const auto prefixHash = readMetaValue(databasePath, std::string(kSourcePrefixSha256MetaKey));
+
+    ASSERT_TRUE(contentHash.has_value());
+    ASSERT_TRUE(prefixHash.has_value());
+    EXPECT_FALSE(contentHash->empty());
+    EXPECT_EQ(*contentHash, *prefixHash);
 
     cleanupPath(databasePath);
     cleanupPath(sourcePath);

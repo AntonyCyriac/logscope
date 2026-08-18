@@ -25,6 +25,7 @@
 #include "query_cache_codec.hpp"
 #include "query_cache_key.hpp"
 #include "schema_version.hpp"
+#include "source_content_hash.hpp"
 #include "sqlite_connection.hpp"
 
 namespace scope::storage
@@ -1314,6 +1315,37 @@ foundation::Result<bool> SqliteIndexStore::finalize(const std::uint64_t totalLin
     if (!mtimeMetaResult)
     {
         return mtimeMetaResult;
+    }
+
+    const auto contentHashResult = computeSourceSha256Hex(m_impl->metadata.sourcePath);
+
+    if (!contentHashResult)
+    {
+        return foundation::Result<bool>(contentHashResult.error());
+    }
+
+    const auto contentHashMetaResult =
+        setMeta(m_impl->database, std::string(kSourceContentSha256MetaKey), *contentHashResult);
+
+    if (!contentHashMetaResult)
+    {
+        return contentHashMetaResult;
+    }
+
+    const auto prefixHashResult =
+        computeSourcePrefixSha256Hex(m_impl->metadata.sourcePath, *sizeResult);
+
+    if (!prefixHashResult)
+    {
+        return foundation::Result<bool>(prefixHashResult.error());
+    }
+
+    const auto prefixHashMetaResult =
+        setMeta(m_impl->database, std::string(kSourcePrefixSha256MetaKey), *prefixHashResult);
+
+    if (!prefixHashMetaResult)
+    {
+        return prefixHashMetaResult;
     }
 
     const auto fingerprintResult = IndexFingerprint::compute(m_impl->metadata.sourcePath);
