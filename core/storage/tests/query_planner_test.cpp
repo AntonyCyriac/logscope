@@ -155,3 +155,23 @@ TEST(QueryPlannerTest, RejectsUnsupportedComparison)
 
     EXPECT_FALSE(plan.has_value());
 }
+
+TEST(QueryPlannerTest, SkipsFtsPushdownForNonAsciiContains)
+{
+    const auto parsed = parseFilterQuery(R"(contains(message, "日本語"))");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+
+    EXPECT_FALSE(plan.has_value());
+}
+
+TEST(QueryPlannerTest, SkipsFtsPushdownForCombinedCjkContains)
+{
+    const auto parsed = parseFilterQuery(R"(level == ERROR AND contains(message, "日本語"))");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+
+    EXPECT_FALSE(plan.has_value());
+}

@@ -11,6 +11,7 @@
 
 #include "index_fingerprint.hpp"
 #include "index_store_options.hpp"
+#include "query_evaluator.hpp"
 #include "query_parser.hpp"
 #include "query_planner.hpp"
 #include "sqlite_index_store.hpp"
@@ -19,6 +20,7 @@ using scope::analysis::DetectedLogLevel;
 using scope::analysis::IndexedLine;
 using scope::analysis::LogFormat;
 using scope::foundation::Path;
+using scope::query::QueryEvaluator;
 using scope::query::parseFilterQuery;
 using scope::storage::IndexFingerprint;
 using scope::storage::IndexMetadata;
@@ -238,6 +240,50 @@ TEST(SqliteIndexStoreJsonFieldsTest, FetchesLinesMatchingCombinedJsonFieldAndLev
     ASSERT_TRUE(lines);
     ASSERT_EQ(1U, lines->size());
     EXPECT_EQ(1U, lines->front().lineNumber);
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(SqliteIndexStoreJsonFieldsTest, JsonFieldOrderedComparisonUsesEvaluatorFallback)
+{
+    const Path workspace = testWorkspace();
+    const Path databasePath = workspace.append("index.db");
+    const Path sourcePath = writeTempSource(workspace, "jsonl\n");
+
+    const auto metadata = makeMetadata(sourcePath);
+    const auto created = SqliteIndexStore::create(databasePath, metadata);
+    ASSERT_TRUE(created);
+
+    ASSERT_TRUE((*created)->appendLine(makeJsonLine(1U, DetectedLogLevel::Error, {{"code", "10"}}),
+                                       R"({"code":10})"));
+    ASSERT_TRUE((*created)->appendLine(makeJsonLine(2U, DetectedLogLevel::Info, {{"code", "20"}}),
+                                       R"({"code":20})"));
+    ASSERT_TRUE((*created)->appendLine(makeJsonLine(3U, DetectedLogLevel::Error, {{"code", "10"}}),
+                                       R"({"code":10})"));
+    ASSERT_TRUE((*created)->finalize(3U));
+
+    const auto parsed = parseFilterQuery("code > 10");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+    EXPECT_FALSE(plan.has_value());
+
+    const auto allLines = (*created)->fetchAllLines();
+    ASSERT_TRUE(allLines);
+
+    const QueryEvaluator evaluator(*parsed);
+    std::vector<std::uint64_t> matchingLineNumbers;
+
+    for (const IndexedLine& line : *allLines)
+    {
+        if (evaluator.matches(line))
+        {
+            matchingLineNumbers.push_back(line.lineNumber);
+        }
+    }
+
+    ASSERT_EQ(1U, matchingLineNumbers.size());
+    EXPECT_EQ(2U, matchingLineNumbers.front());
 
     cleanupWorkspace(workspace);
 }

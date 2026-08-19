@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "foundation/result.hpp"
 #include "line_index.hpp"
 #include "query_node.hpp"
 
@@ -32,5 +33,12 @@ class QueryEvaluator
 
     QueryNode m_root;
 };
+
+/**
+ * @brief Validates filter semantics before evaluation (e.g. unsupported JSON ordered comparisons).
+ *
+ * @return `true` when the filter is valid.
+ */
+[[nodiscard]] foundation::Result<bool> validateFilterSemantics(const QueryNode& root) noexcept;
 
 } // namespace scope::query

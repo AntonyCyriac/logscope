@@ -142,6 +142,19 @@ namespace
 
 } // namespace
 
+bool ftsContainsIsFaithful(const std::string_view term) noexcept
+{
+    for (const unsigned char character : term)
+    {
+        if (character > 127U)
+        {
+            return false;
+        }
+    }
+
+    return true;
+}
+
 std::string escapeFts5Literal(const std::string_view term)
 {
     std::string escaped;

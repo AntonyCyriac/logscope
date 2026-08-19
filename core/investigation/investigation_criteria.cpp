@@ -6,6 +6,7 @@
 #include "investigation_criteria.hpp"
 
 #include "foundation/string.hpp"
+#include "query_evaluator.hpp"
 #include "query_parser.hpp"
 #include "search_query_parser.hpp"
 
@@ -47,17 +48,30 @@ foundation::Result<search::SearchQuery> InvestigationCriteria::resolvedSearchQue
 
 foundation::Result<query::QueryNode> InvestigationCriteria::resolvedFilterQuery() const noexcept
 {
+    foundation::Result<query::QueryNode> resolved(query::QueryNode::matchAll());
+
     if (filterQuery.has_value())
     {
-        return foundation::Result<query::QueryNode>(*filterQuery);
+        resolved = foundation::Result<query::QueryNode>(*filterQuery);
     }
-
-    if (!foundation::isBlank(filterExpression))
+    else if (!foundation::isBlank(filterExpression))
     {
-        return query::parseFilterQuery(filterExpression);
+        resolved = query::parseFilterQuery(filterExpression);
     }
 
-    return foundation::Result<query::QueryNode>(query::QueryNode::matchAll());
+    if (!resolved)
+    {
+        return resolved;
+    }
+
+    const auto validated = query::validateFilterSemantics(*resolved);
+
+    if (!validated)
+    {
+        return foundation::Result<query::QueryNode>(validated.error());
+    }
+
+    return resolved;
 }
 
 void applyInvestigationConfiguration(InvestigationCriteria& criteria,

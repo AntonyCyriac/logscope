@@ -12,6 +12,7 @@ using scope::analysis::DetectedLogLevel;
 using scope::analysis::IndexedLine;
 using scope::query::QueryEvaluator;
 using scope::query::parseFilterQuery;
+using scope::query::validateFilterSemantics;
 using scope::foundation::Timestamp;
 
 namespace
@@ -192,13 +193,81 @@ TEST(QueryEvaluatorTest, MatchesCombinedJsonFieldAndLevel)
 
 TEST(QueryEvaluatorTest, RejectsUnsupportedJsonFieldOperator)
 {
-    IndexedLine line;
-    line.jsonFieldValues = {{"service", "PCF"}};
-
     const auto parsed = parseFilterQuery(R"(service > "PCF")");
+    ASSERT_TRUE(parsed);
+
+    const auto validated = validateFilterSemantics(*parsed);
+
+    ASSERT_FALSE(validated);
+    EXPECT_NE(std::string::npos, validated.error().message().find("numeric literal"));
+}
+
+TEST(QueryEvaluatorTest, MatchesJsonFieldNumericGreaterThan)
+{
+    IndexedLine matchLine;
+    matchLine.jsonFieldValues = {{"code", "20"}};
+
+    IndexedLine belowLine;
+    belowLine.jsonFieldValues = {{"code", "10"}};
+
+    const auto parsed = parseFilterQuery("code > 10");
+    ASSERT_TRUE(parsed);
+
+    const auto validated = validateFilterSemantics(*parsed);
+    ASSERT_TRUE(validated);
+
+    const QueryEvaluator evaluator(*parsed);
+
+    EXPECT_TRUE(evaluator.matches(matchLine));
+    EXPECT_FALSE(evaluator.matches(belowLine));
+}
+
+TEST(QueryEvaluatorTest, MatchesJsonFieldNumericLessThan)
+{
+    IndexedLine matchLine;
+    matchLine.jsonFieldValues = {{"code", "5"}};
+
+    IndexedLine aboveLine;
+    aboveLine.jsonFieldValues = {{"code", "20"}};
+
+    const auto parsed = parseFilterQuery("code < 10");
+    ASSERT_TRUE(parsed);
+
+    const QueryEvaluator evaluator(*parsed);
+
+    EXPECT_TRUE(evaluator.matches(matchLine));
+    EXPECT_FALSE(evaluator.matches(aboveLine));
+}
+
+TEST(QueryEvaluatorTest, ExcludesNonNumericJsonFieldForOrderedComparison)
+{
+    IndexedLine line;
+    line.jsonFieldValues = {{"code", "not-a-number"}};
+
+    const auto parsed = parseFilterQuery("code > 10");
     ASSERT_TRUE(parsed);
 
     const QueryEvaluator evaluator(*parsed);
 
     EXPECT_FALSE(evaluator.matches(line));
+}
+
+TEST(QueryEvaluatorTest, MatchesJsonFieldEqualityRegression)
+{
+    IndexedLine line;
+    line.jsonFieldValues = {{"code", "10"}};
+
+    const auto equalParsed = parseFilterQuery("code == 10");
+    ASSERT_TRUE(equalParsed);
+
+    const QueryEvaluator equalEvaluator(*equalParsed);
+
+    EXPECT_TRUE(equalEvaluator.matches(line));
+
+    const auto notEqualParsed = parseFilterQuery("code != 10");
+    ASSERT_TRUE(notEqualParsed);
+
+    const QueryEvaluator notEqualEvaluator(*notEqualParsed);
+
+    EXPECT_FALSE(notEqualEvaluator.matches(line));
 }
