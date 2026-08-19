@@ -258,6 +258,11 @@ namespace
             return std::nullopt;
         }
 
+        if (!ftsContainsIsFaithful(node.argument()))
+        {
+            return std::nullopt;
+        }
+
         const std::string column = field == "message" ? "message" : "content";
 
         return std::optional<std::string>(buildFtsContainsSql(column, node.argument()));

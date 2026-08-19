@@ -25,6 +25,11 @@ namespace scope::storage
 /**
  * @brief Builds a SQL predicate for contains(message|content, term) pushdown.
  */
+/**
+ * @brief Returns true when FTS5 pushdown can match the same substrings as in-memory contains().
+ */
+[[nodiscard]] bool ftsContainsIsFaithful(std::string_view term) noexcept;
+
 [[nodiscard]] std::string buildFtsContainsSql(std::string_view column, std::string_view term);
 
 /**

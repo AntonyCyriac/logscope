@@ -10,6 +10,7 @@
 #include <sqlite3.h>
 
 #include "index_fingerprint.hpp"
+#include "query_evaluator.hpp"
 #include "query_parser.hpp"
 #include "query_planner.hpp"
 #include "sqlite_index_store.hpp"
@@ -18,6 +19,7 @@ using scope::analysis::DetectedLogLevel;
 using scope::analysis::IndexedLine;
 using scope::analysis::LogFormat;
 using scope::foundation::Path;
+using scope::query::QueryEvaluator;
 using scope::query::parseFilterQuery;
 using scope::storage::IndexFingerprint;
 using scope::storage::IndexMetadata;
@@ -230,6 +232,88 @@ TEST(SqliteIndexStoreFtsTest, BackfillsFtsOnOpenWhenMissing)
     const auto matches = sqliteStore->fetchLinesMatchingFts("timeout");
     ASSERT_TRUE(matches);
     ASSERT_EQ(1U, matches->size());
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(SqliteIndexStoreFtsTest, ContainsCjkUsesEvaluatorFallbackParity)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = writeTempSource(workspace, "fts source\n");
+    const Path databasePath = workspace.append("index.db");
+    const IndexMetadata metadata = makeMetadata(sourcePath);
+
+    const auto created = SqliteIndexStore::create(databasePath, metadata);
+    ASSERT_TRUE(created);
+
+    ASSERT_TRUE((*created)->appendLine(makeLine(1U, DetectedLogLevel::Info, "hello-world"), "hello-world"));
+    ASSERT_TRUE(
+        (*created)->appendLine(makeLine(2U, DetectedLogLevel::Info, "日本語トークン"), "日本語トークン"));
+    ASSERT_TRUE((*created)->finalize(2U));
+
+    const auto parsed = parseFilterQuery(R"(contains(message, "日本語"))");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+    EXPECT_FALSE(plan.has_value());
+
+    const auto opened = SqliteIndexStore::open(databasePath);
+    ASSERT_TRUE(opened);
+
+    const auto allLines = (*opened)->fetchAllLines();
+    ASSERT_TRUE(allLines);
+
+    const QueryEvaluator evaluator(*parsed);
+    std::size_t matchCount = 0U;
+
+    for (const IndexedLine& line : *allLines)
+    {
+        if (evaluator.matches(line))
+        {
+            ++matchCount;
+        }
+    }
+
+    EXPECT_EQ(1U, matchCount);
+
+    cleanupWorkspace(workspace);
+}
+
+TEST(SqliteIndexStoreFtsTest, CombinedCjkContainsUsesEvaluatorFallback)
+{
+    const Path workspace = testWorkspace();
+    const Path sourcePath = writeTempSource(workspace, "fts source\n");
+    const Path databasePath = workspace.append("index.db");
+    const IndexMetadata metadata = makeMetadata(sourcePath);
+
+    const auto created = SqliteIndexStore::create(databasePath, metadata);
+    ASSERT_TRUE(created);
+
+    ASSERT_TRUE((*created)->appendLine(makeLine(1U, DetectedLogLevel::Error, "日本語トークン"), "日本語トークン"));
+    ASSERT_TRUE((*created)->appendLine(makeLine(2U, DetectedLogLevel::Info, "日本語トークン"), "日本語トークン"));
+    ASSERT_TRUE((*created)->finalize(2U));
+
+    const auto parsed = parseFilterQuery(R"(level == ERROR AND contains(message, "日本語"))");
+    ASSERT_TRUE(parsed);
+
+    const auto plan = planQueryPushdown(*parsed);
+    EXPECT_FALSE(plan.has_value());
+
+    const auto allLines = (*created)->fetchAllLines();
+    ASSERT_TRUE(allLines);
+
+    const QueryEvaluator evaluator(*parsed);
+    std::size_t matchCount = 0U;
+
+    for (const IndexedLine& line : *allLines)
+    {
+        if (evaluator.matches(line))
+        {
+            ++matchCount;
+        }
+    }
+
+    EXPECT_EQ(1U, matchCount);
 
     cleanupWorkspace(workspace);
 }

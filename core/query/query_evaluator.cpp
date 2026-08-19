@@ -5,7 +5,10 @@
 #include "query_evaluator.hpp"
 
 #include <algorithm>
+#include <charconv>
+#include <cmath>
 
+#include "foundation/error.hpp"
 #include "foundation/string.hpp"
 #include "foundation/timestamp.hpp"
 
@@ -56,6 +59,64 @@ std::optional<foundation::Timestamp> literalTimestamp(const QueryValue& value)
            lower == "correlationid" || lower == "message" || lower == "content";
 }
 
+[[nodiscard]] bool isOrderedComparisonOperator(const ComparisonOperator comparisonOperator) noexcept
+{
+    switch (comparisonOperator)
+    {
+    case ComparisonOperator::Greater:
+    case ComparisonOperator::GreaterEqual:
+    case ComparisonOperator::Less:
+    case ComparisonOperator::LessEqual:
+        return true;
+    case ComparisonOperator::Equal:
+    case ComparisonOperator::NotEqual:
+        return false;
+    }
+
+    return false;
+}
+
+[[nodiscard]] bool tryParseJsonFieldNumber(const std::string_view text, double& value) noexcept
+{
+    if (text.empty())
+    {
+        return false;
+    }
+
+    const char* begin = text.data();
+    const char* end = begin + text.size();
+    const auto parsed = std::from_chars(begin, end, value);
+
+    if (parsed.ec != std::errc{} || parsed.ptr != end)
+    {
+        return false;
+    }
+
+    return std::isfinite(value);
+}
+
+[[nodiscard]] bool compareNumeric(const double actual, const double expected,
+                                  const ComparisonOperator comparisonOperator) noexcept
+{
+    switch (comparisonOperator)
+    {
+    case ComparisonOperator::Equal:
+        return actual == expected;
+    case ComparisonOperator::NotEqual:
+        return actual != expected;
+    case ComparisonOperator::Greater:
+        return actual > expected;
+    case ComparisonOperator::GreaterEqual:
+        return actual >= expected;
+    case ComparisonOperator::Less:
+        return actual < expected;
+    case ComparisonOperator::LessEqual:
+        return actual <= expected;
+    }
+
+    return false;
+}
+
 [[nodiscard]] std::optional<std::string_view> jsonFieldValue(const analysis::IndexedLine& line,
                                                                const std::string_view field) noexcept
 {
@@ -100,6 +161,23 @@ std::optional<foundation::Timestamp> literalTimestamp(const QueryValue& value)
         return false;
     }
 
+    if (isOrderedComparisonOperator(node.comparisonOperator()))
+    {
+        if (literal.kind() != QueryValue::Kind::Number)
+        {
+            return false;
+        }
+
+        double actualNumber = 0.0;
+
+        if (!tryParseJsonFieldNumber(*actual, actualNumber))
+        {
+            return false;
+        }
+
+        return compareNumeric(actualNumber, static_cast<double>(literal.numberValue()), node.comparisonOperator());
+    }
+
     switch (node.comparisonOperator())
     {
     case ComparisonOperator::Equal:
@@ -111,7 +189,60 @@ std::optional<foundation::Timestamp> literalTimestamp(const QueryValue& value)
     }
 }
 
+[[nodiscard]] foundation::Result<bool> validateFilterSemanticsNode(const QueryNode& node) noexcept
+{
+    switch (node.kind())
+    {
+    case QueryNode::Kind::MatchAll:
+        return foundation::Result<bool>(true);
+    case QueryNode::Kind::Comparison:
+        if (!isReservedComparisonField(node.field()) &&
+            isOrderedComparisonOperator(node.comparisonOperator()) &&
+            node.value().kind() == QueryValue::Kind::String)
+        {
+            return foundation::Result<bool>(foundation::Error(
+                foundation::ErrorCode::InvalidArgument,
+                "Ordered comparison on JSON field requires numeric literal"));
+        }
+
+        return foundation::Result<bool>(true);
+    case QueryNode::Kind::FunctionCall:
+        return foundation::Result<bool>(true);
+    case QueryNode::Kind::And:
+    {
+        const auto left = validateFilterSemanticsNode(*node.left());
+
+        if (!left)
+        {
+            return left;
+        }
+
+        return validateFilterSemanticsNode(*node.right());
+    }
+    case QueryNode::Kind::Or:
+    {
+        const auto left = validateFilterSemanticsNode(*node.left());
+
+        if (!left)
+        {
+            return left;
+        }
+
+        return validateFilterSemanticsNode(*node.right());
+    }
+    case QueryNode::Kind::Not:
+        return validateFilterSemanticsNode(*node.operand());
+    }
+
+    return foundation::Result<bool>(true);
+}
+
 } // namespace
+
+foundation::Result<bool> validateFilterSemantics(const QueryNode& root) noexcept
+{
+    return validateFilterSemanticsNode(root);
+}
 
 QueryEvaluator::QueryEvaluator(QueryNode root) noexcept : m_root(std::move(root)) {}
 
