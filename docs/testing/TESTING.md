@@ -15,7 +15,7 @@
 
 This document describes LogScope test layers, how to run them, and how they map to release quality gates (M5 production readiness through ongoing milestone delivery).
 
-**Current baseline:** **540+** automated tests through **`v2.13.0`** (adds integrity hardening cases in `scope_storage_tests` and `scope_plugin_tests`). Coverage includes `scope_application_tests` (M14 + `InvestigationControllerTest` link/suggestion APIs), `logscope_desktop_tests` (M14 GUI headless), `logscope_desktop_parity_test` (P2/P2.1 desktop Story Gate), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
+**Current baseline:** **550+** automated tests through **`v2.13.1`** (adds Query Trust QT.1–QT.6 in `scope_query_tests` and `scope_storage_tests`). Coverage includes `scope_application_tests` (M14 + `InvestigationControllerTest` link/suggestion APIs), `logscope_desktop_tests` (M14 GUI headless), `logscope_desktop_parity_test` (P2/P2.1 desktop Story Gate), web integration tests (M15), Playwright Story Gate E2E (Stories 1–6 + Crash Timeline), `scope_workspace_tests` (`crash.summary` timeline cases), `scope_ai_tests` (M13), `scope_plugin_tests` (M12), `scope_storage_tests`, persist-index/session-reuse e2e cases, CLI matrix scenarios (including `agent investigate`), AI/plugin regression guards, `query_filter_fuzz`, desktop CI smoke (`LOGSCOPE_DESKTOP`), and CI `license-scan`.
 
 ---
 

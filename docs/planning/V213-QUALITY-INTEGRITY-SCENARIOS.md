@@ -60,6 +60,21 @@ G0 answers this and charters the **minimum slice** for `v2.13.0`. Expected bias:
 
 ```text
 G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 ✅ v2.13.0
+
+## G0 Wave 2 — Query Trust (`v2.13.1`, approved 19-08-2026)
+
+| Issue | Subsystem | Summary | Gate |
+|-------|-----------|---------|------|
+| [#198](https://github.com/AntonyCyriac/logscope/issues/198) | query | JSON ordered comparisons silent zero | G3 ✅ |
+| [#197](https://github.com/AntonyCyriac/logscope/issues/197) | query | FTS `contains()` CJK divergence | G3 ✅ |
+
+Matrix: [`V213X-QUERY-TRUST-SCENARIOS.md`](V213X-QUERY-TRUST-SCENARIOS.md) · PR [#210](https://github.com/AntonyCyriac/logscope/pull/210) (`1c4bf28`).
+
+```text
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.1
+```
+
+**Deferred** (same milestone): #185–#187, #190–#196, #199–#201, #194 — see priority table below.
 ```
 
 ## Scenario matrix (Wave 1 — G3)

@@ -15,7 +15,7 @@
 
 Prioritized **documented** work not yet shipped, derived from the planning corpus (roadmap, M15 completion, post-M15 investigation stories). Use this to sequence releases after [M15](M15-WEB-PLATFORM.md).
 
-**Current public release:** `v2.13.0` (Quality & Integrity Wave 1 shipped). Phase A + P1 + P1.1 + P2 + P2.1 + H0 Wave 1 complete — see §5–§6.
+**Current public release:** `v2.13.1` (Query Trust Wave 2 shipped). Phase A + P1 + P1.1 + P2 + P2.1 + H0 Wave 1–2 complete — see §5–§6.
 
 ---
 
@@ -39,6 +39,7 @@ v2.11.0 → shipped (P2 desktop Timeline/Crash parity)
 v2.12.0 → shipped (P2.1 desktop Evidence/Suggestions)
 v2.12.1 → shipped (timeline refresh after pagination — #204)
 v2.13.0 → shipped (Quality & Integrity Wave 1 — #188 #189 #195 #203)
+v2.13.1 → shipped (Query Trust Wave 2 — #198 #197)
 Next    → #144-B when justified (§5) · deferred hardening backlog · P3 reactive (§5)
 ```
 
@@ -79,7 +80,7 @@ Next    → #144-B when justified (§5) · deferred hardening backlog · P3 reac
 | **P1.1** | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) | TID `symbol - /path` dialect; plugin hook deferred |
 | **P2** | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` | Qt Timeline + Crash via `InvestigationController`; matrix: [`V211-DESKTOP-PARITY-SCENARIOS.md`](V211-DESKTOP-PARITY-SCENARIOS.md) |
 | **P2.1** | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` | Related Evidence, suggestions, async refresh; matrix: [`V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md`](V212-DESKTOP-EVIDENCE-SUGGESTIONS-SCENARIOS.md) |
-| **H0** | Quality & Integrity hardening | **Shipped** — `v2.13.0` Wave 1 | [#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203); matrix: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) |
+| **H0** | Quality & Integrity hardening | **Shipped** — `v2.13.0` Wave 1 · `v2.13.1` Wave 2 (Query Trust [#198](https://github.com/AntonyCyriac/logscope/issues/198) [#197](https://github.com/AntonyCyriac/logscope/issues/197)) | matrices: [`V213-QUALITY-INTEGRITY-SCENARIOS.md`](V213-QUALITY-INTEGRITY-SCENARIOS.md) · [`V213X-QUERY-TRUST-SCENARIOS.md`](V213X-QUERY-TRUST-SCENARIOS.md) |
 | **#144-B** | `register_crash_analyzer` plugin hook | **Next** — architecture | [#144](https://github.com/AntonyCyriac/logscope/issues/144) Option B; charter when a real second analyzer/dialect should not live in core |
 | **P3** | Domain model + events (ADR-010 charter) | **Reactive** — not scheduled | Charter only when P2.1 or #144-B expose a decision that needs formalization; not a milestone on its own |
 | **P4** | Investigation Query Language | **Research only** | Questions to answer — don't build yet |

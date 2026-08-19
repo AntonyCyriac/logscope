@@ -12,6 +12,28 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.13.1] - 2026-08-19
+
+**Patch** — v2.13.x Query Trust hardening (Wave 2).
+
+### Fixed
+
+- **Query — JSON ordered comparisons** ([#198](https://github.com/AntonyCyriac/logscope/issues/198)) — `>`, `<`, `>=`, `<=` on JSON numeric fields; string-literal ordered ops rejected explicitly
+- **Query — FTS `contains()` CJK parity** ([#197](https://github.com/AntonyCyriac/logscope/issues/197)) — non-ASCII needles bypass unfaithful FTS5 pushdown; in-memory and persisted-index paths agree
+
+### Changed
+
+- Invalid JSON ordered filters (e.g. `service > "PCF"`) return an explicit error instead of silent zero matches
+
+### Notes
+
+- No investigation-domain, REST JSON, or desktop/web UX changes
+- ASCII `contains()` FTS pushdown unchanged
+
+See [v2.13.1 release notes](docs/release/v2.13.1-RELEASE-NOTES.md) · ADR-005-M10.1.
+
+---
+
 ## [2.13.0] - 2026-08-18
 
 **Minor** — v2.13.0 Quality & Integrity hardening (Wave 1).

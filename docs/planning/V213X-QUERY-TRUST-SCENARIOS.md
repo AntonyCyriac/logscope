@@ -4,11 +4,9 @@
 |-------|-------|
 | Document | Query Trust Scenario Matrix |
 | Category | Project Planning |
-| Version | 1.0.0 |
-| Status | **G1 approved** — Wave 2 chartered |
-| Created | 19-08-2026 |
-| Milestone | [v2.13.x — Quality & Integrity (deferred)](https://github.com/AntonyCyriac/logscope/milestone/1) |
-| ADR | [ADR-005-M10.1](../architecture/decisions/ADR-005-M10.1-Query-Trust.md) (Proposed) |
+| Version | 1.1.0 |
+| Status | **Shipped** — `v2.13.1` Wave 2 (`1c4bf28`) |
+| ADR | [ADR-005-M10.1](../architecture/decisions/ADR-005-M10.1-Query-Trust.md) (**Accepted**) |
 
 ---
 
@@ -30,11 +28,11 @@ Acceptance matrix for **Query Trust Wave 2** ([#198](https://github.com/AntonyCy
 
 | Issue | Subsystem | Summary | Gate |
 |-------|-----------|---------|------|
-| [#198](https://github.com/AntonyCyriac/logscope/issues/198) | query | JSON field `>` / `<` always match nothing | G3 QT.1–QT.3 |
-| [#197](https://github.com/AntonyCyriac/logscope/issues/197) | query | FTS5 `contains()` misses CJK | G3 QT.4–QT.6 |
+| [#198](https://github.com/AntonyCyriac/logscope/issues/198) | query | JSON field `>` / `<` always match nothing | G3 ✅ QT.1–QT.3 |
+| [#197](https://github.com/AntonyCyriac/logscope/issues/197) | query | FTS5 `contains()` misses CJK | G3 ✅ QT.4–QT.6 |
 
 ```text
-G0 ✅ → G1 ✅ → G2 → G3 → G4 → G5 v2.13.x
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.1
 ```
 
 ---
@@ -43,12 +41,12 @@ G0 ✅ → G1 ✅ → G2 → G3 → G4 → G5 v2.13.x
 
 | ID | Issue | Path | Memory | Persist-index | Test hook |
 |----|-------|------|--------|---------------|-----------|
-| QT.1 | #198 | `code > 10` on JSONL | Must match `code:20` line | **Same line numbers as memory** | `QueryEvaluatorTest` + `sqlite_index_store_json_fields_test` |
-| QT.2 | #198 | `code == 10`, `code != 10` | Unchanged | Same as memory | Regression |
-| QT.3 | #198 | `service > "PCF"` | **Error** (explicit reject) | **Error** (explicit reject) | `QueryEvaluatorTest` |
-| QT.4 | #197 | `contains(message, "日本語")` | 1 match | **Same count as memory** | `sqlite_index_store_fts_test` |
-| QT.5 | #197 | `contains(message, "timeout")` | 1 match | 1 match (FTS pushdown OK) | Regression |
-| QT.6 | — | `level == ERROR AND contains(message, "日本語")` | Composite match | **Same as memory** | Integration |
+| QT.1 | #198 | `code > 10` on JSONL | Must match `code:20` line | **Same line numbers as memory** | ✅ `QueryEvaluatorTest` + `JsonFieldOrderedComparisonUsesEvaluatorFallback` |
+| QT.2 | #198 | `code == 10`, `code != 10` | Unchanged | Same as memory | ✅ `MatchesJsonFieldEqualityRegression` |
+| QT.3 | #198 | `service > "PCF"` | **Error** (explicit reject) | **Error** (explicit reject) | ✅ `RejectsUnsupportedJsonFieldOperator` |
+| QT.4 | #197 | `contains(message, "日本語")` | 1 match | **Same count as memory** | ✅ `ContainsCjkUsesEvaluatorFallbackParity` |
+| QT.5 | #197 | `contains(message, "timeout")` | 1 match | 1 match (FTS pushdown OK) | ✅ `ContainsPushdownUsesFtsMatch` |
+| QT.6 | — | `level == ERROR AND contains(message, "日本語")` | Composite match | **Same as memory** | ✅ `CombinedCjkContainsUsesEvaluatorFallback` |
 
 ### QT.1 fixture (#198)
 
@@ -125,3 +123,4 @@ All other #185–#201, #199 — see [V213-QUALITY-INTEGRITY-SCENARIOS.md](V213-Q
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 19-08-2026 | G1 approved — Query Trust matrix for Wave 2 |
+| 1.1.0 | 19-08-2026 | G3/G4 — QT.1–QT.6 passed; shipped `v2.13.1` |
