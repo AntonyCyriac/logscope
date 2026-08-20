@@ -32,4 +32,8 @@ namespace scope::cli
                                                                 const configuration::ConfigurationManager&
                                                                     configurationManager);
 
+[[nodiscard]] scope::analysis::AnalysisConfig buildAnalysisConfig(const CompareOptions& options,
+                                                                const configuration::ConfigurationManager&
+                                                                    configurationManager);
+
 } // namespace scope::cli

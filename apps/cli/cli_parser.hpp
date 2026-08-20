@@ -51,7 +51,8 @@ enum class CliCommand
     InvestigationLinks,
     InvestigationSuggestions,
     AgentHelp,
-    AgentInvestigate
+    AgentInvestigate,
+    Compare
 };
 
 /**
@@ -70,6 +71,21 @@ struct AnalyzeOptions
     bool reuseIndex = false;
     std::optional<foundation::Path> indexPath;
     bool showStats = false;
+    bool noRecursive = false;
+    bool showHelp = false;
+};
+
+/**
+ * @brief Options for the compare command.
+ */
+struct CompareOptions
+{
+    foundation::Path baselinePath;
+    foundation::Path candidatePath;
+    foundation::Path configFile;
+    OutputFormat format = OutputFormat::Text;
+    analysis::LogFormat logFormat = analysis::LogFormat::Auto;
+    std::string profile;
     bool noRecursive = false;
     bool showHelp = false;
 };
@@ -299,6 +315,7 @@ struct ParsedCli
 {
     CliCommand command = CliCommand::Help;
     AnalyzeOptions analyze;
+    CompareOptions compare;
     InvestigateOptions investigate;
     InvestigateOptions search;
     InvestigateOptions query;

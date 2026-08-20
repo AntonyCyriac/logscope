@@ -6,6 +6,8 @@ add_executable(logscope
     log_analyzer.cpp
     agent_command.cpp
     analyze_command.cpp
+    compare_command.cpp
+    compare_output.cpp
     analytics_command.cpp
     analytics_output.cpp
     cli_analysis_config.cpp
@@ -33,6 +35,7 @@ target_link_libraries(logscope
         scope_application
         scope_analysis
         scope_analytics
+        scope_compare
         scope_configuration
         scope_extension
         scope_plugin
