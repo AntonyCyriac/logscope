@@ -93,10 +93,10 @@ G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.2
 |-------|-----------|---------|------|
 | ADR-014 | compare | Run alignment, signature diff, non-event absence | G3 ✅ |
 
-Matrix: [`V213Z-RUN-COMPARISON-SCENARIOS.md`](V213Z-RUN-COMPARISON-SCENARIOS.md) · PR [#216](https://github.com/AntonyCyriac/logscope/pull/216) (`b177073`).
+Matrix: [`V213Z-RUN-COMPARISON-SCENARIOS.md`](V213Z-RUN-COMPARISON-SCENARIOS.md) · PR [#216](https://github.com/AntonyCyriac/logscope/pull/216) (`bc7f8f0`).
 
 ```text
-G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.3
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 ✅ v2.13.3
 ```
 
 **Deferred** (same milestone): #185–#187, #190–#196, #199–#201, #194 — see priority table below.

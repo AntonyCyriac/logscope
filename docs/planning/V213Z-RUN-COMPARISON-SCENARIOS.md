@@ -4,8 +4,8 @@
 |-------|-------|
 | Document | Run Comparison Scenario Matrix |
 | Category | Project Planning |
-| Version | 1.2.0 |
-| Status | **G4 complete** — Wave 4 step 3 (`b177073` / `v2.13.3`, PR [#216](https://github.com/AntonyCyriac/logscope/pull/216)) |
+| Version | 1.3.0 |
+| Status | **Shipped** — Wave 4 step 3 (`bc7f8f0` / `v2.13.3`) |
 | ADR | [ADR-014](../architecture/decisions/ADR-014-Evidence-Run-Comparison.md) (**Accepted**) |
 
 ---
@@ -35,7 +35,7 @@ Incomparable runs MUST set comparable:false — never exit 0 with empty diff imp
 | 3 | Run comparison — align, diff, absence, incomparable | G3 RC.1–RC.8 |
 
 ```text
-G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.3
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 ✅ v2.13.3
 ```
 
 **Out of scope:** failure-shape steps 4–7; full ADR-012 envelope; #144-B; #185–#201; investigation UX.
@@ -124,3 +124,4 @@ candidate/inst-z/app.log
 | 1.0.0 | 20-08-2026 | G1 scenario matrix — Wave 4 step 3 |
 | 1.1.0 | 20-08-2026 | G3 integrity gates checked — RC.1–RC.8 pass |
 | 1.2.0 | 20-08-2026 | G4 — release notes + docs delta for `v2.13.3` |
+| 1.3.0 | 20-08-2026 | G5 — shipped `v2.13.3`; RC gates checked |
