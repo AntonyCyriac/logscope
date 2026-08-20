@@ -70,6 +70,7 @@ struct AnalyzeOptions
     bool reuseIndex = false;
     std::optional<foundation::Path> indexPath;
     bool showStats = false;
+    bool noRecursive = false;
     bool showHelp = false;
 };
 

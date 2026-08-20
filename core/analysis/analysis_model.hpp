@@ -16,6 +16,7 @@
 #include "line_index.hpp"
 #include "log_format.hpp"
 #include "log_level_counts.hpp"
+#include "discovery_census.hpp"
 
 namespace scope::analysis
 {
@@ -39,7 +40,9 @@ class AnalysisModel
                   std::optional<JsonLinesSummary> jsonLinesSummary = std::nullopt,
                   std::optional<FieldSummary> fieldSummary = std::nullopt,
                   std::optional<LineIndex> lineIndex = std::nullopt,
-                  storage::IndexStorePtr indexStore = nullptr) noexcept;
+                  storage::IndexStorePtr indexStore = nullptr,
+                  std::optional<source::DiscoveryCensus> discoveryCensus = std::nullopt,
+                  std::optional<source::AnalysisAccounting> analysisAccounting = std::nullopt) noexcept;
 
     /**
      * @brief Returns the path of the analyzed source.
@@ -86,6 +89,10 @@ class AnalysisModel
      */
     [[nodiscard]] bool hasQueryableIndex() const noexcept;
 
+    [[nodiscard]] const std::optional<source::DiscoveryCensus>& discoveryCensus() const noexcept;
+
+    [[nodiscard]] const std::optional<source::AnalysisAccounting>& analysisAccounting() const noexcept;
+
   private:
     foundation::Path m_sourcePath;
     std::uint64_t m_totalLines;
@@ -95,6 +102,8 @@ class AnalysisModel
     std::optional<FieldSummary> m_fieldSummary;
     std::optional<LineIndex> m_lineIndex;
     storage::IndexStorePtr m_indexStore;
+    std::optional<source::DiscoveryCensus> m_discoveryCensus;
+    std::optional<source::AnalysisAccounting> m_analysisAccounting;
 };
 
 } // namespace scope::analysis

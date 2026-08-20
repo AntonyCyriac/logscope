@@ -11,8 +11,9 @@ namespace scope::storage
 {
 
 constexpr int kIndexSchemaVersionV1 = 1;
-constexpr int kIndexSchemaVersionCurrent = 2;
-constexpr int kIndexSchemaVersionMaxSupported = 2;
+constexpr int kIndexSchemaVersionV2 = 2;
+constexpr int kIndexSchemaVersionCurrent = 3;
+constexpr int kIndexSchemaVersionMaxSupported = 3;
 
 /**
  * @brief Returns true when an open failure indicates a full rebuild from source is required.

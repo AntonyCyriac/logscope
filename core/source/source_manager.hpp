@@ -5,6 +5,7 @@
 
 #pragma once
 
+#include "discovery_census.hpp"
 #include "foundation/path.hpp"
 #include "foundation/result.hpp"
 #include "source_dataset.hpp"
@@ -19,27 +20,11 @@ namespace scope::source
 class SourceManager
 {
   public:
-    /**
-     * @brief Validates that a log source exists and is supported.
-     *
-     * Accepts a file path, directory containing .log files, or "-" for stdin.
-     *
-     * @param path Path to the log source.
-     * @return true if the source is valid.
-     */
-    [[nodiscard]] foundation::Result<bool> validate(const foundation::Path& path) const;
+    [[nodiscard]] foundation::Result<bool> validate(const foundation::Path& path,
+                                                   const DiscoveryOptions& options = {}) const;
 
-    /**
-     * @brief Opens a log source and returns a prepared dataset.
-     *
-     * @param path Path to a file, directory, or "-" for stdin.
-     * @return Source dataset or error.
-     */
     [[nodiscard]] foundation::Result<SourceDataset> open(const foundation::Path& path) const;
 
-    /**
-     * @brief Opens a log source with options (e.g. live tail follow).
-     */
     [[nodiscard]] foundation::Result<SourceDataset> open(const foundation::Path& path, OpenOptions options) const;
 };
 

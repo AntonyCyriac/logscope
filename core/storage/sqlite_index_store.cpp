@@ -222,6 +222,8 @@ CREATE TABLE IF NOT EXISTS meta (
 CREATE TABLE IF NOT EXISTS lines (
   id INTEGER PRIMARY KEY,
   line_number INTEGER NOT NULL,
+  source_file TEXT NOT NULL DEFAULT '',
+  file_line_number INTEGER NOT NULL DEFAULT 0,
   level INTEGER NOT NULL,
   timestamp_unix INTEGER,
   message TEXT NOT NULL,
@@ -323,28 +325,37 @@ CREATE TABLE IF NOT EXISTS query_cache (
 {
     analysis::IndexedLine line{};
     line.lineNumber = static_cast<std::uint64_t>(sqlite3_column_int64(statement, 1));
-    line.level = levelFromInt(sqlite3_column_int(statement, 2));
 
-    if (sqlite3_column_type(statement, 3) != SQLITE_NULL)
+    const unsigned char* sourceFile = sqlite3_column_text(statement, 2);
+
+    if (sourceFile != nullptr)
     {
-        line.timestamp = foundation::Timestamp::fromUnixSeconds(sqlite3_column_int64(statement, 3));
+        line.sourceFileRelative = reinterpret_cast<const char*>(sourceFile);
     }
 
-    const unsigned char* message = sqlite3_column_text(statement, 4);
-    const unsigned char* correlationId = sqlite3_column_text(statement, 6);
-    const unsigned char* keys = sqlite3_column_text(statement, 7);
+    line.fileLineNumber = static_cast<std::uint64_t>(sqlite3_column_int64(statement, 3));
+    line.level = levelFromInt(sqlite3_column_int(statement, 4));
+
+    if (sqlite3_column_type(statement, 5) != SQLITE_NULL)
+    {
+        line.timestamp = foundation::Timestamp::fromUnixSeconds(sqlite3_column_int64(statement, 5));
+    }
+
+    const unsigned char* message = sqlite3_column_text(statement, 6);
+    const unsigned char* correlationId = sqlite3_column_text(statement, 8);
+    const unsigned char* keys = sqlite3_column_text(statement, 9);
 
     if (message != nullptr)
     {
         line.messageExcerpt = reinterpret_cast<const char*>(message);
     }
 
-    const int contentType = sqlite3_column_type(statement, 5);
+    const int contentType = sqlite3_column_type(statement, 7);
 
     if (contentType == SQLITE_BLOB)
     {
-        const void* blob = sqlite3_column_blob(statement, 5);
-        const int blobSize = sqlite3_column_bytes(statement, 5);
+        const void* blob = sqlite3_column_blob(statement, 7);
+        const int blobSize = sqlite3_column_bytes(statement, 7);
         const auto decompressed = decompressZlib(blob, static_cast<std::size_t>(blobSize));
 
         if (!decompressed)
@@ -356,7 +367,7 @@ CREATE TABLE IF NOT EXISTS query_cache (
     }
     else if (contentType == SQLITE_TEXT)
     {
-        const unsigned char* content = sqlite3_column_text(statement, 5);
+        const unsigned char* content = sqlite3_column_text(statement, 7);
 
         if (content != nullptr)
         {
@@ -649,7 +660,8 @@ fetchLinesByLineNumbers(sqlite3* database, const std::vector<std::uint64_t>& lin
     }
 
     std::string sql =
-        "SELECT id, line_number, level, timestamp_unix, message, content, correlation_id, top_level_keys_json "
+        "SELECT id, line_number, source_file, file_line_number, level, timestamp_unix, message, content, "
+        "correlation_id, top_level_keys_json "
         "FROM lines WHERE line_number IN (";
 
     for (std::size_t index = 0U; index < lineNumbers.size(); ++index)
@@ -868,8 +880,8 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
     if (m_impl->insertStatement == nullptr)
     {
         const char* sql =
-            "INSERT INTO lines(line_number, level, timestamp_unix, message, content, correlation_id, "
-            "top_level_keys_json) VALUES(?, ?, ?, ?, ?, ?, ?);";
+            "INSERT INTO lines(line_number, source_file, file_line_number, level, timestamp_unix, message, content, "
+            "correlation_id, top_level_keys_json) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
         if (sqlite3_prepare_v2(m_impl->database, sql, -1, &m_impl->insertStatement, nullptr) != SQLITE_OK)
         {
@@ -883,18 +895,20 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
     sqlite3_clear_bindings(statement);
 
     sqlite3_bind_int64(statement, 1, static_cast<sqlite3_int64>(line.lineNumber));
-    sqlite3_bind_int(statement, 2, levelToInt(line.level));
+    sqlite3_bind_text(statement, 2, line.sourceFileRelative.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_int64(statement, 3, static_cast<sqlite3_int64>(line.fileLineNumber));
+    sqlite3_bind_int(statement, 4, levelToInt(line.level));
 
     if (line.timestamp.has_value())
     {
-        sqlite3_bind_int64(statement, 3, static_cast<sqlite3_int64>(line.timestamp->unixSeconds()));
+        sqlite3_bind_int64(statement, 5, static_cast<sqlite3_int64>(line.timestamp->unixSeconds()));
     }
     else
     {
-        sqlite3_bind_null(statement, 3);
+        sqlite3_bind_null(statement, 5);
     }
 
-    sqlite3_bind_text(statement, 4, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 6, line.messageExcerpt.c_str(), -1, SQLITE_TRANSIENT);
 
     if (m_impl->compressContent && !m_impl->compressionAdaptiveDisabled &&
         fullContent.size() >= m_impl->compressThresholdBytes)
@@ -911,12 +925,12 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
         if (compressed->size() < fullContent.size())
         {
             ++m_impl->compressionWins;
-            sqlite3_bind_blob(statement, 5, compressed->data(), static_cast<int>(compressed->size()),
+            sqlite3_bind_blob(statement, 7, compressed->data(), static_cast<int>(compressed->size()),
                               SQLITE_TRANSIENT);
         }
         else
         {
-            sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()),
+            sqlite3_bind_text(statement, 7, fullContent.data(), static_cast<int>(fullContent.size()),
                               SQLITE_TRANSIENT);
         }
 
@@ -928,12 +942,12 @@ foundation::Result<bool> SqliteIndexStore::bindAndInsertLine(const analysis::Ind
     }
     else
     {
-        sqlite3_bind_text(statement, 5, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
+        sqlite3_bind_text(statement, 7, fullContent.data(), static_cast<int>(fullContent.size()), SQLITE_TRANSIENT);
     }
 
-    sqlite3_bind_text(statement, 6, line.correlationId.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 8, line.correlationId.c_str(), -1, SQLITE_TRANSIENT);
     const std::string keys = joinKeys(line.topLevelKeys);
-    sqlite3_bind_text(statement, 7, keys.c_str(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(statement, 9, keys.c_str(), -1, SQLITE_TRANSIENT);
 
     const int stepResult = sqlite3_step(statement);
 
@@ -1462,8 +1476,8 @@ foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchAl
 foundation::Result<std::vector<analysis::IndexedLine>> SqliteIndexStore::fetchLinesWhere(
     const std::string& sqlWhereClause) const
 {
-    const std::string sql = "SELECT id, line_number, level, timestamp_unix, message, content, correlation_id, "
-                            "top_level_keys_json FROM lines WHERE " +
+    const std::string sql = "SELECT id, line_number, source_file, file_line_number, level, timestamp_unix, message, "
+                            "content, correlation_id, top_level_keys_json FROM lines WHERE " +
                             sqlWhereClause + " ORDER BY line_number;";
 
     sqlite3_stmt* statement = nullptr;

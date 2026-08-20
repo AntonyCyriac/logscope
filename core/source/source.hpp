@@ -6,6 +6,7 @@
 #pragma once
 
 #include "composite_log_source.hpp"
+#include "discovery_census.hpp"
 #include "file_log_source.hpp"
 #include "log_source.hpp"
 #include "source_dataset.hpp"

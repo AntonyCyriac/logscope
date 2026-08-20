@@ -35,6 +35,8 @@ struct IndexedLine
     IndexedLine& operator=(IndexedLine&&) noexcept = default;
 
     std::uint64_t lineNumber{0U};
+    std::string sourceFileRelative;
+    std::uint64_t fileLineNumber{0U};
     DetectedLogLevel level{DetectedLogLevel::Other};
     std::optional<foundation::Timestamp> timestamp;
     std::string messageExcerpt;

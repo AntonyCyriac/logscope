@@ -359,6 +359,13 @@ std::optional<AnalyzeOptions> parseAnalyzeArguments(int argc, char* argv[], int 
             continue;
         }
 
+        if (argument == "--no-recursive")
+        {
+            options.noRecursive = true;
+
+            continue;
+        }
+
         if (argument == "--sections")
         {
             if (index + 1 >= argc)
