@@ -297,14 +297,18 @@ foundation::Result<DiscoveryScanResult> discoverSource(const foundation::Path& r
 
         IngestFile file;
         file.relativePath = entry.relativePath;
-        file.absolutePath = root;
+        file.instanceKey = entry.instanceKey;
 
-        if (root.string() != entry.relativePath)
+        if (*isFileResult)
         {
-            file.absolutePath = foundation::Path((std::filesystem::path(root.string()) / entry.relativePath).string());
+            file.absolutePath = root;
+        }
+        else
+        {
+            file.absolutePath =
+                foundation::Path((std::filesystem::path(root.string()) / entry.relativePath).string());
         }
 
-        file.instanceKey = entry.instanceKey;
         textCandidates.push_back(std::move(file));
     }
 

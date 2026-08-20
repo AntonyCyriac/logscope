@@ -117,6 +117,22 @@ TEST(SourceDiscoveryTest, AllSkippedIndeterminate)
     std::filesystem::remove_all(directory.string());
 }
 
+TEST(SourceDiscoveryTest, SingleFileRootUsesAbsolutePath)
+{
+    const Path file(logscope::gtest::uniqueTestPath("_single.log"));
+
+    writeTextFile(file, "one line\n");
+
+    const auto result = discoverSource(file, DiscoveryOptions{});
+
+    ASSERT_TRUE(result.hasValue());
+    ASSERT_EQ(1U, result->ingestStreams.size());
+    ASSERT_EQ(1U, result->ingestStreams.front().orderedFiles.size());
+    EXPECT_EQ(file.string(), result->ingestStreams.front().orderedFiles.front().absolutePath.string());
+
+    std::remove(file.string().c_str());
+}
+
 TEST(SourceDiscoveryTest, ArchivePathRejected)
 {
     const Path archivePath(logscope::gtest::uniqueTestPath(".tar.gz"));
