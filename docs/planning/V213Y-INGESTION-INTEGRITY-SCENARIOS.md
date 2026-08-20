@@ -127,7 +127,7 @@ bundle/inst-b/service.log
 
 | ID | Scenario |
 |----|----------|
-| NG.1 | Run comparison (good vs bad) |
+| NG.1 | Run comparison (good vs bad) | **Wave 4** — see [`V213Z-RUN-COMPARISON-SCENARIOS.md`](V213Z-RUN-COMPARISON-SCENARIOS.md) |
 | NG.2 | Trigger vs cascade ranking |
 | NG.3 | Numeric aggregation / percentiles |
 | NG.4 | ADR-012 full envelope on all CLI commands |
