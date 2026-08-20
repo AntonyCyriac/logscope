@@ -12,6 +12,31 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.13.2] - 2026-08-20
+
+**Patch** — v2.13.x Ingestion Integrity hardening (Wave 3, steps 1–2).
+
+### Added
+
+- **Discovery census** — recursive content-informed directory walk; per-candidate disposition and skip reasons; rotation streams and instance grouping
+- **File identity** — per-line `sourceFileRelative` / `fileLineNumber`; index schema **v3** persists attribution
+- **JSON reporting** — `sourceMetadata.discovery` and `sourceMetadata.analysis` on analyze output
+- **CLI** — `--no-recursive`; exit **2** when all candidates skipped; archive paths fail with extract message
+
+### Changed
+
+- Directory ingest is recursive and content-informed (not `.log`-only)
+- Some previously succeeding invocations exit **2** when nothing could be ingested (intended)
+
+### Notes
+
+- No investigation-domain, REST, or desktop/web UX changes
+- v2 index databases rebuild on next analyze (schema v3)
+
+See [v2.13.2 release notes](docs/release/v2.13.2-RELEASE-NOTES.md) · ADR-013.
+
+---
+
 ## [2.13.1] - 2026-08-19
 
 **Patch** — v2.13.x Query Trust hardening (Wave 2).

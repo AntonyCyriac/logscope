@@ -5,7 +5,7 @@
 | Document | Ingestion Integrity Scenario Matrix |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | **G1 approved** — Wave 3 steps 1–2 (implementation pending) |
+| Status | **Shipped** — Wave 3 steps 1–2 (`d951ddd` / `v2.13.2`) |
 | ADR | [ADR-013](../architecture/decisions/ADR-013-Evidence-Ingestion-Integrity.md) (**Accepted**) |
 
 ---
@@ -37,7 +37,7 @@ Discovered and analyzed MUST remain separate facts.
 | 2 | File identity + instance grouping | G3 II.4–II.5 |
 
 ```text
-G0 ✅ → G1 ✅ → G2 ⏳ → G3 → G4 → G5 v2.13.x
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.2
 ```
 
 **Out of scope:** failure-shape steps 3–7; full ADR-012 envelope; #144-B; remaining #185–#201.
@@ -106,20 +106,20 @@ bundle/inst-b/service.log
 
 **Discover/analyze separation:**
 
-- [ ] `DiscoveryCensus` built before first full-file parse line
-- [ ] `sourceMetadata.discovery` present on `--format json` analyze output
-- [ ] `sourceMetadata.analysis` separate from discovery counts
-- [ ] Success exit 0 with `complete:false` possible when skips occurred
+- [x] `DiscoveryCensus` built before first full-file parse line
+- [x] `sourceMetadata.discovery` present on `--format json` analyze output
+- [x] `sourceMetadata.analysis` separate from discovery counts
+- [x] Success exit 0 with `complete:false` possible when skips occurred
 
 **Identity gate:**
 
-- [ ] Persisted index schema v3 stores `source_file` + `file_line_number`
-- [ ] Reuse index on v2 databases triggers rebuild or fail-closed per ADR-005
+- [x] Persisted index schema v3 stores `source_file` + `file_line_number`
+- [x] Reuse index on v2 databases triggers rebuild or fail-closed per ADR-005
 
 **Exit code gate:**
 
-- [ ] All candidates skipped → exit **2** (not 0)
-- [ ] Archive at root → exit **1**
+- [x] All candidates skipped → exit **2** (not 0)
+- [x] Archive at root → exit **1**
 
 ---
 
@@ -142,4 +142,5 @@ bundle/inst-b/service.log
 
 | Version | Date | Description |
 |---------|------|-------------|
+| 1.1.0 | 20-08-2026 | G4 — shipped `v2.13.2`; II gates checked |
 | 1.0.0 | 19-08-2026 | G1 scenario matrix — Wave 3 steps 1–2 |
