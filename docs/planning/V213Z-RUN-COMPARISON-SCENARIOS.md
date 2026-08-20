@@ -5,7 +5,7 @@
 | Document | Run Comparison Scenario Matrix |
 | Category | Project Planning |
 | Version | 1.0.0 |
-| Status | **G1 approved** — Wave 4 step 3 (implementation pending) |
+| Status | **G3 passed** — Wave 4 step 3 (merge pending review on [#216](https://github.com/AntonyCyriac/logscope/pull/216)) |
 | ADR | [ADR-014](../architecture/decisions/ADR-014-Evidence-Run-Comparison.md) (**Accepted**) |
 
 ---
@@ -35,7 +35,7 @@ Incomparable runs MUST set comparable:false — never exit 0 with empty diff imp
 | 3 | Run comparison — align, diff, absence, incomparable | G3 RC.1–RC.8 |
 
 ```text
-G0 ✅ → G1 ✅ → G2 ⏳ → G3 → G4 → G5 v2.13.x
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 → G5 v2.13.x
 ```
 
 **Out of scope:** failure-shape steps 4–7; full ADR-012 envelope; #144-B; #185–#201; investigation UX.
@@ -94,11 +94,11 @@ candidate/inst-z/app.log
 
 ## Integrity gates (G3 blocking)
 
-- [ ] `logscope compare` exists; roles baseline/candidate explicit
-- [ ] JSON `data.comparison.comparable` present on `--format json`
-- [ ] `onlyInBaseline` / `onlyInCandidate` / `countDeltas` on comparable runs
-- [ ] Incomparable → exit **2**, not exit **0** with empty arrays implying match
-- [ ] Alignment uses `instanceKey` + `sourceFileRelative` (no stream-line join)
+- [x] `logscope compare` exists; roles baseline/candidate explicit
+- [x] JSON `data.comparison.comparable` present on `--format json`
+- [x] `onlyInBaseline` / `onlyInCandidate` / `countDeltas` on comparable runs
+- [x] Incomparable → exit **2**, not exit **0** with empty arrays implying match
+- [x] Alignment uses `instanceKey` + `sourceFileRelative` (no stream-line join)
 
 ---
 
@@ -122,3 +122,4 @@ candidate/inst-z/app.log
 | Version | Date | Description |
 |---------|------|-------------|
 | 1.0.0 | 20-08-2026 | G1 scenario matrix — Wave 4 step 3 |
+| 1.1.0 | 20-08-2026 | G3 integrity gates checked — RC.1–RC.8 pass |
