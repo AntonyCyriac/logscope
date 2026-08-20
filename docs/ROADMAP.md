@@ -64,7 +64,7 @@ M13 ██████████ 100%  (v1.5.1 released)
 P1  ██████████ 100%  (v1.5.2 released — stabilize v1.x)
 ```
 
-**Current release:** [`v2.13.1`](CHANGELOG.md) — Query Trust (Wave 2). Stories 1–6 + P1 + P1.1 + P2 + P2.1 + H0 Wave 1–2 shipped. **Next:** **#144-B** when justified · deferred hardening backlog — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
+**Current release:** [`v2.13.2`](CHANGELOG.md) — Ingestion Integrity (Wave 3). Stories 1–6 + P1 + P1.1 + P2 + P2.1 + H0 Wave 1–3 shipped. **Next:** **#144-B** when justified · deferred hardening backlog — see [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md).
 
 See [Next Value-Add Backlog](planning/NEXT-VALUE-ADD.md) for prioritized planning across the corpus.
 
