@@ -5,6 +5,7 @@
 
 #include "analysis_engine.hpp"
 
+#include <algorithm>
 #include <string>
 #include <optional>
 #include <vector>
@@ -13,6 +14,8 @@
 #include "analysis_stats.hpp"
 #include "field_summary.hpp"
 #include "format_detector.hpp"
+#include "attributed_ingest_source.hpp"
+#include "discovery_census.hpp"
 #include "foundation/error.hpp"
 #include "hybrid_index_writer.hpp"
 #include "index_fingerprint.hpp"
@@ -75,7 +78,8 @@ IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLe
                              const std::optional<foundation::Timestamp>& timestamp,
                              const std::string_view messageExcerpt, const std::string_view correlationId,
                              const std::string_view content, std::vector<std::string> topLevelKeys,
-                             std::vector<std::pair<std::string, std::string>> jsonFieldValues = {}) noexcept
+                             std::vector<std::pair<std::string, std::string>> jsonFieldValues = {},
+                             const source::LineAttribution* attribution = nullptr) noexcept
 {
     IndexedLine indexedLine;
     indexedLine.lineNumber = lineNumber;
@@ -87,23 +91,31 @@ IndexedLine buildIndexedLine(const std::uint64_t lineNumber, const DetectedLogLe
     indexedLine.topLevelKeys = std::move(topLevelKeys);
     indexedLine.jsonFieldValues = std::move(jsonFieldValues);
 
+    if (attribution != nullptr)
+    {
+        indexedLine.sourceFileRelative = attribution->sourceFileRelative;
+        indexedLine.fileLineNumber = attribution->fileLineNumber;
+        indexedLine.lineNumber = attribution->streamLineNumber;
+    }
+
     return indexedLine;
 }
 
 foundation::Result<bool> indexPlainTextLine(const std::uint64_t lineNumber, const std::string& line,
-                                            const DetectedLogLevel level, HybridIndexWriter& writer)
+                                            const DetectedLogLevel level, HybridIndexWriter& writer,
+                                            const source::LineAttribution* attribution = nullptr)
 {
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     const std::string correlationId = extractCorrelationId(line, std::string_view{});
 
     return writer.tryAddLine(buildIndexedLine(lineNumber, level, fields.timestamp, fields.messageExcerpt, correlationId,
-                                              line, {}),
+                                              line, {}, {}, attribution),
                              line);
 }
 
 foundation::Result<bool> indexJsonLine(const std::uint64_t lineNumber, const std::string& line,
                                        const JsonLineParseResult& parsed, const DetectedLogLevel level,
-                                       HybridIndexWriter& writer)
+                                       HybridIndexWriter& writer, const source::LineAttribution* attribution = nullptr)
 {
     std::optional<foundation::Timestamp> timestamp;
 
@@ -120,13 +132,13 @@ foundation::Result<bool> indexJsonLine(const std::uint64_t lineNumber, const std
     const std::string correlationId = extractCorrelationId(line, parsed.correlationValue);
 
     return writer.tryAddLine(buildIndexedLine(lineNumber, level, timestamp, parsed.messageValue, correlationId, line,
-                                              parsed.topLevelKeys, parsed.topLevelFieldValues),
+                                              parsed.topLevelKeys, parsed.topLevelFieldValues, attribution),
                              line);
 }
 
 foundation::Result<bool> analyzePlainTextLine(const std::string& line, const std::uint64_t lineNumber,
                                               LogLevelCounts& levelCounts, FieldSummary& fieldSummary,
-                                              HybridIndexWriter& writer)
+                                              HybridIndexWriter& writer, const source::LineAttribution* attribution)
 {
     const DetectedLogLevel level = detectLogLevel(line);
     recordLevel(levelCounts, level);
@@ -134,13 +146,13 @@ foundation::Result<bool> analyzePlainTextLine(const std::string& line, const std
     const PlainTextFields fields = PlainTextFieldExtractor::extract(line);
     recordExtractedFields(fieldSummary, fields.timestamp, fields.messageExcerpt);
 
-    return indexPlainTextLine(lineNumber, line, level, writer);
+    return indexPlainTextLine(lineNumber, line, level, writer, attribution);
 }
 
 foundation::Result<bool> analyzeJsonLine(const std::string& line, const std::uint64_t lineNumber,
                                          LogLevelCounts& levelCounts, JsonLinesSummary& summary,
                                          FieldSummary& fieldSummary, HybridIndexWriter& writer,
-                                         const JsonFieldMapping& mapping)
+                                         const JsonFieldMapping& mapping, const source::LineAttribution* attribution)
 {
     const JsonLineParseResult parsed = JsonLinesParser::parse(line, mapping);
 
@@ -156,7 +168,7 @@ foundation::Result<bool> analyzeJsonLine(const std::string& line, const std::uin
         summary.recordParseFailure();
         levelCounts.recordOther();
 
-        return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
+        return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer, attribution);
     }
 
     summary.recordValidLine(parsed.topLevelKeys);
@@ -195,13 +207,14 @@ foundation::Result<bool> analyzeJsonLine(const std::string& line, const std::uin
         recordExtractedFields(fieldSummary, timestamp, std::string_view{});
     }
 
-    return indexJsonLine(lineNumber, line, parsed, level, writer);
+    return indexJsonLine(lineNumber, line, parsed, level, writer, attribution);
 }
 
 foundation::Result<bool> analyzeLine(const std::string& line, const std::uint64_t lineNumber, const LogFormat format,
                                    LogLevelCounts& levelCounts, JsonLinesSummary* jsonSummary,
                                    FieldSummary& fieldSummary, HybridIndexWriter& writer,
-                                   const JsonFieldMapping& mapping, const FormatParser* pluginParser)
+                                   const JsonFieldMapping& mapping, const FormatParser* pluginParser,
+                                   const source::LineAttribution* attribution)
 {
     if (pluginParser != nullptr)
     {
@@ -218,7 +231,7 @@ foundation::Result<bool> analyzeLine(const std::string& line, const std::uint64_
         {
             levelCounts.recordOther();
 
-            return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer);
+            return indexPlainTextLine(lineNumber, line, DetectedLogLevel::Other, writer, attribution);
         }
 
         DetectedLogLevel level = DetectedLogLevel::Other;
@@ -255,15 +268,15 @@ foundation::Result<bool> analyzeLine(const std::string& line, const std::uint64_
             recordExtractedFields(fieldSummary, timestamp, std::string_view{});
         }
 
-        return indexJsonLine(lineNumber, line, parsed, level, writer);
+        return indexJsonLine(lineNumber, line, parsed, level, writer, attribution);
     }
 
     if (format == LogFormat::JsonLines && jsonSummary != nullptr)
     {
-        return analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping);
+        return analyzeJsonLine(line, lineNumber, levelCounts, *jsonSummary, fieldSummary, writer, mapping, attribution);
     }
 
-    return analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer);
+    return analyzePlainTextLine(line, lineNumber, levelCounts, fieldSummary, writer, attribution);
 }
 
 void trackSanitizedLine(std::string& line, std::size_t& sanitizedLineCount) noexcept
@@ -284,6 +297,75 @@ void warnSanitizedLines(const std::size_t sanitizedLineCount) noexcept
     SCOPE_LOG_WARN("analysis",
                    "Removed non-text bytes from " + std::to_string(sanitizedLineCount) +
                        " log line(s); affected content was sanitized.");
+}
+
+[[nodiscard]] std::optional<source::LineAttribution> currentLineAttribution(source::LogSource& logSource) noexcept
+{
+    if (const source::AttributedIngestSource* attributed = source::asAttributedLogSource(logSource))
+    {
+        return attributed->lastLineAttribution();
+    }
+
+    return std::nullopt;
+}
+
+void updateAnalysisAccounting(source::SourceDataset& dataset, const source::LineAttribution& attribution)
+{
+    source::AnalysisAccounting& accounting = dataset.analysisAccounting();
+
+    auto fileIt = std::find_if(accounting.perFile.begin(), accounting.perFile.end(),
+                               [&](const source::PerFileAnalysis& entry) {
+                                   return entry.relativePath == attribution.sourceFileRelative;
+                               });
+
+    if (fileIt == accounting.perFile.end())
+    {
+        source::PerFileAnalysis entry;
+        entry.relativePath = attribution.sourceFileRelative;
+        accounting.perFile.push_back(std::move(entry));
+        fileIt = accounting.perFile.end() - 1;
+    }
+
+    ++fileIt->linesIngested;
+    ++fileIt->linesAnalyzed;
+}
+
+[[nodiscard]] AnalysisModel buildAnalysisModel(source::SourceDataset& dataset, const std::uint64_t totalLines,
+                                               LogLevelCounts levelCounts, LogFormat resolvedFormat,
+                                               std::optional<JsonLinesSummary> jsonLinesSummary,
+                                               std::optional<FieldSummary> fieldSummary, LineIndex lineIndex,
+                                               storage::IndexStorePtr indexStore)
+{
+    source::AnalysisAccounting accounting = dataset.analysisAccounting();
+    accounting.streamLineCount = totalLines;
+    accounting.analyzedLineCount = totalLines;
+
+    if (fieldSummary.has_value() && resolvedFormat == LogFormat::PlainText && totalLines > 0U &&
+        fieldSummary->linesWithTimestamp() == 0U)
+    {
+        accounting.complete = false;
+        accounting.warnings.push_back(source::IngestionWarning{
+            "UNKNOWN_TIMESTAMP_DIALECT",
+            "One or more ingested files yielded no parseable timestamps; timestamp dialect may be unknown."});
+    }
+
+    std::optional<source::DiscoveryCensus> discovery;
+
+    if (dataset.hasDiscoveryCensus())
+    {
+        discovery = dataset.discoveryCensus();
+    }
+
+    return AnalysisModel(dataset.path(),
+                         totalLines,
+                         levelCounts,
+                         resolvedFormat,
+                         std::move(jsonLinesSummary),
+                         std::move(fieldSummary),
+                         std::make_optional(std::move(lineIndex)),
+                         indexStore,
+                         std::move(discovery),
+                         std::move(accounting));
 }
 
 [[nodiscard]] foundation::Result<LogFormat> resolveFormat(const FormatDetectionResult& detection,
@@ -452,7 +534,13 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
     {
         SCOPE_LOG_INFO("analysis", "Analyzing source: " + dataset.path().string());
 
-        std::vector<std::string> sampleLines;
+        struct SampleLine
+        {
+            std::string text;
+            std::optional<source::LineAttribution> attribution;
+        };
+
+        std::vector<SampleLine> sampleLines;
         sampleLines.reserve(FormatDetector::defaultSampleLineLimit);
 
         while (sampleLines.size() < FormatDetector::defaultSampleLineLimit)
@@ -471,10 +559,26 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 break;
             }
 
-            sampleLines.push_back(line);
+            SampleLine sample;
+            sample.text = line;
+
+            if (const std::optional<source::LineAttribution> attribution = currentLineAttribution(logSource))
+            {
+                sample.attribution = attribution;
+            }
+
+            sampleLines.push_back(std::move(sample));
         }
 
-        const FormatDetectionResult detection = FormatDetector::detect(sampleLines);
+        std::vector<std::string> sampleTexts;
+        sampleTexts.reserve(sampleLines.size());
+
+        for (const SampleLine& sample : sampleLines)
+        {
+            sampleTexts.push_back(sample.text);
+        }
+
+        const FormatDetectionResult detection = FormatDetector::detect(sampleTexts);
         const auto formatResult = pluginParser != nullptr
                                       ? foundation::Result<LogFormat>(LogFormat::PlainText)
                                       : resolveFormat(detection, config.formatHint);
@@ -518,20 +622,28 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
         JsonLinesSummary* jsonSummaryPointer = jsonLinesSummary.has_value() ? &*jsonLinesSummary : nullptr;
 
-        for (std::string& sampleLine : sampleLines)
+        for (SampleLine& sampleLine : sampleLines)
         {
             ++totalLines;
 
             if (accumulateReadBytes)
             {
-                byteCount += sampleLine.size() + 1U;
+                byteCount += sampleLine.text.size() + 1U;
             }
 
-            trackSanitizedLine(sampleLine, sanitizedLineCount);
+            trackSanitizedLine(sampleLine.text, sanitizedLineCount);
+
+            const source::LineAttribution* attribution =
+                sampleLine.attribution.has_value() ? &*sampleLine.attribution : nullptr;
+
+            if (attribution != nullptr)
+            {
+                updateAnalysisAccounting(dataset, *attribution);
+            }
 
             const auto analyzeResult =
-                analyzeLine(sampleLine, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
-                            indexWriter, config.jsonFieldMapping, pluginParser);
+                analyzeLine(sampleLine.text, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary,
+                            indexWriter, config.jsonFieldMapping, pluginParser, attribution);
 
             if (!analyzeResult)
             {
@@ -564,9 +676,18 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
                 byteCount += line.size() + 1U;
             }
 
+            const std::optional<source::LineAttribution> lineAttribution = currentLineAttribution(logSource);
+            const source::LineAttribution* attribution =
+                lineAttribution.has_value() ? &*lineAttribution : nullptr;
+
+            if (attribution != nullptr)
+            {
+                updateAnalysisAccounting(dataset, *attribution);
+            }
+
             const auto analyzeResult =
                 analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                            config.jsonFieldMapping, pluginParser);
+                            config.jsonFieldMapping, pluginParser, attribution);
 
             if (!analyzeResult)
             {
@@ -593,14 +714,14 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
         recordStats(totalLines, byteCount, false);
 
-        return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
-                                                               totalLines,
-                                                               levelCounts,
-                                                               resolvedFormat,
-                                                               std::move(jsonLinesSummary),
-                                                               std::make_optional(std::move(fieldSummary)),
-                                                               std::make_optional(indexWriter.finishLineIndex()),
-                                                               indexWriter.indexStore()));
+        return foundation::Result<AnalysisModel>(buildAnalysisModel(dataset,
+                                                                   totalLines,
+                                                                   levelCounts,
+                                                                   resolvedFormat,
+                                                                   std::move(jsonLinesSummary),
+                                                                   std::make_optional(std::move(fieldSummary)),
+                                                                   indexWriter.finishLineIndex(),
+                                                                   indexWriter.indexStore()));
     }
 
     std::uint64_t totalLines = appendReuse->linesToSkip;
@@ -641,9 +762,17 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
             byteCount += line.size() + 1U;
         }
 
+        const std::optional<source::LineAttribution> lineAttribution = currentLineAttribution(logSource);
+        const source::LineAttribution* attribution = lineAttribution.has_value() ? &*lineAttribution : nullptr;
+
+        if (attribution != nullptr)
+        {
+            updateAnalysisAccounting(dataset, *attribution);
+        }
+
         const auto analyzeResult =
             analyzeLine(line, totalLines, resolvedFormat, levelCounts, jsonSummaryPointer, fieldSummary, indexWriter,
-                        config.jsonFieldMapping, pluginParser);
+                        config.jsonFieldMapping, pluginParser, attribution);
 
         if (!analyzeResult)
         {
@@ -670,14 +799,14 @@ foundation::Result<AnalysisModel> analyzeDataset(source::SourceDataset& dataset,
 
     recordStats(totalLines, byteCount, false);
 
-    return foundation::Result<AnalysisModel>(AnalysisModel(dataset.path(),
-                                                           totalLines,
-                                                           levelCounts,
-                                                           resolvedFormat,
-                                                           std::move(jsonLinesSummary),
-                                                           std::make_optional(std::move(fieldSummary)),
-                                                           std::make_optional(indexWriter.finishLineIndex()),
-                                                           indexWriter.indexStore()));
+    return foundation::Result<AnalysisModel>(buildAnalysisModel(dataset,
+                                                                totalLines,
+                                                                levelCounts,
+                                                                resolvedFormat,
+                                                                std::move(jsonLinesSummary),
+                                                                std::make_optional(std::move(fieldSummary)),
+                                                                indexWriter.finishLineIndex(),
+                                                                indexWriter.indexStore()));
 }
 
 } // namespace

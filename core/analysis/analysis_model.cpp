@@ -13,7 +13,9 @@ AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t to
                              std::optional<JsonLinesSummary> jsonLinesSummary,
                              std::optional<FieldSummary> fieldSummary,
                              std::optional<LineIndex> lineIndex,
-                             storage::IndexStorePtr indexStore) noexcept
+                             storage::IndexStorePtr indexStore,
+                             std::optional<source::DiscoveryCensus> discoveryCensus,
+                             std::optional<source::AnalysisAccounting> analysisAccounting) noexcept
     : m_sourcePath(std::move(sourcePath))
     , m_totalLines(totalLines)
     , m_levelCounts(levelCounts)
@@ -22,6 +24,8 @@ AnalysisModel::AnalysisModel(foundation::Path sourcePath, const std::uint64_t to
     , m_fieldSummary(std::move(fieldSummary))
     , m_lineIndex(std::move(lineIndex))
     , m_indexStore(std::move(indexStore))
+    , m_discoveryCensus(std::move(discoveryCensus))
+    , m_analysisAccounting(std::move(analysisAccounting))
 {
 }
 
@@ -68,6 +72,16 @@ storage::IndexStorePtr AnalysisModel::indexStore() const noexcept
 bool AnalysisModel::hasQueryableIndex() const noexcept
 {
     return m_lineIndex.has_value() || m_indexStore != nullptr;
+}
+
+const std::optional<source::DiscoveryCensus>& AnalysisModel::discoveryCensus() const noexcept
+{
+    return m_discoveryCensus;
+}
+
+const std::optional<source::AnalysisAccounting>& AnalysisModel::analysisAccounting() const noexcept
+{
+    return m_analysisAccounting;
 }
 
 } // namespace scope::analysis

@@ -25,6 +25,7 @@ enum class ErrorCode
     FileNotFound,    ///< A requested file could not be found.
     IOError,         ///< An input/output operation failed.
     ParseError,              ///< Data parsing failed.
+    Indeterminate,           ///< Operation could not complete faithfully (exit 2).
     InvalidLinkTarget,       ///< Timeline event anchor missing or invalid for a link.
     DuplicateEvidenceLink,   ///< Duplicate (source, target, type) evidence link.
     StaleSuggestion          ///< Correlation suggestion references events no longer in projection.

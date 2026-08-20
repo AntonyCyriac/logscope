@@ -2,9 +2,9 @@
 
 | Field | Value |
 |-------|-------|
-| Status | **Proposed** (pre-G0) |
+| Status | **Accepted** (G1 — 19-08-2026) |
 | Date | 19-08-2026 |
-| Deciders | Architecture (G1) — not yet reviewed |
+| Deciders | Architecture (G1) — approved Wave 3 steps 1–2 |
 | Related | [ADR-005-M11.1 Index Integrity](ADR-005-M11.1-Index-Integrity-Hardening.md), [ADR-005-M10.1 Query Trust](ADR-005-M10.1-Query-Trust.md), [ADR-012 Agent-Facing Analysis Contract](ADR-012-Agent-Facing-Analysis-Contract.md), [ADR-009-M15.6 Multi-Source Investigation](ADR-009-M15.6-Multi-Source-Investigation.md), [#148](https://github.com/AntonyCyriac/logscope/issues/148) |
 
 ---
@@ -141,6 +141,17 @@ The obligation this ADR does accept: when a requested path **is** an archive, fa
 
 ## Compliance
 
-G3 scenario matrix (to be authored at G1): `V2XX-INGESTION-INTEGRITY-SCENARIOS.md`.
+G3 scenario matrix: [`V213Y-INGESTION-INTEGRITY-SCENARIOS.md`](../planning/V213Y-INGESTION-INTEGRITY-SCENARIOS.md).
+
+**G1 binding invariant (testable):**
+
+```text
+Every analyzed line MUST be attributable to a discovered input.
+Every discovered input MUST have explicit disposition:
+  ANALYZED | SKIPPED | UNSUPPORTED | FAILED.
+Discovered and analyzed MUST remain separate facts.
+```
 
 Scenarios MUST include, at minimum: a nested bundle root ingests files from every depth within the bound (§2); a directory containing a rotation family ingests the full history as one ordered stream (§4); a directory whose candidates are all skipped yields `indeterminate` + exit `2` with a populated census (§3); a match in a multi-file source resolves to file plus that file's own line number (§5); a file with an unrecognised dialect reports `timestampDialect: "unknown"` with a warning rather than zero timestamps (§6); and an archive path fails with an extraction message rather than "no log files found" (§7).
+
+**G1 scope gate:** implementation owns §1–§5 and §6–§7 reporting only. Run comparison, trigger ranking, aggregation, and full [ADR-012](ADR-012-Agent-Facing-Analysis-Contract.md) envelope are **explicitly deferred**.

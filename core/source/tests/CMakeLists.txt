@@ -1,5 +1,7 @@
 add_executable(scope_source_tests
     file_log_source_test.cpp
+    rotation_grouper_test.cpp
+    source_discovery_test.cpp
     source_manager_test.cpp
     stdin_log_source_test.cpp
     tailing_file_log_source_test.cpp

@@ -13,6 +13,7 @@
 #include "chart_model.hpp"
 #include "field_summary.hpp"
 #include "json_lines_summary.hpp"
+#include "discovery_census.hpp"
 #include "log_format.hpp"
 #include "log_line_classifier.hpp"
 #include "report_string_utils.hpp"
@@ -81,6 +82,143 @@ void appendCsvRow(std::vector<CsvRow>& rows,
                   const std::string_view value)
 {
     rows.push_back(CsvRow{std::string(section), std::string(key), std::string(value)});
+}
+
+std::string discoveryCensusJson(const source::DiscoveryCensus& census)
+{
+    std::ostringstream json;
+    json << "{\n"
+         << "      \"candidatesFound\": " << census.candidatesFound << ",\n"
+         << "      \"analyzedCount\": " << census.analyzedCount << ",\n"
+         << "      \"depthLimitHit\": " << (census.depthLimitHit ? "true" : "false") << ",\n"
+         << "      \"fileLimitHit\": " << (census.fileLimitHit ? "true" : "false") << ",\n"
+         << "      \"entries\": [";
+
+    for (std::size_t index = 0U; index < census.entries.size(); ++index)
+    {
+        const source::DiscoveryEntry& entry = census.entries[index];
+
+        if (index > 0U)
+        {
+            json << ',';
+        }
+
+        json << "\n        {\n"
+             << "          \"relativePath\": " << escapeJsonString(entry.relativePath) << ",\n"
+             << "          \"disposition\": "
+             << escapeJsonString(source::candidateDispositionName(entry.disposition)) << ",\n"
+             << "          \"instanceKey\": " << escapeJsonString(entry.instanceKey) << ",\n"
+             << "          \"sizeBytes\": " << entry.sizeBytes;
+
+        if (entry.skipReason.has_value())
+        {
+            json << ",\n          \"skipReason\": "
+                 << escapeJsonString(source::skipReasonName(*entry.skipReason));
+        }
+
+        if (entry.rotationGroupId.has_value())
+        {
+            json << ",\n          \"rotationGroupId\": " << escapeJsonString(*entry.rotationGroupId);
+        }
+
+        json << "\n        }";
+    }
+
+    json << "\n      ],\n      \"rotationGroups\": [";
+
+    for (std::size_t index = 0U; index < census.rotationGroups.size(); ++index)
+    {
+        const source::RotationGroup& group = census.rotationGroups[index];
+
+        if (index > 0U)
+        {
+            json << ',';
+        }
+
+        json << "\n        {\n"
+             << "          \"groupId\": " << escapeJsonString(group.groupId) << ",\n"
+             << "          \"orderedRelativePaths\": [";
+
+        for (std::size_t pathIndex = 0U; pathIndex < group.orderedRelativePaths.size(); ++pathIndex)
+        {
+            if (pathIndex > 0U)
+            {
+                json << ',';
+            }
+
+            json << escapeJsonString(group.orderedRelativePaths[pathIndex]);
+        }
+
+        json << "]\n        }";
+    }
+
+    json << "\n      ],\n      \"instances\": [";
+
+    for (std::size_t index = 0U; index < census.instances.size(); ++index)
+    {
+        const source::InstanceSummary& instance = census.instances[index];
+
+        if (index > 0U)
+        {
+            json << ',';
+        }
+
+        json << "\n        {\n"
+             << "          \"key\": " << escapeJsonString(instance.key) << ",\n"
+             << "          \"filesDiscovered\": " << instance.filesDiscovered << ",\n"
+             << "          \"filesAnalyzed\": " << instance.filesAnalyzed << ",\n"
+             << "          \"linesAnalyzed\": " << instance.linesAnalyzed << "\n        }";
+    }
+
+    json << "\n      ]\n    }";
+
+    return json.str();
+}
+
+std::string analysisAccountingJson(const source::AnalysisAccounting& accounting)
+{
+    std::ostringstream json;
+    json << "{\n"
+         << "      \"streamLineCount\": " << accounting.streamLineCount << ",\n"
+         << "      \"analyzedLineCount\": " << accounting.analyzedLineCount << ",\n"
+         << "      \"complete\": " << (accounting.complete ? "true" : "false") << ",\n"
+         << "      \"perFile\": [";
+
+    for (std::size_t index = 0U; index < accounting.perFile.size(); ++index)
+    {
+        const source::PerFileAnalysis& file = accounting.perFile[index];
+
+        if (index > 0U)
+        {
+            json << ',';
+        }
+
+        json << "\n        {\n"
+             << "          \"relativePath\": " << escapeJsonString(file.relativePath) << ",\n"
+             << "          \"linesIngested\": " << file.linesIngested << ",\n"
+             << "          \"linesAnalyzed\": " << file.linesAnalyzed << ",\n"
+             << "          \"timestampDialect\": " << escapeJsonString(file.timestampDialect) << "\n        }";
+    }
+
+    json << "\n      ],\n      \"warnings\": [";
+
+    for (std::size_t index = 0U; index < accounting.warnings.size(); ++index)
+    {
+        const source::IngestionWarning& warning = accounting.warnings[index];
+
+        if (index > 0U)
+        {
+            json << ',';
+        }
+
+        json << "\n        {\n"
+             << "          \"code\": " << escapeJsonString(warning.code) << ",\n"
+             << "          \"message\": " << escapeJsonString(warning.message) << "\n        }";
+    }
+
+    json << "\n      ]\n    }";
+
+    return json.str();
 }
 
 class ExecutiveSummaryRenderer final : public ReportSectionRenderer
@@ -781,6 +919,16 @@ class SourceMetadataRenderer final : public ReportSectionRenderer
 
                     json << "    }";
                 }
+            }
+
+            if (const std::optional<source::DiscoveryCensus>& discovery = model.discoveryCensus())
+            {
+                json << ",\n    \"discovery\": " << discoveryCensusJson(*discovery);
+            }
+
+            if (const std::optional<source::AnalysisAccounting>& analysis = model.analysisAccounting())
+            {
+                json << ",\n    \"analysis\": " << analysisAccountingJson(*analysis);
             }
 
             fragment.jsonBody = json.str();

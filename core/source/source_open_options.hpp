@@ -5,6 +5,8 @@
 
 #pragma once
 
+#include "discovery_census.hpp"
+
 namespace scope::source
 {
 
@@ -15,6 +17,9 @@ struct OpenOptions
 {
     /// When true, file sources poll for appended data after EOF (live tail).
     bool follow = false;
+
+    /// Discovery traversal options for directory and bundle sources.
+    DiscoveryOptions discovery{};
 };
 
 } // namespace scope::source

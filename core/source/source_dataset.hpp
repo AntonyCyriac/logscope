@@ -6,7 +6,9 @@
 #pragma once
 
 #include <memory>
+#include <optional>
 
+#include "discovery_census.hpp"
 #include "foundation/path.hpp"
 #include "log_source.hpp"
 
@@ -23,34 +25,34 @@ class SourceDataset
 
     explicit SourceDataset(std::unique_ptr<LogSource> source);
 
+    SourceDataset(std::unique_ptr<LogSource> source, DiscoveryCensus census);
+
     SourceDataset(const SourceDataset&) = delete;
     SourceDataset& operator=(const SourceDataset&) = delete;
 
     SourceDataset(SourceDataset&&) noexcept = default;
     SourceDataset& operator=(SourceDataset&&) noexcept = default;
 
-    /**
-     * @brief Determines whether the dataset contains a source.
-     */
     [[nodiscard]] bool isValid() const noexcept;
 
-    /**
-     * @brief Returns the path of the underlying source.
-     */
     [[nodiscard]] const foundation::Path& path() const;
 
-    /**
-     * @brief Returns the underlying log source.
-     */
     [[nodiscard]] LogSource& source();
 
-    /**
-     * @brief Returns the underlying log source.
-     */
     [[nodiscard]] const LogSource& source() const;
+
+    [[nodiscard]] bool hasDiscoveryCensus() const noexcept;
+
+    [[nodiscard]] const DiscoveryCensus& discoveryCensus() const noexcept;
+
+    [[nodiscard]] AnalysisAccounting& analysisAccounting() noexcept;
+
+    [[nodiscard]] const AnalysisAccounting& analysisAccounting() const noexcept;
 
   private:
     std::unique_ptr<LogSource> m_source;
+    std::optional<DiscoveryCensus> m_discoveryCensus;
+    AnalysisAccounting m_analysisAccounting;
 };
 
 } // namespace scope::source

@@ -5,16 +5,14 @@
 
 #include "source_manager.hpp"
 
-#include <vector>
-
-#include "composite_log_source.hpp"
+#include "attributed_ingest_source.hpp"
 #include "file_log_source.hpp"
-#include "tailing_file_log_source.hpp"
 #include "foundation/error.hpp"
 #include "foundation/filesystem.hpp"
-#include "foundation/string.hpp"
 #include "log_macros.hpp"
+#include "source_discovery.hpp"
 #include "stdin_log_source.hpp"
+#include "tailing_file_log_source.hpp"
 
 namespace scope::source
 {
@@ -27,44 +25,46 @@ bool isStdinPath(const foundation::Path& path) noexcept
     return path.string() == "-";
 }
 
-bool isLogFile(const foundation::Path& path)
+[[nodiscard]] bool censusHasAnalyzableContent(const DiscoveryCensus& census) noexcept
 {
-    return foundation::endsWith(foundation::toLower(path.string()), ".log");
+    return census.analyzedCount > 0U;
 }
 
-foundation::Result<std::vector<foundation::Path>> listLogFilesInDirectory(const foundation::Path& directory)
+[[nodiscard]] bool censusIsComplete(const DiscoveryCensus& census) noexcept
 {
-    const auto filesResult = foundation::FileSystem::listRegularFiles(directory);
-
-    if (!filesResult)
+    if (census.depthLimitHit || census.fileLimitHit)
     {
-        return foundation::Result<std::vector<foundation::Path>>(filesResult.error());
+        return false;
     }
 
-    std::vector<foundation::Path> logFiles;
-
-    for (const foundation::Path& file : *filesResult)
+    for (const DiscoveryEntry& entry : census.entries)
     {
-        if (isLogFile(file))
+        if (entry.disposition == CandidateDisposition::Skipped)
         {
-            logFiles.push_back(file);
+            return false;
         }
     }
 
-    return foundation::Result<std::vector<foundation::Path>>(std::move(logFiles));
+    return true;
 }
 
 } // namespace
 
-foundation::Result<bool> SourceManager::validate(const foundation::Path& path) const
+foundation::Result<bool> SourceManager::validate(const foundation::Path& path,
+                                                 const DiscoveryOptions& options) const
 {
     SCOPE_LOG_DEBUG("source", "Validating source: " + path.string());
 
     if (isStdinPath(path))
     {
-        SCOPE_LOG_DEBUG("source", "Source validated: stdin");
-
         return foundation::Result<bool>(true);
+    }
+
+    if (isArchivePath(path))
+    {
+        return foundation::Result<bool>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Archive sources must be extracted before analysis. Extract the archive and pass the directory path."));
     }
 
     const auto existsResult = foundation::FileSystem::exists(path);
@@ -76,60 +76,29 @@ foundation::Result<bool> SourceManager::validate(const foundation::Path& path) c
 
     if (!*existsResult)
     {
-        SCOPE_LOG_ERROR("source", "Source not found: " + path.string());
-
         return foundation::Result<bool>(
             foundation::Error(foundation::ErrorCode::FileNotFound, "Log source not found."));
     }
 
-    const auto isFileResult = foundation::FileSystem::isFile(path);
+    const auto discoverResult = discoverSource(path, options);
 
-    if (!isFileResult)
+    if (!discoverResult)
     {
-        return foundation::Result<bool>(isFileResult.error());
+        return foundation::Result<bool>(discoverResult.error());
     }
 
-    if (*isFileResult)
+    if (discoverResult->census.candidatesFound == 0U)
     {
-        SCOPE_LOG_DEBUG("source", "Source validated: " + path.string());
-
-        return foundation::Result<bool>(true);
+        return foundation::Result<bool>(
+            foundation::Error(foundation::ErrorCode::InvalidArgument, "No files found in directory."));
     }
 
-    const auto isDirectoryResult = foundation::FileSystem::isDirectory(path);
-
-    if (!isDirectoryResult)
+    if (!censusHasAnalyzableContent(discoverResult->census))
     {
-        return foundation::Result<bool>(isDirectoryResult.error());
-    }
-
-    if (!*isDirectoryResult)
-    {
-        SCOPE_LOG_ERROR("source", "Unsupported source type: " + path.string());
-
         return foundation::Result<bool>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument,
-            "Log source must be a file, directory, or stdin ('-')."));
+            foundation::ErrorCode::Indeterminate,
+            "Candidates were found but none could be ingested. See discovery census for skip reasons."));
     }
-
-    const auto logFilesResult = listLogFilesInDirectory(path);
-
-    if (!logFilesResult)
-    {
-        return foundation::Result<bool>(logFilesResult.error());
-    }
-
-    if (logFilesResult->empty())
-    {
-        SCOPE_LOG_ERROR("source", "No log files found in directory: " + path.string());
-
-        return foundation::Result<bool>(foundation::Error(
-            foundation::ErrorCode::InvalidArgument, "No log files found in directory."));
-    }
-
-    SCOPE_LOG_DEBUG("source",
-                    "Source validated directory: " + path.string() + " (" +
-                        std::to_string(logFilesResult->size()) + " log file(s))");
 
     return foundation::Result<bool>(true);
 }
@@ -143,13 +112,6 @@ foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& pa
 {
     SCOPE_LOG_INFO("source", "Opening source: " + path.string());
 
-    const auto validationResult = validate(path);
-
-    if (!validationResult)
-    {
-        return foundation::Result<SourceDataset>(validationResult.error());
-    }
-
     if (isStdinPath(path))
     {
         auto sourceResult = StdinLogSource::open();
@@ -162,6 +124,20 @@ foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& pa
         return foundation::Result<SourceDataset>(SourceDataset(std::move(*sourceResult)));
     }
 
+    if (isArchivePath(path))
+    {
+        return foundation::Result<SourceDataset>(foundation::Error(
+            foundation::ErrorCode::InvalidArgument,
+            "Archive sources must be extracted before analysis. Extract the archive and pass the directory path."));
+    }
+
+    const auto validationResult = validate(path, options.discovery);
+
+    if (!validationResult)
+    {
+        return foundation::Result<SourceDataset>(validationResult.error());
+    }
+
     const auto isFileResult = foundation::FileSystem::isFile(path);
 
     if (!isFileResult)
@@ -169,21 +145,9 @@ foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& pa
         return foundation::Result<SourceDataset>(isFileResult.error());
     }
 
-    if (*isFileResult)
+    if (*isFileResult && options.follow)
     {
-        if (options.follow)
-        {
-            auto sourceResult = TailingFileLogSource::open(path, true);
-
-            if (!sourceResult)
-            {
-                return foundation::Result<SourceDataset>(sourceResult.error());
-            }
-
-            return foundation::Result<SourceDataset>(SourceDataset(std::move(*sourceResult)));
-        }
-
-        auto sourceResult = FileLogSource::open(path);
+        auto sourceResult = TailingFileLogSource::open(path, true);
 
         if (!sourceResult)
         {
@@ -193,35 +157,32 @@ foundation::Result<SourceDataset> SourceManager::open(const foundation::Path& pa
         return foundation::Result<SourceDataset>(SourceDataset(std::move(*sourceResult)));
     }
 
-    const auto logFilesResult = listLogFilesInDirectory(path);
+    const auto discoverResult = discoverSource(path, options.discovery);
 
-    if (!logFilesResult)
+    if (!discoverResult)
     {
-        return foundation::Result<SourceDataset>(logFilesResult.error());
+        return foundation::Result<SourceDataset>(discoverResult.error());
     }
 
-    std::vector<std::unique_ptr<LogSource>> sources;
-
-    for (const foundation::Path& logFile : *logFilesResult)
+    if (!censusHasAnalyzableContent(discoverResult->census))
     {
-        auto sourceResult = FileLogSource::open(logFile);
-
-        if (!sourceResult)
-        {
-            return foundation::Result<SourceDataset>(sourceResult.error());
-        }
-
-        sources.push_back(std::move(*sourceResult));
+        return foundation::Result<SourceDataset>(foundation::Error(
+            foundation::ErrorCode::Indeterminate,
+            "Candidates were found but none could be ingested. See discovery census for skip reasons."));
     }
 
-    auto compositeResult = CompositeLogSource::create(path, std::move(sources));
+    auto attributedResult =
+        AttributedIngestSource::create(path, std::move(discoverResult->ingestStreams));
 
-    if (!compositeResult)
+    if (!attributedResult)
     {
-        return foundation::Result<SourceDataset>(compositeResult.error());
+        return foundation::Result<SourceDataset>(attributedResult.error());
     }
 
-    return foundation::Result<SourceDataset>(SourceDataset(std::move(*compositeResult)));
+    SourceDataset dataset(std::move(*attributedResult), std::move(discoverResult->census));
+    dataset.analysisAccounting().complete = censusIsComplete(dataset.discoveryCensus());
+
+    return foundation::Result<SourceDataset>(std::move(dataset));
 }
 
 } // namespace scope::source
