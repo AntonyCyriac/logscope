@@ -91,12 +91,12 @@ G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.2
 
 | Track | Subsystem | Summary | Gate |
 |-------|-----------|---------|------|
-| ADR-014 | compare | Run alignment, signature diff, non-event absence | G1 ✅ → G3 RC.1–RC.8 |
+| ADR-014 | compare | Run alignment, signature diff, non-event absence | G3 ✅ |
 
-Matrix: [`V213Z-RUN-COMPARISON-SCENARIOS.md`](V213Z-RUN-COMPARISON-SCENARIOS.md) · G2 branch `feat/v2.13.x-run-comparison`.
+Matrix: [`V213Z-RUN-COMPARISON-SCENARIOS.md`](V213Z-RUN-COMPARISON-SCENARIOS.md) · PR [#216](https://github.com/AntonyCyriac/logscope/pull/216) (`b177073`).
 
 ```text
-G0 ✅ → G1 ✅ → G2 ⏳ → G3 → G4 → G5 v2.13.x
+G0 ✅ → G1 ✅ → G2 ✅ → G3 ✅ → G4 ✅ → G5 v2.13.3
 ```
 
 **Deferred** (same milestone): #185–#187, #190–#196, #199–#201, #194 — see priority table below.

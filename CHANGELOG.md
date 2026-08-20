@@ -12,6 +12,26 @@ Pre-M3 history (M0–M2) is preserved in Git history, project documentation, and
 
 ---
 
+## [2.13.3] - 2026-08-20
+
+**Patch** — v2.13.x Run Comparison hardening (Wave 4, failure-shape step 3).
+
+### Added
+
+- **`logscope compare`** — baseline vs candidate run contrast on normalized error signatures
+- **Alignment** — `instanceKey` + `sourceFileRelative` (ADR-013 identity); single-file implicit pairing
+- **Diff surfaces** — `onlyInBaseline`, `onlyInCandidate`, `countDeltas`; JSON `data.comparison` envelope
+- **Incomparable handling** — `comparable: false` with reason codes; exit **2** (fail-closed)
+
+### Notes
+
+- No investigation-domain, REST, or desktop/web UX changes
+- Builds on ingestion integrity (`v2.13.2` / ADR-013); no new index schema version
+
+See [v2.13.3 release notes](docs/release/v2.13.3-RELEASE-NOTES.md) · ADR-014.
+
+---
+
 ## [2.13.2] - 2026-08-20
 
 **Patch** — v2.13.x Ingestion Integrity hardening (Wave 3, steps 1–2).
