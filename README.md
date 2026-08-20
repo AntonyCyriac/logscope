@@ -29,7 +29,7 @@
 
 ![LogScope Web](docs/assets/logscope-web.png)
 
-**Current release:** [`v2.13.2`](CHANGELOG.md) — Ingestion Integrity hardening (Wave 3). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.13.2-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
+**Current release:** [`v2.13.3`](CHANGELOG.md) — Run Comparison hardening (Wave 4). Stories 1–6 + P1 + P1.1 + P2 + P2.1 shipped. [Release notes](docs/release/v2.13.3-RELEASE-NOTES.md) · [Roadmap](docs/ROADMAP.md) · [Changelog](CHANGELOG.md) · [Downloads](https://github.com/AntonyCyriac/logscope/releases/latest)
 
 ---
 
@@ -59,14 +59,14 @@ Investigation → Artifacts → Timeline (logs + crash.summary) → Crash → Su
 |------|----------------|
 | **Search** | Boolean, regex, full-text (FTS5), field filter DSL, saved searches |
 | **Reporting** | Text, JSON, HTML, PDF — charts, executive summaries, section picker |
-| **Analytics** | Frequency, clustering, timelines, trends, correlations |
+| **Analytics** | Frequency, clustering, timelines, trends, correlations, **run comparison** (`logscope compare`, `v2.13.3`) |
 | **Storage** | SQLite hybrid index, compression, incremental append, query cache |
 | **Desktop** | Live tail, session save/load, export dialogs, AI panel, investigation mode, Timeline · Crash · Results · AI · Analytics, Related Evidence + Suggestions (`v2.12.0`) |
 | **Web** | REST API, IDE SPA, investigations, timeline with crash summaries, crash analysis, suggested connections, evidence links, shared workspaces, async analyze, tail poll, API key auth |
 | **Investigations** | Portable incident containers, multi-artifact, timeline, crash analysis, correlation suggestions, evidence links (`v2.3.0`–`v2.9.0`) |
 | **Plugins** | Runtime `.so`/`.dll` loading — parser, report, search, storage providers |
 
-Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`; **P2.1 Evidence/Suggestions** in `v2.12.0`; **v2.13.x** integrity hardening (Waves 1–3) shipped through `v2.13.2`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
+Phase A investigation stories are **complete** through Story 6; **P1 Crash Timeline** shipped in `v2.9.0`; **P2 desktop parity** in `v2.11.0`; **P2.1 Evidence/Suggestions** in `v2.12.0`; **v2.13.x** integrity hardening (Waves 1–4) shipped through `v2.13.3`. Next: [backlog](docs/planning/NEXT-VALUE-ADD.md). [Domain glossary](docs/handbook/GLOSSARY.md).
 
 ## Install
 
@@ -107,6 +107,7 @@ Optional targets: `logscope-desktop` (Qt), `logscope-web` (`-DLOGSCOPE_WEB=ON`).
 ```bash
 ./build/apps/cli/logscope analyze samples/sample.log
 ./build/apps/cli/logscope investigate samples/sample.log --level error
+./build/apps/cli/logscope compare samples/good.log samples/bad.log --format json
 ./build/apps/cli/logscope search samples/sample.log "timeout"
 # Investigations (v2.3.0+): timeline, crash, suggestions, evidence links
 ./build/apps/cli/logscope investigation timeline <id>

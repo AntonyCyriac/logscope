@@ -1928,6 +1928,116 @@ std::optional<InvestigationSuggestionsOptions> parseInvestigationSuggestionsArgu
     return options;
 }
 
+std::optional<CompareOptions> parseCompareArguments(int argc, char* argv[], const int startIndex)
+{
+    CompareOptions options;
+
+    for (int index = startIndex; index < argc; ++index)
+    {
+        const std::string argument = argv[index];
+
+        if (argument == "--help" || argument == "-h")
+        {
+            options.showHelp = true;
+
+            return options;
+        }
+
+        if (argument == "--config")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            options.configFile = foundation::Path(argv[++index]);
+
+            continue;
+        }
+
+        if (argument == "--format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto format = parseOutputFormat(argv[++index]);
+
+            if (!format)
+            {
+                return std::nullopt;
+            }
+
+            options.format = *format;
+
+            continue;
+        }
+
+        if (argument == "--log-format")
+        {
+            if (index + 1 >= argc)
+            {
+                return std::nullopt;
+            }
+
+            const auto logFormat = analysis::parseLogFormat(argv[++index]);
+
+            if (!logFormat || *logFormat == analysis::LogFormat::Unknown)
+            {
+                return std::nullopt;
+            }
+
+            options.logFormat = *logFormat;
+
+            continue;
+        }
+
+        if (parseProfileOption(argument, index, argc, argv, options.profile))
+        {
+            continue;
+        }
+
+        if (argument == "--no-recursive")
+        {
+            options.noRecursive = true;
+
+            continue;
+        }
+
+        if (isOption(argument))
+        {
+            return std::nullopt;
+        }
+
+        if (options.baselinePath.string().empty())
+        {
+            options.baselinePath = foundation::Path(argument);
+            continue;
+        }
+
+        if (options.candidatePath.string().empty())
+        {
+            options.candidatePath = foundation::Path(argument);
+            continue;
+        }
+
+        return std::nullopt;
+    }
+
+    if (options.showHelp)
+    {
+        return options;
+    }
+
+    if (options.baselinePath.string().empty() || options.candidatePath.string().empty())
+    {
+        return std::nullopt;
+    }
+
+    return options;
+}
+
 } // namespace
 
 std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
@@ -1949,6 +2059,14 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
 
     if (firstArgument == "help")
     {
+        if (argc >= 3 && std::string_view(argv[2]) == "compare")
+        {
+            parsed.command = CliCommand::Compare;
+            parsed.compare.showHelp = true;
+
+            return parsed;
+        }
+
         if (argc >= 3 && std::string_view(argv[2]) == "analyze")
         {
             parsed.command = CliCommand::Analyze;
@@ -2109,6 +2227,21 @@ std::optional<ParsedCli> parseCliArguments(int argc, char* argv[])
         }
 
         parsed.showGlobalHelp = true;
+
+        return parsed;
+    }
+
+    if (firstArgument == "compare")
+    {
+        const auto options = parseCompareArguments(argc, argv, 2);
+
+        if (!options)
+        {
+            return std::nullopt;
+        }
+
+        parsed.command = CliCommand::Compare;
+        parsed.compare = *options;
 
         return parsed;
     }

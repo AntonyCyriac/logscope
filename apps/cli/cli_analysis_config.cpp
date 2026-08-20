@@ -86,4 +86,11 @@ scope::analysis::AnalysisConfig buildAnalysisConfig(const AnalyticsOptions& opti
         configurationManager.configuration(), cliOverridesFromProfileAndFormat(options.profile, options.logFormat));
 }
 
+scope::analysis::AnalysisConfig buildAnalysisConfig(const CompareOptions& options,
+                                                    const configuration::ConfigurationManager& configurationManager)
+{
+    return scope::analysis::resolveAnalysisConfig(
+        configurationManager.configuration(), cliOverridesFromProfileAndFormat(options.profile, options.logFormat));
+}
+
 } // namespace scope::cli

@@ -14,6 +14,7 @@
 #include "agent_command.hpp"
 #include "analyze_command.hpp"
 #include "analytics_command.hpp"
+#include "compare_command.hpp"
 #include "config_validate_command.hpp"
 #include "extensions_command.hpp"
 #include "investigate_command.hpp"
@@ -29,7 +30,7 @@ namespace
 {
 
 constexpr std::string_view knownCommands[] = {
-    "analyze",      "investigate", "search",    "query",       "analytics", "config",
+    "analyze",      "compare",     "investigate", "search",    "query",       "analytics", "config",
     "extensions",   "session",     "investigation", "agent",     "help",
 };
 
@@ -93,6 +94,7 @@ void CliApplication::printUsage(std::ostream& output)
            << "\n"
            << "Commands:\n"
            << "  analyze            Analyze a log file, directory, or stdin\n"
+           << "  compare            Compare baseline and candidate log sources\n"
            << "  investigate        Search and filter indexed log content\n"
            << "  search             Alias for investigate focused on search queries\n"
            << "  query              Run field-aware filter DSL queries\n"
@@ -148,6 +150,8 @@ int CliApplication::run(const ParsedCli& parsed,
     {
     case CliCommand::Analyze:
         return runAnalyzeCommand(parsed.analyze, configurationManager, output, errorOutput);
+    case CliCommand::Compare:
+        return runCompareCommand(parsed.compare, configurationManager, output, errorOutput);
     case CliCommand::Investigate:
         return runInvestigateCommand(parsed.investigate, configurationManager, output, errorOutput);
     case CliCommand::Search:

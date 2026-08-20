@@ -31,7 +31,7 @@ The project follows architecture-first development. Every implementation should 
 
 # Current Project Status
 
-**Current release:** `v2.13.2` (shipped). **Next:** **#144-B** `register_crash_analyzer` when justified · **P3** reactive charter · post–v2.13.0 evidence review G0. H0 Wave 1–3 complete.
+**Current release:** `v2.13.3` (shipped). **Next:** **#144-B** `register_crash_analyzer` when justified · **P3** reactive charter · failure-shape steps 4–7 G0. H0 Wave 1–4 complete.
 
 **North star (public):** LogScope is an **Evidence-Centric Investigation Platform** — organize, connect, and understand evidence from production incidents.
 
@@ -47,7 +47,7 @@ The project follows architecture-first development. Every implementation should 
 | P1.1 | Alternate pstack dialects | **Shipped** — `v2.10.0` ([#144](https://github.com/AntonyCyriac/logscope/issues/144)) |
 | P2 | Desktop Timeline/Crash parity | **Shipped** — `v2.11.0` |
 | P2.1 | Desktop Evidence & Suggestions chrome | **Shipped** — `v2.12.0` (+ refresh fix `v2.12.1`) |
-| H0 | Quality & Integrity hardening | **Shipped** — `v2.13.0` Wave 1 ([#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203)) · `v2.13.1` Wave 2 ([#198](https://github.com/AntonyCyriac/logscope/issues/198) [#197](https://github.com/AntonyCyriac/logscope/issues/197)) · `v2.13.2` Wave 3 (Ingestion Integrity — ADR-013) |
+| H0 | Quality & Integrity hardening | **Shipped** — `v2.13.0` Wave 1 ([#188](https://github.com/AntonyCyriac/logscope/issues/188) [#189](https://github.com/AntonyCyriac/logscope/issues/189) [#195](https://github.com/AntonyCyriac/logscope/issues/195) [#203](https://github.com/AntonyCyriac/logscope/issues/203)) · `v2.13.1` Wave 2 ([#198](https://github.com/AntonyCyriac/logscope/issues/198) [#197](https://github.com/AntonyCyriac/logscope/issues/197)) · `v2.13.2` Wave 3 (Ingestion Integrity — ADR-013) · `v2.13.3` Wave 4 (Run Comparison — ADR-014) |
 | #144-B | `register_crash_analyzer` | **Next** — when a real second analyzer justifies it |
 | P3 | Domain architecture charter | **Reactive** — not scheduled |
 | P4–P5 | IQL · AI Investigation Assistant | Research only |

@@ -4,10 +4,10 @@
 |-------|-------|
 | Document | CLI Reference |
 | Category | Handbook |
-| Version | 1.11.0 |
+| Version | 1.12.0 |
 | Status | Approved |
 | Created | 18-07-2026 |
-| Last Updated | 25-07-2026 |
+| Last Updated | 20-08-2026 |
 
 ---
 
@@ -64,6 +64,34 @@ logscope analyze --format html --output report.html samples/sample.log
 logscope analyze --sections executive,errors,charts samples/sample.log
 logscope analyze --persist-index samples/large-app.log
 ```
+
+---
+
+## compare
+
+Compare two log sources (baseline vs candidate) and report signature differences.
+
+```text
+logscope compare [options] <baseline> <candidate>
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format text\|json` | Output format (default: text) |
+| `--no-recursive` | Do not recurse when opening directory sources |
+
+Both paths use the same discovery + analysis pipeline as `analyze`. Comparison aligns on `instanceKey` and `sourceFileRelative` (ADR-013), then diffs normalized error signatures.
+
+**JSON** (`--format json`): `data.comparison` includes `comparable`, `complete`, `alignment`, `onlyInBaseline`, `onlyInCandidate`, `countDeltas`, and `warnings`.
+
+**Exit codes:** `0` comparable result; `1` invalid arguments / unsupported path; `2` incomparable or indeterminate (e.g. `NO_INSTANCE_OVERLAP`, `BASELINE_INDETERMINATE`).
+
+```bash
+logscope compare fixtures/rc1/good.log fixtures/rc1/bad.log
+logscope compare --format json baseline/ candidate/
+```
+
+See [ADR-014](../architecture/decisions/ADR-014-Evidence-Run-Comparison.md) and [V213Z-RUN-COMPARISON-SCENARIOS.md](../planning/V213Z-RUN-COMPARISON-SCENARIOS.md).
 
 ---
 
@@ -326,7 +354,8 @@ See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151) fo
 | Code | Meaning |
 |------|---------|
 | 0 | Success |
-| Non-zero | Error (invalid arguments, I/O failure, analysis failure) |
+| 1 | Error (invalid arguments, I/O failure, unsupported path) |
+| 2 | Indeterminate or incomparable (`analyze` all-skipped; `compare` cannot align runs) |
 
 ---
 
@@ -345,3 +374,4 @@ See [Configuration Guide §9](CONFIGURATION_GUIDE.md#9-ai-configuration-v151) fo
 | 1.9.0 | 24-07-2026 | v1.4.3 JSON field filter and FTS pushdown. |
 | 1.10.0 | 25-07-2026 | v1.4.3 release doc sync. |
 | 1.11.0 | 25-07-2026 | v1.5.1 `agent investigate` command and AI flags. |
+| 1.12.0 | 20-08-2026 | v2.13.3 `compare` command, exit code 2 for incomparable runs. |
